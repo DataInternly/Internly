@@ -1,0 +1,36 @@
+/* css/style.css */
+body {
+  font-family: 'Outfit', sans-serif;
+  background: #f4f3ef;
+  margin: 0;
+}
+
+.rp-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #0d1520;
+}
+
+.role-card {
+  background: white;
+  border: 1.5px solid #e5e3db;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.role-card.active {
+  border-color: #e05c1a;
+}
+
+.btn-enter {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 14px;
+  background: #0d1520;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}

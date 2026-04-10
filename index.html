@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Beta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Role Picker -->
+  <div id="role-screen">
+    <div style="text-align:center; margin-bottom:2rem">
+      <div class="rp-logo">Internly</div>
+      <div class="rp-sub">Beta demo</div>
+    </div>
+   
+    <div class="rp-title">Wie ben jij?</div>
+   
+    <div class="role-cards">
+      <div class="role-card" onclick="selectRole('student')" id="rc-student">
+        <div class="rc-icon">👤</div>
+        <div>
+          <div class="rc-name">Student</div>
+          <div class="rc-desc">Zoek een stage op basis van ambitie & leerdoelen</div>
+        </div>
+      </div>
+      
+      <div class="role-card" onclick="selectRole('bedrijf')" id="rc-bedrijf">
+        <div class="rc-icon">🏢</div>
+        <div>
+          <div class="rc-name">Bedrijf</div>
+          <div class="rc-desc">Vind gemotiveerde stagiairs en bouw reputatie</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-enter" onclick="enterApp()" id="enter-btn" disabled>
+      Ga verder →
+    </button>
+  </div>
+
+  <script>
+    let selectedRole = null;
+
+    function selectRole(r) {
+      selectedRole = r;
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('rc-' + r).classList.add('active');
+      document.getElementById('enter-btn').disabled = false;
+    }
+
+    function enterApp() {
+      if (!selectedRole) return;
+      window.location.href = 'discover.html';
+    }
+  </script>
+</body>
+</html>
