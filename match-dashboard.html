@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="/manifest.json">
   <title>Stage Hub — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     /* ── Design tokens ───────────────────────────────────────────── */
     :root {
@@ -1336,6 +1338,49 @@
       padding: 0;
     }
     .archief-toggle:hover { color: var(--ink); }
+
+    @media print {
+      #hub-topbar, #sidebar, #sidebar-overlay,
+      #modal-overlay, #modal-root, #avail-modal-root,
+      #toast, #role-picker, .role-switch-btn { display: none !important; }
+      #main-content { margin-left: 0 !important; max-width: 100% !important; padding: 16px !important; }
+      .hub-layout { padding-top: 0 !important; }
+      #app-shell { display: block !important; }
+    }
+
+    /* ── Animaties & micro-interacties ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    @keyframes pageIn   { from{opacity:0;transform:translateY(8px);}  to{opacity:1;transform:translateY(0);} }
+    @keyframes modalIn  { from{opacity:0;transform:scale(.96) translateY(8px);} to{opacity:1;transform:scale(1) translateY(0);} }
+    @keyframes modalOut { from{opacity:1;transform:scale(1) translateY(0);} to{opacity:0;transform:scale(.96) translateY(8px);} }
+    @keyframes sidebarIn{ from{opacity:0;transform:translateX(-8px);} to{opacity:1;transform:translateX(0);} }
+    @keyframes barGrow  { from{width:0;} to{width:100%;} }
+    @keyframes shakeIn  { 0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-3px);}80%{transform:translateX(3px);} }
+
+    body { animation: pageIn 0.32s ease both; }
+
+    /* Modal entrance */
+    #modal-overlay.open .modal,
+    #modal-overlay.open .modal-box { animation: modalIn 0.22s ease both; }
+
+    /* Card hover lift */
+    .card  { transition: transform .18s ease, box-shadow .18s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+
+    /* Progress bar */
+    .progress-fill, .prog-fill { animation: barGrow 0.6s ease both; }
+
+    /* Input focus glow */
+    input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
+
+    /* Shake on validation error */
+    .shake { animation: shakeIn 0.3s ease; }
   </style>
 </head>
 <body>
@@ -1716,8 +1761,10 @@ function updateSidebarUser() {
 }
 
 function updateTakenBadge() {
-  const open = hubState.tasks.filter(t => t.status !== 'done').length;
+  const role = hubState.role;
+  const open = hubState.tasks.filter(t => t.status !== 'done' && (!role || t.assignee === role)).length;
   const badge = document.getElementById('sidebar-badge-taken');
+  if (!badge) return;
   if (open > 0) {
     badge.textContent = open;
     badge.style.display = '';
@@ -2227,12 +2274,25 @@ function openModal(html) {
 }
 
 function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
+  const overlay = document.getElementById('modal-overlay');
+  const box = overlay.querySelector('.modal, .modal-box');
+  if (box) {
+    box.style.animation = 'modalOut .18s ease forwards';
+    setTimeout(() => {
+      overlay.classList.remove('open');
+      box.style.animation = '';
+    }, 175);
+  } else {
+    overlay.classList.remove('open');
+  }
 }
 
 function closeModalOnOverlay(e) {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
 
 /* Taak modal */
 function openTaakModal(id) {
@@ -2291,7 +2351,7 @@ function saveTaak(id) {
     addLog(`Taak "${title}" bewerkt.`, 'blue');
     toast('Taak bijgewerkt!');
   } else {
-    hubState.tasks.push({ id: hubState.nextId++, title, desc, deadline, assignee, status });
+    hubState.tasks.push({ id: hubState.nextId++, title, desc, deadline, assignee, status, maker: hubState.role });
     addLog(`Taak "${title}" toegevoegd door ${roleName()}.`, 'green');
     toast('Taak toegevoegd!');
   }
@@ -3157,6 +3217,129 @@ function saveAvailability() {
   toast('Beschikbaarheid bijgewerkt');
   closeAvailModal();
   switchTab('afspraken');
+}
+
+/* ── CSV Export ───────────────────────────────────────────────────── */
+function exportCSV() {
+  const csv = rows => rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const statusNl = s => ({ done: 'Afgerond', 'in-progress': 'Bezig', todo: 'Open' }[s] || s);
+  const rows = [
+    ['Type', 'Omschrijving', 'Datum / Details', 'Status', 'Partij'],
+    ['', '=== STAGEGEGEVENS ===', '', '', ''],
+    ['Stage',   match.company.vacature,  `${match.company.start} – ${match.company.eind}`, 'Lopend', 'Alle partijen'],
+    ['Student', match.student.name,       match.student.opleiding, '', 'Student'],
+    ['Bedrijf', match.company.name,        match.company.sector,   '', 'Bedrijf'],
+    ['School',  match.school.name,         match.school.opleiding, '', 'School'],
+    ['', '=== LEERDOELEN ===', '', '', ''],
+    ...hubState.leerdoelen.map(l => [
+      'Leerdoel', l.title,
+      l.progress + '%' + (l.notes ? ' — ' + l.notes : ''),
+      l.progress >= 60 ? 'Op schema' : l.progress >= 35 ? 'In ontwikkeling' : 'Aandacht nodig',
+      match.student.name
+    ]),
+    ['', '=== PLANNING ===', '', '', ''],
+    ...hubState.deadlines.map(d => ['Deadline', d.title, d.date, '', 'Alle partijen']),
+    ['', '=== TAKEN ===', '', '', ''],
+    ...hubState.tasks.map(t => ['Taak', t.title, t.deadline || '', statusNl(t.status), t.assignee]),
+    ['', '=== AFSPRAKEN ===', '', '', ''],
+    ...hubState.meetings.map(m => {
+      const pd = m.selectedDate && m.selectedDate !== 'counter'
+        ? m.proposedDates.find(d => d.id === m.selectedDate) : null;
+      const dt = pd ? `${pd.date} ${pd.from}–${pd.to}`
+        : m.counterProposal ? `${m.counterProposal.date} ${m.counterProposal.from}–${m.counterProposal.to}`
+        : '—';
+      return ['Afspraak', m.subject, dt, m.status, `${m.from} → ${m.toAll ? 'alle' : m.to}`];
+    }),
+  ];
+  const blob = new Blob(['\uFEFF' + csv(rows)], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `stageplan-${match.student.name.replace(/ /g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  toast('CSV gedownload');
+}
+
+/* ── PDF Export ───────────────────────────────────────────────────── */
+function exportPDF() {
+  if (typeof window.jspdf === 'undefined') {
+    toast('PDF-bibliotheek niet geladen — gebruik Ctrl+P om af te drukken');
+    window.print();
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const margin = 14;
+  let y = 18;
+
+  const guard   = () => { if (y > 270) { doc.addPage(); y = margin; } };
+  const section = title => {
+    guard();
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+    doc.setFillColor(244, 243, 239);
+    doc.rect(margin, y - 4, 182, 8, 'F');
+    doc.text(title, margin + 2, y); y += 9;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  };
+  const line = (label, val) => {
+    guard();
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
+    doc.text(label + ':', margin, y);
+    doc.setFont('helvetica', 'normal');
+    const wrapped = doc.splitTextToSize(String(val ?? '—'), 140);
+    doc.text(wrapped, 52, y);
+    y += wrapped.length * 5 + 2;
+  };
+
+  // Header
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+  doc.text('Stage Hub — Internly', margin, y); y += 7;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+  doc.setTextColor(100);
+  doc.text(`${match.student.name} × ${match.company.name} — ${match.company.vacature}`, margin, y); y += 5;
+  doc.text(`${match.company.start} – ${match.company.eind} | ${match.company.duur}`, margin, y); y += 10;
+  doc.setTextColor(0);
+
+  section('Stagegegevens');
+  line('Student',   match.student.name);
+  line('Opleiding', match.student.opleiding);
+  line('Bedrijf',   match.company.name);
+  line('Sector',    match.company.sector);
+  line('School',    `${match.school.name} (${match.school.opleiding})`);
+  y += 3;
+
+  section('Leerdoelen & Voortgang');
+  hubState.leerdoelen.forEach(l => {
+    line(l.title, `${l.progress}%${l.notes ? ' — ' + l.notes : ''}`);
+  });
+  y += 3;
+
+  section('Planning & Deadlines');
+  hubState.deadlines.forEach(d => { line(d.title, d.date); });
+  y += 3;
+
+  section('Taken');
+  const statusNl = s => ({ done: 'Afgerond', 'in-progress': 'Bezig', todo: 'Open' }[s] || s);
+  hubState.tasks.forEach(t => {
+    line(t.title, `${t.assignee} · ${statusNl(t.status)}${t.deadline ? ' · ' + t.deadline : ''}`);
+  });
+  y += 3;
+
+  section('Afspraken');
+  hubState.meetings.forEach(m => {
+    const pd = m.selectedDate && m.selectedDate !== 'counter'
+      ? m.proposedDates.find(d => d.id === m.selectedDate) : null;
+    const dt = pd ? `${pd.date} ${pd.from}–${pd.to}`
+      : m.counterProposal ? `${m.counterProposal.date} ${m.counterProposal.from}–${m.counterProposal.to}`
+      : '—';
+    line(m.subject, `${m.status} · ${dt}`);
+  });
+  y += 3;
+
+  section('Activiteitenlog');
+  hubState.log.slice(0, 10).forEach(l => { line(l.time, l.msg); });
+
+  doc.save(`stageplan-${match.student.name.replace(/ /g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
+  toast('PDF gedownload');
 }
 
 /* ── Utility ──────────────────────────────────────────────────────── */

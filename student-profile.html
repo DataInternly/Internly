@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
   <title>Internly — Maak je profiel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -644,14 +645,6 @@
     </div>
   </div>
 
-  <!-- Beschikbaarheid -->
-  <div class="form-section" id="section-availability" style="display:block">
-    <div class="section-label">Jouw planning</div>
-    <div class="section-title">Beschikbaarheid</div>
-    <p class="section-sub">Geef aan wanneer je beschikbaar bent voor gesprekken of afspraken. Bedrijven en scholen kunnen dit zien bij het plannen van een meeting.</p>
-    <div id="ical-container"></div>
-  </div>
-
   <!-- Success -->
   <div class="success-screen" id="successScreen">
     <div class="success-icon">🎉</div>
@@ -670,6 +663,14 @@
   </div>
   </div><!-- /#view-form -->
 </div><!-- /.container -->
+
+<!-- ── BESCHIKBAARHEID — altijd zichtbaar, buiten view-form/view-profiel ── -->
+<div class="container" style="padding-top:0;padding-bottom:2.5rem">
+  <div class="section-label">Jouw planning</div>
+  <div class="section-title">Beschikbaarheid</div>
+  <p class="section-sub">Geef aan wanneer je beschikbaar bent voor gesprekken of afspraken. Bedrijven en scholen zien dit bij het plannen van een meeting.</p>
+  <div id="ical-container"></div>
+</div>
 
 <script>
 const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';

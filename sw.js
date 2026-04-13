@@ -14,8 +14,8 @@ self.addEventListener('push', function(event) {
 
   const options = {
     body:    data.body || 'Je hebt een nieuwe melding',
-    icon:    '/icon-192.png',
-    badge:   '/badge-72.png',
+    icon:    '/icons/icon-192.png',
+    badge:   '/icons/badge-72.png',
     tag:     data.tag || 'internly-notif',
     data:    { url: data.url || '/' },
     actions: [

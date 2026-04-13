@@ -1,0 +1,22 @@
+{
+  "name": "Internly",
+  "short_name": "Internly",
+  "description": "Internly — de stagemarkt voor studenten, scholen en bedrijven",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF7E42",
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

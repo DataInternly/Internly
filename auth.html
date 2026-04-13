@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
+  <meta name="description" content="Log in op Internly of maak een account aan als student, bedrijf of school.">
   <title>Internly — Inloggen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -196,6 +199,27 @@
       animation: spin .6s linear infinite; margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ANIMATIES ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    @keyframes authIn {
+      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+    @keyframes shakeInput {
+      0%, 100% { transform: translateX(0);   }
+      20%      { transform: translateX(-6px);}
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px);}
+      80%      { transform: translateX(4px); }
+    }
+    .auth-card { animation: authIn 0.4s ease both; }
+    .shake     { animation: shakeInput 0.35s ease !important; border-color: var(--red) !important; }
   </style>
 </head>
 <body>
@@ -447,6 +471,16 @@ function showError(msg) {
   el.textContent = msg;
   el.classList.add('show');
   document.getElementById('successBox').classList.remove('show');
+  // Shake the active input (or all visible inputs) for tactile feedback
+  const activeInput = document.activeElement;
+  const target = (activeInput && activeInput.tagName === 'INPUT') ? activeInput
+    : document.querySelector('.card-body input');
+  if (target) {
+    target.classList.remove('shake');
+    void target.offsetWidth; // reflow to restart animation
+    target.classList.add('shake');
+    target.addEventListener('animationend', () => target.classList.remove('shake'), { once: true });
+  }
 }
 
 function showSuccess(msg) {

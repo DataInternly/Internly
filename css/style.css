@@ -725,3 +725,208 @@ body                  { top: 0 !important; position: static !important; }
   .mobile-tabs { padding-bottom: env(safe-area-inset-bottom); height: calc(56px + env(safe-area-inset-bottom)); }
   .main        { padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ANIMATIES & MICRO-INTERACTIES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Reduced motion — must come first ────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+    scroll-behavior:          auto   !important;
+  }
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px);  }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes navItemIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+@keyframes barGrow {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+@keyframes authIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes shakeInput {
+  0%, 100% { transform: translateX(0);   }
+  20%      { transform: translateX(-6px);}
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px);}
+  80%      { transform: translateX(4px); }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+@keyframes sidebarIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Page entrance ────────────────────────────────────────────────────────── */
+body { animation: pageIn 0.35s ease both; }
+
+/* ── Card hover lift ──────────────────────────────────────────────────────── */
+.card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+}
+
+/* ── btn-primary active press ─────────────────────────────────────────────── */
+.btn-primary {
+  transition: background .15s, transform .1s, box-shadow .1s;
+}
+.btn-primary:active {
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/* ── Trust badge hover pop ────────────────────────────────────────────────── */
+.trust {
+  transition: transform .12s ease, box-shadow .12s ease;
+  cursor: default;
+}
+.trust:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+/* ── Progress bar animated fill ──────────────────────────────────────────── */
+.progress-fill {
+  animation: barGrow 0.65s ease both;
+}
+
+/* ── Tab btn active underline indicator ──────────────────────────────────── */
+.tab-btn {
+  position: relative;
+  overflow: hidden;
+  transition: color .15s, background .15s;
+}
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--orange, #FF7E42);
+  border-radius: 2px;
+}
+
+/* ── Topbar nav item entrance stagger ────────────────────────────────────── */
+.topbar .nav a {
+  animation: navItemIn 0.25s ease both;
+}
+.topbar .nav a:nth-child(1) { animation-delay: 0.05s; }
+.topbar .nav a:nth-child(2) { animation-delay: 0.10s; }
+.topbar .nav a:nth-child(3) { animation-delay: 0.15s; }
+.topbar .nav a:nth-child(4) { animation-delay: 0.20s; }
+.topbar .nav a:nth-child(5) { animation-delay: 0.25s; }
+
+/* ── Topbar nav active underline ─────────────────────────────────────────── */
+.topbar .nav a { position: relative; }
+.topbar .nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ── Scroll-triggered fade-up (index.html / about.html) ──────────────────── */
+.anim-card {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.anim-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Hero children stagger (index.html) ──────────────────────────────────── */
+.hero-stagger > * {
+  animation: heroIn 0.5s ease both;
+}
+.hero-stagger > *:nth-child(1) { animation-delay: 0.00s; }
+.hero-stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.hero-stagger > *:nth-child(3) { animation-delay: 0.20s; }
+.hero-stagger > *:nth-child(4) { animation-delay: 0.30s; }
+.hero-stagger > *:nth-child(5) { animation-delay: 0.40s; }
+
+/* ── Auth card entrance ───────────────────────────────────────────────────── */
+.auth-card { animation: authIn 0.4s ease both; }
+
+/* ── Shake on validation error ───────────────────────────────────────────── */
+.shake { animation: shakeInput 0.35s ease; }
+
+/* ── Form input focus glow ────────────────────────────────────────────────── */
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(26,122,72,.15);
+}
+
+/* ── Modal scale-in entrance ─────────────────────────────────────────────── */
+.modal-bg.open .modal,
+.modal-bg.open .modal-box {
+  animation: modalIn 0.22s ease both;
+}
+
+/* ── Sidebar nav item stagger (dashboards) ───────────────────────────────── */
+.nav-item {
+  animation: sidebarIn 0.25s ease both;
+}
+.nav-item:nth-child(1) { animation-delay: 0.03s; }
+.nav-item:nth-child(2) { animation-delay: 0.06s; }
+.nav-item:nth-child(3) { animation-delay: 0.09s; }
+.nav-item:nth-child(4) { animation-delay: 0.12s; }
+.nav-item:nth-child(5) { animation-delay: 0.15s; }
+.nav-item:nth-child(6) { animation-delay: 0.18s; }
+.nav-item:nth-child(7) { animation-delay: 0.21s; }
+
+/* ── Mobile tab active pulse dot ─────────────────────────────────────────── */
+.mt-tab.active .mt-icon {
+  animation: none;
+  transform: scale(1.12);
+  display: inline-block;
+}
+
+/* ── Calendar cell hover (js/calendar.js) ────────────────────────────────── */
+.ical-cell {
+  transition: background .12s ease, transform .12s ease;
+}
+.ical-cell:hover {
+  transform: scale(1.04);
+}
+.ical-cell.selected {
+  animation: cardIn 0.15s ease both;
+}

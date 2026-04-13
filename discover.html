@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FF7E42">
+  <meta name="description" content="Ontdek stageplaatsen bij transparante bedrijven. Filter op sector, locatie en reistijd.">
   <title>Internly — Ontdek Stages</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -284,6 +287,7 @@
     <a href="about.html">Over ons</a>
     <a href="matches.html">Matches</a>
     <a href="mijn-sollicitaties.html">Mijn Stages</a>
+    <a href="stage-hub.html">📊 Stage Hub</a>
     <a href="student-profile.html">Mijn profiel</a>
     <a href="chat.html">💬 Berichten</a>
   </nav>
@@ -331,6 +335,10 @@
   <a href="mijn-sollicitaties.html" class="mt-tab">
     <span class="mt-icon">📋</span>
     <span class="mt-label">Stages</span>
+  </a>
+  <a href="stage-hub.html" class="mt-tab">
+    <span class="mt-icon">📊</span>
+    <span class="mt-label">Hub</span>
   </a>
   <a href="student-profile.html" class="mt-tab">
     <span class="mt-icon">👤</span>
@@ -854,9 +862,9 @@ function handleNotifClick(notifId, refType, refId) {
     loadNotifications();
   });
   // Navigate
-  if (refType === 'match')        window.location.href = 'matches.html';
-  else if (refType === 'conversation') window.location.href = 'chat.html?conversation=' + refId;
-  else                             document.getElementById('notifDropdown').style.display = 'none';
+  if (refType === 'message' && refId)  window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
+  else if (refType === 'match')        window.location.href = 'matches.html';
+  else                                 document.getElementById('notifDropdown').style.display = 'none';
 }
 
 function startNotifSubscription() {

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
   <title>Chat — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -169,6 +170,7 @@
     <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
     <div class="topbar-match-sub" id="topbarMatchSub"></div>
   </div>
+  <a id="stage-hub-topbar-link" href="#" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
   <div class="lang-switcher" style="margin-left:auto;flex-shrink:0">
     <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
     <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
@@ -381,6 +383,13 @@
     document.getElementById('topbarMatchName').textContent = posting.title || 'Chat';
     document.getElementById('topbarMatchSub').textContent  = posting.company_name || '';
 
+    // Stage Hub shortcut
+    const stageHubLink = document.getElementById('stage-hub-topbar-link');
+    if (stageHubLink && mId) {
+      stageHubLink.href = 'stage-hub.html?match=' + encodeURIComponent(mId);
+      stageHubLink.style.display = 'inline-block';
+    }
+
     // Resolve other party
     otherPartyId = match.party_a === currentUser.id ? match.party_b : match.party_a;
     if (otherPartyId) {
@@ -524,8 +533,8 @@
       createNotification(
         otherPartyId,
         'new_message',
-        convId,
-        'conversation',
+        matchId,
+        'message',
         myName + ' heeft je een bericht gestuurd'
       );
     }

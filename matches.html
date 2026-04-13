@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
   <title>Internly — Matches</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -193,6 +195,7 @@
     <a href="discover.html">Ontdek</a>
     <a href="matches.html" class="active">Matches</a>
     <a href="mijn-sollicitaties.html">Mijn Stages</a>
+    <a href="stage-hub.html">📊 Stage Hub</a>
     <a href="chat.html">💬 Berichten</a>
   </nav>
   <div class="lang-switcher">
@@ -232,6 +235,10 @@
   <button class="mt-tab" onclick="window.location.href='mijn-sollicitaties.html'">
     <span class="mt-icon">📋</span>
     <span class="mt-label">Stages</span>
+  </button>
+  <button class="mt-tab" onclick="window.location.href='stage-hub.html'">
+    <span class="mt-icon">📊</span>
+    <span class="mt-label">Hub</span>
   </button>
   <button class="mt-tab" onclick="window.location.href='student-profile.html'">
     <span class="mt-icon">👤</span>
@@ -357,8 +364,8 @@
     document.getElementById('notifDropdown').style.display = 'none';
     if (refType === 'match' && refId) {
       window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
-    } else if (refType === 'conversation' && refId) {
-      // refId is conv id — navigate to match
+    } else if (refType === 'message' && refId) {
+      window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
     }
     loadNotifications();
   }
@@ -467,6 +474,15 @@
       ? '<span class="pool-badge">📋 Uit matchpool</span>'
       : '';
 
+    const stageHubLink = card.type === 'match' && card.matchId
+      ? `<a href="stage-hub.html?match=${encodeURIComponent(card.matchId)}"
+            onclick="event.stopPropagation()"
+            style="display:inline-block;margin-top:10px;font-size:.8rem;font-weight:700;
+                   color:#e05c1a;background:#fdf0e8;padding:5px 12px;border-radius:20px;
+                   text-decoration:none;">
+            📊 Stage Hub →</a>`
+      : '';
+
     el.innerHTML = `
       <div class="card-visual">
         ${card.emoji || '🏢'}
@@ -479,6 +495,7 @@
         </div>
         <div class="card-role">${escapeHtml(card.title)}</div>
         <p class="card-desc">${escapeHtml(card.description || '')}</p>
+        ${stageHubLink}
       </div>
     `;
 
@@ -617,7 +634,7 @@
             const { data: match } = await db.from('matches').insert({
               party_a:      currentUser.id,
               party_b:      posting.created_by,
-              type:         'student_to_company',
+              type:         'student_posting',
               status:       'accepted',
               initiated_by: currentUser.id,
               match_target: 'posting',
@@ -687,7 +704,7 @@
         .from('matches')
         .select('*, internship_postings(title, company_name, trust_score, trust_grade)')
         .or(`party_a.eq.${currentUser.id},party_b.eq.${currentUser.id}`)
-        .in('status', ['pending', 'active']);
+        .eq('status', 'pending');
 
       if (matchRows && matchRows.length > 0) {
         allCards.push(...matchRows.map(m => {

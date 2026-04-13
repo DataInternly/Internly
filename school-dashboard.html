@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
   <title>Internly — Schooldashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -426,6 +428,15 @@
       opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Animaties ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+    }
+    @keyframes modalIn  { from{opacity:0;transform:scale(.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);} }
+    @keyframes modalOut { from{opacity:1;transform:scale(1) translateY(0);}to{opacity:0;transform:scale(.96) translateY(8px);} }
+    .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
+    input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
   </style>
 </head>
 <body>
@@ -902,6 +913,10 @@ function toggleNotifDropdown(e) {
 async function handleNotifClick(id, refType, refId) {
   if (id) await db.from('notifications').update({ read: true }).eq('id', id);
   document.getElementById('notifDropdown').style.display = 'none';
+  if (refType === 'message' && refId) {
+    window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
+    return;
+  }
   if (refType === 'match' && refId) show('bedrijven');
   loadNotifications();
 }
@@ -992,8 +1007,19 @@ function openModal(title, body, onConfirm) {
   document.getElementById('confirmModal').classList.add('show');
 }
 function closeModal() {
-  document.getElementById('confirmModal').classList.remove('show');
-  _modalConfirmFn = null;
+  const overlay = document.getElementById('confirmModal');
+  const box = overlay.querySelector('.modal-box');
+  if (box) {
+    box.style.animation = 'modalOut .18s ease forwards';
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      box.style.animation = '';
+      _modalConfirmFn = null;
+    }, 175);
+  } else {
+    overlay.classList.remove('show');
+    _modalConfirmFn = null;
+  }
 }
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modalConfirmBtn').addEventListener('click', () => {
@@ -1005,6 +1031,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('koppelModal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeKoppelModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const km = document.getElementById('koppelModal');
+    if (km && km.classList.contains('show')) { closeKoppelModal(); return; }
+    closeModal();
   });
   document.getElementById('bedrijven-list').addEventListener('click', e => {
     const btn = e.target.closest('.koppel-btn');

@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF7E42">
+<meta name="description" content="Hoe bedrijven en scholen stages begeleiden via Internly — van onboarding tot eindevaluatie en CSRD-rapportage.">
 <title>Stagebegeleiding — Internly</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -238,6 +241,13 @@ footer p{font-size:.77rem;color:var(--ink3);}
 .hero h1{animation:fadeUp .45s .07s ease both;}
 .hero-sub{animation:fadeUp .45s .14s ease both;}
 .hero-shelf{animation:fadeUp .45s .21s ease both;}
+
+.anim-card{opacity:0;transform:translateY(16px);transition:opacity .45s ease,transform .45s ease;}
+.anim-card.visible{opacity:1;transform:translateY(0);}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+  .anim-card{opacity:1;transform:none;}
+}
 </style>
 </head>
 <body>
@@ -269,13 +279,13 @@ footer p{font-size:.77rem;color:var(--ink3);}
 <!-- ── BEDRIJVEN ── -->
 <div class="panel active" id="panel-bedrijven">
 <div class="container">
-  <div class="sec-head">
+  <div class="sec-head anim-card">
     <div class="sec-eyebrow">Voor bedrijven</div>
     <h2 class="sec-title">Van onboarding tot eindevaluatie</h2>
     <p class="sec-sub">Een goed begeleide stage verbetert je Trust Score, trekt gemotiveerdere kandidaten aan en levert automatisch je ESG-data op.</p>
   </div>
 
-  <div class="two-col">
+  <div class="two-col anim-card">
     <div class="card">
       <div class="clist-head">
         <div class="clist-icon" style="background:var(--green-bg)">📋</div>
@@ -333,7 +343,7 @@ footer p{font-size:.77rem;color:var(--ink3);}
 
   <div class="gap"></div>
 
-  <div class="sec-head">
+  <div class="sec-head anim-card">
     <div class="sec-eyebrow">Platform</div>
     <h2 class="sec-title">Wat Internly voor je regelt</h2>
   </div>
@@ -386,13 +396,13 @@ footer p{font-size:.77rem;color:var(--ink3);}
 <!-- ── SCHOLEN ── -->
 <div class="panel" id="panel-scholen">
 <div class="container">
-  <div class="sec-head">
+  <div class="sec-head anim-card">
     <div class="sec-eyebrow">Voor scholen &amp; begeleiders</div>
     <h2 class="sec-title">Minder administratie, meer regie</h2>
     <p class="sec-sub">Het schooldashboard toont per student de voortgang, signaleert problemen vroeg en genereert rapportages automatisch.</p>
   </div>
 
-  <div class="two-col">
+  <div class="two-col anim-card">
     <div class="card">
       <div class="clist-head">
         <div class="clist-icon" style="background:var(--amber-bg)">📡</div>
@@ -443,7 +453,7 @@ footer p{font-size:.77rem;color:var(--ink3);}
 
   <div class="gap"></div>
 
-  <div class="sec-head">
+  <div class="sec-head anim-card">
     <div class="sec-eyebrow">Stappenplan</div>
     <h2 class="sec-title">Hoe een opleiding meedoet</h2>
   </div>
@@ -498,14 +508,14 @@ footer p{font-size:.77rem;color:var(--ink3);}
 <!-- ── WETGEVING ── -->
 <div class="panel" id="panel-wetgeving">
 <div class="container">
-  <div class="sec-head">
+  <div class="sec-head anim-card">
     <div class="sec-eyebrow">Wetgeving &amp; verplichtingen</div>
     <h2 class="sec-title">Wat wettelijk verplicht is</h2>
     <p class="sec-sub">Een overzicht van de juridische kaders voor bedrijven en scholen — van erkenning tot stagecontract en CSRD.</p>
   </div>
 
   <div class="sec-eyebrow" style="margin-bottom:.6rem">Erkenning leerbedrijf</div>
-  <div class="two-col" style="margin-bottom:1.4rem">
+  <div class="two-col anim-card" style="margin-bottom:1.4rem">
     <div class="card">
       <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.8rem">
         <div style="width:38px;height:38px;border-radius:8px;background:var(--orange-bg);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">🏅</div>
@@ -617,6 +627,20 @@ function toggleCheck(el) {
   const done = el.classList.toggle('done');
   el.textContent = done ? '✓' : '';
 }
+</script>
+<script>
+(function() {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.anim-card').forEach(function(el) { el.classList.add('visible'); });
+    return;
+  }
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.anim-card').forEach(function(el) { obs.observe(el); });
+})();
 </script>
 </body>
 </html>

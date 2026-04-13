@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
   <title>Mijn Sollicitaties - Internly</title>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -87,6 +89,7 @@
       <a href="discover.html">Ontdek</a>
       <a href="matches.html">Matches</a>
       <a href="mijn-sollicitaties.html" class="active">Mijn Stages</a>
+      <a href="stage-hub.html">📊 Stage Hub</a>
       <a href="chat.html">💬 Berichten</a>
     </nav>
     <div class="lang-switcher">
@@ -127,6 +130,10 @@
     <a href="mijn-sollicitaties.html" class="mt-tab active">
       <span class="mt-icon">📋</span>
       <span class="mt-label">Stages</span>
+    </a>
+    <a href="stage-hub.html" class="mt-tab">
+      <span class="mt-icon">📊</span>
+      <span class="mt-label">Hub</span>
     </a>
     <a href="student-profile.html" class="mt-tab">
       <span class="mt-icon">👤</span>
@@ -342,6 +349,12 @@
                       background:#e8f5ee;padding:4px 10px;border-radius:20px;">
                💬 Open chat →</a>`
           : '';
+        const stageHubLink = (app._status === 'uitgenodigd' && matchId)
+          ? `<a href="stage-hub.html?match=${escapeHtml(String(matchId))}"
+               style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;white-space:nowrap;
+                      background:#fdf0e8;padding:4px 10px;border-radius:20px;">
+               📊 Stage Hub →</a>`
+          : '';
 
         // ── Review eligibility ──
         let reviewSection = '';
@@ -403,6 +416,7 @@
               <span style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;align-items:center">
                 ${detailLink}
                 ${chatLink}
+                ${stageHubLink}
               </span>
             </div>
             ${reviewSection}
@@ -546,11 +560,14 @@
     function handleNotifClick(notifId, refType, refId) {
       if (!refType || !refId) return;
       const routes = {
-        'match':        'matches.html',
-        'conversation': 'chat.html?conversation=' + refId,
-        'application':  'mijn-sollicitaties.html',
-        'review':       'mijn-sollicitaties.html',
+        'match':       'matches.html',
+        'application': 'mijn-sollicitaties.html',
+        'review':      'mijn-sollicitaties.html',
       };
+      if (refType === 'message' && refId) {
+        window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
+        return;
+      }
       const route = routes[refType];
       if (route) window.location.href = route;
     }

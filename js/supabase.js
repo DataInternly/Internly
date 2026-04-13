@@ -45,16 +45,10 @@ function urlBase64ToUint8Array(base64String) {
 // Returns: true if permission was granted and subscription was stored,
 //          false/undefined on any failure.
 async function registerPushNotifications(dbClient, userId) {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('[push] Not supported in this browser');
-    return false;
-  }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
   if (!userId) return false;
   // Guard: VAPID key not yet configured — skip silently
-  if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
-    console.log('[push] VAPID_PUBLIC_KEY not configured — push skipped');
-    return false;
-  }
+  if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY.startsWith('REPLACE_')) return false;
 
   try {
     // 1. Register / reuse service worker

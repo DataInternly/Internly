@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FF7E42">
+  <meta name="description" content="Internly verbindt studenten, scholen en bedrijven op een eerlijke en transparante stagemarkt.">
   <title>Internly — Stages fixen door eerlijkheid te bouwen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -230,7 +233,7 @@
   <button class="beta-close" onclick="document.getElementById('betaBanner').style.display='none'" aria-label="Sluiten">×</button>
 </div>
 
-<div class="hero">
+<div class="hero hero-stagger">
   <div class="logo">intern<span>ly</span></div>
 
   <h1 class="tagline">Stages fixen door<br><em>eerlijkheid te bouwen</em></h1>
@@ -284,7 +287,7 @@
 </div>
 
 <!-- ── STAGE SIMULATOR ────────────────────────────────────────────────────── -->
-<section style="background:#0d1520;padding:80px 24px;overflow:hidden;position:relative;">
+<section class="anim-card" style="background:#0d1520;padding:80px 24px;overflow:hidden;position:relative;">
 
   <!-- achtergrond grid-sfeer -->
   <div aria-hidden="true" style="
@@ -378,7 +381,7 @@
 <!-- ── EINDE STAGE SIMULATOR ──────────────────────────────────────────────── -->
 
 <!-- ── BLIJF OP DE HOOGTE ──────────────────────────────────────────────────── -->
-<section style="background:#f4f3ef;padding:80px 24px;">
+<section class="anim-card" style="background:#f4f3ef;padding:80px 24px;">
   <div style="max-width:560px;margin:0 auto;text-align:center;">
     <p style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1a7a48;margin-bottom:14px;">Geen spam, beloofd</p>
     <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.6rem,3vw,2.1rem);font-weight:700;color:#0d1520;line-height:1.2;margin-bottom:14px;">
@@ -660,5 +663,25 @@ window.addEventListener('load', function() {
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+// ── Scroll-triggered animations (IntersectionObserver) ──────────────────────
+(function() {
+  if (!('IntersectionObserver' in window)) {
+    // Fallback: just show everything
+    document.querySelectorAll('.anim-card').forEach(el => el.classList.add('visible'));
+    return;
+  }
+  const obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.anim-card').forEach(el => obs.observe(el));
+})();
+</script>
 </body>
 </html>

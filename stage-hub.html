@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<title>Internly — Stage Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --ink:#0d1520;--ink2:#374151;--ink3:#6b7280;--ink4:#9ca3af;
+  --bg:#f4f3ef;--bg2:#eceae4;--white:#ffffff;
+  --border:rgba(13,21,32,.09);--border2:rgba(13,21,32,.15);
+  --green:#1a7a48;--green-dark:#0f5c36;--green-bg:#e8f5ee;
+  --orange:#FF7E42;--orange-dark:#e05c1a;--orange-bg:#fdf0e8;
+  --blue:#1756a8;--blue-bg:#e8f0fc;
+  --amber:#a06010;--amber-bg:#fdf3e0;
+  --red:#b82020;--red-bg:#fdeaea;
+  --nav-w:220px;--r:12px;--r-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── Loading screen ── */
+#loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.loading-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:600;color:var(--ink);animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── Role picker ── */
+#role-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;}
+.rp-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:600;color:var(--ink);margin-bottom:.2rem;letter-spacing:-.02em;}
+.rp-tagline{font-size:.85rem;color:var(--ink3);margin-bottom:3rem;}
+.rp-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:500;color:var(--ink2);margin-bottom:1.25rem;text-align:center;}
+.role-cards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:380px;}
+.role-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:1.2rem 1.5rem;cursor:pointer;display:flex;align-items:center;gap:1rem;transition:border-color .15s,box-shadow .15s,transform .12s;}
+.role-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-1px);}
+.role-card.active{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-bg);}
+.rc-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;}
+.rc-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:.96rem;margin-bottom:2px;}
+.rc-desc{font-size:.78rem;color:var(--ink3);}
+.btn-enter{margin-top:1.5rem;width:100%;max-width:380px;padding:13px;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:background .15s;letter-spacing:.01em;}
+.btn-enter:hover{background:var(--green-dark);}
+.btn-enter:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── App shell ── */
+#app{display:none;min-height:100vh;}
+.topbar{display:none;position:sticky;top:0;z-index:100;background:var(--ink);height:52px;padding:0 1rem;align-items:center;justify-content:space-between;}
+.topbar-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:600;color:#fff;letter-spacing:-.01em;}
+.topbar-role{font-size:.73rem;color:rgba(255,255,255,.5);background:rgba(255,255,255,.1);padding:3px 10px;border-radius:20px;}
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:6px;background:none;border:none;}
+.hamburger span{display:block;width:20px;height:2px;background:rgba(255,255,255,.65);border-radius:1px;}
+@media(max-width:700px){.topbar{display:flex;}.hamburger{display:flex;}}
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--nav-w);background:var(--ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0;transition:transform .25s ease;}
+.sidebar-head{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.08);}
+.s-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:600;color:#fff;letter-spacing:-.02em;margin-bottom:.15rem;}
+.s-role{font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.07em;text-transform:uppercase;}
+.sidebar-nav{flex:1;padding:1rem .75rem;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.6rem .75rem;border-radius:var(--r-sm);cursor:pointer;color:rgba(255,255,255,.5);font-size:.88rem;transition:background .12s,color .12s;border:none;background:none;text-align:left;width:100%;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);}
+.nav-item.active{background:rgba(255,255,255,.12);color:#fff;font-weight:500;}
+.nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:20px;}
+.sidebar-bottom{padding:.75rem;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:6px;}
+.switch-btn{width:100%;padding:.6rem .75rem;border-radius:var(--r-sm);background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.45);font-size:.78rem;cursor:pointer;transition:all .12s;text-align:left;display:flex;align-items:center;gap:.5rem;}
+.switch-btn:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);}
+@media(max-width:700px){
+  .sidebar{position:fixed;top:0;left:0;height:100%;z-index:200;transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-head{padding-top:4rem;}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:199;}
+  .overlay.show{display:block;}
+}
+.main{flex:1;overflow:auto;padding:2rem;}
+@media(max-width:700px){.main{padding:1.25rem 1rem;}}
+.notif{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:#fff;padding:.85rem 1.25rem;border-radius:var(--r);font-size:.88rem;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:9999;transform:translateY(20px);opacity:0;transition:all .25s ease;pointer-events:none;}
+.notif.show{transform:translateY(0);opacity:1;}
+.notif.notif-success{background:var(--green);}
+.notif.notif-error{background:var(--red);}
+.notif.notif-warning{background:var(--amber);}
+
+/* ── Content components ── */
+.page-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.45rem;font-weight:600;color:var(--ink);letter-spacing:-.02em;margin-bottom:.25rem;}
+.page-sub{font-size:.88rem;color:var(--ink3);}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:10px;}
+.tag{display:inline-block;font-size:.73rem;font-weight:500;padding:3px 9px;border-radius:20px;margin-right:4px;margin-bottom:2px;}
+.tag.blue{background:var(--blue-bg);color:var(--blue);}
+.tag.green{background:var(--green-bg);color:var(--green);}
+.tag.amber{background:var(--amber-bg);color:var(--amber);}
+.tag.neutral{background:var(--bg2);color:var(--ink2);}
+.trust{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:500;}
+.trust.a{background:var(--green-bg);color:var(--green);}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;flex-shrink:0;font-family:'Bricolage Grotesque',sans-serif;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:8px 16px;border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .12s;}
+.btn-primary{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-primary:hover{background:var(--green-dark);}
+.btn-ghost{background:transparent;color:var(--ink2);border-color:var(--border2);}
+.btn-ghost:hover{background:var(--bg2);}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:.85rem;}
+.progress-track{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+.sec-label{font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:.85rem;margin-top:1.5rem;display:flex;align-items:center;gap:.5rem;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.divider{height:1px;background:var(--border);margin:1rem 0;}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--ink3);font-size:.9rem;}
+.empty-icon{font-size:2rem;margin-bottom:.6rem;}
+.tab-bar{display:flex;gap:2px;background:var(--bg2);border-radius:var(--r-sm);padding:3px;margin-bottom:1.5rem;width:fit-content;max-width:100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{padding:.45rem 1rem;border-radius:6px;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:500;color:var(--ink3);cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0;}
+.tab-btn:hover{color:var(--ink);}
+.tab-btn.active{background:var(--white);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.filter-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+@media(max-width:600px){.filter-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.filter-chips::-webkit-scrollbar{display:none;}}
+.hub-header{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.hub-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:.2rem;}
+.hub-sub{font-size:.8rem;color:var(--ink3);}
+.hub-meta{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.6rem;}
+.export-btns{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+.plan-section{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;margin-bottom:16px;}
+.plan-section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:1rem;}
+.form-row{margin-bottom:.85rem;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:.85rem;}
+@media(max-width:480px){.form-row-2{grid-template-columns:1fr;}}
+.form-label{display:block;font-size:.78rem;font-weight:500;color:var(--ink2);margin-bottom:.3rem;}
+.form-input,.form-select,.form-textarea{width:100%;padding:.6rem .85rem;border:1.5px solid rgba(13,21,32,.12);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .12s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--orange);}
+.form-input:disabled,.form-textarea:disabled{background:var(--bg2);color:var(--ink3);cursor:default;border-color:transparent;}
+.form-textarea{resize:vertical;min-height:80px;line-height:1.55;}
+.leerdoel-card{background:var(--bg2);border-radius:var(--r-sm);padding:1rem 1.1rem;margin-bottom:10px;}
+.ld-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.65rem;}
+.ld-title{font-size:.9rem;font-weight:500;color:var(--ink);}
+.ld-pct{font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:600;}
+.ld-pct-btns{display:flex;gap:4px;flex-wrap:wrap;margin-top:.6rem;}
+.pct-btn{padding:3px 9px;border-radius:20px;font-size:.72rem;border:1px solid rgba(13,21,32,.12);background:var(--white);color:var(--ink2);cursor:pointer;transition:all .12s;}
+.pct-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.dl-item{display:flex;align-items:center;gap:.75rem;padding:.8rem 1rem;background:var(--white);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;}
+.dl-item.overdue{border-left:3px solid var(--red);border-radius:0 var(--r-sm) var(--r-sm) 0;}
+.dl-item.soon{border-left:3px solid var(--amber);border-radius:0 var(--r-sm) var(--r-sm) 0;}
+.dl-item.done{opacity:.5;}
+.dl-date{min-width:46px;text-align:center;flex-shrink:0;background:var(--bg2);border-radius:var(--r-sm);padding:.35rem .4rem;}
+.dl-day{font-family:'Bricolage Grotesque',sans-serif;font-size:1.1rem;font-weight:600;color:var(--ink);line-height:1;}
+.dl-month{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;}
+.dl-body{flex:1;min-width:0;}
+.dl-title-text{font-size:.88rem;font-weight:500;color:var(--ink);}
+.dl-meta{font-size:.76rem;color:var(--ink3);margin-top:1px;}
+.dl-type{display:inline-flex;font-size:.68rem;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px;}
+.dl-type.verplicht{background:var(--blue-bg);color:var(--blue);}
+.dl-type.begeleiding{background:var(--green-bg);color:var(--green);}
+.dl-type.oplevering{background:var(--amber-bg);color:var(--amber);}
+.btn-icon{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid rgba(13,21,32,.12);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:background .12s;flex-shrink:0;}
+.btn-icon:hover{background:var(--bg2);}
+.task-item{display:flex;align-items:flex-start;gap:.75rem;padding:.85rem 1rem;background:var(--white);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;}
+.task-item.done{opacity:.5;}
+.task-check{width:20px;height:20px;min-width:20px;border-radius:5px;border:1.5px solid rgba(13,21,32,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:2px;font-size:.6rem;color:transparent;transition:all .12s;user-select:none;flex-shrink:0;}
+.task-check.done{background:var(--green);border-color:var(--green);color:white;}
+.task-body{flex:1;min-width:0;}
+.task-title{font-size:.88rem;font-weight:500;color:var(--ink);margin-bottom:.2rem;}
+.task-item.done .task-title{text-decoration:line-through;color:var(--ink3);}
+.task-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;}
+.priority{display:inline-flex;font-size:.68rem;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;}
+.priority.hoog{background:var(--red-bg);color:var(--red);}
+.priority.medium{background:var(--amber-bg);color:var(--amber);}
+.priority.laag{background:var(--green-bg);color:var(--green);}
+.reflection-box{background:var(--bg2);border-radius:var(--r-sm);padding:1rem 1.1rem;margin-bottom:10px;}
+.ref-week{font-size:.72rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:.3rem;}
+.ref-text{font-size:.85rem;color:var(--ink2);line-height:1.6;}
+.ref-author{font-size:.75rem;color:var(--ink3);margin-top:.3rem;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.75rem;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem;}
+.stat-label{font-size:.72rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:.4rem;}
+.stat-val{font-family:'Bricolage Grotesque',sans-serif;font-size:1.7rem;font-weight:600;color:var(--ink);line-height:1;}
+.stat-note{font-size:.75rem;color:var(--ink3);margin-top:.2rem;}
+.modal-bg{position:fixed;inset:0;background:rgba(13,21,32,.45);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.modal-bg.open{display:flex;}
+@media(min-width:520px){.modal-bg{align-items:center;}}
+.modal{background:var(--white);border-radius:var(--r) var(--r) 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .2s ease;}
+@media(min-width:520px){.modal{border-radius:var(--r);}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes slideDown{from{transform:translateY(0);opacity:1;}to{transform:translateY(20px);opacity:0;}}
+@keyframes tabFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.modal-title{font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:600;}
+.modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--ink3);padding:4px;}
+.sb-row{display:flex;align-items:center;gap:.75rem;margin-bottom:10px;}
+.sb-label{font-size:.82rem;color:var(--ink2);min-width:170px;flex-shrink:0;}
+.sb-track{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.sb-fill{height:100%;border-radius:3px;}
+.sb-val{font-size:.82rem;font-weight:500;color:var(--ink);width:36px;text-align:right;}
+.log-item{display:flex;gap:.65rem;padding:.55rem 0;border-bottom:1px solid var(--border);}
+.log-item:last-child{border-bottom:none;}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.log-text{font-size:.82rem;color:var(--ink2);line-height:1.5;}
+.log-time{font-size:.73rem;color:var(--ink3);}
+@media(max-width:600px){
+  .overzicht-grid, .overzicht-bottom-grid { grid-template-columns:1fr !important; }
+}
+/* ── Quick todo & personal note ── */
+.qt-item{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;background:var(--bg2);border-radius:var(--r-sm);margin-bottom:6px;}
+.qt-check{width:18px;height:18px;min-width:18px;border-radius:4px;border:1.5px solid rgba(13,21,32,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.65rem;color:transparent;transition:all .12s;flex-shrink:0;user-select:none;}
+.qt-check.done{background:var(--green);border-color:var(--green);color:#fff;}
+.qt-text{flex:1;font-size:.84rem;color:var(--ink2);line-height:1.45;}
+.qt-text.done{text-decoration:line-through;color:var(--ink4);}
+.qt-del{background:none;border:none;color:var(--ink4);font-size:.78rem;cursor:pointer;padding:2px 5px;border-radius:4px;flex-shrink:0;transition:color .12s;line-height:1;}
+.qt-del:hover{color:var(--red);}
+.qt-add-row{display:flex;gap:6px;margin-top:8px;}
+.qt-add-input{flex:1;padding:.5rem .75rem;border:1.5px solid rgba(13,21,32,.12);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.84rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .12s;}
+.qt-add-input:focus{border-color:var(--orange);}
+.qt-add-btn{padding:.5rem .9rem;background:var(--green);color:#fff;border:none;border-radius:var(--r-sm);font-size:.82rem;font-weight:500;cursor:pointer;transition:background .12s;white-space:nowrap;}
+.qt-add-btn:hover{background:var(--green-dark);}
+
+@media print{
+  .sidebar,.topbar,.export-btns,.btn-row,.modal-bg,.tab-bar,.btn-icon,.task-check{display:none!important;}
+  body{background:white;font-size:11pt;}
+  .main{padding:0;}
+  .plan-section{border:1px solid #ccc;page-break-inside:avoid;margin-bottom:12px;}
+  .leerdoel-card{background:#f5f5f5;}
+}
+</style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- ── MODALS ── -->
+<div class="modal-bg" id="modal-task" onclick="closeModal('modal-task')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">Taak toevoegen</div>
+      <button class="modal-close" onclick="closeModal('modal-task')">&#x2715;</button>
+    </div>
+    <div class="form-row"><label class="form-label">Titel</label><input class="form-input" id="task-title-input" placeholder="Wat moet er gebeuren?"></div>
+    <div class="form-row"><label class="form-label">Omschrijving (optioneel)</label><textarea class="form-textarea" id="task-desc-input" placeholder="Extra toelichting..."></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:.85rem">
+      <div><label class="form-label">Toegewezen aan</label><select class="form-select" id="task-assign-input"><option value="student">Student</option><option value="bedrijf">Bedrijf</option><option value="school">School</option></select></div>
+      <div><label class="form-label">Prioriteit</label><select class="form-select" id="task-prio-input"><option value="medium">Medium</option><option value="hoog">Hoog</option><option value="laag">Laag</option></select></div>
+    </div>
+    <div class="form-row"><label class="form-label">Deadline (optioneel)</label><input class="form-input" id="task-deadline-input" type="date"></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="saveTask()">Taak opslaan</button><button class="btn btn-ghost" onclick="closeModal('modal-task')">Annuleren</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-deadline" onclick="closeModal('modal-deadline')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">Deadline toevoegen</div>
+      <button class="modal-close" onclick="closeModal('modal-deadline')">&#x2715;</button>
+    </div>
+    <div class="form-row"><label class="form-label">Omschrijving</label><input class="form-input" id="dl-title-input" placeholder="Bijv. Concept tussenrapport inleveren"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:.85rem">
+      <div><label class="form-label">Datum</label><input class="form-input" id="dl-date-input" type="date"></div>
+      <div><label class="form-label">Type</label><select class="form-select" id="dl-type-input"><option value="verplicht">Verplicht</option><option value="begeleiding">Begeleidingsgesprek</option><option value="oplevering">Oplevering</option></select></div>
+    </div>
+    <div class="form-row"><label class="form-label">Verantwoordelijke</label><select class="form-select" id="dl-who-input"><option value="student">Student</option><option value="bedrijf">Bedrijf</option><option value="school">School</option><option value="alle">Alle partijen</option></select></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="saveDeadline()">Opslaan</button><button class="btn btn-ghost" onclick="closeModal('modal-deadline')">Annuleren</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-reflectie" onclick="closeModal('modal-reflectie')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">Reflectie toevoegen</div>
+      <button class="modal-close" onclick="closeModal('modal-reflectie')">&#x2715;</button>
+    </div>
+    <div class="form-row"><label class="form-label">Reflectie deze week</label><textarea class="form-textarea" id="ref-text-input" placeholder="Wat heb je geleerd, wat ging goed, wat kan beter?" style="min-height:100px"></textarea></div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="saveReflectie()">Opslaan</button><button class="btn btn-ghost" onclick="closeModal('modal-reflectie')">Annuleren</button></div>
+  </div>
+</div>
+
+<!-- ── LOADING ── -->
+<div id="loading-screen">
+  <div class="loading-logo">Internly</div>
+</div>
+
+<!-- ── ROLE PICKER ── -->
+<div id="role-screen">
+  <div style="text-align:center;margin-bottom:.5rem">
+    <div class="rp-logo">Internly</div>
+    <div class="rp-tagline">Stage Hub — kies je rol om verder te gaan</div>
+  </div>
+  <div class="rp-title">Wie ben jij in dit traject?</div>
+  <div class="role-cards">
+    <div class="role-card" onclick="selectRole('student')" id="rc-student">
+      <div class="rc-icon" style="background:var(--blue-bg)">&#128100;</div>
+      <div>
+        <div class="rc-name">Student</div>
+        <div class="rc-desc" id="rc-student-desc">Lena de Vries &mdash; Vandaag Agency</div>
+      </div>
+    </div>
+    <div class="role-card" onclick="selectRole('bedrijf')" id="rc-bedrijf">
+      <div class="rc-icon" style="background:var(--green-bg)">&#127970;</div>
+      <div>
+        <div class="rc-name">Bedrijf</div>
+        <div class="rc-desc" id="rc-bedrijf-desc">Vandaag Agency &mdash; begeleider</div>
+      </div>
+    </div>
+    <div class="role-card" onclick="selectRole('school')" id="rc-school">
+      <div class="rc-icon" style="background:var(--amber-bg)">&#127891;</div>
+      <div>
+        <div class="rc-name">School / Begeleider</div>
+        <div class="rc-desc" id="rc-school-desc">M. Jansen &mdash; HvA Communicatie</div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-enter" onclick="enterApp()" id="enter-btn" disabled>Open Stage Hub &rarr;</button>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+  <div class="topbar">
+    <span class="topbar-logo">Internly</span>
+    <span class="topbar-role" id="topbar-role-label">Student</span>
+    <button class="hamburger" onclick="openSidebar()"><span></span><span></span><span></span></button>
+  </div>
+  <div class="layout">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="s-logo">Internly</div>
+        <div class="s-role" id="sidebar-role-label">Student</div>
+      </div>
+      <div class="sidebar-nav">
+        <button class="nav-item" id="nav-overzicht"  onclick="showTab('overzicht');closeSidebar()"><span class="nav-icon">&#128203;</span>Overzicht</button>
+        <button class="nav-item" id="nav-stageplan"  onclick="showTab('stageplan');closeSidebar()"><span class="nav-icon">&#128196;</span>Stageplan</button>
+        <button class="nav-item" id="nav-planning"   onclick="showTab('planning');closeSidebar()"><span class="nav-icon">&#128197;</span>Planning</button>
+        <button class="nav-item" id="nav-taken"      onclick="showTab('taken');closeSidebar()"><span class="nav-icon">&#9989;</span>Taken<span id="taken-badge" class="nav-badge" style="display:none"></span></button>
+        <button class="nav-item" id="nav-voortgang"  onclick="showTab('voortgang');closeSidebar()"><span class="nav-icon">&#128200;</span>Voortgang</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="switch-btn" onclick="switchRole()">&#8617; Andere rol</button>
+        <button class="switch-btn" onclick="goToMijnStages()">&#128203; Mijn Stages</button>
+        <button class="switch-btn" id="back-btn" onclick="goToDashboard()">&#127968; Terug naar dashboard</button>
+      </div>
+    </nav>
+    <main class="main" id="main-content"></main>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+
+const match = {
+  student: { name:'Lena de Vries', opleiding:'Communicatie & Multimedia Design', jaar:3, initials:'LH' },
+  company: {
+    name:'Vandaag Agency', sector:'Digital Marketing', score:91, grade:'A',
+    scores:{ respons:95, leerdoel:89, afspraken:93, begeleiding:87 },
+    vacature:'Stage Contentstrateeg & Schrijver',
+    duur:'5 maanden', start:'1 september 2025', eind:'31 januari 2026'
+  },
+  school: { name:'M. Jansen', opleiding:'HvA Communicatie' }
+};
+
+const roleLabels = { student:'Student', bedrijf:'Bedrijf', school:'Begeleider' };
+
+let hub = {
+  role: null, currentTab: 'overzicht', nextId: 100,
+  quickTodos: [],
+  personalNote: '',
+  stageplan: {
+    opdrachtTitel:         'Contentstrategie & communicatie voor maatschappelijke impact',
+    opdrachtOmschrijving:  'Lena ontwikkelt een volledige contentstrategie voor Vandaag Agency. Zij schrijft blogs, video-scripts en verzorgt de social media contentkalender voor twee klanten.',
+    begeleidingFrequentie: 'Wekelijks — elke woensdag 10:00–10:30',
+    begeleidingBedrijf:    'Sanne de Groot (Senior Strateeg)',
+    begeleidingSchool:     'M. Jansen (HvA)',
+    evaluatieCriteria:     'Kwaliteit van geschreven content, zelfstandigheid, communicatie met stakeholders, leerdoelopvolging.',
+    notities:              ''
+  },
+  leerdoelen: [
+    { title:'Klantgericht schrijven',  pct:75, notes:'Eerste twee blogposts live gegaan. Positieve feedback van klant.' },
+    { title:'Content strategie',       pct:40, notes:'Contentkalender voor mei opgeleverd. Strategisch denken nog in ontwikkeling.' },
+    { title:'Visual storytelling',     pct:20, notes:'Eerste video-script in conceptfase. Vraagt meer begeleiding.' }
+  ],
+  deadlines: [
+    { id:1, title:'Startgesprek + leerdoelen vastleggen',              date:'2025-09-01', type:'verplicht',    who:'alle',    done:true  },
+    { id:2, title:'Eerste blogpost live',                               date:'2025-09-22', type:'oplevering',   who:'student', done:true  },
+    { id:3, title:'1-op-1 week 3',                                      date:'2025-09-17', type:'begeleiding',  who:'bedrijf', done:true  },
+    { id:4, title:'Contentkalender opleveren',                          date:'2025-10-15', type:'oplevering',   who:'student', done:false },
+    { id:5, title:'1-op-1 week 8 — halverwege evaluatie',              date:'2025-10-22', type:'begeleiding',  who:'bedrijf', done:false },
+    { id:6, title:'Concept tussenrapport inleveren bij school',         date:'2025-11-01', type:'verplicht',    who:'student', done:false },
+    { id:7, title:'Voortgangsgesprek school week 14',                   date:'2025-12-03', type:'begeleiding',  who:'school',  done:false },
+    { id:8, title:'Definitief stageverslag inleveren',                  date:'2026-01-15', type:'verplicht',    who:'student', done:false },
+    { id:9, title:'Eindevaluatie',                                      date:'2026-01-28', type:'verplicht',    who:'alle',    done:false }
+  ],
+  tasks: [
+    { id:1, title:'Contentkalender mei-juni opzetten',        desc:'Planning voor social media posts per klant',          assigned:'student', priority:'hoog',   deadline:'2025-10-15', done:false, maker:'bedrijf', date:'10 sep' },
+    { id:2, title:'Video-script zeecampagne uitwerken',       desc:'Doelgroep: breed publiek, max 3 minuten',             assigned:'student', priority:'hoog',   deadline:'2025-10-28', done:false, maker:'bedrijf', date:'15 sep' },
+    { id:3, title:'Evaluatieformulier halverwege invullen',   desc:'',                                                    assigned:'school',  priority:'medium', deadline:'2025-10-22', done:false, maker:'school',  date:'1 okt'  },
+    { id:4, title:'Doelgroepanalyse afronden',                desc:'Kwalitatief onderzoek twee focusgroepen',             assigned:'student', priority:'medium', deadline:'2025-10-10', done:true,  maker:'student', date:'5 sep'  },
+    { id:5, title:'Toegang geven tot analytics dashboard',   desc:'Google Analytics + Meta Business Suite',             assigned:'bedrijf', priority:'laag',   deadline:'2025-09-08', done:true,  maker:'bedrijf', date:'1 sep'  }
+  ],
+  reflecties: [
+    { week:'Week 6', text:'De contentkalender begint echt vorm te krijgen. Ik merk dat ik beter ben geworden in het afstemmen van de toon per platform.',       author:'Lena de Vries', date:'10 okt' },
+    { week:'Week 3', text:'Goede start. De eerste blogpost is live gegaan en goed ontvangen. Ik wil meer initiatief nemen bij klantgesprekken.',                author:'Lena de Vries', date:'19 sep' }
+  ],
+  log: [
+    { text:'Lena heeft voortgang "Klantgericht schrijven" bijgewerkt naar 75%', time:'10 okt, 14:22', color:'var(--green)' },
+    { text:'Sanne (bedrijf) heeft taak "Video-script" toegevoegd',              time:'15 sep, 09:05', color:'var(--blue)'  },
+    { text:'M. Jansen heeft evaluatieformulier-taak toegevoegd',                time:'1 okt, 11:30',  color:'var(--amber)' },
+    { text:'Deadline "Eerste blogpost" afgerond',                               time:'22 sep',        color:'var(--green)' },
+    { text:'Stage Hub aangemaakt na match',                                     time:'1 sep, 09:00',  color:'var(--ink3)'  }
+  ]
+};
+
+// ── Auth & init ───────────────────────────────────────────────────────────────
+let _authUserRole = null;
+let _authUserName = null;
+
+// Read ?match= from URL so incoming links carry context
+const _urlParams = new URLSearchParams(location.search);
+hub.matchId = _urlParams.get('match') || null;
+hub.isDraft = !hub.matchId;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role, naam, name')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  _authUserRole = profile?.role || null;
+  _authUserName = profile?.naam || profile?.name || user.email?.split('@')[0] || '';
+
+  // Update role picker descriptions with real names
+  if (hub.isDraft) {
+    document.getElementById('rc-student-desc').textContent = _authUserName || 'Jouw account';
+    document.getElementById('rc-bedrijf-desc').textContent = 'Nog geen match gekoppeld';
+    document.getElementById('rc-school-desc').textContent  = 'Nog geen match gekoppeld';
+  } else {
+    document.getElementById('rc-student-desc').textContent = match.student.name + ' \u2014 ' + match.company.name;
+    document.getElementById('rc-bedrijf-desc').textContent = match.company.name + ' \u2014 begeleider';
+    document.getElementById('rc-school-desc').textContent  = match.school.name + ' \u2014 ' + match.school.opleiding;
+  }
+
+  document.getElementById('loading-screen').style.display = 'none';
+
+  // Auto-select the logged-in user's role
+  if (_authUserRole && ['student','bedrijf','school'].includes(_authUserRole)) {
+    selectRole(_authUserRole);
+    enterApp();
+  } else {
+    // Fallback: show role picker
+    document.getElementById('role-screen').style.display = 'flex';
+  }
+});
+
+// ── Role picker ───────────────────────────────────────────────────────────────
+let selectedRole = null;
+
+function selectRole(r) {
+  selectedRole = r;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('rc-' + r).classList.add('active');
+  document.getElementById('enter-btn').disabled = false;
+}
+
+function enterApp() {
+  if (!selectedRole) return;
+  hub.role = selectedRole;
+  document.getElementById('role-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const label = roleLabels[selectedRole];
+  document.getElementById('sidebar-role-label').textContent = label;
+  document.getElementById('topbar-role-label').textContent  = label;
+
+  updateTaskBadge();
+  showTab('overzicht');
+}
+
+function switchRole() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('role-screen').style.display = 'flex';
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('enter-btn').disabled = true;
+  selectedRole = null;
+  closeSidebar();
+}
+
+function goToDashboard() {
+  const routes = { student:'student-profile.html', bedrijf:'company-dashboard.html', school:'school-dashboard.html' };
+  window.location.href = routes[_authUserRole] || 'index.html';
+}
+
+function goToMijnStages() {
+  window.location.href = 'mijn-sollicitaties.html';
+}
+
+// ── Tab routing ───────────────────────────────────────────────────────────────
+function showTab(tab) {
+  hub.currentTab = tab;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('nav-' + tab);
+  if (nav) nav.classList.add('active');
+  const main = document.getElementById('main-content');
+
+  // Fade out → swap content → fade in
+  main.style.opacity = '0';
+  main.style.transform = 'translateY(5px)';
+  main.style.transition = 'opacity .1s ease, transform .1s ease';
+
+  setTimeout(() => {
+    if      (tab === 'overzicht') main.innerHTML = renderOverzicht();
+    else if (tab === 'stageplan') main.innerHTML = renderStageplan();
+    else if (tab === 'planning')  { _planningFilter = 'alle'; main.innerHTML = renderPlanning('alle'); }
+    else if (tab === 'taken')     { _takenFilter = 'alle'; main.innerHTML = renderTaken('alle'); }
+    else if (tab === 'voortgang') main.innerHTML = renderVoortgang();
+    main.style.transition = 'opacity .18s ease, transform .18s ease';
+    main.style.opacity = '1';
+    main.style.transform = 'translateY(0)';
+  }, 95);
+}
+
+// ── Hub header ────────────────────────────────────────────────────────────────
+function renderHubHeader() {
+  if (hub.isDraft) {
+    const initials = (_authUserName || 'IK').slice(0, 2).toUpperCase();
+    return `<div class="hub-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:.85rem">
+          <div class="avatar" style="background:var(--blue-bg);color:var(--blue)">${initials}</div>
+          <div>
+            <div class="hub-title">&#128203; Mijn Stagevoorbereiding</div>
+            <div class="hub-sub">Concept &mdash; nog niet gekoppeld aan een match</div>
+          </div>
+        </div>
+        <div class="hub-meta">
+          <span class="tag amber">&#9997; Concept</span>
+          <span style="font-size:.73rem;color:var(--ink3)">Zodra je een match accepteert, wordt dit plan automatisch gedeeld</span>
+        </div>
+      </div>
+      <div class="export-btns">
+        <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px" onclick="exportCSV()">&#11015; CSV</button>
+        <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px" onclick="exportPDF()">&#11015; PDF</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="hub-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:.85rem">
+        <div class="avatar" style="background:var(--blue-bg);color:var(--blue)">${match.student.initials}</div>
+        <div class="avatar" style="background:var(--green-bg);color:var(--green);margin-left:-10px">${match.company.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+        <div>
+          <div class="hub-title">Stage Hub &mdash; ${match.student.name} &times; ${match.company.name}</div>
+          <div class="hub-sub">${match.company.vacature} &middot; ${match.company.duur} &middot; ${match.company.start} &ndash; ${match.company.eind}</div>
+        </div>
+      </div>
+      <div class="hub-meta">
+        <span class="trust a">A &middot; ${match.company.score}</span>
+        <span class="tag amber">&#127891; ${match.school.name} &mdash; ${match.school.opleiding}</span>
+      </div>
+    </div>
+    <div class="export-btns">
+      <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px" onclick="exportCSV()">&#11015; CSV</button>
+      <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px" onclick="exportPDF()">&#11015; PDF</button>
+    </div>
+  </div>`;
+}
+
+function renderTabBar(active) {
+  const tabs = [
+    { id:'overzicht', label:'Overzicht' },
+    { id:'stageplan', label:'Stageplan' },
+    { id:'planning',  label:'Planning'  },
+    { id:'taken',     label:'Taken'     },
+    { id:'voortgang', label:'Voortgang' }
+  ];
+  return `<div class="tab-bar">${tabs.map(t =>
+    `<button class="tab-btn${active === t.id ? ' active' : ''}" onclick="showTab('${t.id}')">${t.label}</button>`
+  ).join('')}</div>`;
+}
+
+// ── Overzicht ─────────────────────────────────────────────────────────────────
+function renderOverzicht() {
+  const openTasks  = hub.tasks.filter(t => !t.done).length;
+  const upcomingDl = hub.deadlines.filter(d => !d.done).length;
+  const avgPct     = Math.round(hub.leerdoelen.reduce((a, l) => a + l.pct, 0) / hub.leerdoelen.length);
+
+  const draftBanner = hub.isDraft ? `
+    <div style="background:var(--orange-bg);border:1.5px solid rgba(255,126,66,.3);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:.92rem;color:var(--orange-dark);margin-bottom:.2rem">&#9888; Concept &mdash; nog geen actieve stage</div>
+        <div style="font-size:.82rem;color:var(--ink3);line-height:1.5">
+          Vul alvast je stageplan, planning en leerdoelen in. Zodra je een match accepteert, kunnen je stagebegeleider en school dit plan direct inzien en bijdragen.
+        </div>
+      </div>
+      <a href="matches.html" style="display:inline-block;white-space:nowrap;background:var(--green);color:#fff;font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:var(--r-sm);text-decoration:none;flex-shrink:0">Zoek een match &#8594;</a>
+    </div>` : '';
+
+  const trustSection = hub.isDraft ? `
+    <div class="sec-label">Stageplaats</div>
+    <div class="card" style="cursor:default;margin-bottom:0;padding:1.25rem">
+      <div style="text-align:center;padding:.5rem 0;color:var(--ink3);font-size:.88rem;line-height:1.8">
+        <div style="font-size:2rem;margin-bottom:.5rem">&#127970;</div>
+        Nog geen bedrijf gekoppeld.<br>
+        <a href="discover.html" style="color:var(--green);font-weight:600;text-decoration:none">Verken vacatures &#8594;</a>
+      </div>
+    </div>` : `
+    <div class="sec-label">Trust Score bedrijf</div>
+    <div class="card" style="cursor:default;margin-bottom:0">
+      ${Object.entries(match.company.scores).map(([k, v]) => `
+        <div class="sb-row">
+          <div class="sb-label">${{ respons:'Responssnelheid', leerdoel:'Leerdoelopvolging', afspraken:'Nakomen afspraken', begeleiding:'Begeleidingskwaliteit' }[k]}</div>
+          <div class="sb-track"><div class="sb-fill" style="width:${v}%;background:${v>=80?'var(--green)':v>=65?'var(--amber)':'var(--red)'}"></div></div>
+          <div class="sb-val">${v}</div>
+        </div>`).join('')}
+    </div>`;
+
+  const weekStat = hub.isDraft
+    ? `<div class="stat-card"><div class="stat-label">Status</div><div class="stat-val" style="font-size:1.1rem;color:var(--orange)">Concept</div><div class="stat-note">nog geen match</div></div>`
+    : `<div class="stat-card"><div class="stat-label">Week</div><div class="stat-val" style="color:var(--green)">6</div><div class="stat-note">van 20</div></div>`;
+
+  return `${renderHubHeader()}${renderTabBar('overzicht')}
+  ${draftBanner}
+  <div class="stats-row">
+    ${weekStat}
+    <div class="stat-card"><div class="stat-label">Voortgang</div><div class="stat-val" style="color:var(--green)">${avgPct}%</div><div class="stat-note">gem. leerdoelen</div></div>
+    <div class="stat-card"><div class="stat-label">Open taken</div><div class="stat-val">${openTasks}</div><div class="stat-note">van ${hub.tasks.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Deadlines</div><div class="stat-val">${upcomingDl}</div><div class="stat-note">aankomend</div></div>
+  </div>
+  <div class="overzicht-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div>
+      <div class="sec-label">Leerdoelen</div>
+      ${hub.leerdoelen.map(l => `
+        <div class="card" style="cursor:default;margin-bottom:8px;padding:1rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+            <span style="font-size:.86rem;font-weight:500">${l.title}</span>
+            <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:600;color:${pctColor(l.pct)}">${l.pct}%</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:${l.pct}%;background:${pctColor(l.pct)}"></div></div>
+        </div>`).join('')}
+      ${trustSection}
+    </div>
+    <div>
+      <div class="sec-label">Activiteitenlog</div>
+      <div class="card" style="cursor:default;margin-bottom:0">
+        ${hub.log.slice(0, 5).map(l => `
+          <div class="log-item">
+            <div class="log-dot" style="background:${l.color}"></div>
+            <div><div class="log-text">${l.text}</div><div class="log-time">${l.time}</div></div>
+          </div>`).join('')}
+        ${hub.log.length > 5 ? `<div style="font-size:.74rem;color:var(--ink4);text-align:center;padding:.5rem 0;margin-top:.15rem;border-top:1px solid var(--border)">+ ${hub.log.length - 5} oudere activiteiten</div>` : ''}
+      </div>
+    </div>
+  </div>
+  <div class="overzicht-bottom-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+    <div>
+      <div class="sec-label">&#9989; Snelle taken <span style="font-size:.7rem;font-weight:400;color:var(--ink4);text-transform:none;letter-spacing:0">&nbsp;alleen voor jou</span></div>
+      <div class="card" style="cursor:default;margin-bottom:0">
+        ${hub.quickTodos.length === 0 ? `<div style="font-size:.84rem;color:var(--ink3);padding:.15rem 0 .5rem">${hub.role === 'student' ? 'Nog geen taken. Voeg er hieronder een toe.' : 'Student heeft nog geen persoonlijke taken aangemaakt.'}</div>` : ''}
+        ${hub.quickTodos.map(t => `
+          <div class="qt-item">
+            <div class="qt-check${t.done ? ' done' : ''}" onclick="${hub.role === 'student' ? `toggleQuickTodo(${t.id})` : ''}" style="${hub.role !== 'student' ? 'cursor:default;' : ''}">${t.done ? '&#10003;' : ''}</div>
+            <span class="qt-text${t.done ? ' done' : ''}">${escHtml(t.text)}</span>
+            ${hub.role === 'student' ? `<button class="qt-del" onclick="deleteQuickTodo(${t.id})" title="Verwijderen">&#x2715;</button>` : ''}
+          </div>`).join('')}
+        ${hub.role === 'student' ? `
+        <div class="qt-add-row">
+          <input class="qt-add-input" id="qt-input" placeholder="Nieuwe taak toevoegen..." onkeydown="if(event.key==='Enter')addQuickTodo()">
+          <button class="qt-add-btn" onclick="addQuickTodo()">+ Voeg toe</button>
+        </div>` : `<div style="font-size:.76rem;color:var(--ink4);margin-top:.4rem">Bewerkbaar door de student.</div>`}
+      </div>
+    </div>
+    <div>
+      <div class="sec-label">&#128221; Persoonlijke notitie <span style="font-size:.7rem;font-weight:400;color:var(--ink4);text-transform:none;letter-spacing:0">&nbsp;alleen voor jou</span></div>
+      <div class="card" style="cursor:default;margin-bottom:0">
+        <textarea id="personal-note" class="form-textarea"
+          style="min-height:118px;resize:vertical;font-size:.84rem"
+          placeholder="Notities, ideeën, vragen voor je begeleider..."
+          ${hub.role !== 'student' ? 'disabled' : ''}
+          oninput="hub.personalNote=this.value">${escHtml(hub.personalNote)}</textarea>
+        ${hub.role === 'student' ? `<div style="margin-top:.5rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem">
+          <span style="font-size:.74rem;color:var(--ink4)">Opgeslagen in deze sessie</span>
+          <button class="btn btn-ghost" style="font-size:.78rem;padding:4px 12px" onclick="notify('Notitie opgeslagen ✓')">Opslaan</button>
+        </div>` : `<div style="font-size:.76rem;color:var(--ink4);margin-top:.4rem">Bewerkbaar door de student.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Stageplan ─────────────────────────────────────────────────────────────────
+function renderStageplan() {
+  const canEdit = hub.role === 'student' || hub.role === 'bedrijf';
+  const dis = canEdit ? '' : 'disabled';
+  return `${renderHubHeader()}${renderTabBar('stageplan')}
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem">
+    <div><div class="page-title">Stageplan</div><div class="page-sub">Gedeeld document — alle partijen zien dezelfde versie</div></div>
+    ${canEdit ? `<button class="btn btn-primary" onclick="saveStageplan()">Opslaan</button>` : '<span class="tag neutral">Leesmodus</span>'}
+  </div>
+  <div class="plan-section">
+    <div class="plan-section-title">&#128203; Stageopdracht</div>
+    <div class="form-row"><label class="form-label">Titel van de opdracht</label><input class="form-input" id="sp-titel" value="${escHtml(hub.stageplan.opdrachtTitel)}" ${dis}></div>
+    <div class="form-row"><label class="form-label">Omschrijving</label><textarea class="form-textarea" id="sp-omschrijving" style="min-height:100px" ${dis}>${escHtml(hub.stageplan.opdrachtOmschrijving)}</textarea></div>
+  </div>
+  <div class="plan-section">
+    <div class="plan-section-title">&#127919; Leerdoelen</div>
+    ${hub.leerdoelen.map((l, i) => `
+      <div class="leerdoel-card">
+        <div class="ld-header">
+          <input class="form-input" id="ld-title-${i}" value="${escHtml(l.title)}" ${dis}
+            style="font-weight:500;font-size:.9rem;border:none;background:transparent;padding:.2rem 0;${canEdit ? 'border-bottom:1px solid rgba(13,21,32,.12)' : ''}">
+          <span class="ld-pct" style="color:${pctColor(l.pct)}">${l.pct}%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${l.pct}%;background:${pctColor(l.pct)}"></div></div>
+        ${canEdit ? `<div class="ld-pct-btns">${[0,25,50,75,100].map(v =>
+          `<button class="pct-btn${l.pct===v?' active':''}" onclick="setPct(${i},${v})">${v}%</button>`).join('')}</div>` : ''}
+        <textarea class="form-textarea" id="ld-notes-${i}" style="margin-top:.6rem;min-height:60px;font-size:.8rem"
+          placeholder="Toelichting voortgang..." ${dis}>${escHtml(l.notes)}</textarea>
+      </div>`).join('')}
+  </div>
+  <div class="plan-section">
+    <div class="plan-section-title">&#129309; Begeleidingsafspraken</div>
+    <div class="form-row-2">
+      <div><label class="form-label">Frequentie 1-op-1</label><input class="form-input" id="sp-freq" value="${escHtml(hub.stageplan.begeleidingFrequentie)}" ${dis}></div>
+      <div><label class="form-label">Begeleider bedrijf</label><input class="form-input" id="sp-beg-bedrijf" value="${escHtml(hub.stageplan.begeleidingBedrijf)}" ${dis}></div>
+    </div>
+    <div class="form-row-2">
+      <div><label class="form-label">Begeleider school</label><input class="form-input" id="sp-beg-school" value="${escHtml(hub.stageplan.begeleidingSchool)}" ${dis}></div>
+      <div><label class="form-label">Evaluatiecriteria</label><input class="form-input" id="sp-eval" value="${escHtml(hub.stageplan.evaluatieCriteria)}" ${dis}></div>
+    </div>
+  </div>
+  <div class="plan-section">
+    <div class="plan-section-title">&#128221; Notities</div>
+    <div class="form-row"><textarea class="form-textarea" id="sp-notities" style="min-height:80px"
+      placeholder="Aanvullende afspraken of opmerkingen..." ${dis}>${escHtml(hub.stageplan.notities)}</textarea></div>
+  </div>
+  ${canEdit ? `<div class="btn-row">
+    <button class="btn btn-primary" onclick="saveStageplan()">Stageplan opslaan</button>
+    <button class="btn btn-ghost" onclick="exportPDF()">&#11015; PDF</button>
+    <button class="btn btn-ghost" onclick="exportCSV()">&#11015; CSV</button>
+  </div>` : ''}`;
+}
+
+// ── Planning ──────────────────────────────────────────────────────────────────
+function renderPlanning(filter) {
+  const today  = new Date();
+  const canEdit = hub.role === 'student' || hub.role === 'bedrijf';
+  let dls = [...hub.deadlines].sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (filter !== 'alle') dls = dls.filter(d => d.type === filter);
+  const filters = ['alle','verplicht','begeleiding','oplevering'];
+  const flabels = { alle:'Alle', verplicht:'Verplicht', begeleiding:'Begeleidingsgesprekken', oplevering:'Opleveringen' };
+  return `${renderHubHeader()}${renderTabBar('planning')}
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem">
+    <div><div class="page-title">Planning</div><div class="page-sub">Afgesproken deadlines — zichtbaar voor alle partijen</div></div>
+    ${canEdit ? `<button class="btn btn-primary" onclick="openModal('modal-deadline')">+ Deadline toevoegen</button>` : ''}
+  </div>
+  <div class="filter-chips">
+    ${filters.map(f => `
+      <div style="padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:500;border:1px solid rgba(13,21,32,.12);flex-shrink:0;
+        background:${filter===f?'var(--ink)':'var(--white)'};color:${filter===f?'#fff':'var(--ink2)'};cursor:pointer"
+        onclick="renderPlanningFilter('${f}')">${flabels[f]}</div>`).join('')}
+  </div>
+  ${dls.length === 0 ? '<div class="empty"><div class="empty-icon">&#128197;</div>Geen deadlines voor dit filter.</div>' : ''}
+  ${dls.map(d => {
+    const dt = new Date(d.date);
+    const diff = Math.round((dt - today) / (1000 * 60 * 60 * 24));
+    const cls  = d.done ? 'done' : (!d.done && diff < 0) ? 'overdue' : (!d.done && diff <= 7) ? 'soon' : '';
+    return `<div class="dl-item ${cls}">
+      <div class="dl-date">
+        <div class="dl-day">${dt.getDate()}</div>
+        <div class="dl-month">${MONTHS[dt.getMonth()]}</div>
+      </div>
+      <div class="dl-body">
+        <div class="dl-title-text">${escHtml(d.title)}${d.done ? ' <span style="color:var(--green);font-size:.75rem">&#10003;</span>' : ''}</div>
+        <div class="dl-meta">
+          <span class="dl-type ${d.type}">${{ verplicht:'Verplicht', begeleiding:'Begeleiding', oplevering:'Oplevering' }[d.type]}</span>
+          ${whoLabel(d.who)}
+          ${!d.done && diff < 0 ? ' &middot; <span style="color:var(--red)">Verlopen</span>' : ''}
+          ${!d.done && diff <= 7 && diff >= 0 ? ` &middot; <span style="color:var(--amber)">Over ${diff} dag${diff===1?'':'en'}</span>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn-icon" onclick="toggleDeadline(${d.id})"
+          title="${d.done ? 'Heropenen' : 'Markeer afgerond'}"
+          style="${d.done ? 'color:var(--green);background:var(--green-bg);border-color:transparent' : ''}">
+          ${d.done ? '&#8617;' : '&#10003;'}
+        </button>
+        ${canEdit ? `<button class="btn-icon" onclick="removeDeadline(${d.id})" title="Verwijder" style="color:var(--red)">&#x2715;</button>` : ''}
+      </div>
+    </div>`;
+  }).join('')}
+  <div class="btn-row" style="margin-top:1rem">
+    <button class="btn btn-ghost" onclick="exportCSV()">&#11015; CSV planning</button>
+    <button class="btn btn-ghost" onclick="exportPDF()">&#11015; PDF planning</button>
+  </div>`;
+}
+
+let _planningFilter = 'alle';
+function renderPlanningFilter(f) { _planningFilter = f; document.getElementById('main-content').innerHTML = renderPlanning(f); }
+
+// ── Taken ─────────────────────────────────────────────────────────────────────
+function renderTaken(filter) {
+  const role = hub.role;
+  let tasks = hub.tasks;
+  if (filter === 'open')      tasks = tasks.filter(t => !t.done);
+  else if (filter === 'afgerond')  tasks = tasks.filter(t =>  t.done);
+  else if (['student','bedrijf','school'].includes(filter)) tasks = tasks.filter(t => t.assigned === filter);
+  const filters = ['alle','student','bedrijf','school','open','afgerond'];
+  const flabels = { alle:'Alle', student:'Student', bedrijf:'Bedrijf', school:'School', open:'Open', afgerond:'Afgerond' };
+  return `${renderHubHeader()}${renderTabBar('taken')}
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem">
+    <div><div class="page-title">Taken</div><div class="page-sub">Gedeelde takenlijst voor alle partijen</div></div>
+    <button class="btn btn-primary" onclick="openModal('modal-task')">+ Taak toevoegen</button>
+  </div>
+  <div class="filter-chips">
+    ${filters.map(f => `
+      <div style="padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:500;border:1px solid rgba(13,21,32,.12);flex-shrink:0;
+        background:${filter===f?'var(--ink)':'var(--white)'};color:${filter===f?'#fff':'var(--ink2)'};cursor:pointer"
+        onclick="renderTakenFilter('${f}')">${flabels[f]}</div>`).join('')}
+  </div>
+  ${tasks.length === 0 ? '<div class="empty"><div class="empty-icon">&#9989;</div>Geen taken voor dit filter.</div>' : ''}
+  ${tasks.map(t => {
+    const canDelete = t.maker === role;
+    let dlStr = '';
+    if (t.deadline) { const dt = new Date(t.deadline); dlStr = `${dt.getDate()} ${MONTHS[dt.getMonth()]}`; }
+    return `<div class="task-item ${t.done ? 'done' : ''}">
+      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})">${t.done ? '&#10003;' : ''}</div>
+      <div class="task-body">
+        <div class="task-title">${escHtml(t.title)}</div>
+        ${t.desc ? `<div style="font-size:.8rem;color:var(--ink3);margin-bottom:.3rem;line-height:1.5">${escHtml(t.desc)}</div>` : ''}
+        <div class="task-meta">
+          <span class="priority ${t.priority}">${t.priority}</span>
+          <span style="font-size:.72rem;color:var(--ink3)">${assignedIcon(t.assigned)} ${t.assigned}</span>
+          ${dlStr ? `<span style="font-size:.72rem;color:var(--ink3)">&#128197; ${dlStr}</span>` : ''}
+          <span style="font-size:.72rem;color:var(--ink3)">Door: ${t.maker}</span>
+        </div>
+      </div>
+      ${canDelete ? `<button class="btn" style="font-size:.78rem;padding:5px 10px;color:var(--red);border-color:rgba(184,32,32,.2);background:transparent" onclick="removeTask(${t.id})">Verwijder</button>` : ''}
+    </div>`;
+  }).join('')}`;
+}
+
+let _takenFilter = 'alle';
+function renderTakenFilter(f) { _takenFilter = f; document.getElementById('main-content').innerHTML = renderTaken(f); }
+
+// ── Voortgang ─────────────────────────────────────────────────────────────────
+function renderVoortgang() {
+  const canEdit = hub.role === 'student' || hub.role === 'bedrijf';
+  return `${renderHubHeader()}${renderTabBar('voortgang')}
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem">
+    <div><div class="page-title">Voortgang</div><div class="page-sub">Leerdoelen en reflecties — inzichtelijk voor alle partijen</div></div>
+    ${hub.role === 'student' ? `<button class="btn btn-ghost" style="font-size:.82rem" onclick="openModal('modal-reflectie')">+ Reflectie toevoegen</button>` : ''}
+  </div>
+  <div class="sec-label" style="margin-top:0">Voortgang per leerdoel</div>
+  ${hub.leerdoelen.map((l, i) => `
+    <div class="leerdoel-card">
+      <div class="ld-header">
+        <div class="ld-title">${escHtml(l.title)}</div>
+        <div class="ld-pct" style="color:${pctColor(l.pct)}">${l.pct}%</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${l.pct}%;background:${pctColor(l.pct)}"></div></div>
+      ${canEdit ? `<div class="ld-pct-btns">${[0,25,50,75,100].map(v =>
+        `<button class="pct-btn${l.pct===v?' active':''}" onclick="setPct(${i},${v})">${v}%</button>`).join('')}</div>` : ''}
+      ${l.notes ? `<div style="font-size:.8rem;color:var(--ink3);margin-top:.5rem;line-height:1.55;font-style:italic">"${escHtml(l.notes)}"</div>` : ''}
+    </div>`).join('')}
+  <div class="sec-label" style="margin-top:1.5rem">Wekelijkse reflecties</div>
+  ${hub.reflecties.length === 0
+    ? `<div class="empty"><div class="empty-icon">&#9997;&#65039;</div>Nog geen reflecties. Schrijf je eerste terugblik op de afgelopen week.</div>`
+    : hub.reflecties.map(r => `
+    <div class="reflection-box">
+      <div class="ref-week">${r.week}</div>
+      <div class="ref-text">${escHtml(r.text)}</div>
+      <div class="ref-author">${escHtml(r.author)} &middot; ${r.date}</div>
+    </div>`).join('')
+  }
+  <div class="btn-row" style="margin-top:1rem">
+    <button class="btn btn-ghost" onclick="exportCSV()">&#11015; CSV voortgang</button>
+    <button class="btn btn-ghost" onclick="exportPDF()">&#11015; PDF rapport</button>
+  </div>`;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function saveStageplan() {
+  const gv = id => document.getElementById(id)?.value ?? null;
+  if (gv('sp-titel')        !== null) hub.stageplan.opdrachtTitel         = gv('sp-titel');
+  if (gv('sp-omschrijving') !== null) hub.stageplan.opdrachtOmschrijving  = gv('sp-omschrijving');
+  if (gv('sp-freq')         !== null) hub.stageplan.begeleidingFrequentie = gv('sp-freq');
+  if (gv('sp-beg-bedrijf')  !== null) hub.stageplan.begeleidingBedrijf    = gv('sp-beg-bedrijf');
+  if (gv('sp-beg-school')   !== null) hub.stageplan.begeleidingSchool     = gv('sp-beg-school');
+  if (gv('sp-eval')         !== null) hub.stageplan.evaluatieCriteria     = gv('sp-eval');
+  if (gv('sp-notities')     !== null) hub.stageplan.notities              = gv('sp-notities');
+  hub.leerdoelen.forEach((l, i) => {
+    const t = gv('ld-title-' + i); if (t !== null) l.title = t;
+    const n = gv('ld-notes-' + i); if (n !== null) l.notes = n;
+  });
+  hub.log.unshift({ text:`${roleLabels[hub.role]} heeft het stageplan bijgewerkt`, time:'Zojuist', color:'var(--blue)' });
+  notify('Stageplan opgeslagen');
+  showTab('stageplan');
+}
+
+function setPct(idx, val) {
+  // When on stageplan tab, preserve any unsaved form text before re-render
+  if (hub.currentTab === 'stageplan') {
+    const gv = id => document.getElementById(id)?.value ?? null;
+    if (gv('sp-titel')        !== null) hub.stageplan.opdrachtTitel         = gv('sp-titel');
+    if (gv('sp-omschrijving') !== null) hub.stageplan.opdrachtOmschrijving  = gv('sp-omschrijving');
+    if (gv('sp-freq')         !== null) hub.stageplan.begeleidingFrequentie = gv('sp-freq');
+    if (gv('sp-beg-bedrijf')  !== null) hub.stageplan.begeleidingBedrijf    = gv('sp-beg-bedrijf');
+    if (gv('sp-beg-school')   !== null) hub.stageplan.begeleidingSchool     = gv('sp-beg-school');
+    if (gv('sp-eval')         !== null) hub.stageplan.evaluatieCriteria     = gv('sp-eval');
+    if (gv('sp-notities')     !== null) hub.stageplan.notities              = gv('sp-notities');
+    hub.leerdoelen.forEach((l, i) => {
+      const t = gv('ld-title-' + i); if (t !== null) l.title = t;
+      const n = gv('ld-notes-' + i); if (n !== null) l.notes = n;
+    });
+  }
+  hub.leerdoelen[idx].pct = val;
+  hub.log.unshift({ text:`Voortgang "${hub.leerdoelen[idx].title}" bijgewerkt naar ${val}%`, time:'Zojuist', color:'var(--green)' });
+  notify(`Voortgang: ${val}%`);
+  showTab(hub.currentTab);
+}
+
+function toggleTask(id) {
+  const t = hub.tasks.find(x => x.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  hub.log.unshift({ text:`${roleLabels[hub.role]} heeft taak "${t.title.substring(0,35)}" ${t.done?'afgevinkt':'heropend'}`, time:'Zojuist', color:t.done?'var(--green)':'var(--ink3)' });
+  updateTaskBadge();
+  notify(t.done ? 'Taak afgevinkt ✓' : 'Heropend');
+  renderTakenFilter(_takenFilter);
+}
+
+function removeTask(id) {
+  const t = hub.tasks.find(x => x.id === id);
+  if (!t) return;
+  hub.tasks = hub.tasks.filter(x => x.id !== id);
+  hub.log.unshift({ text:`Taak "${t.title.substring(0,35)}" verwijderd`, time:'Zojuist', color:'var(--red)' });
+  updateTaskBadge();
+  notify('Taak verwijderd');
+  renderTakenFilter(_takenFilter);
+}
+
+function saveTask() {
+  const title = document.getElementById('task-title-input').value.trim();
+  if (!title) { notify('Geef een taaknaam op'); return; }
+  hub.tasks.unshift({
+    id:       hub.nextId++,
+    title,
+    desc:     document.getElementById('task-desc-input').value.trim(),
+    assigned: document.getElementById('task-assign-input').value,
+    priority: document.getElementById('task-prio-input').value,
+    deadline: document.getElementById('task-deadline-input').value,
+    done:     false,
+    maker:    hub.role,
+    date:     new Date().toLocaleDateString('nl-NL', { day:'numeric', month:'short' })
+  });
+  hub.log.unshift({ text:`${roleLabels[hub.role]} heeft taak "${title}" toegevoegd`, time:'Zojuist', color:'var(--blue)' });
+  updateTaskBadge();
+  _takenFilter = 'alle';
+  closeModal('modal-task');
+  notify('Taak toegevoegd');
+  showTab('taken');
+}
+
+function toggleDeadline(id) {
+  const d = hub.deadlines.find(x => x.id === id);
+  if (d) { d.done = !d.done; notify(d.done ? 'Deadline afgerond ✓' : 'Heropend'); renderPlanningFilter(_planningFilter); }
+}
+
+function removeDeadline(id) {
+  hub.deadlines = hub.deadlines.filter(x => x.id !== id);
+  notify('Deadline verwijderd');
+  renderPlanningFilter(_planningFilter);
+}
+
+function saveDeadline() {
+  const title = document.getElementById('dl-title-input').value.trim();
+  const date  = document.getElementById('dl-date-input').value;
+  if (!title || !date) { notify('Vul omschrijving en datum in'); return; }
+  hub.deadlines.push({
+    id:   hub.nextId++,
+    title, date,
+    type: document.getElementById('dl-type-input').value,
+    who:  document.getElementById('dl-who-input').value,
+    done: false
+  });
+  hub.log.unshift({ text:`${roleLabels[hub.role]} heeft deadline "${title}" toegevoegd`, time:'Zojuist', color:'var(--blue)' });
+  closeModal('modal-deadline');
+  notify('Deadline toegevoegd');
+  showTab('planning');
+}
+
+function saveReflectie() {
+  const text = document.getElementById('ref-text-input').value.trim();
+  if (!text) { notify('Schrijf eerst een reflectie'); return; }
+  const authorName = hub.isDraft ? (_authUserName || 'Student') : match.student.name;
+  hub.reflecties.unshift({
+    week:   `Week ${hub.reflecties.length + 7}`,
+    text,
+    author: authorName,
+    date:   new Date().toLocaleDateString('nl-NL', { day:'numeric', month:'short' })
+  });
+  hub.log.unshift({ text:`${authorName} heeft een reflectie toegevoegd`, time:'Zojuist', color:'var(--blue)' });
+  closeModal('modal-reflectie');
+  notify('Reflectie opgeslagen');
+  showTab('voortgang');
+}
+
+// ── Exports ───────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const stuName  = hub.isDraft ? (_authUserName || 'concept') : match.student.name;
+  const bedName  = hub.isDraft ? '—' : match.company.name;
+  const schName  = hub.isDraft ? '—' : match.school.name;
+  const period   = hub.isDraft ? 'Concept' : `${match.company.start} – ${match.company.eind}`;
+  const csv = (rows) => rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const rows = [
+    ['Type','Omschrijving','Datum / Details','Status','Partij'],
+    ['','=== STAGEGEGEVENS ===','','',''],
+    ['Opdracht', hub.stageplan.opdrachtTitel, period, 'Lopend', 'Alle partijen'],
+    ['Begeleider bedrijf', hub.stageplan.begeleidingBedrijf, hub.stageplan.begeleidingFrequentie, '', bedName],
+    ['Begeleider school',  hub.stageplan.begeleidingSchool,  '', '', schName],
+    ['','=== LEERDOELEN ===','','',''],
+    ...hub.leerdoelen.map(l => ['Leerdoel', l.title, `${l.pct}%`, l.pct>=60?'Op schema':l.pct>=35?'In ontwikkeling':'Aandacht nodig', stuName]),
+    ['','=== PLANNING ===','','',''],
+    ...hub.deadlines.map(d  => ['Deadline', d.title, d.date, d.done?'Afgerond':'Openstaand', d.who]),
+    ['','=== TAKEN ===','','',''],
+    ...hub.tasks.map(t     => ['Taak', t.title, t.deadline||'', t.done?'Afgerond':'Open', t.assigned])
+  ];
+  const blob = new Blob(['\uFEFF' + csv(rows)], { type:'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `stageplan-${stuName.replace(/ /g,'-')}-${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  notify('CSV gedownload');
+}
+
+function exportPDF() {
+  if (typeof window.jspdf === 'undefined') { notify('PDF-bibliotheek nog niet geladen, probeer opnieuw'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 18;
+
+  const section = (title) => {
+    if (y > 260) { doc.addPage(); y = 18; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.setFillColor(244,243,239);
+    doc.rect(12, y-4, 186, 8, 'F');
+    doc.text(title, 14, y); y += 8;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  };
+  const line = (label, val) => {
+    if (y > 270) { doc.addPage(); y = 18; }
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text(label + ':', 14, y);
+    doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(String(val||'—'), 145);
+    doc.text(lines, 50, y); y += lines.length * 5 + 2;
+  };
+
+  // Header
+  const _pdfStu = hub.isDraft ? (_authUserName || 'Concept') : match.student.name;
+  const _pdfBed = hub.isDraft ? 'Geen match' : match.company.name;
+  const _pdfVac = hub.isDraft ? 'Concept Stagevoorbereiding' : match.company.vacature;
+  const _pdfPeriod = hub.isDraft ? 'Concept' : `${match.company.start} – ${match.company.eind} | ${match.company.duur}`;
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  doc.text('Stage Hub — Internly', 14, y); y += 7;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text(`${_pdfStu} × ${_pdfBed} — ${_pdfVac}`, 14, y); y += 5;
+  doc.text(_pdfPeriod, 14, y); y += 10;
+  doc.setTextColor(0);
+
+  section('Stageopdracht');
+  line('Titel',       hub.stageplan.opdrachtTitel);
+  line('Omschrijving',hub.stageplan.opdrachtOmschrijving);
+  line('Begeleider bedrijf', hub.stageplan.begeleidingBedrijf);
+  line('Begeleider school',  hub.stageplan.begeleidingSchool);
+  line('Frequentie',  hub.stageplan.begeleidingFrequentie);
+  line('Evaluatiecriteria', hub.stageplan.evaluatieCriteria);
+  if (hub.stageplan.notities) line('Notities', hub.stageplan.notities);
+  y += 3;
+
+  section('Leerdoelen');
+  hub.leerdoelen.forEach(l => {
+    line(l.title, `${l.pct}% — ${l.notes || 'Geen toelichting'}`);
+  });
+  y += 3;
+
+  section('Planning');
+  hub.deadlines.forEach(d => {
+    if (y > 270) { doc.addPage(); y = 18; }
+    doc.setFont('helvetica', d.done ? 'normal' : 'normal');
+    doc.setTextColor(d.done ? 150 : 0);
+    const types = { verplicht:'[V]', begeleiding:'[B]', oplevering:'[O]' };
+    doc.text(`${d.date}  ${types[d.type]||''}  ${d.title}  ${d.done?'✓':''}`, 14, y); y += 5;
+  });
+  doc.setTextColor(0); y += 3;
+
+  section('Taken');
+  hub.tasks.forEach(t => {
+    if (y > 270) { doc.addPage(); y = 18; }
+    doc.setTextColor(t.done ? 150 : 0);
+    doc.text(`${t.done?'✓':'○'}  ${t.title} (${t.assigned} / ${t.priority})`, 14, y); y += 5;
+  });
+  doc.setTextColor(0);
+
+  doc.save(`stageplan-${_pdfStu.replace(/ /g,'-')}-${new Date().toISOString().split('T')[0]}.pdf`);
+  notify('PDF gedownload');
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function pctColor(pct) {
+  return pct >= 60 ? 'var(--green)' : pct >= 35 ? 'var(--amber)' : 'var(--red)';
+}
+
+function whoLabel(who) {
+  const map = { student:'Student', bedrijf:'Bedrijf', school:'School', alle:'Alle partijen' };
+  return `<span style="font-size:.72rem;color:var(--ink3)">${map[who] || who}</span>`;
+}
+
+function assignedIcon(r) {
+  return { student:'👤', bedrijf:'🏢', school:'🎓' }[r] || '👤';
+}
+
+function updateTaskBadge() {
+  const open  = hub.tasks.filter(t => !t.done).length;
+  const badge = document.getElementById('taken-badge');
+  if (badge) { badge.textContent = open; badge.style.display = open > 0 ? 'inline' : 'none'; }
+}
+
+function openModal(id) {
+  const el = document.getElementById(id);
+  el.querySelectorAll('input, textarea').forEach(f => { f.value = ''; });
+  el.querySelectorAll('select').forEach(s => { s.selectedIndex = 0; });
+  el.classList.add('open');
+  requestAnimationFrame(() => { const f = el.querySelector('input, textarea'); if (f) f.focus(); });
+}
+function closeModal(id) {
+  const bg = document.getElementById(id);
+  const modal = bg.querySelector('.modal');
+  if (modal) {
+    modal.style.animation = 'slideDown .18s ease forwards';
+    setTimeout(() => {
+      bg.classList.remove('open');
+      modal.style.animation = '';
+    }, 175);
+  } else {
+    bg.classList.remove('open');
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-bg.open').forEach(m => closeModal(m.id));
+});
+function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+function notify(msg, type = '') {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.className = 'notif show' + (type ? ' notif-' + type : '');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── Quick todos & personal note ───────────────────────────────────────────────
+function addQuickTodo() {
+  const input = document.getElementById('qt-input');
+  const text = input?.value.trim();
+  if (!text) return;
+  hub.quickTodos.push({ id: hub.nextId++, text, done: false });
+  showTab('overzicht');
+  requestAnimationFrame(() => { document.getElementById('qt-input')?.focus(); });
+}
+
+function toggleQuickTodo(id) {
+  const t = hub.quickTodos.find(t => t.id === id);
+  if (t) { t.done = !t.done; showTab('overzicht'); }
+}
+
+function deleteQuickTodo(id) {
+  hub.quickTodos = hub.quickTodos.filter(t => t.id !== id);
+  showTab('overzicht');
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

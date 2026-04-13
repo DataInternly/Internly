@@ -76,6 +76,7 @@ const InternlyCalendar = (() => {
 @media(min-width:520px){.mtg-bg{align-items:center;}.mtg-box{border-radius:12px!important;max-width:480px;}}
 .mtg-box{background:#fff;border-radius:12px 12px 0 0;padding:1.5rem;width:100%;max-height:90vh;overflow-y:auto;animation:calUp .2s ease;}
 @keyframes calUp{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes calDown{from{transform:translateY(0);opacity:1;}to{transform:translateY(18px);opacity:0;}}
 .mtg-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;}
 .mtg-title{font-family:'Bricolage Grotesque','Outfit',sans-serif;font-size:1rem;font-weight:700;color:#0d1520;}
 .mtg-close{background:none;border:none;font-size:1.1rem;cursor:pointer;color:#7a8799;padding:4px;}
@@ -103,6 +104,14 @@ const InternlyCalendar = (() => {
 .cal-chat-btn{width:38px;height:38px;border-radius:8px;background:#e8f5ee;border:1.5px solid rgba(26,122,72,.25);display:flex;align-items:center;justify-content:center;font-size:1.05rem;cursor:pointer;flex-shrink:0;transition:background .12s,transform .1s;}
 .cal-chat-btn:hover{background:#d5eede;}
 .cal-chat-btn:active{transform:scale(.94);}
+
+/* ripple on cell toggle */
+.ical-cell{position:relative;overflow:hidden;}
+.ical-ripple{position:absolute;inset:0;border-radius:inherit;background:rgba(255,255,255,.55);pointer-events:none;animation:icalRipple .28s ease forwards;}
+@keyframes icalRipple{from{opacity:.9;transform:scale(.4);}to{opacity:0;transform:scale(1.5);}}
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){.ical-cell,.cal-chat-btn{transition:none!important;}.ical-ripple{display:none;}}
     `;
     document.head.appendChild(s);
   }
@@ -180,6 +189,12 @@ const InternlyCalendar = (() => {
     if (next===null) delete _slots[key]; else _slots[key]=next;
     const cell = document.querySelector(`[data-d="${d}"][data-h="${h}"]`);
     if (cell) {
+      // Ripple feedback
+      const r = document.createElement('span');
+      r.className = 'ical-ripple';
+      cell.appendChild(r);
+      r.addEventListener('animationend', () => r.remove(), { once: true });
+
       cell.className = `ical-cell ${_slots[key]||''}`;
       cell.title = `${DAYS[d]} ${h}:00${_slots[key]?' — '+_slots[key]:''}`;
     }
@@ -267,8 +282,15 @@ const InternlyCalendar = (() => {
   }
 
   function closeModal() {
-    const m = document.getElementById('mtg-modal-bg');
-    if (m) m.remove();
+    const bg = document.getElementById('mtg-modal-bg');
+    if (!bg) return;
+    const box = bg.querySelector('.mtg-box');
+    if (box) {
+      box.style.animation = 'calDown .18s ease forwards';
+      setTimeout(() => bg.remove(), 175);
+    } else {
+      bg.remove();
+    }
   }
 
   function updateLabel() {
