@@ -9,9 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ── Design tokens ───────────────────────────────────────────── */
     :root {
+      /* Core */
       --primary:     #1a7a48;
       --dark-green:  #0f5c36;
       --accent:      #FF7E42;
@@ -19,16 +21,36 @@
       --ink:         #0d1520;
       --ink-2:       #1a2535;
       --ink-3:       #253047;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
       --bg:          #f4f3ef;
+      --bg2:         #eceae4;
+      --bg3:         #dddbd5;
       --white:       #ffffff;
       --border:      #e5e3de;
+      --border2:     #d4d1cb;
       --text:        #1a1a1a;
       --muted:       #6b7280;
-      --blue:        #1756a8;
-      --blue-bg:     #eef3fb;
-      --r:           16px;
+      /* Radius */
+      --r:           14px;
+      --r-sm:        8px;
+      /* Layout */
       --sidebar-w:   220px;
       --topbar-h:    60px;
+      /* Accent / orange */
+      --orange:      #FF7E42;
+      --orange-dk:   #e05c1a;
+      --orange-bg:   #fff2eb;
+      /* Party colors */
+      --student:     #1756a8;
+      --student-bg:  #e8f0fc;
+      --bedrijf:     #1a7a48;
+      --bedrijf-bg:  #e8f5ee;
+      --school:      #a06010;
+      --school-bg:   #fdf3e0;
+      /* Semantic aliases (kept for backward compat) */
+      --blue:        #1756a8;
+      --blue-bg:     #e8f0fc;
       --green:       #1a7a48;
       --green-bg:    #e8f5ee;
       --amber:       #a06010;
@@ -1381,9 +1403,379 @@
 
     /* Shake on validation error */
     .shake { animation: shakeIn 0.3s ease; }
+
+    /* ── Hide role-picker during auth boot ───────────────────────────────── */
+    body.auth-boot #role-picker { display: none !important; }
+
+    /* ── Loading spinner ──────────────────────────────────────────────────── */
+    #hub-spinner {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(244,243,239,.82);
+      z-index: 9999;
+      align-items: center; justify-content: center;
+    }
+    #hub-spinner.show { display: flex; }
+    .spinner-ring {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Match indicator ──────────────────────────────────────────────────── */
+    .match-indicator {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1.1rem 1.4rem .9rem;
+      margin-bottom: 1.1rem;
+    }
+    .party-row {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: .6rem;
+    }
+    .party-node {
+      display: flex; flex-direction: column;
+      align-items: center; gap: .3rem; flex-shrink: 0;
+    }
+    .party-connector {
+      flex: 1; height: 0;
+      border-top: 2px dashed var(--border2);
+      margin: 0 .5rem;
+      position: relative; top: -14px;
+    }
+    .party-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700; font-size: .82rem;
+      border: 2px solid transparent;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .party-avatar.active {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-bg);
+    }
+    .party-name {
+      font-size: .74rem; font-weight: 600; color: var(--ink);
+      text-align: center; max-width: 80px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .party-role {
+      font-size: .63rem; color: var(--ink3);
+      text-align: center; letter-spacing: .05em; text-transform: uppercase;
+    }
+    .stage-meta {
+      display: flex; align-items: center; gap: .65rem;
+      flex-wrap: wrap; font-size: .8rem; color: var(--ink2);
+      margin-bottom: .7rem;
+    }
+    .stage-meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .progress-stage {
+      height: 4px; background: var(--bg2);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-stage-fill {
+      height: 100%; border-radius: 2px; transition: width .6s ease;
+    }
+    .progress-stage-wrap {
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .progress-stage-wrap .progress-stage { flex: 1; }
+    .progress-stage-pct {
+      font-size: .74rem; font-weight: 700; color: var(--ink2);
+      white-space: nowrap; min-width: 32px; text-align: right;
+    }
+    .mi-stage-info {
+      margin-bottom: .65rem;
+    }
+    .mi-stage-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .92rem; font-weight: 700; color: var(--ink);
+      margin-bottom: .25rem;
+    }
+    .mi-stage-meta {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .78rem; color: var(--ink3); flex-wrap: wrap;
+    }
+    .mi-status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); display: inline-block; flex-shrink: 0;
+    }
+
+    /* ── Kalender ─────────────────────────────────────────────────────────── */
+    .kal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .kal-month-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 600; color: var(--ink);
+      text-transform: capitalize;
+    }
+    .kal-nav-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--border2); background: var(--white);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; color: var(--ink2); transition: background .12s;
+    }
+    .kal-nav-btn:hover { background: var(--bg2); }
+    .kal-filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .kal-filter {
+      padding: 4px 14px; border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--white); cursor: pointer;
+      font-size: .8rem; font-family: 'Outfit', sans-serif;
+      color: var(--text); transition: all .15s;
+    }
+    .kal-filter.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .kal-grid-head {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 3px; margin-bottom: 3px;
+    }
+    .kal-dow {
+      text-align: center; font-size: .68rem;
+      color: var(--muted); font-weight: 700;
+      padding: 3px 0; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .kal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .kal-day {
+      min-height: 58px; padding: 5px;
+      border: 1px solid var(--border); border-radius: var(--r-sm);
+      background: var(--white); cursor: pointer;
+      transition: border-color .12s, background .12s;
+    }
+    .kal-day:hover { border-color: var(--primary); }
+    .kal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+    .kal-day.today { border-color: var(--orange); background: var(--orange-bg); }
+    .kal-day.overdue-day { background: var(--red-bg); }
+    .kal-day-num { font-size: .78rem; font-weight: 600; color: var(--ink); line-height: 1; }
+    .kal-day.empty .kal-day-num { visibility: hidden; }
+    .kal-dots { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 4px; }
+    .kal-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .kal-dot.oplevering { background: var(--orange); }
+    .kal-dot.meeting    { background: #7c3aed; }
+    .kal-dot.verplicht  { background: var(--blue); }
+    .kal-dot.begeleiding{ background: var(--green); }
+    .kal-dot.verlopen   { background: var(--red); }
+    .kal-dot.deadline   { background: var(--orange); }
+    .kal-legend {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-top: 12px; font-size: .75rem; color: var(--muted);
+      padding-top: 12px; border-top: 1px solid var(--border);
+    }
+    .kal-legend-item { display: flex; align-items: center; gap: 5px; }
+    .kal-popup {
+      position: fixed;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.13);
+      z-index: 1000;
+      min-width: 220px; max-width: 300px;
+    }
+    .kal-popup-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700; font-size: .9rem;
+      color: var(--ink); margin-bottom: 10px;
+    }
+    .kal-popup-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: .82rem; color: var(--text); margin-bottom: 6px; line-height: 1.4;
+    }
+    .kal-popup-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 4px;
+    }
+    .kal-popup-dot.oplevering { background: var(--orange); }
+    .kal-popup-dot.meeting    { background: #7c3aed; }
+    .kal-popup-dot.verplicht  { background: var(--blue); }
+    .kal-popup-dot.verlopen   { background: var(--red); }
+    .kal-popup-dot.deadline   { background: var(--orange); }
+    .kal-popup-close {
+      position: absolute; top: 8px; right: 10px;
+      background: none; border: none; cursor: pointer;
+      font-size: 1.1rem; color: var(--muted); line-height: 1;
+    }
+
+    /* ── Stageplan ────────────────────────────────────────────────────────── */
+    .sp-section-head {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .95rem; font-weight: 700; color: var(--ink);
+      padding: 14px 0 10px;
+      border-top: 1px solid var(--border); margin-top: 6px;
+    }
+    .sp-section-head:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    .sp-section-icon { font-size: 1rem; line-height: 1; margin-right: .25rem; }
+    .deelvragen-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .deelvraag-row { display: flex; gap: 10px; align-items: center; }
+    .deelvraag-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--bg2); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 700; color: var(--ink3);
+    }
+    .deelvraag-row .form-input { flex: 1; }
+    .deelvraag-remove {
+      width: 28px; height: 28px; border-radius: var(--r-sm);
+      border: 1px solid rgba(184,32,32,.18);
+      background: var(--red-bg); color: var(--red);
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: .82rem; flex-shrink: 0;
+      transition: background .12s;
+    }
+    .deelvraag-remove:hover { background: #fbd0d0; }
+    .add-deelvraag {
+      font-size: .82rem; color: var(--orange);
+      background: none; border: 1.5px dashed rgba(255,126,66,.45);
+      border-radius: var(--r-sm); padding: .5rem 1rem;
+      cursor: pointer; width: 100%; text-align: left;
+      transition: background .12s; font-family: 'Outfit', sans-serif;
+    }
+    .add-deelvraag:hover { background: var(--orange-bg); }
+    .sp-readonly-note {
+      background: var(--student-bg); border: 1.5px solid #bfdbfe;
+      border-radius: var(--r-sm); padding: 10px 14px;
+      margin-bottom: 14px; font-size: .83rem; color: var(--student);
+    }
+    .sp-field-val { padding: 6px 0; font-size: .88rem; color: var(--text); line-height: 1.55; }
+
+    /* ── Planning urgency ─────────────────────────────────────────────────── */
+    .dl-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 11px 14px; border-radius: var(--r-sm);
+      background: var(--white); border: 1px solid var(--border);
+      border-left-width: 3px; border-left-color: transparent;
+      margin-bottom: 8px; transition: border-color .15s;
+    }
+    .dl-item.overdue { border-left-color: var(--red); }
+    .dl-item.soon    { border-left-color: var(--amber); }
+    .dl-item.done    { opacity: .55; }
+    .dl-date {
+      min-width: 46px; text-align: center; flex-shrink: 0;
+      background: var(--bg2); border-radius: var(--r-sm); padding: .3rem .45rem;
+    }
+    .dl-date.overdue-date { background: var(--red-bg); }
+    .dl-date.soon-date    { background: var(--amber-bg); }
+    .dl-day {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.35rem; font-weight: 700; line-height: 1; color: var(--ink);
+    }
+    .dl-date.overdue-date .dl-day,
+    .dl-date.overdue-date .dl-month { color: var(--red); }
+    .dl-date.soon-date .dl-day,
+    .dl-date.soon-date .dl-month    { color: var(--amber); }
+    .dl-date.done-date .dl-day,
+    .dl-date.done-date .dl-month    { color: var(--muted); }
+    .dl-month {
+      font-size: .58rem; color: var(--ink3);
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .dl-body { flex: 1; min-width: 0; }
+    .dl-label {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 2px;
+    }
+    .dl-label.overdue-label { color: var(--red); }
+    .dl-label.soon-label    { color: var(--amber); }
+    .dl-title { font-weight: 600; font-size: .9rem; color: var(--ink); }
+    .dl-title.done-title { text-decoration: line-through; color: var(--muted); }
+    .dl-sub   { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .dl-meta  { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--muted); margin-top: 2px; flex-wrap: wrap; }
+    .dl-urgency { padding: 1px 8px; border-radius: 20px; font-size: .68rem; font-weight: 700; }
+    .dl-urgency.overdue { background: var(--red-bg); color: var(--red); }
+    .dl-urgency.soon    { background: var(--amber-bg); color: var(--amber); }
+
+    /* ── Taken ────────────────────────────────────────────────────────────── */
+    .task-party-counts {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .tpc-item { font-size: .82rem; color: var(--muted); padding: 3px 10px;
+      border-radius: 20px; border: 1.5px solid var(--border);
+      display: inline-flex; align-items: center; gap: 6px; }
+    .tpc-item.active { border-color: var(--orange); color: var(--orange); font-weight: 600; }
+    .tpc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .task-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 12px 14px;
+      margin-bottom: 8px; transition: opacity .2s;
+    }
+    .task-item.done { opacity: .5; }
+    .task-check {
+      width: 20px; height: 20px; border-radius: 5px;
+      border: 1.5px solid rgba(13,21,32,.2); cursor: pointer;
+      transition: all .15s; flex-shrink: 0; margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      background: none;
+    }
+    .task-check.done { background: var(--green); border-color: var(--green); }
+    .task-check.done::after { content: '✓'; font-size: .65rem; color: #fff; font-weight: 700; }
+    .task-body { flex: 1; min-width: 0; }
+    .task-title { font-weight: 600; font-size: .9rem; color: var(--ink); line-height: 1.3; }
+    .task-item.done .task-title { text-decoration: line-through; color: var(--muted); }
+    .task-desc { font-size: .8rem; color: var(--muted); margin-top: 3px; }
+    .task-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .priority { padding: 2px 9px; border-radius: 20px; font-size: .7rem; font-weight: 700; }
+    .priority.hoog   { background: var(--red-bg);   color: var(--red); }
+    .priority.medium { background: var(--amber-bg); color: var(--amber); }
+    .priority.laag   { background: var(--green-bg); color: var(--green); }
+
+    /* ── Voortgang ────────────────────────────────────────────────────────── */
+    .ld-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 14px 16px; margin-bottom: 10px;
+    }
+    .ld-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .ld-name { font-weight: 600; font-size: .9rem; color: var(--ink); }
+    .ld-pct  { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 700; }
+    .ld-pct-btns { display: flex; gap: 5px; flex-wrap: wrap; margin: 8px 0; }
+    .ld-pct-btn {
+      padding: 3px 11px; border-radius: 20px; font-size: .75rem;
+      border: 1.5px solid var(--border); background: var(--white);
+      cursor: pointer; font-family: 'Outfit', sans-serif; transition: all .12s;
+    }
+    .ld-pct-btn.active { color: #fff; }
+    .ld-notes { font-size: .8rem; color: var(--muted); margin-top: 6px; line-height: 1.45; }
+    .avg-progress-wrap { background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 14px 16px; margin-bottom: 16px; }
+    .avg-title { font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); margin-bottom: 10px; }
+    .avg-row { display: flex; align-items: center; gap: 10px; }
+    .avg-pct { font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.3rem; font-weight: 700; min-width: 42px; }
+    .avg-bar-wrap { flex: 1; height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+    .avg-bar-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+    .avg-labels { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: .75rem; color: var(--muted); }
+    .avg-label-item { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Skeleton loading ─────────────────────────────────────────────────── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: var(--r-sm);
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Toast (typed) ────────────────────────────────────────────────────── */
+    #toast {
+      background: var(--ink); color: #fff;
+    }
+    #toast.success { background: var(--green); }
+    #toast.error   { background: var(--red); }
+
   </style>
 </head>
 <body>
+
+<!-- ══ Spinner ═══════════════════════════════════════════════════════════════ -->
+<div id="hub-spinner"><div class="spinner-ring"></div></div>
 
 <!-- ══ Role picker ══════════════════════════════════════════════════════════ -->
 <div id="role-picker">
@@ -1461,6 +1853,24 @@
         </svg>
         Planning
       </button>
+      <button class="sidebar-item" data-tab="kalender" onclick="switchTab('kalender')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          <circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="12" cy="16" r="1" fill="currentColor"/>
+          <circle cx="16" cy="16" r="1" fill="currentColor"/>
+        </svg>
+        Kalender
+      </button>
+      <button class="sidebar-item" data-tab="stageplan" onclick="switchTab('stageplan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Stageplan
+      </button>
       <button class="sidebar-item" data-tab="taken" onclick="switchTab('taken')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
@@ -1530,6 +1940,23 @@
 <script>
 'use strict';
 
+/* ── Supabase client ─────────────────────────────────────────────────────── */
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Match ID from URL (?match=UUID) — null in demo mode
+const MATCH_ID = new URLSearchParams(window.location.search).get('match');
+// Hide role-picker immediately so it doesn't flash during auth check
+if (MATCH_ID) document.body.classList.add('auth-boot');
+
+/* ── Kalender state ──────────────────────────────────────────────────────── */
+let kalState = {
+  year:  new Date().getFullYear(),
+  month: new Date().getMonth(),  // 0-indexed
+  filter: 'alles'                // 'alles' | 'deadlines' | 'meetings'
+};
+
 /* ── Demo data ──────────────────────────────────────────────────────────── */
 
 const match = {
@@ -1570,11 +1997,11 @@ let hubState = {
   nextId: 20,
 
   tasks: [
-    { id: 1, title: 'Onderzoeksvoorstel schrijven', desc: 'Schrijf een voorstel van 3-5 pagina\'s over wetenschapscommunicatie voor brede doelgroepen.', deadline: '2026-03-15', status: 'done',        assignee: 'student' },
-    { id: 2, title: 'Doelgroepanalyse uitvoeren',   desc: 'Analyseer de doelgroep voor de NIOZ nieuwsbrief en socialmediakanalen.',                    deadline: '2026-03-28', status: 'in-progress', assignee: 'student' },
-    { id: 3, title: 'Interne presentatie geven',     desc: 'Presenteer de tussentijdse bevindingen aan het communicatieteam van NIOZ.',                  deadline: '2026-04-10', status: 'todo',        assignee: 'student' },
-    { id: 4, title: 'Stagegesprek week 8 plannen',   desc: 'Plan het formele stagegesprek met de stagebegeleider en schoolmentor.',                      deadline: '2026-04-17', status: 'todo',        assignee: 'bedrijf' },
-    { id: 5, title: 'Tussentijdse beoordeling',      desc: 'Vul het beoordelingsformulier in via het schoolportaal voor de tussentijdse evaluatie.',     deadline: '2026-04-22', status: 'todo',        assignee: 'school'  }
+    { id: 1, title: 'Onderzoeksvoorstel schrijven', desc: 'Schrijf een voorstel van 3-5 pagina\'s over wetenschapscommunicatie voor brede doelgroepen.', deadline: '2026-03-15', status: 'done',        assignee: 'student', priority: 'hoog'   },
+    { id: 2, title: 'Doelgroepanalyse uitvoeren',   desc: 'Analyseer de doelgroep voor de NIOZ nieuwsbrief en socialmediakanalen.',                    deadline: '2026-03-28', status: 'in-progress', assignee: 'student', priority: 'hoog'   },
+    { id: 3, title: 'Interne presentatie geven',     desc: 'Presenteer de tussentijdse bevindingen aan het communicatieteam van NIOZ.',                  deadline: '2026-04-10', status: 'todo',        assignee: 'student', priority: 'medium' },
+    { id: 4, title: 'Stagegesprek week 8 plannen',   desc: 'Plan het formele stagegesprek met de stagebegeleider en schoolmentor.',                      deadline: '2026-04-17', status: 'todo',        assignee: 'bedrijf', priority: 'medium' },
+    { id: 5, title: 'Tussentijdse beoordeling',      desc: 'Vul het beoordelingsformulier in via het schoolportaal voor de tussentijdse evaluatie.',     deadline: '2026-04-22', status: 'todo',        assignee: 'school',  priority: 'laag'   }
   ],
 
   deadlines: [
@@ -1618,6 +2045,24 @@ let hubState = {
   ],
 
   nextMeetingId: 4,
+
+  stageplan: {
+    _dbId:              null,
+    stageopdracht:      'Ontwikkel een content- en communicatiestrategie voor NIOZ om wetenschappelijk onderzoek toegankelijk te maken voor brede publieksgroepen via website, nieuwsbrief en sociale media.',
+    hoofdvraag:         'Hoe kan NIOZ Zeewetenschappen haar wetenschappelijke bevindingen effectiever communiceren naar een breed, niet-wetenschappelijk publiek?',
+    onderzoekstype:     'mixed',
+    context:            'NIOZ publiceert veel onderzoek maar bereikt vooral een wetenschappelijk publiek. Er is behoefte aan een strategie om ook burgers, scholieren en beleidsmakers te bereiken.',
+    methode:            'mixed',
+    methodeomschrijving:'Combinatie van diepte-interviews met communicatiemedewerkers en een online enquête onder volgers van het NIOZ sociale media-kanaal.',
+    resultaattype:      'advies',
+    doelgroep:          'Communicatieteam NIOZ, directie en externe stakeholders',
+    deelvragen: [
+      { id: 1, tekst: 'Welke doelgroepen bereikt NIOZ momenteel via haar communicatiekanalen?' },
+      { id: 2, tekst: 'Welke drempels ervaren niet-wetenschappelijke lezers bij wetenschapscontent?' },
+      { id: 3, tekst: 'Welke contentformaten scoren het best bij de gewenste doelgroepen?' }
+    ],
+    schoolnoot: ''
+  },
 
   meetings: [
     {
@@ -1698,21 +2143,24 @@ const CAN = {
     addTask: true, editTask: true, deleteTask: false, checkTask: true,
     addDeadline: false, editDeadline: false,
     addReflectie: true, editReflectie: true,
-    updateLeerdoel: true,
+    updateLeerdoel: true, editStageplan: true,
+    inviteSchool: true,
     viewLog: true, viewScores: false
   },
   bedrijf: {
     addTask: true, editTask: true, deleteTask: true, checkTask: true,
     addDeadline: true, editDeadline: true,
     addReflectie: false, editReflectie: false,
-    updateLeerdoel: true,
+    updateLeerdoel: true, editStageplan: true,
+    inviteSchool: true,
     viewLog: true, viewScores: true
   },
   school: {
     addTask: false, editTask: false, deleteTask: false, checkTask: false,
     addDeadline: false, editDeadline: false,
     addReflectie: false, editReflectie: false,
-    updateLeerdoel: false,
+    updateLeerdoel: false, editStageplan: false,
+    inviteSchool: false,
     viewLog: true, viewScores: true
   }
 };
@@ -1722,7 +2170,7 @@ function can(action) {
 }
 
 function roleName() {
-  return { student: match.student.name, bedrijf: match.company.name, school: match.school.name }[hubState.role] || hubState.role;
+  return { student: match.student.name, bedrijf: match.company.name, school: match.school.name }[hubState.role] || hubState.role || '';
 }
 
 /* ── Bootstrap ──────────────────────────────────────────────────────────── */
@@ -1735,12 +2183,240 @@ function startHub(role) {
   updateSidebarUser();
   updateTakenBadge();
   switchTab('overzicht');
+  if (MATCH_ID) loadHubFromDB();
 }
 
 function switchRole() {
+  document.body.classList.remove('auth-boot');
   document.getElementById('role-picker').style.display = 'flex';
   document.getElementById('app-shell').style.display = 'none';
   hubState.role = null;
+}
+
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
+
+function showSpinner() { document.getElementById('hub-spinner').classList.add('show'); }
+function hideSpinner() { document.getElementById('hub-spinner').classList.remove('show'); }
+
+/* ── Match indicator ──────────────────────────────────────────────────────── */
+
+function renderMatchIndicator() {
+  const role = hubState.role;
+  const wk = stageWeekNum();
+  const weekPct = wk.total > 0 ? Math.round((wk.current / wk.total) * 100) : 0;
+  const avgPct = hubState.leerdoelen.length
+    ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
+    : 0;
+
+  const node = (name, roleKey, colorVar, bgVar, label) => {
+    const initials = name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const isActive = role === roleKey;
+    return `
+      <div class="party-node">
+        <div class="party-avatar${isActive ? ' active' : ''}"
+             style="background:var(${bgVar});color:var(${colorVar});border-color:${isActive ? 'var(--orange)' : 'transparent'}">
+          ${initials}
+        </div>
+        <div class="party-name">${escHtml(name)}</div>
+        <div class="party-role">${label}</div>
+      </div>`;
+  };
+
+  return `
+    <div class="match-indicator">
+      <div class="party-row">
+        ${node(match.student.name, 'student', '--student', '--student-bg', 'Student')}
+        <div class="party-connector"></div>
+        ${node(match.company.name, 'bedrijf', '--bedrijf', '--bedrijf-bg', 'Bedrijf')}
+        <div class="party-connector"></div>
+        ${node(match.school.name,  'school',  '--school',  '--school-bg',  'School')}
+      </div>
+      <div class="mi-stage-info">
+        <div class="mi-stage-name">${escHtml(match.company.vacature)}</div>
+        <div class="mi-stage-meta">
+          <span class="mi-status-dot"></span>
+          Lopend &nbsp;·&nbsp; Week ${wk.current} van ${wk.total}
+          &nbsp;·&nbsp; ${escHtml(match.company.start)} – ${escHtml(match.company.eind)}
+        </div>
+      </div>
+      <div class="progress-stage-wrap">
+        <div class="progress-stage">
+          <div class="progress-stage-fill" style="width:${weekPct}%;background:${pctColor(avgPct)}"></div>
+        </div>
+        <span class="progress-stage-pct">${weekPct}%</span>
+      </div>
+    </div>`;
+}
+
+/* ── DB loader ────────────────────────────────────────────────────────────── */
+
+async function loadHubFromDB() {
+  if (!MATCH_ID) return;
+  showSpinner();
+  try {
+    const [planRes, leerdoelenRes, deadlinesRes, tasksRes, reflectiesRes, logRes] = await Promise.all([
+      db.from('stage_plans').select('*').eq('match_id', MATCH_ID).maybeSingle(),
+      db.from('stage_leerdoelen').select('*').eq('match_id', MATCH_ID).order('created_at'),
+      db.from('stage_deadlines').select('*').eq('match_id', MATCH_ID).order('date'),
+      db.from('stage_tasks').select('*').eq('match_id', MATCH_ID).order('created_at'),
+      db.from('stage_reflecties').select('*').eq('match_id', MATCH_ID).order('date', { ascending: false }),
+      db.from('stage_log').select('*').eq('match_id', MATCH_ID).order('created_at', { ascending: false }).limit(20)
+    ]);
+
+    if (planRes.data) {
+      const p = planRes.data;
+      hubState.stageplan = {
+        _dbId:              p.id,
+        stageopdracht:      p.stageopdracht      || '',
+        hoofdvraag:         p.hoofdvraag         || '',
+        onderzoekstype:     p.onderzoekstype      || 'kwalitatief',
+        context:            p.context             || '',
+        methode:            p.methode             || 'interviews',
+        methodeomschrijving: p.methodeomschrijving || '',
+        resultaattype:      p.resultaattype       || 'rapport',
+        doelgroep:          p.doelgroep           || '',
+        deelvragen:         Array.isArray(p.deelvragen) ? p.deelvragen : [],
+        schoolnoot:         p.schoolnoot          || ''
+      };
+      hubState.schoolInvited = p.school_invited ?? false;
+    }
+
+    if (leerdoelenRes.data?.length) {
+      hubState.leerdoelen = leerdoelenRes.data.map(l => ({
+        id: hubState.nextId++, _dbId: l.id,
+        title: l.title, progress: l.progress ?? 0, notes: l.notes || ''
+      }));
+    }
+
+    if (deadlinesRes.data?.length) {
+      hubState.deadlines = deadlinesRes.data.map(d => ({
+        id: 'd' + hubState.nextId++, _dbId: d.id,
+        title: d.title, date: d.date, type: d.type || 'future'
+      }));
+    }
+
+    if (tasksRes.data?.length) {
+      hubState.tasks = tasksRes.data.map(t => ({
+        id: hubState.nextId++, _dbId: t.id,
+        title: t.title, desc: t.desc || '', deadline: t.deadline || '',
+        status: t.status || 'todo', assignee: t.assignee || 'student', maker: t.maker || 'student',
+        priority: t.priority || 'medium'
+      }));
+    }
+
+    if (reflectiesRes.data?.length) {
+      hubState.reflecties = reflectiesRes.data.map(r => ({
+        id: 'r' + hubState.nextId++, _dbId: r.id,
+        period: r.period, date: r.date || '', text: r.text,
+        editAllowed: r.author_role === hubState.role
+      }));
+    }
+
+    if (logRes.data?.length) {
+      hubState.log = logRes.data.map(l => ({
+        id: 'lg' + hubState.nextId++, _dbId: l.id,
+        msg: l.msg, time: l.time || l.created_at, color: l.color || 'blue'
+      }));
+    }
+
+    switchTab(hubState.currentTab);
+  } catch (e) {
+    toast('Fout bij laden: ' + (e.message || e));
+  } finally {
+    hideSpinner();
+  }
+}
+
+/* ── Auth boot (runs only when ?match=UUID is present) ────────────────────── */
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!MATCH_ID) return; // demo mode — role-picker handles boot
+  showSpinner();
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) {
+    window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+    return;
+  }
+  await loadMatchFromDB(user);
+});
+
+async function loadMatchFromDB(user) {
+  // Spinner already showing from DOMContentLoaded handler.
+  // loadHubFromDB (called via startHub) will hide it when done.
+  try {
+    // 1. Load match record + vacature name via FK join
+    const { data: matchRow, error: matchErr } = await db
+      .from('matches')
+      .select('id, party_a, party_b, internship_postings(title)')
+      .eq('id', MATCH_ID)
+      .single();
+
+    if (matchErr || !matchRow) {
+      toast('Match niet gevonden of geen toegang.');
+      hideSpinner();
+      return;
+    }
+
+    // 2. Determine role of the authenticated user
+    let role = null;
+    if (user.id === matchRow.party_a) {
+      role = 'student';
+    } else if (user.id === matchRow.party_b) {
+      role = 'bedrijf';
+    } else {
+      const { data: prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      if (prof?.role === 'school') role = 'school';
+    }
+
+    if (!role) {
+      toast('Je bent geen deelnemer van dit Stage Hub.');
+      hideSpinner();
+      return;
+    }
+
+    // 3. Load student + company names in parallel
+    const [studentRes, companyRes] = await Promise.all([
+      db.from('student_profiles').select('naam, opleiding, jaar').eq('profile_id', matchRow.party_a).maybeSingle(),
+      db.from('company_profiles').select('bedrijfsnaam, sector').eq('profile_id', matchRow.party_b).maybeSingle()
+    ]);
+
+    if (studentRes.data) {
+      const s = studentRes.data;
+      match.student.name      = s.naam      || match.student.name;
+      match.student.opleiding = s.opleiding || match.student.opleiding;
+      match.student.avatar    = (s.naam || match.student.name).trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+    }
+
+    if (companyRes.data) {
+      const c = companyRes.data;
+      match.company.name   = c.bedrijfsnaam || match.company.name;
+      match.company.sector = c.sector       || match.company.sector;
+    }
+
+    if (matchRow.internship_postings?.title) {
+      match.company.vacature = matchRow.internship_postings.title;
+    }
+
+    // For school: load school name
+    if (role === 'school') {
+      const { data: schoolRow } = await db.from('school_profiles')
+        .select('schoolnaam').eq('profile_id', user.id).maybeSingle();
+      if (schoolRow?.schoolnaam) match.school.name = schoolRow.schoolnaam;
+    }
+
+    // Update topbar with real match info
+    const topbarStage = document.querySelector('.hub-topbar-stage-name');
+    const topbarMeta  = document.querySelector('.hub-topbar-stage-meta');
+    if (topbarStage) topbarStage.textContent = match.company.vacature;
+    if (topbarMeta)  topbarMeta.textContent  = match.company.name + ' · ' + match.company.start + ' – ' + match.company.eind;
+
+    // 4. Auto-start hub (also triggers loadHubFromDB which hides spinner)
+    startHub(role);
+
+  } catch (e) {
+    hideSpinner();
+    toast('Fout bij laden: ' + (e.message || e));
+  }
 }
 
 function updateRoleBadge() {
@@ -1753,9 +2429,9 @@ function updateRoleBadge() {
 function updateSidebarUser() {
   const el = document.getElementById('sidebar-user-info');
   const info = {
-    student: `${match.student.name}<br>${match.student.opleiding}`,
-    bedrijf: `${match.company.name}<br>${match.company.sector}`,
-    school:  `${match.school.name}<br>${match.school.opleiding}`
+    student: `${escHtml(match.student.name)}<br>${escHtml(match.student.opleiding)}`,
+    bedrijf: `${escHtml(match.company.name)}<br>${escHtml(match.company.sector)}`,
+    school:  `${escHtml(match.school.name)}<br>${escHtml(match.school.opleiding)}`
   };
   el.innerHTML = info[hubState.role] || '';
 }
@@ -1787,11 +2463,14 @@ function switchTab(tab) {
   const renderers = {
     overzicht:  renderOverzicht,
     planning:   renderPlanning,
+    kalender:   renderKalender,
+    stageplan:  renderStageplan,
     taken:      renderTaken,
     voortgang:  renderVoortgang,
     afspraken:  renderAfspraken
   };
-  mc.innerHTML = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
+  const tabHtml = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
+  mc.innerHTML = renderMatchIndicator() + tabHtml;
   updateMeetingBadge();
 }
 
@@ -1816,7 +2495,9 @@ function renderOverzicht() {
   const openTasks  = totalTasks - doneTasks;
   const stageEnd   = new Date('2026-08-31');
   const daysLeft   = Math.max(0, Math.round((stageEnd - new Date()) / 86400000));
-  const avgLeerdoel = Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length);
+  const avgLeerdoel = hubState.leerdoelen.length
+    ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
+    : 0;
 
   const schoolBanner = !hubState.schoolInvited ? `
     <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
@@ -1824,7 +2505,7 @@ function renderOverzicht() {
         <div style="font-weight:600;font-size:.9rem;color:#9a3412;">School nog niet uitgenodigd</div>
         <div style="font-size:.82rem;color:#c2410c;margin-top:2px;">Nodig de schoolbegeleider uit om het dashboard te delen.</div>
       </div>
-      ${can('addTask') ? `<button class="btn btn-sm" onclick="inviteSchool()" style="background:#ff7e42;color:#fff;border:none;">Uitnodigen</button>` : ''}
+      ${can('inviteSchool') ? `<button class="btn btn-sm" onclick="inviteSchool()" style="background:#ff7e42;color:#fff;border:none;">Uitnodigen</button>` : ''}
     </div>` : '';
 
   const leerdoelenRows = hubState.leerdoelen.map(l => `
@@ -1871,7 +2552,7 @@ function renderOverzicht() {
     <div class="page-head">
       <div>
         <div class="page-title">Overzicht</div>
-        <div class="page-sub">Stage Wetenschapscommunicatie · ${match.company.name}</div>
+        <div class="page-sub">Stage Wetenschapscommunicatie · ${escHtml(match.company.name)}</div>
       </div>
     </div>
 
@@ -1880,15 +2561,15 @@ function renderOverzicht() {
     <!-- Stats row -->
     <div class="grid-3" style="margin-bottom:16px;">
       <div class="stat-card">
-        <div class="stat-num" style="color:var(--primary);">${doneTasks}/${totalTasks}</div>
+        <div class="stat-num" style="color:var(--green);">${doneTasks}/${totalTasks}</div>
         <div class="stat-label">Taken afgerond</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num" style="color:var(--blue);">${avgLeerdoel}%</div>
+        <div class="stat-num" style="color:${pctColor(avgLeerdoel)};">${avgLeerdoel}%</div>
         <div class="stat-label">Leerdoelen gem.</div>
       </div>
       <div class="stat-card">
-        <div class="stat-num" style="color:var(--accent);">${openTasks}</div>
+        <div class="stat-num" style="color:var(--orange);">${openTasks}</div>
         <div class="stat-label">Open taken</div>
       </div>
     </div>
@@ -1902,7 +2583,7 @@ function renderOverzicht() {
           <div class="card-head">
             <div>
               <div class="card-title">Stagegegevens</div>
-              <div class="card-sub">${match.company.duur} · ${match.company.start} – ${match.company.eind}</div>
+              <div class="card-sub">${escHtml(match.company.duur)} · ${escHtml(match.company.start)} – ${escHtml(match.company.eind)}</div>
             </div>
             <div class="avatar" style="background:var(--blue-bg);color:var(--blue);">${match.student.avatar}</div>
           </div>
@@ -1910,10 +2591,10 @@ function renderOverzicht() {
             ${match.company.tags.map(t => `<span class="tag neutral" style="margin-right:4px;margin-bottom:4px;">${escHtml(t)}</span>`).join('')}
           </div>
           <div style="font-size:.82rem;color:var(--muted);">
-            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Student</span><strong style="color:var(--text);">${match.student.name}</strong></div>
-            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Opleiding</span><strong style="color:var(--text);">${match.student.opleiding}</strong></div>
-            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Bedrijf</span><strong style="color:var(--text);">${match.company.name}</strong></div>
-            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${match.school.name} · ${match.school.opleiding}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Student</span><strong style="color:var(--text);">${escHtml(match.student.name)}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Opleiding</span><strong style="color:var(--text);">${escHtml(match.student.opleiding)}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Bedrijf</span><strong style="color:var(--text);">${escHtml(match.company.name)}</strong></div>
+            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${escHtml(match.school.name)} · ${escHtml(match.school.opleiding)}</strong></div>
           </div>
         </div>
 
@@ -1962,38 +2643,52 @@ function renderOverzicht() {
 
 function renderPlanning() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
-  const deadlinesHtml = hubState.deadlines.map((d) => {
-    const dDate = new Date(d.date); dDate.setHours(0, 0, 0, 0);
-    const diffDays = Math.ceil((dDate - today) / 86400000);
-    const dotClass = dDate < today ? 'past'
-      : diffDays === 0 ? 'today'
-      : diffDays <= 30 ? 'soon'
-      : 'future';
-    const monthAbbr = formatDateShort(d.date);
-    const editBtn = can('editDeadline') ? `
-      <button class="icon-btn" title="Bewerken" onclick="openDeadlineModal('${d.id}')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>` : '';
-    return `
-      <div class="deadline-item">
-        <div class="deadline-dot ${dotClass}">${monthAbbr}</div>
-        <div class="deadline-body">
-          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
-            <div>
-              <div class="deadline-title">${escHtml(d.title)}</div>
-              <div class="deadline-date">${formatDate(d.date)}</div>
+
+  const deadlinesHtml = hubState.deadlines.length === 0
+    ? `<div class="empty-state"><div class="empty-icon">📅</div>Nog geen deadlines toegevoegd.</div>`
+    : hubState.deadlines.map((d) => {
+        const dDate = new Date(d.date); dDate.setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((dDate - today) / 86400000);
+        const isDone    = d.type === 'done' || dDate < today;
+        const isSoon    = !isDone && diffDays <= 7;
+        const urgency   = isDone ? 'overdue' : isSoon ? 'soon' : '';
+        const urgLabel  = isDone
+          ? `<span class="dl-urgency overdue">Verlopen</span>`
+          : isSoon
+            ? `<span class="dl-urgency soon">${diffDays === 0 ? 'Vandaag' : `${diffDays} dag${diffDays > 1 ? 'en' : ''}`}</span>`
+            : '';
+
+        const dObj = new Date(d.date + 'T00:00:00');
+        const dayNum   = dObj.getDate();
+        const monthStr = dObj.toLocaleDateString('nl-NL', { month: 'short' }).replace('.', '');
+
+        const editBtn = can('editDeadline') ? `
+          <button class="icon-btn" title="Bewerken" onclick="openDeadlineModal('${d.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>` : '';
+
+        return `
+          <div class="dl-item ${urgency}">
+            <div class="dl-date">
+              <div class="dl-day">${dayNum}</div>
+              <div class="dl-month">${monthStr}</div>
             </div>
-            ${editBtn}
-          </div>
-        </div>
-      </div>`;
-  }).join('');
+            <div class="dl-body">
+              <div class="dl-title">${escHtml(d.title)}</div>
+              <div class="dl-meta">${formatDate(d.date)} ${urgLabel}</div>
+            </div>
+            <div class="task-actions">${editBtn}</div>
+          </div>`;
+      }).join('');
 
   const addDeadlineBtn = can('addDeadline') ? `
     <button class="btn btn-primary btn-sm" onclick="openDeadlineModal(null)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Deadline toevoegen
     </button>` : '';
+
+  const now2 = new Date(); now2.setHours(0,0,0,0);
+  const next = hubState.deadlines.find(d => new Date(d.date + 'T00:00:00') >= now2);
 
   return `
     <div class="page-head">
@@ -2007,41 +2702,30 @@ function renderPlanning() {
     <div class="grid-2">
       <div>
         <div class="card">
-          <div class="card-head">
-            <div class="card-title">Stageperiode tijdlijn</div>
-          </div>
+          <div class="card-head"><div class="card-title">Stageperiode tijdlijn</div></div>
           ${deadlinesHtml}
         </div>
       </div>
 
       <div>
         <div class="card">
-          <div class="card-head">
-            <div class="card-title">Stage info</div>
-          </div>
+          <div class="card-head"><div class="card-title">Stage info</div></div>
           <div style="font-size:.88rem;line-height:2;">
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Duur</span><strong>${match.company.duur}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Startdatum</span><strong>${match.company.start}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Einddatum</span><strong>${match.company.eind}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Bedrijf</span><strong>${match.company.name}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Sector</span><strong>${match.company.sector}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Duur</span><strong>${escHtml(match.company.duur)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Startdatum</span><strong>${escHtml(match.company.start)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Einddatum</span><strong>${escHtml(match.company.eind)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Bedrijf</span><strong>${escHtml(match.company.name)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Sector</span><strong>${escHtml(match.company.sector)}</strong></div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-head">
-            <div class="card-title">Volgende deadline</div>
-          </div>
-          ${(() => {
-            const now = new Date(); now.setHours(0, 0, 0, 0);
-            const next = hubState.deadlines.find(d => new Date(d.date) >= now);
-            if (!next) return '<p style="color:var(--muted);font-size:.88rem;">Geen aankomende deadlines.</p>';
-            return `
-              <div style="text-align:center;padding:8px 0;">
-                <div style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:2rem;font-weight:700;color:var(--ink);">${formatDate(next.date)}</div>
-                <div style="font-size:.9rem;color:var(--muted);margin-top:4px;">${escHtml(next.title)}</div>
-              </div>`;
-          })()}
+          <div class="card-head"><div class="card-title">Volgende deadline</div></div>
+          ${next ? `
+            <div style="text-align:center;padding:8px 0;">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:var(--ink);">${formatDate(next.date)}</div>
+              <div style="font-size:.9rem;color:var(--muted);margin-top:4px;">${escHtml(next.title)}</div>
+            </div>` : '<p style="color:var(--muted);font-size:.88rem;">Geen aankomende deadlines.</p>'}
         </div>
       </div>
     </div>`;
@@ -2052,19 +2736,35 @@ function renderPlanning() {
 let takenFilter = 'all';
 
 function renderTaken() {
-  const filtered = takenFilter === 'all'
-    ? hubState.tasks
-    : takenFilter === 'open'
-      ? hubState.tasks.filter(t => t.status !== 'done')
-      : takenFilter === 'done'
-        ? hubState.tasks.filter(t => t.status === 'done')
-        : hubState.tasks.filter(t => t.assignee === takenFilter);
+  const tasks = hubState.tasks;
+  const role  = hubState.role;
 
-  const tasksHtml = filtered.length === 0 ? `
-    <div class="empty-state">
-      <div class="empty-icon">✅</div>
-      Geen taken gevonden.
-    </div>` : filtered.map(t => renderTaskItem(t)).join('');
+  // Per-party counts (open only)
+  const countFor = r => tasks.filter(t => t.assignee === r && t.status !== 'done').length;
+  const partyCounts = `
+    <div class="task-party-counts">
+      <span class="tpc-item${role==='student'?' active':''}">
+        <span class="tpc-dot" style="background:var(--student)"></span>
+        Student <strong>${countFor('student')}</strong>
+      </span>
+      <span class="tpc-item${role==='bedrijf'?' active':''}">
+        <span class="tpc-dot" style="background:var(--bedrijf)"></span>
+        Bedrijf <strong>${countFor('bedrijf')}</strong>
+      </span>
+      <span class="tpc-item${role==='school'?' active':''}">
+        <span class="tpc-dot" style="background:var(--school)"></span>
+        School <strong>${countFor('school')}</strong>
+      </span>
+    </div>`;
+
+  const filtered = takenFilter === 'all'  ? tasks
+    : takenFilter === 'open'              ? tasks.filter(t => t.status !== 'done')
+    : takenFilter === 'done'              ? tasks.filter(t => t.status === 'done')
+    : tasks.filter(t => t.assignee === takenFilter);
+
+  const tasksHtml = filtered.length === 0
+    ? `<div class="empty-state"><div class="empty-icon">✅</div>Geen taken gevonden.</div>`
+    : filtered.map(t => renderTaskItem(t)).join('');
 
   const addBtn = can('addTask') ? `
     <button class="btn btn-primary btn-sm" onclick="openTaakModal(null)">
@@ -2076,10 +2776,12 @@ function renderTaken() {
     <div class="page-head">
       <div>
         <div class="page-title">Taken</div>
-        <div class="page-sub">${hubState.tasks.filter(t=>t.status==='done').length} van ${hubState.tasks.length} afgerond</div>
+        <div class="page-sub">${tasks.filter(t=>t.status==='done').length} van ${tasks.length} afgerond</div>
       </div>
       ${addBtn}
     </div>
+
+    ${partyCounts}
 
     <div class="filter-pills">
       <button class="pill ${takenFilter==='all'?'active':''}"     onclick="setTakenFilter('all')">Alle taken</button>
@@ -2096,19 +2798,13 @@ function renderTaken() {
 }
 
 function renderTaskItem(t) {
-  const isDone = t.status === 'done';
-  const statusTag = isDone
-    ? `<span class="tag green">Afgerond</span>`
-    : t.status === 'in-progress'
-      ? `<span class="tag yellow">Bezig</span>`
-      : `<span class="tag neutral">Open</span>`;
+  const isDone    = t.status === 'done';
+  const priority  = t.priority || 'medium';
+  const prioLabel = { hoog: 'Hoog', medium: 'Medium', laag: 'Laag' }[priority] || priority;
 
-  const assigneeTag = `<span class="tag ${t.assignee === 'student' ? 'blue' : t.assignee === 'bedrijf' ? 'green' : 'orange'}" style="margin-left:4px;">${t.assignee.charAt(0).toUpperCase()+t.assignee.slice(1)}</span>`;
-
-  const checkboxHtml = can('checkTask') ? `
-    <div class="task-checkbox ${isDone ? 'done' : ''}" onclick="toggleTaskDone(${t.id})" title="${isDone ? 'Markeer als open' : 'Markeer als afgerond'}">
-      ${isDone ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
-    </div>` : `<div style="width:20px;"></div>`;
+  const checkHtml = can('checkTask') ? `
+    <div class="task-check${isDone ? ' done' : ''}" onclick="toggleTaskDone(${t.id})" title="${isDone ? 'Markeer als open' : 'Markeer als afgerond'}"></div>`
+    : `<div style="width:20px;flex-shrink:0"></div>`;
 
   const editBtn = can('editTask') ? `
     <button class="icon-btn" title="Bewerken" onclick="openTaakModal(${t.id})">
@@ -2120,13 +2816,18 @@ function renderTaskItem(t) {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
     </button>` : '';
 
+  const assigneeColor = t.assignee === 'student' ? 'blue' : t.assignee === 'bedrijf' ? 'green' : 'orange';
+
   return `
-    <div class="task-item" id="task-${t.id}">
-      ${checkboxHtml}
+    <div class="task-item${isDone ? ' done' : ''}" id="task-${t.id}">
+      ${checkHtml}
       <div class="task-body">
-        <div class="task-title ${isDone ? 'done-text' : ''}">${escHtml(t.title)}</div>
+        <div class="task-title">${escHtml(t.title)}</div>
+        <div class="task-desc">${t.desc ? escHtml(t.desc) : ''}</div>
         <div class="task-meta">
-          Deadline: ${formatDate(t.deadline)} &nbsp;${statusTag}${assigneeTag}
+          <span class="tag ${assigneeColor}">${t.assignee.charAt(0).toUpperCase()+t.assignee.slice(1)}</span>
+          <span class="priority ${priority}">${prioLabel}</span>
+          <span style="color:var(--muted);font-size:.75rem;">· ${formatDate(t.deadline)}</span>
         </div>
       </div>
       <div class="task-actions">
@@ -2141,11 +2842,14 @@ function setTakenFilter(f) {
   switchTab('taken');
 }
 
-function toggleTaskDone(id) {
+async function toggleTaskDone(id) {
   if (!can('checkTask')) return;
   const task = hubState.tasks.find(t => t.id === id);
   if (!task) return;
   task.status = task.status === 'done' ? 'todo' : 'done';
+  if (MATCH_ID && task._dbId) {
+    await db.from('stage_tasks').update({ status: task.status }).eq('id', task._dbId);
+  }
   const logMsg = task.status === 'done'
     ? `Taak "${task.title}" afgerond door ${roleName()}.`
     : `Taak "${task.title}" heropend.`;
@@ -2155,12 +2859,15 @@ function toggleTaskDone(id) {
   toast(task.status === 'done' ? 'Taak afgerond!' : 'Taak heropend.');
 }
 
-function deleteTask(id) {
+async function deleteTask(id) {
   if (!can('deleteTask')) return;
   const task = hubState.tasks.find(t => t.id === id);
   if (!task) return;
   if (!confirm(`Weet je zeker dat je "${task.title}" wilt verwijderen?`)) return;
   hubState.tasks = hubState.tasks.filter(t => t.id !== id);
+  if (MATCH_ID && task._dbId) {
+    await db.from('stage_tasks').delete().eq('id', task._dbId);
+  }
   addLog(`Taak "${task.title}" verwijderd.`, 'orange');
   updateTakenBadge();
   switchTab('taken');
@@ -2170,21 +2877,43 @@ function deleteTask(id) {
 /* ── Voortgang tab ──────────────────────────────────────────────────────── */
 
 function renderVoortgang() {
-  const leerdoelenHtml = hubState.leerdoelen.map(l => `
-    <div class="leerdoel-item">
-      <div class="leerdoel-head">
-        <div class="leerdoel-name">${escHtml(l.title)}</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="leerdoel-pct">${l.progress}%</span>
-          ${can('updateLeerdoel') ? `
-            <button class="icon-btn" onclick="openLeerdoelModal('${l.id}')" title="Voortgang bijwerken">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>` : ''}
-        </div>
+  const avgPct = hubState.leerdoelen.length
+    ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
+    : 0;
+
+  const avgBar = `
+    <div class="avg-progress-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:.82rem;font-weight:600;color:var(--ink2);">Gemiddelde voortgang</span>
+        <span style="font-size:.9rem;font-weight:700;color:${pctColor(avgPct)}">${avgPct}%</span>
       </div>
-      <div class="progress-wrap"><div class="progress-bar" style="width:${l.progress}%"></div></div>
-      ${l.notes ? `<div style="font-size:.8rem;color:var(--muted);margin-top:8px;">${escHtml(l.notes)}</div>` : ''}
-    </div>`).join('');
+      <div class="progress-wrap">
+        <div class="progress-bar" style="width:${avgPct}%;background:${pctColor(avgPct)}"></div>
+      </div>
+    </div>`;
+
+  const leerdoelenHtml = hubState.leerdoelen.map(l => {
+    const pctBtns = can('updateLeerdoel')
+      ? [0, 25, 50, 75, 100].map(v => `
+          <button class="ld-pct-btn${l.progress === v ? ' active' : ''}"
+                  style="${l.progress === v ? `background:${pctColor(v)};border-color:${pctColor(v)};` : ''}"
+                  onclick="quickSetLeerdoel('${l.id}', ${v})">${v}%</button>`
+        ).join('')
+      : '';
+
+    return `
+      <div class="ld-card">
+        <div class="leerdoel-head">
+          <div class="leerdoel-name">${escHtml(l.title)}</div>
+          <span class="leerdoel-pct" style="color:${pctColor(l.progress)}">${l.progress}%</span>
+        </div>
+        <div class="progress-wrap" style="margin-bottom:8px;">
+          <div class="progress-bar" style="width:${l.progress}%;background:${pctColor(l.progress)}"></div>
+        </div>
+        ${pctBtns ? `<div class="ld-pct-btns">${pctBtns}</div>` : ''}
+        ${l.notes ? `<div style="font-size:.8rem;color:var(--muted);margin-top:8px;">${escHtml(l.notes)}</div>` : ''}
+      </div>`;
+  }).join('');
 
   const reflectiesHtml = hubState.reflecties.length === 0 ? `
     <div class="empty-state">
@@ -2234,6 +2963,7 @@ function renderVoortgang() {
           <div class="card-head">
             <div class="card-title">Leerdoelen</div>
           </div>
+          ${avgBar}
           ${leerdoelenHtml}
         </div>
       </div>
@@ -2323,6 +3053,14 @@ function openTaakModal(id) {
       </select>
     </div>
     <div class="form-group">
+      <label class="form-label">Prioriteit</label>
+      <select class="form-select" id="m-task-priority">
+        <option value="hoog"   ${(task?.priority||'medium')==='hoog'  ?'selected':''}>Hoog</option>
+        <option value="medium" ${(task?.priority||'medium')==='medium'?'selected':''}>Medium</option>
+        <option value="laag"   ${(task?.priority||'medium')==='laag'  ?'selected':''}>Laag</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label class="form-label">Status</label>
       <select class="form-select" id="m-task-status">
         <option value="todo"        ${task?.status==='todo'?       'selected':''}>Open</option>
@@ -2336,24 +3074,40 @@ function openTaakModal(id) {
     </div>`);
 }
 
-function saveTaak(id) {
+async function saveTaak(id) {
+  const requiredPerm = id ? 'editTask' : 'addTask';
+  if (!can(requiredPerm)) { toast('Geen toegang.', 'error'); return; }
   const title    = document.getElementById('m-task-title').value.trim();
   const desc     = document.getElementById('m-task-desc').value.trim();
   const deadline = document.getElementById('m-task-deadline').value;
   const assignee = document.getElementById('m-task-assignee').value;
+  const priority = document.getElementById('m-task-priority').value;
   const status   = document.getElementById('m-task-status').value;
 
-  if (!title) { alert('Geef een taakomschrijving op.'); return; }
+  if (!title) { toast('Geef een taakomschrijving op.', 'error'); return; }
 
   if (id) {
     const task = hubState.tasks.find(t => t.id === id);
-    if (task) { task.title = title; task.desc = desc; task.deadline = deadline; task.assignee = assignee; task.status = status; }
+    if (task) {
+      task.title = title; task.desc = desc; task.deadline = deadline;
+      task.assignee = assignee; task.status = status; task.priority = priority;
+      if (MATCH_ID && task._dbId) {
+        await db.from('stage_tasks').update({ title, desc, deadline, assignee, status, priority }).eq('id', task._dbId);
+      }
+    }
     addLog(`Taak "${title}" bewerkt.`, 'blue');
-    toast('Taak bijgewerkt!');
+    toast('Taak bijgewerkt!', 'success');
   } else {
-    hubState.tasks.push({ id: hubState.nextId++, title, desc, deadline, assignee, status, maker: hubState.role });
+    const newTask = { id: hubState.nextId++, _dbId: null, title, desc, deadline, assignee, status, priority, maker: hubState.role };
+    if (MATCH_ID) {
+      const { data } = await db.from('stage_tasks')
+        .insert({ match_id: MATCH_ID, title, desc, deadline, assignee, status, priority, maker: hubState.role })
+        .select().single();
+      if (data) newTask._dbId = data.id;
+    }
+    hubState.tasks.push(newTask);
     addLog(`Taak "${title}" toegevoegd door ${roleName()}.`, 'green');
-    toast('Taak toegevoegd!');
+    toast('Taak toegevoegd!', 'success');
   }
 
   updateTakenBadge();
@@ -2383,18 +3137,31 @@ function openDeadlineModal(id) {
     </div>`);
 }
 
-function saveDeadline(id) {
+async function saveDeadline(id) {
+  const requiredPerm = id ? 'editDeadline' : 'addDeadline';
+  if (!can(requiredPerm)) { toast('Geen toegang.', 'error'); return; }
   const title = document.getElementById('m-dl-title').value.trim();
   const date  = document.getElementById('m-dl-date').value;
-  if (!title || !date) { alert('Vul alle velden in.'); return; }
+  if (!title || !date) { toast('Vul alle velden in.', 'error'); return; }
 
   if (id) {
     const d = hubState.deadlines.find(x => x.id === id);
-    if (d) { d.title = title; d.date = date; }
+    if (d) {
+      d.title = title; d.date = date;
+      if (MATCH_ID && d._dbId) {
+        await db.from('stage_deadlines').update({ title, date }).eq('id', d._dbId);
+      }
+    }
     toast('Deadline bijgewerkt!');
   } else {
-    const newId = 'd' + hubState.nextId++;
-    hubState.deadlines.push({ id: newId, title, date, type: 'future' });
+    const newD = { id: 'd' + hubState.nextId++, _dbId: null, title, date, type: 'future' };
+    if (MATCH_ID) {
+      const { data } = await db.from('stage_deadlines')
+        .insert({ match_id: MATCH_ID, title, date, type: 'future' })
+        .select().single();
+      if (data) newD._dbId = data.id;
+    }
+    hubState.deadlines.push(newD);
     hubState.deadlines.sort((a, b) => a.date.localeCompare(b.date));
     addLog(`Deadline "${title}" toegevoegd.`, 'blue');
     toast('Deadline toegevoegd!');
@@ -2432,14 +3199,30 @@ function openLeerdoelModal(id) {
     </div>`);
 }
 
-function saveLeerdoel(id) {
+async function saveLeerdoel(id) {
   const l = hubState.leerdoelen.find(x => x.id === id);
   if (!l) return;
   l.progress = parseInt(document.getElementById('m-ld-progress').value, 10);
   l.notes    = document.getElementById('m-ld-notes').value.trim();
+  if (MATCH_ID && l._dbId) {
+    await db.from('stage_leerdoelen').update({ progress: l.progress, notes: l.notes }).eq('id', l._dbId);
+  }
   addLog(`Leerdoel "${l.title}" bijgewerkt naar ${l.progress}%.`, 'green');
-  toast('Leerdoel bijgewerkt!');
+  toast('Leerdoel bijgewerkt!', 'success');
   closeModal();
+  switchTab('voortgang');
+}
+
+async function quickSetLeerdoel(id, pct) {
+  if (!can('updateLeerdoel')) return;
+  const l = hubState.leerdoelen.find(x => x.id === id);
+  if (!l) return;
+  l.progress = pct;
+  if (MATCH_ID && l._dbId) {
+    await db.from('stage_leerdoelen').update({ progress: pct }).eq('id', l._dbId);
+  }
+  addLog(`Leerdoel "${l.title}" bijgewerkt naar ${pct}%.`, 'green');
+  toast(`${pct}% ingesteld`, 'success');
   switchTab('voortgang');
 }
 
@@ -2469,20 +3252,33 @@ function openReflectieModal(id) {
     </div>`);
 }
 
-function saveReflectie(id) {
+async function saveReflectie(id) {
+  const requiredPerm = id ? 'editReflectie' : 'addReflectie';
+  if (!can(requiredPerm)) { toast('Geen toegang.', 'error'); return; }
   const period = document.getElementById('m-r-period').value.trim();
   const date   = document.getElementById('m-r-date').value;
   const text   = document.getElementById('m-r-text').value.trim();
-  if (!period || !text) { alert('Vul het periode-veld en de reflectietekst in.'); return; }
+  if (!period || !text) { toast('Vul het periode-veld en de reflectietekst in.', 'error'); return; }
 
   if (id) {
     const r = hubState.reflecties.find(x => x.id === id);
-    if (r) { r.period = period; r.date = date; r.text = text; }
+    if (r) {
+      r.period = period; r.date = date; r.text = text;
+      if (MATCH_ID && r._dbId) {
+        await db.from('stage_reflecties').update({ period, date, text }).eq('id', r._dbId);
+      }
+    }
     toast('Reflectie bijgewerkt!');
   } else {
-    const newId = 'r' + hubState.nextId++;
-    hubState.reflecties.unshift({ id: newId, period, date, text, editAllowed: true });
-    addLog(`Reflectie "${period}" ingediend door ${match.student.name}.`, 'green');
+    const newR = { id: 'r' + hubState.nextId++, _dbId: null, period, date, text, editAllowed: true };
+    if (MATCH_ID) {
+      const { data } = await db.from('stage_reflecties')
+        .insert({ match_id: MATCH_ID, period, date, text, author_role: hubState.role })
+        .select().single();
+      if (data) newR._dbId = data.id;
+    }
+    hubState.reflecties.unshift(newR);
+    addLog(`Reflectie "${period}" ingediend door ${roleName()}.`, 'green');
     toast('Reflectie opgeslagen!');
   }
 
@@ -2492,8 +3288,20 @@ function saveReflectie(id) {
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
 
-function inviteSchool() {
+async function inviteSchool() {
   hubState.schoolInvited = true;
+  if (MATCH_ID) {
+    const sp = hubState.stageplan;
+    if (sp._dbId) {
+      db.from('stage_plans').update({ school_invited: true }).eq('id', sp._dbId)
+        .then(({ error }) => { if (error) console.warn('[inviteSchool] update failed:', error.message); });
+    } else {
+      const { data } = await db.from('stage_plans')
+        .upsert({ match_id: MATCH_ID, school_invited: true }, { onConflict: 'match_id' })
+        .select('id').single();
+      if (data) sp._dbId = data.id;
+    }
+  }
   addLog('School uitgenodigd voor het Stage Hub dashboard.', 'blue');
   toast('Uitnodiging verstuurd aan ' + match.school.name);
   switchTab('overzicht');
@@ -2505,13 +3313,56 @@ function addLog(msg, color) {
     now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
   hubState.log.unshift({ id: 'lg' + hubState.nextId++, msg, time, color });
   if (hubState.log.length > 20) hubState.log.pop();
+  // Persist to DB (fire-and-forget — does not block the caller)
+  if (MATCH_ID) {
+    db.from('stage_log').insert({ match_id: MATCH_ID, msg, time, color }).then(({ error }) => {
+      if (error) console.warn('[stage_log] insert failed:', error.message);
+    });
+  }
 }
 
-function toast(msg) {
+function toast(msg, type = '') {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2800);
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(el._toastTimer);
+  el._toastTimer = setTimeout(() => { el.className = ''; }, 2800);
+}
+
+/* ── Utility: colour from progress % ───────────────────────────────── */
+function pctColor(pct) {
+  if (pct >= 60) return 'var(--green)';
+  if (pct >= 35) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+/* ── Utility: parse Dutch date strings ('1 maart 2026') → Date ─────── */
+function parseDutchDate(str) {
+  if (!str) return null;
+  const months = { januari:0, februari:1, maart:2, april:3, mei:4, juni:5,
+                   juli:6, augustus:7, september:8, oktober:9, november:10, december:11 };
+  const parts = String(str).trim().toLowerCase().split(/\s+/);
+  if (parts.length === 3) {
+    const d = parseInt(parts[0], 10);
+    const m = months[parts[1]];
+    const y = parseInt(parts[2], 10);
+    if (!isNaN(d) && m !== undefined && !isNaN(y)) return new Date(y, m, d);
+  }
+  const iso = new Date(str);
+  return isNaN(iso.getTime()) ? null : iso;
+}
+
+/* ── Utility: current + total stage week numbers ────────────────────── */
+function stageWeekNum() {
+  const start = parseDutchDate(match.company.start);
+  const eind  = parseDutchDate(match.company.eind);
+  if (!start || !eind) return { current: 0, total: 0 };
+  const now = new Date();
+  const MS_WEEK = 7 * 86400000;
+  const total   = Math.max(1, Math.round((eind  - start) / MS_WEEK));
+  const elapsed = Math.max(0, Math.round((now   - start) / MS_WEEK));
+  const current = Math.min(elapsed + 1, total);
+  return { current, total };
 }
 
 function escHtml(str) {
@@ -2534,6 +3385,435 @@ function formatDateShort(dateStr) {
   const d = new Date(dateStr);
   const parts = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }).split(' ');
   return `<span>${parts[0]}</span><span>${parts[1] || ''}</span>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STAGEPLAN TAB
+   ══════════════════════════════════════════════════════════════════ */
+
+function renderStageplan() {
+  const sp = hubState.stageplan;
+  const editable = can('editStageplan');
+  const readonly = hubState.role === 'school';
+
+  const readonlyBanner = readonly ? `
+    <div class="sp-readonly-note">
+      <span style="font-size:1rem;">🏫</span>
+      Je bekijkt het stageplan als schoolbegeleider — alleen lezen.
+    </div>` : '';
+
+  const saveBtn = editable ? `
+    <button class="btn btn-primary" onclick="saveStageplan()">Opslaan</button>` : '';
+
+  // Helper: field (textarea or input, or read-only display)
+  const field = (label, id, value, type = 'input', placeholder = '') => {
+    if (readonly) {
+      return `<div class="form-group">
+        <label class="form-label">${label}</label>
+        <div class="sp-field-val">${escHtml(value || '—')}</div>
+      </div>`;
+    }
+    if (type === 'textarea') {
+      return `<div class="form-group">
+        <label class="form-label">${label}</label>
+        <textarea class="form-textarea" id="${id}" placeholder="${placeholder}" style="min-height:80px">${escHtml(value || '')}</textarea>
+      </div>`;
+    }
+    return `<div class="form-group">
+      <label class="form-label">${label}</label>
+      <input class="form-input" id="${id}" type="text" value="${escHtml(value || '')}" placeholder="${placeholder}" />
+    </div>`;
+  };
+
+  // Helper: select field
+  const sel = (label, id, value, opts) => {
+    if (readonly) {
+      const match_opt = opts.find(o => o.v === value);
+      return `<div class="form-group">
+        <label class="form-label">${label}</label>
+        <div class="sp-field-val">${escHtml(match_opt ? match_opt.l : value || '—')}</div>
+      </div>`;
+    }
+    const options = opts.map(o => `<option value="${o.v}"${value === o.v ? ' selected' : ''}>${o.l}</option>`).join('');
+    return `<div class="form-group">
+      <label class="form-label">${label}</label>
+      <select class="form-select" id="${id}">${options}</select>
+    </div>`;
+  };
+
+  // Deelvragen
+  const dvHtml = (sp.deelvragen || []).map((dv, i) => `
+    <div class="deelvraag-row">
+      <div class="deelvraag-num">${i + 1}</div>
+      ${readonly
+        ? `<div style="flex:1;font-size:.88rem;padding:6px 0;color:var(--text)">${escHtml(dv.tekst || '—')}</div>`
+        : `<input class="form-input" value="${escHtml(dv.tekst || '')}"
+             oninput="hubState.stageplan.deelvragen[${i}].tekst=this.value" />`
+      }
+      ${!readonly ? `<button class="deelvraag-remove btn btn-ghost btn-sm" onclick="removeDeelvraag(${i})">✕</button>` : ''}
+    </div>`).join('') || `<div class="empty-state" style="font-size:.82rem;padding:8px 0">Nog geen deelvragen toegevoegd.</div>`;
+
+  const addDvBtn = !readonly ? `
+    <button class="btn btn-ghost btn-sm add-deelvraag" onclick="addDeelvraag()">＋ Deelvraag toevoegen</button>` : '';
+
+  // School annotation
+  const schoolNote = readonly ? `
+    <div class="card" style="margin-top:16px">
+      <div class="card-head"><div class="card-title">Notitie schoolbegeleider</div></div>
+      <textarea class="form-textarea" id="sp-schoolnoot" placeholder="Voeg een notitie toe…">${escHtml(sp.schoolnoot || '')}</textarea>
+      <div style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" onclick="saveSchoolnoot()">Notitie opslaan</button>
+      </div>
+    </div>` : '';
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Stageplan</div>
+        <div class="page-sub">Stageopdracht, onderzoeksvraag en deelvragen</div>
+      </div>
+      ${saveBtn}
+    </div>
+
+    ${readonlyBanner}
+
+    <div class="grid-2">
+      <div>
+        <!-- Stage info -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Stage info</div></div>
+          <div style="font-size:.88rem;line-height:2.1;">
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Student</span><strong>${escHtml(match.student.name)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Opleiding</span>${escHtml(match.student.opleiding)}</div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Bedrijf</span><strong>${escHtml(match.company.name)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Vacature</span>${escHtml(match.company.vacature)}</div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Periode</span>${escHtml(match.company.start)} – ${escHtml(match.company.eind)}</div>
+          </div>
+        </div>
+
+        <!-- Stageopdracht -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="sp-section-icon">📎</span>Stageopdracht</div>
+          </div>
+          ${field('Omschrijving van de opdracht', 'sp-stageopdracht', sp.stageopdracht, 'textarea', 'Beschrijf de stageopdracht…')}
+        </div>
+
+        ${schoolNote}
+      </div>
+
+      <div>
+        <!-- Onderzoeksvraag -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title"><span class="sp-section-icon">🔬</span>Onderzoeksvraag</div>
+          </div>
+
+          ${field('Hoofdvraag', 'sp-hoofdvraag', sp.hoofdvraag, 'textarea', 'Wat is de centrale onderzoeksvraag?')}
+
+          ${sel('Type onderzoek', 'sp-onderzoekstype', sp.onderzoekstype, [
+            { v: 'kwalitatief',  l: 'Kwalitatief' },
+            { v: 'kwantitatief', l: 'Kwantitatief' },
+            { v: 'mixed',        l: 'Mixed methods' }
+          ])}
+
+          ${field('Context & aanleiding', 'sp-context', sp.context, 'textarea', 'Wat is de achtergrond en aanleiding?')}
+
+          <div class="form-group">
+            <label class="form-label">Deelvragen</label>
+            <div class="deelvragen-list">${dvHtml}</div>
+            ${addDvBtn}
+          </div>
+
+          <div class="card-head" style="padding-top:8px;padding-bottom:4px;border-top:1px solid var(--border);margin-top:8px;">
+            <div class="card-title" style="font-size:.85rem;"><span class="sp-section-icon">🧪</span>Methode &amp; resultaat</div>
+          </div>
+          ${sel('Methode', 'sp-methode', sp.methode, [
+            { v: 'interviews',  l: 'Diepte-interviews' },
+            { v: 'enquete',     l: 'Enquête / survey' },
+            { v: 'observatie',  l: 'Observatie' },
+            { v: 'literatuur',  l: 'Literatuuronderzoek' },
+            { v: 'experiment',  l: 'Experiment' },
+            { v: 'mixed',       l: 'Combinatie van methoden' }
+          ])}
+
+          ${field('Toelichting methode', 'sp-methodeomschrijving', sp.methodeomschrijving, 'textarea', 'Beschrijf hoe je de methode toepast…')}
+
+          ${sel('Resultaattype', 'sp-resultaattype', sp.resultaattype, [
+            { v: 'rapport',      l: 'Rapport / scriptie' },
+            { v: 'product',      l: 'Product / prototype' },
+            { v: 'presentatie',  l: 'Presentatie' },
+            { v: 'advies',       l: 'Adviesrapport' },
+            { v: 'artikel',      l: 'Artikel / publicatie' }
+          ])}
+
+          ${field('Doelgroep', 'sp-doelgroep', sp.doelgroep, 'input', 'Voor wie is het resultaat bestemd?')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function addDeelvraag() {
+  const maxId = hubState.stageplan.deelvragen.length > 0
+    ? Math.max(...hubState.stageplan.deelvragen.map(d => d.id))
+    : 0;
+  hubState.stageplan.deelvragen.push({ id: maxId + 1, tekst: '' });
+  switchTab('stageplan');
+}
+
+function removeDeelvraag(idx) {
+  hubState.stageplan.deelvragen.splice(idx, 1);
+  switchTab('stageplan');
+}
+
+async function saveStageplan() {
+  if (!can('editStageplan')) { toast('Geen toegang.', 'error'); return; }
+  const sp = hubState.stageplan;
+  if (!document.getElementById('sp-hoofdvraag')) return;
+
+  sp.stageopdracht       = document.getElementById('sp-stageopdracht')?.value       ?? sp.stageopdracht;
+  sp.hoofdvraag          = document.getElementById('sp-hoofdvraag')?.value          ?? sp.hoofdvraag;
+  sp.onderzoekstype      = document.getElementById('sp-onderzoekstype')?.value      ?? sp.onderzoekstype;
+  sp.context             = document.getElementById('sp-context')?.value             ?? sp.context;
+  sp.methode             = document.getElementById('sp-methode')?.value             ?? sp.methode;
+  sp.methodeomschrijving = document.getElementById('sp-methodeomschrijving')?.value ?? sp.methodeomschrijving;
+  sp.resultaattype       = document.getElementById('sp-resultaattype')?.value       ?? sp.resultaattype;
+  sp.doelgroep           = document.getElementById('sp-doelgroep')?.value           ?? sp.doelgroep;
+
+  if (MATCH_ID) {
+    const payload = {
+      match_id:            MATCH_ID,
+      stageopdracht:       sp.stageopdracht,
+      hoofdvraag:          sp.hoofdvraag,
+      onderzoekstype:      sp.onderzoekstype,
+      context:             sp.context,
+      methode:             sp.methode,
+      methodeomschrijving: sp.methodeomschrijving,
+      resultaattype:       sp.resultaattype,
+      doelgroep:           sp.doelgroep,
+      deelvragen:          sp.deelvragen,
+      schoolnoot:          sp.schoolnoot,   // preserve school annotation on bedrijf/student saves
+      school_invited:      hubState.schoolInvited  // preserve invite state on each save
+    };
+    const { data, error } = await db.from('stage_plans')
+      .upsert(payload, { onConflict: 'match_id' })
+      .select().single();
+    if (error) { toast('Fout bij opslaan: ' + error.message); return; }
+    if (data) sp._dbId = data.id;
+  }
+
+  addLog('Stageplan bijgewerkt door ' + roleName() + '.', 'blue');
+  toast('Stageplan opgeslagen!');
+  switchTab('stageplan');
+}
+
+async function saveSchoolnoot() {
+  const val = document.getElementById('sp-schoolnoot')?.value || '';
+  hubState.stageplan.schoolnoot = val;
+  if (MATCH_ID) {
+    const sp = hubState.stageplan;
+    if (sp._dbId) {
+      // Plan row exists — targeted UPDATE (don't overwrite other fields)
+      const { error } = await db.from('stage_plans').update({ schoolnoot: val }).eq('id', sp._dbId);
+      if (error) { toast('Fout bij opslaan: ' + error.message, 'error'); return; }
+    } else {
+      // No plan row yet — UPSERT with only required fields
+      const { data, error } = await db.from('stage_plans')
+        .upsert({ match_id: MATCH_ID, schoolnoot: val }, { onConflict: 'match_id' })
+        .select('id').single();
+      if (error) { toast('Fout bij opslaan: ' + error.message, 'error'); return; }
+      if (data) sp._dbId = data.id;
+    }
+  }
+  toast('Notitie opgeslagen!', 'success');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   KALENDER TAB
+   ══════════════════════════════════════════════════════════════════ */
+
+function buildKalDateMap() {
+  const map = {};
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const add = (dateStr, item) => {
+    if (!dateStr) return;
+    if (!map[dateStr]) map[dateStr] = [];
+    map[dateStr].push(item);
+  };
+
+  if (kalState.filter !== 'meetings') {
+    hubState.deadlines.forEach(d => {
+      const evType = buildKalEventType(d, today);
+      add(d.date, { type: evType, label: d.title });
+    });
+  }
+  if (kalState.filter !== 'deadlines') {
+    hubState.meetings.filter(m => m.status === 'geaccepteerd').forEach(m => {
+      let ds = null;
+      if (m.selectedDate === 'counter' && m.counterProposal) ds = m.counterProposal.date;
+      else if (m.selectedDate) { const pd = m.proposedDates.find(d => d.id === m.selectedDate); if (pd) ds = pd.date; }
+      add(ds, { type: 'meeting', label: m.subject });
+    });
+  }
+  return map;
+}
+
+function buildKalEventType(d, today) {
+  const dDate = new Date(d.date + 'T00:00:00');
+  if (dDate < today) return 'verlopen';
+  const diffDays = Math.ceil((dDate - today) / 86400000);
+  if (d.type === 'done') return 'verlopen';
+  if (diffDays <= 3) return 'verplicht';
+  if (d.type === 'oplevering') return 'oplevering';
+  return 'oplevering';
+}
+
+function renderKalender() {
+  const { year, month } = kalState;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const firstDay   = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startDow    = (firstDay.getDay() + 6) % 7; // Monday = 0
+
+  const monthName = firstDay.toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+
+  // Build date map with enhanced event types
+  const dateMap = {};
+  const add = (ds, item) => {
+    if (!ds) return;
+    if (!dateMap[ds]) dateMap[ds] = [];
+    dateMap[ds].push(item);
+  };
+  if (kalState.filter !== 'meetings') {
+    hubState.deadlines.forEach(d => {
+      const evType = buildKalEventType(d, today);
+      add(d.date, { type: evType, label: d.title });
+    });
+  }
+  if (kalState.filter !== 'deadlines') {
+    hubState.meetings.filter(m => m.status === 'geaccepteerd').forEach(m => {
+      let ds = null;
+      if (m.selectedDate === 'counter' && m.counterProposal) ds = m.counterProposal.date;
+      else if (m.selectedDate) { const pd = m.proposedDates.find(d => d.id === m.selectedDate); if (pd) ds = pd.date; }
+      add(ds, { type: 'meeting', label: m.subject });
+    });
+  }
+
+  const filters = ['alles', 'deadlines', 'meetings'].map(f => `
+    <button class="kal-filter${kalState.filter === f ? ' active' : ''}" onclick="setKalFilter('${f}')">
+      ${f === 'alles' ? 'Alles' : f === 'deadlines' ? 'Deadlines' : 'Afspraken'}
+    </button>`).join('');
+
+  const dowHtml = ['Ma','Di','Wo','Do','Vr','Za','Zo']
+    .map(d => `<div class="kal-dow">${d}</div>`).join('');
+
+  let totalEvents = 0;
+  let cellsHtml = '';
+  for (let i = 0; i < startDow; i++) cellsHtml += '<div class="kal-day empty"></div>';
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const ds  = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dObj = new Date(ds + 'T00:00:00');
+    const events = dateMap[ds] || [];
+    const isToday   = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+    const isOverdue = dObj < today && events.length > 0;
+    totalEvents += events.length;
+
+    const dots = events.slice(0, 4).map(e => `<div class="kal-dot ${e.type}"></div>`).join('');
+    const moreIndicator = events.length > 4 ? `<div style="font-size:.6rem;color:var(--muted);line-height:1">+${events.length-4}</div>` : '';
+
+    let dayClass = 'kal-day';
+    if (isToday)   dayClass += ' today';
+    if (isOverdue) dayClass += ' overdue-day';
+
+    cellsHtml += `
+      <div class="${dayClass}" onclick="openKalPopup('${ds}', event)">
+        <div class="kal-day-num">${day}</div>
+        <div class="kal-dots">${dots}${moreIndicator}</div>
+      </div>`;
+  }
+
+  const emptyMonthMsg = totalEvents === 0
+    ? `<div style="text-align:center;padding:12px 0 4px;font-size:.82rem;color:var(--muted);">Geen evenementen in ${firstDay.toLocaleDateString('nl-NL', { month: 'long' })}.</div>`
+    : '';
+
+  const legend = `
+    <div class="kal-legend">
+      <span class="kal-legend-item"><span class="kal-dot oplevering"></span>Oplevering</span>
+      <span class="kal-legend-item"><span class="kal-dot meeting"></span>Afspraak</span>
+      <span class="kal-legend-item"><span class="kal-dot verplicht"></span>Urgent</span>
+      <span class="kal-legend-item"><span class="kal-dot verlopen"></span>Verlopen</span>
+    </div>`;
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Kalender</div>
+        <div class="page-sub">Deadlines en afspraken in één overzicht</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="kal-header">
+        <button class="kal-nav-btn" onclick="kalPrevMonth()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <strong style="font-size:1rem;color:var(--ink);text-transform:capitalize">${monthName}</strong>
+        <button class="kal-nav-btn" onclick="kalNextMonth()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="kal-filters">${filters}</div>
+      <div class="kal-grid-head">${dowHtml}</div>
+      <div class="kal-grid">${cellsHtml}</div>
+      ${emptyMonthMsg}
+      ${legend}
+    </div>
+    <div id="kal-popup" class="kal-popup" style="display:none"></div>`;
+}
+
+function setKalFilter(f) {
+  kalState.filter = f;
+  switchTab('kalender');
+}
+
+function kalPrevMonth() {
+  kalState.month--;
+  if (kalState.month < 0) { kalState.month = 11; kalState.year--; }
+  switchTab('kalender');
+}
+
+function kalNextMonth() {
+  kalState.month++;
+  if (kalState.month > 11) { kalState.month = 0; kalState.year++; }
+  switchTab('kalender');
+}
+
+function openKalPopup(dateStr, e) {
+  const events = buildKalDateMap()[dateStr] || [];
+  if (events.length === 0) return;
+  const d = new Date(dateStr + 'T00:00:00');
+  const dateLabel = d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const items = events.map(ev => `
+    <div class="kal-popup-item">
+      <div class="kal-popup-dot ${ev.type}"></div>
+      <span>${escHtml(ev.label)}</span>
+    </div>`).join('');
+  const popup = document.getElementById('kal-popup');
+  if (!popup) return;
+  popup.innerHTML = `
+    <button class="kal-popup-close" onclick="document.getElementById('kal-popup').style.display='none'">×</button>
+    <div class="kal-popup-title">${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</div>
+    ${items}`;
+  popup.style.display = 'block';
+  popup.style.left = Math.min(e.clientX + 8, window.innerWidth - 290) + 'px';
+  popup.style.top  = Math.min(e.clientY + 8, window.innerHeight - 200) + 'px';
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', function closeKalPopup(ev) {
+      if (!popup.contains(ev.target)) { popup.style.display = 'none'; document.removeEventListener('click', closeKalPopup); }
+    });
+  }, 10);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -2883,7 +4163,7 @@ function submitCounter(id) {
   const from = document.getElementById(`cf-from-${id}`)?.value;
   const to   = document.getElementById(`cf-to-${id}`)?.value;
   const note = document.getElementById(`cf-note-${id}`)?.value || '';
-  if (!date || !from || !to) { alert('Vul datum en tijden in.'); return; }
+  if (!date || !from || !to) { toast('Vul datum en tijden in.', 'error'); return; }
   const m = hubState.meetings.find(m => m.id === id);
   if (!m) return;
   m.status          = 'tegenbod';
@@ -3023,7 +4303,7 @@ function nextStep() {
   const subject = document.getElementById('m-subject')?.value?.trim();
   const contact = document.getElementById('m-contact')?.value?.trim();
   if (!to || !subject || !contact) {
-    alert('Vul alle verplichte velden in (Aan, Onderwerp, Contactgegevens).'); return;
+    toast('Vul alle verplichte velden in.', 'error'); return;
   }
   newMeeting.to          = to;
   newMeeting.subject     = subject;
@@ -3096,7 +4376,7 @@ function removeTimeSlot(idx) {
 
 function saveMeeting() {
   const filled = modalTimeSlots.filter(s => s.date && s.from && s.to);
-  if (filled.length === 0) { alert('Voeg minimaal één tijdstip toe.'); return; }
+  if (filled.length === 0) { toast('Voeg minimaal één tijdstip toe.', 'error'); return; }
   const now = new Date();
   const timeStr = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
     now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
@@ -3210,7 +4490,7 @@ function saveAvailability() {
   const slots = hubState.availability[role]?.slots || [];
   const invalid = slots.filter(s => !s.from || !s.to || s.from >= s.to);
   if (invalid.length > 0) {
-    alert('Controleer de tijden: elk blok moet een geldige van–tot hebben (van < tot).');
+    toast('Ongeldige tijden: van moet vóór tot liggen.', 'error');
     return;
   }
   addLog(`${roleDisplay(role)} heeft beschikbaarheid bijgewerkt.`, 'blue');
@@ -3343,6 +4623,25 @@ function exportPDF() {
 }
 
 /* ── Utility ──────────────────────────────────────────────────────── */
+
+/* ── SESSION IMPLEMENTATION ──────────────────────────────────────────────
+   TASK:           Stage Hub 2.0 — Match-indicator + Kalender + Stageplan + DB
+   ADDED:
+     1. Match-indicator bar — rendered at top of every tab via renderMatchIndicator()
+        Shows student/company/school avatars; active user gets orange ring
+     2. Kalender tab — month grid with deadline (orange) + meeting (green) dots,
+        day-click popup, prev/next month nav, filter pills (Alles/Deadlines/Meetings)
+     3. Stageplan tab — stageopdracht + onderzoeksvraag form with deelvragen
+        dynamic list; school gets read-only view + annotation field
+     4. DB persistence — loadHubFromDB() on page load when ?match=UUID present;
+        saveTaak/saveDeadline/saveLeerdoel/saveReflectie/saveStageplan write to DB
+        using _dbId field (numeric IDs retained for in-page JS compatibility)
+   SQL REQUIRED:
+     ALTER TABLE stage_plans ADD COLUMN IF NOT EXISTS deelvragen jsonb NOT NULL DEFAULT '[]';
+   DEMO FALLBACK:
+     All demo data unchanged — page works fully without ?match= param
+   ──────────────────────────────────────────────────────────────────────── */
+
 function nowStr() {
   const now = new Date();
   return now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +

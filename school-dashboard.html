@@ -568,6 +568,9 @@
         <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
           <span class="nav-icon">💬</span> Berichten
         </button>
+        <button class="nav-btn" onclick="window.location.href='match-dashboard.html'">
+          <span class="nav-icon">📊</span> Stage Hub
+        </button>
       </div>
 
       <div class="sidebar-section">
@@ -1068,7 +1071,7 @@ let _schoolNaamFilter = null;
 async function loadStudenten() {
   let q = db
     .from('student_profiles')
-    .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein')
+    .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
     .order('created_at', { ascending: false });
 
   // Filter op eigen school als de schoolnaam bekend is
@@ -1080,19 +1083,86 @@ async function loadStudenten() {
     console.error('Fout bij laden studenten:', error);
     studenten = [];
   } else {
+    // Start with base data (all zoekend / progress 0)
     studenten = (data || []).map(s => ({
-      naam:      s.naam || 'Onbekende student',
-      opleiding: [s.opleiding, s.school].filter(Boolean).join(' — ') || '—',
-      jaar:      s.jaar || '—',
-      status:    'zoekend',
-      progress:  0,
-      bedrijf:   null,
+      naam:       s.naam || 'Onbekende student',
+      opleiding:  [s.opleiding, s.school].filter(Boolean).join(' — ') || '—',
+      jaar:       s.jaar || '—',
+      status:     'zoekend',
+      progress:   0,
+      bedrijf:    null,
+      profileId:  s.profile_id,
+      matchId:    null,
     }));
+
+    // Enrich with real match + progress data when profile_ids are available
+    const profileIds = studenten.map(s => s.profileId).filter(Boolean);
+    if (profileIds.length > 0) {
+      try {
+        // 1. Find accepted matches for these students
+        const { data: matchRows } = await db
+          .from('matches')
+          .select('id, party_a, status, internship_postings(title, company_name)')
+          .in('party_a', profileIds)
+          .eq('status', 'accepted');
+
+        if (matchRows && matchRows.length > 0) {
+          // 2. For each match, get average leerdoel progress
+          const matchIds = matchRows.map(m => m.id);
+          const { data: leerdoelenRows } = await db
+            .from('stage_leerdoelen')
+            .select('match_id, progress')
+            .in('match_id', matchIds);
+
+          // Build lookup: party_a → { bedrijf, matchId, progress }
+          const avgByMatch = {};
+          (leerdoelenRows || []).forEach(l => {
+            if (!avgByMatch[l.match_id]) avgByMatch[l.match_id] = [];
+            avgByMatch[l.match_id].push(l.progress);
+          });
+
+          const matchByPartyA = {};
+          matchRows.forEach(m => {
+            const avgs = avgByMatch[m.id] || [];
+            const avg  = avgs.length ? Math.round(avgs.reduce((a, b) => a + b, 0) / avgs.length) : 0;
+            matchByPartyA[m.party_a] = {
+              matchId: m.id,
+              bedrijf: m.internship_postings?.company_name || m.internship_postings?.title || 'Bedrijf',
+              progress: avg,
+            };
+          });
+
+          // Apply to studenten array
+          // status: 'actief' = on track (≥20%), 'risico' = lagging (<20%), 'zoekend' = no match
+          studenten = studenten.map(s => {
+            const info = s.profileId ? matchByPartyA[s.profileId] : null;
+            if (!info) return s;
+            return {
+              ...s,
+              status:   info.progress >= 20 ? 'actief' : 'risico',
+              progress: info.progress,
+              bedrijf:  info.bedrijf,
+              matchId:  info.matchId,
+            };
+          });
+        }
+      } catch (enrichErr) {
+        console.warn('Verrijking match-data mislukt:', enrichErr.message);
+        // Non-fatal — fall back to zoekend / 0
+      }
+    }
   }
 
-  document.getElementById('stat-active').textContent  = 0;
-  document.getElementById('stat-risico').textContent  = 0;
-  document.getElementById('stat-zoekend').textContent = studenten.length;
+  const activeCount  = studenten.filter(s => s.status === 'actief').length;
+  const risicoCount  = studenten.filter(s => s.status === 'risico').length;
+  const zoekendCount = studenten.filter(s => s.status === 'zoekend').length;
+
+  document.getElementById('stat-active').textContent  = activeCount;
+  document.getElementById('stat-risico').textContent  = risicoCount;
+  document.getElementById('stat-zoekend').textContent = zoekendCount;
+
+  const risicoAlert = document.getElementById('risico-alert');
+  if (risicoAlert) risicoAlert.style.display = risicoCount > 0 ? '' : 'none';
 
   const badge = document.getElementById('badge-studenten');
   if (studenten.length > 0) { badge.textContent = studenten.length; badge.style.display = 'inline'; }
@@ -1142,6 +1212,9 @@ function renderStudentenRows(cid, data) {
         <span class="signal-badge ${s.status === 'actief' ? 'sb-green' : s.status === 'risico' ? 'sb-red' : 'sb-amber'}">
           ${s.status === 'actief' ? 'Actief' : s.status === 'risico' ? '⚠ Risico' : 'Zoekend'}
         </span>
+        ${s.matchId ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
+           style="font-size:.75rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:3px 9px;border-radius:20px;white-space:nowrap;margin-left:4px;">
+           📊 Hub</a>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1159,11 +1232,17 @@ function renderSignalen() {
 
   let html = '';
   risico.forEach(s => {
+    const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
+    const hubLink  = s.matchId
+      ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
+            style="font-size:.78rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:3px 9px;border-radius:20px;margin-left:6px;white-space:nowrap;">
+            📊 Stage Hub →</a>`
+      : '';
     html += `
       <div class="signal-card urgent">
         <span class="signal-badge sb-red">⚠ Urgent</span>
-        <div class="signal-title">${escapeHtml(s.naam)} — ${escapeHtml(s.bedrijf || '')}</div>
-        <div class="signal-sub">Platform signaleert vertraagde leerdoelopvolging. Voortgang: ${Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0))}%. Neem contact op met de begeleider.</div>
+        <div class="signal-title">${escapeHtml(s.naam)} — ${escapeHtml(s.bedrijf || '')}${hubLink}</div>
+        <div class="signal-sub">Platform signaleert vertraagde leerdoelopvolging. Voortgang: ${progress}%. Neem contact op met de begeleider.</div>
       </div>`;
   });
   zoekend.forEach(s => {

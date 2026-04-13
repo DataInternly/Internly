@@ -89,7 +89,7 @@
       <a href="discover.html">Ontdek</a>
       <a href="matches.html">Matches</a>
       <a href="mijn-sollicitaties.html" class="active">Mijn Stages</a>
-      <a href="stage-hub.html">📊 Stage Hub</a>
+      <a href="match-dashboard.html">📊 Stage Hub</a>
       <a href="chat.html">💬 Berichten</a>
     </nav>
     <div class="lang-switcher">
@@ -131,7 +131,7 @@
       <span class="mt-icon">📋</span>
       <span class="mt-label">Stages</span>
     </a>
-    <a href="stage-hub.html" class="mt-tab">
+    <a href="match-dashboard.html" class="mt-tab">
       <span class="mt-icon">📊</span>
       <span class="mt-label">Hub</span>
     </a>
@@ -350,7 +350,7 @@
                💬 Open chat →</a>`
           : '';
         const stageHubLink = (app._status === 'uitgenodigd' && matchId)
-          ? `<a href="stage-hub.html?match=${escapeHtml(String(matchId))}"
+          ? `<a href="match-dashboard.html?match=${escapeHtml(String(matchId))}"
                style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;white-space:nowrap;
                       background:#fdf0e8;padding:4px 10px;border-radius:20px;">
                📊 Stage Hub →</a>`

@@ -582,6 +582,9 @@
           <span class="nav-icon">💬</span> Berichten
           <span class="nav-badge" id="badge-unread" style="display:none">0</span>
         </button>
+        <button class="nav-btn" onclick="window.location.href='match-dashboard.html'">
+          <span class="nav-icon">📊</span> Stage Hub
+        </button>
         <button class="nav-btn" onclick="window.location.href='company-discover.html'">
           <span class="nav-icon">🔍</span> Zoek stagiairs
         </button>
@@ -1293,6 +1296,12 @@ async function loadCompanyMatches() {
                         background:var(--green-bg);padding:7px 14px;border-radius:20px;display:inline-block;min-height:36px;align-items:center;display:inline-flex">
                 💬 Open chat →
               </a>` : ''}
+            ${hasConv ? `
+              <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
+                 style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;
+                        background:#fdf0e8;padding:7px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;min-height:36px">
+                📊 Stage Hub →
+              </a>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -1400,11 +1409,16 @@ async function loadBerichten() {
             </div>
             ${unread > 0 ? `<span class="tag neutral" style="background:var(--orange-bg);color:var(--orange);border:none">${unread} nieuw</span>` : ''}
           </div>
-          <div style="margin-top:8px">
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
             <a href="chat.html?match=${escapeHtml(m.id)}"
                style="font-size:.85rem;color:var(--green);font-weight:700;text-decoration:none;
                       background:var(--green-bg);padding:6px 14px;border-radius:20px;display:inline-block">
               💬 Open gesprek →
+            </a>
+            <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
+               style="font-size:.85rem;color:#e05c1a;font-weight:700;text-decoration:none;
+                      background:#fdf0e8;padding:6px 14px;border-radius:20px;display:inline-block">
+              📊 Stage Hub →
             </a>
           </div>
         </div>`;

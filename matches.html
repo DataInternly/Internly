@@ -195,7 +195,7 @@
     <a href="discover.html">Ontdek</a>
     <a href="matches.html" class="active">Matches</a>
     <a href="mijn-sollicitaties.html">Mijn Stages</a>
-    <a href="stage-hub.html">📊 Stage Hub</a>
+    <a href="match-dashboard.html">📊 Stage Hub</a>
     <a href="chat.html">💬 Berichten</a>
   </nav>
   <div class="lang-switcher">
@@ -236,7 +236,7 @@
     <span class="mt-icon">📋</span>
     <span class="mt-label">Stages</span>
   </button>
-  <button class="mt-tab" onclick="window.location.href='stage-hub.html'">
+  <button class="mt-tab" onclick="window.location.href='match-dashboard.html'">
     <span class="mt-icon">📊</span>
     <span class="mt-label">Hub</span>
   </button>
@@ -475,7 +475,7 @@
       : '';
 
     const stageHubLink = card.type === 'match' && card.matchId
-      ? `<a href="stage-hub.html?match=${encodeURIComponent(card.matchId)}"
+      ? `<a href="match-dashboard.html?match=${encodeURIComponent(card.matchId)}"
             onclick="event.stopPropagation()"
             style="display:inline-block;margin-top:10px;font-size:.8rem;font-weight:700;
                    color:#e05c1a;background:#fdf0e8;padding:5px 12px;border-radius:20px;
