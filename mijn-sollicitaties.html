@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mijn Sollicitaties - Internly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+
+    .topbar-user {
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500;
+    }
+    .topbar-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,.2); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .btn-topbar-logout {
+      background: none; border: 1px solid rgba(255,255,255,.3);
+      color: rgba(255,255,255,.7); padding: 5px 12px; border-radius: 20px;
+      font-family: 'Outfit', sans-serif; font-size: .8rem; cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-topbar-logout:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    .page-head { margin-bottom: 28px; }
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.6rem; font-weight: 700; color: #0d1520; margin-bottom: 4px;
+    }
+    .page-sub { font-size: .9rem; color: #6b7280; }
+
+    .status-bar {
+      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .status-count {
+      background: #fff; border: 1px solid #f0f0ee;
+      border-radius: 10px; padding: 10px 16px;
+      font-size: .82rem; color: #6b7280;
+    }
+    .status-count strong { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.4rem; color: #0d1520; line-height: 1; margin-bottom: 2px; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      background: #fff; border: 1px solid #f0f0ee;
+      border-radius: 12px; color: #9ca3af; font-size: .9rem; line-height: 2;
+    }
+    .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+
+    /* Review pending badge */
+    .review-pending-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .78rem; font-weight: 600;
+      background: #fdf3e0; color: #a06010;
+      padding: 4px 10px; border-radius: 20px;
+      cursor: pointer; border: none;
+      font-family: 'Outfit', sans-serif;
+      transition: background .15s;
+      min-height: 32px;
+    }
+    .review-pending-badge:hover { background: #fde8b0; }
+    .review-placed-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .78rem; font-weight: 600;
+      background: #e8f5ee; color: #1a7a48;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .review-soon-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .78rem; color: #9ca3af;
+      padding: 4px 10px; border-radius: 20px;
+      background: #f4f3ef;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <a href="index.html" class="logo">intern<span>ly</span></a>
+    <nav class="nav">
+      <a href="discover.html">Ontdek</a>
+      <a href="matches.html">Matches</a>
+      <a href="mijn-sollicitaties.html" class="active">Mijn Stages</a>
+      <a href="chat.html">💬 Berichten</a>
+    </nav>
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <!-- Notification bell -->
+    <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown()">
+      <span class="bell-icon">🔔</span>
+      <span class="bell-count" id="bellCount" style="display:none">0</span>
+    </div>
+    <div class="notif-dropdown" id="notifDropdown" style="display:none">
+      <div class="nd-header">
+        <span class="nd-title">Meldingen</span>
+        <button onclick="markAllRead()" class="nd-mark-all">Alles gelezen</button>
+      </div>
+      <div class="nd-list" id="notifList">
+        <div class="nd-empty">Geen nieuwe meldingen</div>
+      </div>
+    </div>
+    <div id="topbarAuth">
+      <a href="auth.html" class="nav" style="gap:0;color:rgba(255,255,255,.7);font-size:.88rem;font-weight:500;text-decoration:none;">Inloggen</a>
+    </div>
+  </div>
+
+  <!-- Mobile bottom tab bar -->
+  <nav class="mobile-tabs">
+    <a href="discover.html" class="mt-tab">
+      <span class="mt-icon">🔍</span>
+      <span class="mt-label">Ontdek</span>
+    </a>
+    <a href="matches.html" class="mt-tab">
+      <span class="mt-icon">💫</span>
+      <span class="mt-label">Matches</span>
+    </a>
+    <a href="mijn-sollicitaties.html" class="mt-tab active">
+      <span class="mt-icon">📋</span>
+      <span class="mt-label">Stages</span>
+    </a>
+    <a href="student-profile.html" class="mt-tab">
+      <span class="mt-icon">👤</span>
+      <span class="mt-label">Profiel</span>
+    </a>
+  </nav>
+
+  <div class="layout">
+    <main class="main">
+      <div class="page-head">
+        <div class="page-title">Mijn Sollicitaties</div>
+        <div class="page-sub">Overzicht van je ingediende aanvragen</div>
+      </div>
+
+      <div class="status-bar">
+        <div class="status-count"><strong id="cnt-total">—</strong>Totaal</div>
+        <div class="status-count"><strong id="cnt-uitgenodigd" style="color:#1a7a48">—</strong>Uitgenodigd</div>
+        <div class="status-count"><strong id="cnt-wacht" style="color:#a06010">—</strong>In behandeling</div>
+        <div class="status-count"><strong id="cnt-afgewezen" style="color:#b82020">—</strong>Afgewezen</div>
+      </div>
+
+      <div id="applications-container">
+        <div class="empty-state">
+          <span class="icon">⏳</span>Laden…
+        </div>
+      </div>
+
+      <!-- Opgeslagen zonder account (localStorage) -->
+      <div id="local-saved-section" style="display:none;margin-top:40px;">
+        <div style="border-top:1px solid #f0f0ee;padding-top:32px;margin-bottom:16px">
+          <div class="page-title" style="font-size:1.15rem;margin-bottom:4px">Opgeslagen zonder account</div>
+          <div class="page-sub" style="font-size:.88rem">
+            Vacatures die je hebt bewaard vóór het inloggen. <a href="discover.html" style="color:#1a7a48;font-weight:600">Verken meer stages →</a>
+          </div>
+        </div>
+        <div id="local-saved-list"></div>
+      </div>
+
+      <div style="text-align:center; margin-top:40px;">
+        <a href="discover.html" class="btn btn-primary" style="padding:12px 32px;">Meer vacatures ontdekken →</a>
+      </div>
+    </main>
+  </div>
+
+  <div class="notif" id="notif"></div>
+
+  <script>
+    const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUserId = null;
+    let notifSubscription = null;
+
+    // Status mapping: Supabase waarden → weergave
+    const STATUS_NL = {
+      pending:   'wacht',
+      invited:   'uitgenodigd',
+      rejected:  'afgewezen',
+      accepted:  'uitgenodigd',
+      wacht:      'wacht',
+      uitgenodigd:'uitgenodigd',
+      afgewezen:  'afgewezen',
+    };
+
+    // Per-application review rating state — keyed by unique app card id
+    const reviewRatings = {};
+
+    function formatDate(d) {
+      return new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    // ── Review form ────────────────────────────────────────────────────────
+
+    function openReviewForm(appId, matchId, revieweeId, companyName) {
+      const form = document.getElementById('review-form-' + appId);
+      if (form) { form.style.display = 'block'; }
+    }
+
+    function closeReviewForm(appId) {
+      const form = document.getElementById('review-form-' + appId);
+      if (form) form.style.display = 'none';
+    }
+
+    function setReviewStar(appId, rating) {
+      reviewRatings[appId] = rating;
+      for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById('star-' + appId + '-' + i);
+        if (star) {
+          star.classList.toggle('filled', i <= rating);
+          star.textContent = i <= rating ? '★' : '☆';
+        }
+      }
+    }
+
+    async function submitReview(appId, matchId, revieweeId, companyName) {
+      const rating = reviewRatings[appId] || 0;
+      const errEl = document.getElementById('review-err-' + appId);
+      const btn   = document.getElementById('review-btn-' + appId);
+
+      if (!rating || rating < 1) {
+        if (errEl) { errEl.textContent = 'Kies een beoordeling van 1 tot 5 sterren'; errEl.style.display = 'block'; }
+        return;
+      }
+
+      const body = (document.getElementById('review-body-' + appId)?.value || '').trim();
+      if (btn) { btn.disabled = true; btn.textContent = 'Plaatsen…'; }
+      if (errEl) errEl.style.display = 'none';
+
+      try {
+        const { error } = await db.from('reviews').insert({
+          reviewer_id: currentUserId,
+          reviewee_id: revieweeId,
+          match_id:    matchId,
+          rating,
+          body:        body || null,
+        });
+
+        if (error) {
+          if (error.code === '23505') {
+            if (errEl) { errEl.textContent = 'Je hebt al een review achtergelaten'; errEl.style.display = 'block'; }
+          } else {
+            if (errEl) { errEl.textContent = 'Er ging iets mis. Probeer het opnieuw.'; errEl.style.display = 'block'; }
+          }
+          if (btn) { btn.disabled = false; btn.textContent = 'Review plaatsen'; }
+          return;
+        }
+
+        // Hide form, replace button with success badge
+        closeReviewForm(appId);
+        const reviewBtnContainer = document.getElementById('review-btn-container-' + appId);
+        if (reviewBtnContainer) {
+          reviewBtnContainer.innerHTML = '<span class="review-placed-badge">✓ Review geplaatst — dankjewel!</span>';
+        }
+
+        // Clear Trust Score throttle so company dashboard recalculates on next load
+        sessionStorage.removeItem('internly_trust_calculated_' + revieweeId);
+
+        // Notify the reviewee (company) — fire and forget
+        await createNotification(
+          revieweeId,
+          'new_review',
+          null,
+          'review',
+          'Een student heeft een review achtergelaten over jouw stage'
+        );
+
+      } catch(e) {
+        console.error('Review submit error:', e);
+        if (errEl) { errEl.textContent = 'Er ging iets mis. Probeer het opnieuw.'; errEl.style.display = 'block'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Review plaatsen'; }
+      }
+    }
+
+    // ── Render applications ───────────────────────────────────────────────
+
+    function renderApplications(apps, matchByPosting = {}, revieweeByPosting = {}, reviewedMatchIds = new Set()) {
+      const container = document.getElementById('applications-container');
+
+      const norm = apps.map(a => ({ ...a, _status: STATUS_NL[a.status] || 'wacht' }));
+
+      document.getElementById('cnt-total').textContent       = norm.length;
+      document.getElementById('cnt-uitgenodigd').textContent = norm.filter(a => a._status === 'uitgenodigd').length;
+      document.getElementById('cnt-wacht').textContent       = norm.filter(a => a._status === 'wacht').length;
+      document.getElementById('cnt-afgewezen').textContent   = norm.filter(a => a._status === 'afgewezen').length;
+
+      if (norm.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="icon">📭</span>
+            Je hebt nog geen sollicitaties ingediend.<br>
+            <a href="discover.html" style="color:#1a7a48;font-weight:600">Ontdek vacatures →</a>
+          </div>`;
+        return;
+      }
+
+      const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+
+      container.innerHTML = norm.map((app, idx) => {
+        const vacature   = app.internships || app.internship_postings || {};
+        const title      = vacature.title      || app.title      || 'Onbekende vacature';
+        const company    = vacature.company_name || app.company_name || '—';
+        const grade      = vacature.trust_grade || app.trust_grade || '—';
+        const score      = vacature.trust_score ?? app.trust_score ?? '—';
+        const created    = app.created_at || app.date;
+        const gradeClass = grade === 'A' ? 'a' : grade === 'B' ? 'b' : 'c';
+        const titleShort = title.length > 50 ? title.slice(0, 50) + '…' : title;
+        const appId      = 'app-' + (app.id || idx);
+
+        let statusTag = '';
+        if (app._status === 'uitgenodigd') {
+          statusTag = `<span class="tag green">✓ Uitgenodigd</span>`;
+        } else if (app._status === 'wacht') {
+          statusTag = `<span class="tag neutral">⏳ In behandeling</span>`;
+        } else if (app._status === 'afgewezen') {
+          statusTag = `<span class="tag red">✕ Afgewezen</span>`;
+        }
+
+        const detailLink = app.internship_id
+          ? `<a href="vacature-detail.html?id=${escapeHtml(String(app.internship_id))}&source=internships"
+               style="font-size:.82rem;color:#1a7a48;font-weight:600;text-decoration:none;white-space:nowrap;">
+               Bekijk vacature →</a>`
+          : '';
+
+        const matchId   = app.internship_id ? matchByPosting[String(app.internship_id)] : null;
+        const chatLink  = (app._status === 'uitgenodigd' && matchId)
+          ? `<a href="chat.html?match=${escapeHtml(String(matchId))}"
+               style="font-size:.82rem;color:#0f5c36;font-weight:700;text-decoration:none;white-space:nowrap;
+                      background:#e8f5ee;padding:4px 10px;border-radius:20px;">
+               💬 Open chat →</a>`
+          : '';
+
+        // ── Review eligibility ──
+        let reviewSection = '';
+        if (app._status === 'uitgenodigd' && matchId) {
+          const revieweeId = revieweeByPosting[String(app.internship_id)];
+          const ageMs      = created ? Date.now() - new Date(created).getTime() : 0;
+          const eligible   = ageMs > NINETY_DAYS_MS;
+
+          if (reviewedMatchIds.has(matchId)) {
+            // Already reviewed
+            reviewSection = `<div style="margin-top:8px"><span class="review-placed-badge">★ Review geplaatst</span></div>`;
+          } else if (eligible && revieweeId) {
+            const eligibleDate = new Date(new Date(created).getTime() + NINETY_DAYS_MS)
+              .toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+            const starsHtml = [1,2,3,4,5].map(i =>
+              `<span class="star" id="star-${appId}-${i}" onclick="setReviewStar('${appId}', ${i})">☆</span>`
+            ).join('');
+            reviewSection = `
+              <div id="review-btn-container-${appId}" style="margin-top:8px">
+                <button class="review-pending-badge"
+                  onclick="openReviewForm('${appId}', '${escapeHtml(matchId)}', '${escapeHtml(revieweeId)}', '${escapeHtml(company)}')">
+                  ★ Laat een review achter
+                </button>
+              </div>
+              <div class="review-form" id="review-form-${appId}" style="display:none">
+                <div class="review-form-title">Hoe was je stage bij ${escapeHtml(company)}?</div>
+                <div class="star-rating">${starsHtml}</div>
+                <textarea id="review-body-${appId}" placeholder="Vertel anderen over je ervaring (optioneel)" maxlength="500" rows="3"></textarea>
+                <div class="review-error" id="review-err-${appId}"></div>
+                <div class="review-form-actions">
+                  <button class="btn-review-submit" id="review-btn-${appId}"
+                    onclick="submitReview('${appId}', '${escapeHtml(matchId)}', '${escapeHtml(revieweeId)}', '${escapeHtml(company)}')">
+                    Review plaatsen
+                  </button>
+                  <button class="btn-review-cancel" onclick="closeReviewForm('${appId}')">Annuleren</button>
+                </div>
+              </div>`;
+          } else if (!eligible && revieweeId) {
+            const eligibleDate = created
+              ? new Date(new Date(created).getTime() + NINETY_DAYS_MS)
+                  .toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+              : '';
+            reviewSection = `<div style="margin-top:8px"><span class="review-soon-badge">⏳ Review beschikbaar na ${escapeHtml(eligibleDate)}</span></div>`;
+          }
+        }
+
+        return `
+          <div class="card">
+            <div class="card-head">
+              <div style="min-width:0">
+                <div class="card-title" title="${escapeHtml(title)}">${escapeHtml(titleShort)}</div>
+                <div class="card-sub">${escapeHtml(company)}</div>
+              </div>
+              <span class="trust ${gradeClass}">${escapeHtml(grade)} ${escapeHtml(String(score))}</span>
+            </div>
+            <div style="margin:12px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              ${statusTag}
+              ${created ? `<span style="color:#9ca3af;font-size:.82rem">${formatDate(created)}</span>` : ''}
+              <span style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;align-items:center">
+                ${detailLink}
+                ${chatLink}
+              </span>
+            </div>
+            ${reviewSection}
+          </div>`;
+      }).join('');
+    }
+
+    // ── Load applications ─────────────────────────────────────────────────
+
+    async function loadApplications(userId) {
+      const container = document.getElementById('applications-container');
+      container.innerHTML = `<div class="empty-state"><span class="icon">⏳</span>Laden…</div>`;
+
+      // Fetch applications, accepted matches, and existing reviews in parallel
+      const [
+        { data, error },
+        { data: acceptedMatches },
+        { data: myReviews },
+      ] = await Promise.all([
+        db.from('applications')
+          .select('*, internships(title, company_name, trust_score, trust_grade)')
+          .eq('student_id', userId)
+          .order('created_at', { ascending: false }),
+        db.from('matches')
+          .select('id, posting_id, party_b')
+          .eq('party_a', userId)
+          .eq('status', 'accepted')
+          .not('posting_id', 'is', null),
+        db.from('reviews')
+          .select('match_id')
+          .eq('reviewer_id', userId),
+      ]);
+
+      if (error) {
+        const errBox = document.createElement('div');
+        errBox.className = 'empty-state';
+        errBox.textContent = `Fout bij laden: ${error.message}`;
+        errBox.prepend(Object.assign(document.createElement('span'), { className: 'icon', textContent: '⚠️' }));
+        container.innerHTML = '';
+        container.appendChild(errBox);
+        return;
+      }
+
+      // Build posting_id → match_id lookup for chat links and reviews
+      const matchByPosting   = {};
+      const revieweeByPosting = {};
+      (acceptedMatches || []).forEach(m => {
+        if (m.posting_id) {
+          matchByPosting[String(m.posting_id)]    = m.id;
+          revieweeByPosting[String(m.posting_id)] = m.party_b;
+        }
+      });
+
+      // Build set of already-reviewed match IDs
+      const reviewedMatchIds = new Set((myReviews || []).map(r => r.match_id).filter(Boolean));
+
+      renderApplications(data || [], matchByPosting, revieweeByPosting, reviewedMatchIds);
+    }
+
+    // ── Notifications ─────────────────────────────────────────────────────
+
+    async function createNotification(userId, type, refId, refType, message) {
+      if (!userId) return;
+      try {
+        await db.from('notifications').insert({
+          user_id:  userId,
+          type,
+          ref_id:   refId   || null,
+          ref_type: refType || null,
+          message,
+        });
+      } catch(e) {
+        console.warn('Notification insert failed:', e);
+      }
+    }
+
+    async function loadNotifications() {
+      if (!currentUserId) return;
+      const { data } = await db
+        .from('notifications')
+        .select('*')
+        .eq('user_id', currentUserId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (!data) return;
+      const unread  = data.filter(n => !n.read).length;
+      const countEl = document.getElementById('bellCount');
+      if (unread > 0) {
+        countEl.textContent = unread > 9 ? '9+' : unread;
+        countEl.style.display = 'flex';
+      } else {
+        countEl.style.display = 'none';
+      }
+      const list = document.getElementById('notifList');
+      if (data.length === 0) {
+        list.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
+        return;
+      }
+      list.innerHTML = data.map(n => `
+        <div class="nd-item ${n.read ? '' : 'unread'}"
+          onclick="handleNotifClick('${escapeHtml(n.id)}','${escapeHtml(n.ref_type||'')}','${escapeHtml(n.ref_id||'')}')">
+          <div class="nd-dot ${n.read ? 'read' : ''}"></div>
+          <div>
+            <div class="nd-msg">${escapeHtml(n.message)}</div>
+            <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    function formatRelativeTime(iso) {
+      const diff = Date.now() - new Date(iso).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1)  return 'Zojuist';
+      if (mins < 60) return mins + ' min geleden';
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24)  return hrs + ' uur geleden';
+      const days = Math.floor(hrs / 24);
+      if (days < 7)  return days + ' dag' + (days > 1 ? 'en' : '') + ' geleden';
+      return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+    }
+
+    async function markAllRead() {
+      if (!currentUserId) return;
+      await db.from('notifications')
+        .update({ read: true })
+        .eq('user_id', currentUserId)
+        .eq('read', false);
+      loadNotifications();
+    }
+
+    function toggleNotifDropdown() {
+      const dd = document.getElementById('notifDropdown');
+      const isOpen = dd.style.display !== 'none';
+      dd.style.display = isOpen ? 'none' : 'flex';
+      if (!isOpen) {
+        loadNotifications();
+        setTimeout(() => markAllRead(), 2000);
+      }
+    }
+
+    function handleNotifClick(notifId, refType, refId) {
+      if (!refType || !refId) return;
+      const routes = {
+        'match':        'matches.html',
+        'conversation': 'chat.html?conversation=' + refId,
+        'application':  'mijn-sollicitaties.html',
+        'review':       'mijn-sollicitaties.html',
+      };
+      const route = routes[refType];
+      if (route) window.location.href = route;
+    }
+
+    function startNotifSubscription(userId) {
+      return db
+        .channel('notifs-msoll-' + userId)
+        .on('postgres_changes', {
+          event:  'INSERT',
+          schema: 'public',
+          table:  'notifications',
+          filter: 'user_id=eq.' + userId,
+        }, (payload) => {
+          const countEl = document.getElementById('bellCount');
+          const current = parseInt(countEl.textContent) || 0;
+          const next    = current + 1;
+          countEl.textContent  = next > 9 ? '9+' : next;
+          countEl.style.display = 'flex';
+          showToast(payload.new.message);
+        })
+        .subscribe();
+    }
+
+    function showToast(message) {
+      const existing = document.getElementById('notif-toast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.id = 'notif-toast';
+      toast.style.cssText = `
+        position:fixed;bottom:80px;right:20px;z-index:9999;
+        background:#0d1520;color:#fff;padding:12px 18px;
+        border-radius:12px;font-size:.88rem;max-width:280px;
+        box-shadow:0 8px 24px rgba(0,0,0,.2);
+        font-family:'Outfit',sans-serif;line-height:1.4;
+      `;
+      toast.innerHTML = '<span style="margin-right:8px">🔔</span>' + escapeHtml(message);
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.notif-bell') && !e.target.closest('.notif-dropdown')) {
+        const dd = document.getElementById('notifDropdown');
+        if (dd) dd.style.display = 'none';
+      }
+    });
+
+    // ── Helpers ───────────────────────────────────────────────────────────
+
+    function notify(msg) {
+      const el = document.getElementById('notif');
+      el.textContent = msg; el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    async function signOut() {
+      try {
+        await db.auth.signOut();
+      } catch(e) {
+        console.error('Logout error:', e);
+      } finally {
+        sessionStorage.removeItem('internly_role');
+        window.location.href = 'auth.html';
+      }
+    }
+
+    function renderLocalSaved() {
+      let saved;
+      try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
+      catch(e) { saved = []; }
+
+      const section = document.getElementById('local-saved-section');
+      const list    = document.getElementById('local-saved-list');
+
+      if (!saved || saved.length === 0) { section.style.display = 'none'; return; }
+
+      section.style.display = 'block';
+
+      const gradeClass = g => g === 'A' ? 'a' : g === 'B' ? 'b' : 'c';
+
+      list.innerHTML = saved.map(v => {
+        const title  = v.title || 'Onbekende vacature';
+        const short  = title.length > 50 ? title.slice(0, 50) + '…' : title;
+        const grade  = v.trust_grade || '—';
+        const score  = v.trust_score ?? '—';
+        const cls    = gradeClass(grade);
+        const date   = v.saved_at
+          ? new Date(v.saved_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+          : '';
+        return `
+          <div class="card">
+            <div class="card-head">
+              <div style="min-width:0">
+                <div class="card-title" title="${escapeHtml(title)}">${escapeHtml(short)}</div>
+                <div class="card-sub">${escapeHtml(v.company_name || '—')}${v.sector ? ' · ' + escapeHtml(v.sector) : ''}</div>
+              </div>
+              <span class="trust ${cls}">${escapeHtml(grade)} ${escapeHtml(String(score))}</span>
+            </div>
+            <div style="margin:10px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span class="tag neutral">📌 Lokaal opgeslagen</span>
+              ${date ? `<span style="color:#9ca3af;font-size:.82rem">${escapeHtml(date)}</span>` : ''}
+              <a href="vacature-detail.html?id=${escapeHtml(String(v.id))}&source=${escapeHtml(v.source || 'internships')}"
+                style="font-size:.82rem;color:#1a7a48;font-weight:600;text-decoration:none;margin-left:auto;white-space:nowrap;">
+                Bekijk vacature →</a>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      renderLocalSaved();
+
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) { window.location.href = 'auth.html'; return; }
+      currentUserId = user.id;
+
+      const authEl = document.getElementById('topbarAuth');
+      const email  = user.email || '';
+      const name   = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+      const initials = name.slice(0, 2).toUpperCase();
+      authEl.innerHTML = `
+        <div class="topbar-user">
+          <div class="topbar-avatar">${escapeHtml(initials)}</div>
+          <span>${escapeHtml(name)}</span>
+          <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
+        </div>`;
+
+      await loadApplications(user.id);
+      await loadNotifications();
+      notifSubscription = startNotifSubscription(user.id);
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (notifSubscription) notifSubscription.unsubscribe();
+    });
+  </script>
+
+  <!-- Google Translate Widget -->
+  <div id="google_translate_element" style="display:none"></div>
+  <script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
+
+<!-- ── SESSION IMPLEMENTATION ─────────────────────────────────────────────────
+   TASK:         Task 1 (Review System) + Task 2 (Notifications) + Task 3 (Mobile)
+   ADDED:        Review eligibility check (90-day rule), inline star rating form,
+                 submitReview() with duplicate guard, notification bell + dropdown,
+                 real-time notification subscription via Supabase Realtime
+   MODIFIED:     renderApplications() now takes reviewedMatchIds + revieweeByPosting,
+                 loadApplications() parallel-fetches reviews alongside matches;
+                 bell-count is 44px touch target on mobile
+   MOBILE:       Bell touch target 44px, DE/FR lang btns hidden, topbar padding 14px
+   NOTIFICATIONS: Review submitted → notify company (new_review). Bell shows unread
+                  count from notifications table; Realtime subscription for live delivery
+   SQL REQUIRED: reviews table + notifications table (from session prompt)
+   TESTED VIA:   Student accepts a stage, waits 90 days, leaves review; company sees
+                 notification badge on dashboard
+   ─────────────────────────────────────────────────────────────────────────── -->

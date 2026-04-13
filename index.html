@@ -3,58 +3,662 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internly — Beta</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Internly — Stages fixen door eerlijkheid te bouwen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f3ef;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px;
+      color: #fff;
+    }
+
+    .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: -.03em;
+      margin-bottom: 20px;
+    }
+    .logo span { color: #FF7E42; }
+
+    .tagline {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 600;
+      line-height: 1.15;
+      max-width: 680px;
+      margin: 0 auto 24px;
+    }
+    .tagline em { font-style: italic; color: #FF7E42; }
+
+    .subtitle {
+      font-size: 1.1rem;
+      max-width: 560px;
+      margin: 0 auto 52px;
+      opacity: .9;
+      line-height: 1.6;
+    }
+
+    /* ── Role picker ── */
+    .role-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto 16px;
+    }
+
+    .role-card {
+      background: rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      transition: background .15s, border-color .15s, transform .12s;
+    }
+    .role-card:hover {
+      background: rgba(255,255,255,.18);
+      border-color: rgba(255,255,255,.4);
+      transform: translateY(-1px);
+    }
+    .role-card.active {
+      background: rgba(255,255,255,.2);
+      border-color: #FF7E42;
+      box-shadow: 0 0 0 3px rgba(255,126,66,.3);
+    }
+
+    .role-icon {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .role-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 2px;
+    }
+    .role-desc { font-size: .82rem; color: rgba(255,255,255,.65); }
+
+    /* ── Verken knop ── */
+    .btn-verken {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 380px;
+      margin: 0 auto 20px;
+      padding: 12px 24px;
+      background: rgba(255,255,255,.08);
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: 50px;
+      color: rgba(255,255,255,.85);
+      font-family: 'Outfit', sans-serif;
+      font-size: .95rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-verken:hover {
+      background: rgba(255,255,255,.15);
+      border-color: rgba(255,255,255,.45);
+    }
+
+    /* ── Simulator CTA ── */
+    .btn-simulator {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #FF7E42; color: #fff; text-decoration: none;
+      padding: 16px 40px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700;
+      box-shadow: 0 10px 30px rgba(255,126,66,.35);
+      transition: background .15s, transform .2s, box-shadow .2s;
+    }
+    .btn-simulator:hover {
+      background: #e05c1a;
+      transform: translateY(-3px);
+      box-shadow: 0 14px 36px rgba(255,126,66,.5);
+    }
+
+    /* ── CTA knop ── */
+    .btn-demo {
+      background: #FF7E42;
+      color: #fff;
+      padding: 16px 52px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 10px 30px rgba(255,126,66,.4);
+      transition: background .15s, transform .2s, box-shadow .2s;
+    }
+    .btn-demo:hover {
+      background: #e05c1a;
+      transform: translateY(-3px);
+      box-shadow: 0 14px 36px rgba(255,126,66,.5);
+    }
+    .btn-demo:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .footer-text { margin-top: 48px; font-size: .9rem; opacity: .65; }
+
+    /* ── Beta banner ── */
+    .beta-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: rgba(13, 21, 32, .92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: .82rem;
+      color: rgba(255,255,255,.75);
+    }
+    .beta-pill {
+      background: #FF7E42;
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 50px;
+      flex-shrink: 0;
+    }
+    .beta-close {
+      position: absolute;
+      right: 16px;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,.4);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+      transition: color .15s;
+    }
+    .beta-close:hover { color: rgba(255,255,255,.8); }
+  </style>
 </head>
 <body>
 
-  <!-- Role Picker -->
-  <div id="role-screen">
-    <div style="text-align:center; margin-bottom:2rem">
-      <div class="rp-logo">Internly</div>
-      <div class="rp-sub">Beta demo</div>
-    </div>
-   
-    <div class="rp-title">Wie ben jij?</div>
-   
-    <div class="role-cards">
-      <div class="role-card" onclick="selectRole('student')" id="rc-student">
-        <div class="rc-icon">👤</div>
-        <div>
-          <div class="rc-name">Student</div>
-          <div class="rc-desc">Zoek een stage op basis van ambitie & leerdoelen</div>
-        </div>
-      </div>
-      
-      <div class="role-card" onclick="selectRole('bedrijf')" id="rc-bedrijf">
-        <div class="rc-icon">🏢</div>
-        <div>
-          <div class="rc-name">Bedrijf</div>
-          <div class="rc-desc">Vind gemotiveerde stagiairs en bouw reputatie</div>
-        </div>
-      </div>
-    </div>
+<div class="beta-banner" id="betaBanner">
+  <span class="beta-pill">Beta</span>
+  <span>Dit platform is momenteel in testfase — functionaliteiten worden actief ontwikkeld. Klik gerust rond!</span>
+  <div class="lang-switcher" style="margin-left:auto;margin-right:36px">
+    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+  </div>
+  <button class="beta-close" onclick="document.getElementById('betaBanner').style.display='none'" aria-label="Sluiten">×</button>
+</div>
 
-    <button class="btn-enter" onclick="enterApp()" id="enter-btn" disabled>
-      Ga verder →
-    </button>
+<div class="hero">
+  <div class="logo">intern<span>ly</span></div>
+
+  <h1 class="tagline">Stages fixen door<br><em>eerlijkheid te bouwen</em></h1>
+
+  <p class="subtitle">
+    Een datagedreven platform met verwachtingsmanagement, Trust Scores en wederzijdse verantwoordelijkheid — voor studenten, bedrijven én scholen.
+  </p>
+
+  <!-- Role picker -->
+  <div class="role-picker">
+    <div class="role-card" id="rc-student" onclick="selectRole('student')">
+      <div class="role-icon">👤</div>
+      <div>
+        <div class="role-name">Student</div>
+        <div class="role-desc">Zoek een stage op basis van ambitie &amp; leerdoelen</div>
+      </div>
+    </div>
+    <div class="role-card" id="rc-bedrijf" onclick="selectRole('bedrijf')">
+      <div class="role-icon">🏢</div>
+      <div>
+        <div class="role-name">Bedrijf</div>
+        <div class="role-desc">Vind gemotiveerde stagiairs, bouw je reputatie op</div>
+      </div>
+    </div>
+    <div class="role-card" id="rc-school" onclick="selectRole('school')">
+      <div class="role-icon">🎓</div>
+      <div>
+        <div class="role-name">School</div>
+        <div class="role-desc">Volg studenten, beoordeel bedrijven en stuur het proces</div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    let selectedRole = null;
+  <!-- Verken knop -->
+  <a href="discover.html" class="btn-verken">
+    🔍 Verken beschikbare stageopdrachten
+  </a>
 
-    function selectRole(r) {
-      selectedRole = r;
-      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
-      document.getElementById('rc-' + r).classList.add('active');
-      document.getElementById('enter-btn').disabled = false;
+  <button class="btn-demo" id="enterBtn" onclick="enterApp()" disabled>
+    Ga verder →
+  </button>
+
+  <p class="footer-text">Gratis voor studenten · ESG-rapportage voor bedrijven · <a href="school-dashboard.html" style="color:inherit;text-decoration:underline;opacity:.8;">Schooldashboard</a> · <a href="about.html" style="color:inherit;text-decoration:underline;opacity:.8;">Over ons</a></p>
+
+  <p style="margin-top:16px;font-size:.85rem;opacity:.6">
+    Al eerder gesolliciteerd?
+    <a href="mijn-sollicitaties.html" style="color:#FF7E42;font-weight:600;text-decoration:none;">Bekijk je sollicitaties →</a>
+    &nbsp;·&nbsp;
+    <a href="matches.html" style="color:#FF7E42;font-weight:600;text-decoration:none;">Mijn matches →</a>
+  </p>
+</div>
+
+<!-- ── STAGE SIMULATOR ────────────────────────────────────────────────────── -->
+<section style="background:#0d1520;padding:80px 24px;overflow:hidden;position:relative;">
+
+  <!-- achtergrond grid-sfeer -->
+  <div aria-hidden="true" style="
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(26,122,72,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26,122,72,.08) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none;">
+  </div>
+
+  <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+
+    <!-- label -->
+    <div style="
+      display:inline-flex;align-items:center;gap:7px;
+      background:rgba(255,126,66,.12);border:1px solid rgba(255,126,66,.3);
+      border-radius:50px;padding:5px 14px;margin-bottom:24px;">
+      <span style="font-size:.85rem;">🎮</span>
+      <span style="font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;
+        letter-spacing:.1em;text-transform:uppercase;color:#FF7E42;">
+        Interactieve simulator
+      </span>
+    </div>
+
+    <!-- kop -->
+    <h2 style="
+      font-family:'Bricolage Grotesque',sans-serif;
+      font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;
+      color:#fff;line-height:1.15;margin:0 0 18px;letter-spacing:-.02em;">
+      Overleef jij je<br><em style="font-style:italic;color:#FF7E42;">eerste stageweek?</em>
+    </h2>
+
+    <p style="font-family:'Outfit',sans-serif;font-size:1rem;color:rgba(255,255,255,.6);
+      line-height:1.7;max-width:520px;margin:0 auto 36px;">
+      Maandag 08:47. Je loopt voor het eerst het kantoor van Vandaag Agency binnen.
+      Elke keuze telt — van je eerste standup tot hoe laat je thuiskomt op woensdag.
+    </p>
+
+    <!-- terminal-preview -->
+    <div style="
+      background:#111927;border:1px solid rgba(255,255,255,.1);border-radius:14px;
+      padding:20px 24px;margin:0 auto 36px;max-width:520px;text-align:left;
+      font-family:'Courier New',monospace;font-size:.85rem;line-height:1.8;
+      color:rgba(255,255,255,.55);">
+      <div style="display:flex;gap:6px;margin-bottom:14px;">
+        <span style="width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
+        <span style="width:11px;height:11px;border-radius:50%;background:#febc2e;display:inline-block;"></span>
+        <span style="width:11px;height:11px;border-radius:50%;background:#28c840;display:inline-block;"></span>
+      </div>
+      <div><span style="color:#1a7a48;">›</span> <span style="color:#fff;">Dag 1 — Maandag</span></div>
+      <div style="margin-top:6px;color:rgba(255,255,255,.45);">
+        Je mentor Mara kijkt je aan. "Heb je de briefing al gelezen?"
+      </div>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
+        <span style="color:#FF7E42;">[ A ]</span> <span>"Ja, helemaal."</span>
+        <span style="color:#FF7E42;">[ B ]</span> <span>"Ik ben er net mee bezig."</span>
+        <span style="color:#FF7E42;">[ C ]</span> <span>"Welke briefing?"</span>
+      </div>
+      <div style="margin-top:12px;color:#1a7a48;font-size:.75rem;">▋ jouw keuze bepaalt je eindscore</div>
+    </div>
+
+    <!-- chips -->
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:36px;">
+      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
+        font-size:.8rem;color:rgba(255,255,255,.6);">📅 5 stagedagen</span>
+      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
+        font-size:.8rem;color:rgba(255,255,255,.6);">🌿 65+ keuze-scènes</span>
+      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
+        font-size:.8rem;color:rgba(255,255,255,.6);">🏆 3 einduitslagen</span>
+      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
+        font-size:.8rem;color:rgba(255,255,255,.6);">⚡ Geen account nodig</span>
+    </div>
+
+    <!-- CTA -->
+    <a href="internly_simulator.html" class="btn-simulator">
+      🎮 Speel de stage-simulator →
+    </a>
+
+    <p style="margin-top:14px;font-family:'Outfit',sans-serif;font-size:.78rem;
+      color:rgba(255,255,255,.3);">
+      Gratis · Speelt in je browser · ~10 minuten
+    </p>
+
+  </div>
+</section>
+<!-- ── EINDE STAGE SIMULATOR ──────────────────────────────────────────────── -->
+
+<!-- ── BLIJF OP DE HOOGTE ──────────────────────────────────────────────────── -->
+<section style="background:#f4f3ef;padding:80px 24px;">
+  <div style="max-width:560px;margin:0 auto;text-align:center;">
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1a7a48;margin-bottom:14px;">Geen spam, beloofd</p>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.6rem,3vw,2.1rem);font-weight:700;color:#0d1520;line-height:1.2;margin-bottom:14px;">
+      Blijf op de hoogte van Internly
+    </h2>
+    <p style="font-size:.95rem;color:#6b7280;line-height:1.65;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;">
+      Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal één mail per maand.
+    </p>
+
+    <div id="hero-wl-form" style="display:flex;gap:8px;max-width:440px;margin:0 auto 12px;">
+      <input type="email" id="hero-wl-email" placeholder="jouw@email.nl" style="
+        flex:1;padding:12px 18px;
+        border:1.5px solid #e2e8f0;border-radius:50px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;
+        color:#0d1520;outline:none;box-sizing:border-box;
+        transition:border-color .15s;"
+        onfocus="this.style.borderColor='#1a7a48'"
+        onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')schrijfInHero()">
+      <button onclick="schrijfInHero()" id="hero-wl-btn" style="
+        padding:12px 22px;
+        background:#FF7E42;color:#fff;border:none;border-radius:50px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;
+        cursor:pointer;white-space:nowrap;flex-shrink:0;
+        transition:background .15s;">
+        Schrijf je in →
+      </button>
+    </div>
+
+    <div id="hero-wl-success" style="display:none;padding:14px 0;">
+      <span style="font-size:.95rem;font-weight:600;color:#1a7a48;">Je staat op de lijst! We houden je op de hoogte.</span>
+    </div>
+
+    <div id="hero-wl-error" style="display:none;color:#b82020;font-size:.85rem;margin-top:6px;"></div>
+
+    <p style="font-size:.72rem;color:#b0b7c3;margin-top:10px;">
+      Door je in te schrijven ga je akkoord met ons privacybeleid. Altijd makkelijk uitschrijven.
+    </p>
+  </div>
+</section>
+<!-- ── EINDE BLIJF OP DE HOOGTE ───────────────────────────────────────────── -->
+
+<script>
+let selectedRole = null;
+
+function selectRole(role) {
+  selectedRole = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('rc-' + role).classList.add('active');
+  document.getElementById('enterBtn').disabled = false;
+}
+
+function enterApp() {
+  if (!selectedRole) return;
+  sessionStorage.setItem('internly_role', selectedRole);
+  window.location.href = 'auth.html?role=' + selectedRole;
+}
+
+async function schrijfInHero() {
+  const email = document.getElementById('hero-wl-email').value.trim();
+  const btn   = document.getElementById('hero-wl-btn');
+  const err   = document.getElementById('hero-wl-error');
+
+  err.style.display = 'none';
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    err.textContent   = 'Voer een geldig e-mailadres in.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Bezig…';
+
+  const { error } = await supabase
+    .from('waitlist')
+    .insert({ email, source: window.location.pathname });
+
+  btn.disabled    = false;
+  btn.textContent = 'Schrijf je in →';
+
+  if (error) {
+    if (error.code === '23505') {
+      document.getElementById('hero-wl-form').style.display    = 'none';
+      document.getElementById('hero-wl-success').style.display = 'block';
+    } else {
+      err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
+      err.style.display = 'block';
+    }
+    return;
+  }
+
+  document.getElementById('hero-wl-form').style.display    = 'none';
+  document.getElementById('hero-wl-success').style.display = 'block';
+}
+</script>
+
+<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
+<div id="waitlist-overlay" style="
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:24px;">
+</div>
+
+<div id="waitlist-popup" style="
+  display:none; position:fixed; z-index:9999;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#fff; border-radius:20px;
+  width:100%; max-width:440px;
+  box-shadow:0 24px 60px rgba(0,0,0,.18);
+  overflow:hidden; font-family:'Outfit',sans-serif;">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#1a7a48,#0f5c36);padding:28px 32px 24px;position:relative;">
+    <button onclick="sluitPopup()" style="
+      position:absolute;top:14px;right:16px;
+      background:rgba(255,255,255,.15);border:none;
+      color:#fff;width:28px;height:28px;border-radius:50%;
+      font-size:1rem;cursor:pointer;line-height:1;
+      display:flex;align-items:center;justify-content:center;">×</button>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
+      intern<span style="color:#FF7E42;">ly</span>
+    </div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.65);">
+      Blijf op de hoogte van de ontwikkeling
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div style="padding:28px 32px 32px;">
+    <p style="font-size:.95rem;color:#374151;line-height:1.7;margin:0 0 8px;">
+      Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
+    </p>
+    <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
+      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
+    </p>
+
+    <div id="wl-form">
+      <input type="email" id="wl-email" placeholder="jouw@email.nl" style="
+        width:100%;padding:11px 16px;
+        border:1.5px solid #e2e8f0;border-radius:10px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;
+        color:#0d1520;outline:none;box-sizing:border-box;
+        transition:border-color .15s;margin-bottom:10px;"
+        onfocus="this.style.borderColor='#1a7a48'"
+        onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')schrijfIn()">
+      <button onclick="schrijfIn()" id="wl-btn" style="
+        width:100%;padding:12px;
+        background:#FF7E42;color:#fff;border:none;
+        border-radius:50px;font-family:'Outfit',sans-serif;
+        font-size:.95rem;font-weight:700;cursor:pointer;
+        transition:background .15s;">
+        Houd me op de hoogte →
+      </button>
+    </div>
+
+    <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
+      <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
+    </div>
+
+    <div id="wl-error" style="display:none;margin-top:8px;
+      background:#fdeaea;color:#b82020;border-radius:8px;
+      padding:8px 14px;font-size:.82rem;"></div>
+
+    <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
+      Door je in te schrijven ga je akkoord met ons privacybeleid.
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+
+  if (!localStorage.getItem('internly_waitlist_seen')) {
+    setTimeout(async function() {
+      const _client = (typeof supabase !== 'undefined') ? supabase
+        : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { session } } = await _client.auth.getSession();
+      if (!session) toonPopup();
+    }, 8000);
+  }
+
+  function toonPopup() {
+    document.getElementById('waitlist-overlay').style.display = 'flex';
+    document.getElementById('waitlist-popup').style.display  = 'block';
+    localStorage.setItem('internly_waitlist_seen', '1');
+  }
+
+  window.sluitPopup = function() {
+    document.getElementById('waitlist-overlay').style.display = 'none';
+    document.getElementById('waitlist-popup').style.display  = 'none';
+  };
+
+  document.getElementById('waitlist-overlay').addEventListener('click', sluitPopup);
+
+  window.schrijfIn = async function() {
+    const email = document.getElementById('wl-email').value.trim();
+    const btn   = document.getElementById('wl-btn');
+    const err   = document.getElementById('wl-error');
+
+    err.style.display = 'none';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent   = 'Voer een geldig e-mailadres in.';
+      err.style.display = 'block';
+      return;
     }
 
-    function enterApp() {
-      if (!selectedRole) return;
-      window.location.href = 'discover.html';
+    btn.disabled    = true;
+    btn.textContent = 'Bezig…';
+
+    const client = (typeof supabase !== 'undefined') ? supabase
+      : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const { error } = await client
+      .from('waitlist')
+      .insert({ email, source: window.location.pathname });
+
+    btn.disabled    = false;
+    btn.textContent = 'Houd me op de hoogte →';
+
+    if (error) {
+      if (error.code === '23505') {
+        document.getElementById('wl-form').style.display    = 'none';
+        document.getElementById('wl-success').style.display = 'block';
+      } else {
+        err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
+        err.style.display = 'block';
+      }
+      return;
     }
-  </script>
+
+    document.getElementById('wl-form').style.display    = 'none';
+    document.getElementById('wl-success').style.display = 'block';
+
+    setTimeout(sluitPopup, 3000);
+  };
+})();
+</script>
+<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

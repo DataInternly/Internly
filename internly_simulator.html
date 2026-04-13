@@ -1,0 +1,4111 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Internly Simulator — Jouw eerste stageweek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&family=VT323&display=swap" rel="stylesheet" />
+<style>
+/* ── Design tokens ──────────────────────────────────────────────── */
+:root {
+  --ink:    #0d1520;
+  --bg:     #f4f3ef;
+  --accent: #e05c1a;
+  --green:  #1a7a48;
+  --amber:  #a06010;
+  --red:    #b82020;
+  --white:  #ffffff;
+  --border: #e5e3de;
+  --muted:  #6b7280;
+
+  /* Terminal palette */
+  --term-bg:    #080c08;
+  --term-green: #33ff44;
+  --term-amber: #f0b429;
+  --term-dim:   #1a3a1e;
+  --term-red:   #ff4444;
+  --term-blue:  #66aaff;
+
+  --r: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Nav ────────────────────────────────────────────────────────── */
+#sim-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--ink);
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.nav-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.02em;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--accent); }
+
+.nav-tag {
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  color: var(--term-green);
+  letter-spacing: .04em;
+  opacity: .8;
+}
+
+/* ── Intro screen ───────────────────────────────────────────────── */
+#intro-screen {
+  min-height: calc(100vh - 54px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.intro-eyebrow {
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  letter-spacing: .12em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.intro-h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  max-width: 680px;
+  margin-bottom: 20px;
+}
+
+.intro-h1 em {
+  font-style: italic;
+  color: var(--green);
+}
+
+.intro-sub {
+  font-size: 1rem;
+  color: var(--muted);
+  max-width: 480px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.intro-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+}
+
+.pill.green { background: #e8f5ee; border-color: #b6dfc8; color: var(--green); }
+.pill.amber { background: #fdf3e0; border-color: #f0d090; color: var(--amber); }
+.pill.ink   { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+.intro-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background .15s, transform .12s;
+  letter-spacing: -.01em;
+}
+
+.intro-cta:hover {
+  background: #1a2535;
+  transform: translateY(-2px);
+}
+
+.intro-cta .cta-arrow {
+  font-size: 1.2rem;
+  transition: transform .15s;
+}
+
+.intro-cta:hover .cta-arrow { transform: translateX(4px); }
+
+.intro-footnote {
+  margin-top: 20px;
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+/* ── Game container ─────────────────────────────────────────────── */
+#game-container {
+  display: none;
+  flex-direction: column;
+  min-height: calc(100vh - 54px);
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ── HUD bar ────────────────────────────────────────────────────── */
+#hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--ink);
+  border-radius: 12px;
+  padding: 10px 18px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  font-family: 'VT323', monospace;
+}
+
+.hud-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hud-label {
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  line-height: 1;
+  margin-bottom: 2px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+}
+
+.hud-val {
+  font-size: 1.5rem;
+  color: var(--term-green);
+  line-height: 1;
+}
+
+.hud-val.amber { color: var(--term-amber); }
+.hud-val.red   { color: var(--term-red); }
+
+#hud-divider {
+  width: 1px;
+  height: 32px;
+  background: rgba(255,255,255,.1);
+}
+
+/* PP bar */
+.pp-bar-wrap {
+  flex: 1;
+  min-width: 120px;
+}
+
+.pp-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.pp-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--term-green);
+  transition: width .35s ease, background .35s;
+}
+
+.pp-bar-fill.amber { background: var(--term-amber); }
+.pp-bar-fill.red   { background: var(--term-red); }
+
+/* ── CRT terminal wrapper ───────────────────────────────────────── */
+#terminal-wrap {
+  background: var(--term-bg);
+  border-radius: var(--r);
+  overflow: hidden;
+  border: 1.5px solid #1a2a1a;
+  box-shadow: 0 0 0 1px #0a0f0a, 0 8px 40px rgba(0,0,0,.5), inset 0 1px 0 rgba(51,255,68,.06);
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chrome dots */
+.term-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: #0d130d;
+  border-bottom: 1px solid #1a2a1a;
+  flex-shrink: 0;
+}
+
+.chrome-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.chrome-dot:nth-child(1) { background: #ff5f57; }
+.chrome-dot:nth-child(2) { background: #ffbd2e; }
+.chrome-dot:nth-child(3) { background: #28c840; }
+
+.term-chrome-label {
+  margin-left: 8px;
+  font-family: 'VT323', monospace;
+  font-size: .85rem;
+  color: rgba(51,255,68,.35);
+  letter-spacing: .06em;
+}
+
+/* Terminal inner (scanlines + vignette + flicker) */
+#term-inner {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  animation: crt-flicker 8s infinite;
+}
+
+/* Scanlines overlay */
+#term-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,.18) 2px,
+    rgba(0,0,0,.18) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Vignette overlay */
+#term-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0,0,0,.55) 100%
+  );
+  pointer-events: none;
+  z-index: 11;
+}
+
+@keyframes crt-flicker {
+  0%   { opacity: 1; }
+  4%   { opacity: .97; }
+  8%   { opacity: 1; }
+  50%  { opacity: 1; }
+  52%  { opacity: .98; }
+  54%  { opacity: 1; }
+  92%  { opacity: 1; }
+  93%  { opacity: .96; }
+  94%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Terminal output */
+#term-output {
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  line-height: 1.55;
+  color: var(--term-green);
+  padding: 20px 22px 12px;
+  min-height: 320px;
+  max-height: 460px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 5;
+  scrollbar-width: thin;
+  scrollbar-color: #1a3a1e transparent;
+  flex-shrink: 0;
+}
+
+#term-output::-webkit-scrollbar { width: 4px; }
+#term-output::-webkit-scrollbar-track { background: transparent; }
+#term-output::-webkit-scrollbar-thumb { background: #1a3a1e; border-radius: 2px; }
+
+.t-line {
+  display: block;
+  word-break: break-word;
+}
+
+.t-blank { display: block; height: .7em; }
+
+/* Terminal text colour helpers */
+.t-green  { color: var(--term-green); }
+.t-amber  { color: var(--term-amber); }
+.t-red    { color: var(--term-red); }
+.t-blue   { color: var(--term-blue); }
+.t-dim    { color: rgba(51,255,68,.4); }
+.t-white  { color: rgba(255,255,255,.85); }
+.t-muted  { color: rgba(51,255,68,.5); }
+.t-bold   { font-weight: 700; } /* VT323 is already monoline, used for emphasis */
+
+/* Cursor blink */
+.t-cursor {
+  display: inline-block;
+  width: 9px;
+  height: 1.1em;
+  background: var(--term-green);
+  vertical-align: text-bottom;
+  animation: blink .9s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Choices ────────────────────────────────────────────────────── */
+#choices {
+  border-top: 1px solid #1a2a1a;
+  padding: 14px 18px 16px;
+  background: #060a06;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.choice-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  background: none;
+  border: 1px solid #1a3a1e;
+  border-radius: 8px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-family: 'VT323', monospace;
+  font-size: 1.05rem;
+  color: rgba(51,255,68,.75);
+  text-align: left;
+  transition: background .12s, border-color .12s, color .12s;
+  line-height: 1.3;
+}
+
+.choice-btn:hover, .choice-btn:focus {
+  background: #0d1f0d;
+  border-color: var(--term-green);
+  color: var(--term-green);
+  outline: none;
+}
+
+.choice-key {
+  color: var(--term-amber);
+  font-size: 1rem;
+  flex-shrink: 0;
+  min-width: 18px;
+}
+
+/* ── Inventory row ──────────────────────────────────────────────── */
+#inv-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inv-label {
+  font-family: 'VT323', monospace;
+  font-size: .9rem;
+  color: var(--muted);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.inv-chips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.inv-chip {
+  font-family: 'VT323', monospace;
+  font-size: .95rem;
+  padding: 3px 11px;
+  border-radius: 20px;
+  border: 1.5px solid;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.inv-chip.ok   { background: #e8f5ee; border-color: #b6dfc8; color: var(--green); }
+.inv-chip.warn { background: #fdf3e0; border-color: #f0d090; color: var(--amber); }
+.inv-chip.bad  { background: #fdeaea; border-color: #fca5a5; color: var(--red); }
+.inv-chip.dim  { background: #f4f3ef; border-color: var(--border); color: var(--muted); }
+
+.inv-empty {
+  font-family: 'VT323', monospace;
+  font-size: .9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── End card ───────────────────────────────────────────────────── */
+#end-card {
+  display: none;
+  margin-top: 24px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px;
+  text-align: center;
+}
+
+.end-grade-letter {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.end-grade-letter.grade-a { color: var(--green); }
+.end-grade-letter.grade-b { color: var(--amber); }
+.end-grade-letter.grade-c { color: var(--red); }
+
+.end-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: -.02em;
+}
+
+.end-desc {
+  font-size: .92rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0 auto 16px;
+}
+
+.end-tip {
+  background: #f4f3ef;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: .88rem;
+  color: var(--ink);
+  line-height: 1.6;
+  max-width: 520px;
+  margin: 0 auto 24px;
+  text-align: left;
+}
+
+.end-tip strong { color: var(--green); }
+
+/* Stat strip */
+.stat-strip {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 auto 24px;
+  max-width: 440px;
+}
+
+.stat-cell {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.stat-cell:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-num.green { color: var(--green); }
+.stat-num.amber { color: var(--amber); }
+.stat-num.red   { color: var(--red); }
+
+.stat-lbl {
+  font-size: .72rem;
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.end-restart {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .95rem;
+  font-weight: 600;
+  padding: 11px 26px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.end-restart:hover { background: #1a2535; }
+
+/* Dynamic end card (appended by showEnd) */
+.end-card-dyn {
+  margin-top: 24px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px;
+  text-align: center;
+}
+
+/* End actions row */
+.end-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.end-link {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  transition: color .15s, border-color .15s;
+}
+
+.end-link:hover { color: var(--ink); border-color: #8a9bb0; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  #game-container { padding: 16px 12px 48px; }
+
+  #term-output {
+    font-size: .95rem;
+    max-height: 360px;
+    min-height: 240px;
+    padding: 14px 14px 10px;
+  }
+
+  .choice-btn { font-size: .95rem; padding: 8px 12px; }
+
+  .intro-h1 { font-size: 1.8rem; }
+
+  .stat-strip { max-width: 100%; }
+
+  .end-card { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────────────── -->
+<nav id="sim-nav">
+  <a class="nav-logo" href="index.html">Internly<span>.</span></a>
+  <span class="nav-tag">[ SIMULATOR v1.0 ]</span>
+</nav>
+
+<!-- ── Intro screen ─────────────────────────────────────────────── -->
+<section id="intro-screen">
+  <div class="intro-eyebrow">Internly Simulator</div>
+  <h1 class="intro-h1">Jouw eerste stageweek — <em>gesimuleerd</em></h1>
+  <p class="intro-sub">
+    Navigeer door vijf dagen bij een bureau. Elke keuze telt.
+    Maak indruk op Mara, snap het jargon, en overleef de standup.
+  </p>
+  <div class="intro-pills">
+    <span class="pill green">✦ 5 werkdagen</span>
+    <span class="pill amber">⚡ PP-systeem</span>
+    <span class="pill">📋 Inventory</span>
+    <span class="pill ink">🖥 CRT terminal</span>
+  </div>
+  <button class="intro-cta" id="start-btn">
+    Start stage <span class="cta-arrow">→</span>
+  </button>
+  <p class="intro-footnote">Geen inloggen nodig · Volledig in het Nederlands</p>
+</section>
+
+<!-- ── Game container ───────────────────────────────────────────── -->
+<div id="game-container">
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-block">
+      <span class="hud-label">Dag</span>
+      <span class="hud-val" id="hud-dag">0</span>
+    </div>
+    <div id="hud-divider"></div>
+    <div class="hud-block pp-bar-wrap">
+      <span class="hud-label">Professionele Punten (PP)</span>
+      <span class="hud-val" id="hud-pp">50</span>
+      <div class="pp-bar-track">
+        <div class="pp-bar-fill" id="pp-bar" style="width:50%"></div>
+      </div>
+    </div>
+    <div id="hud-divider"></div>
+    <div class="hud-block">
+      <span class="hud-label">Scene</span>
+      <span class="hud-val t-dim" id="hud-scene" style="font-size:1rem;">—</span>
+    </div>
+  </div>
+
+  <!-- CRT terminal -->
+  <div id="terminal-wrap">
+    <div class="term-chrome">
+      <div class="chrome-dot"></div>
+      <div class="chrome-dot"></div>
+      <div class="chrome-dot"></div>
+      <span class="term-chrome-label">internly_sim.exe — stage week 1</span>
+    </div>
+    <div id="term-inner">
+      <div id="term-output"></div>
+      <div id="choices"></div>
+    </div>
+  </div>
+
+  <!-- Inventory -->
+  <div id="inv-row">
+    <span class="inv-label">Inventory:</span>
+    <div class="inv-chips" id="inv-chips">
+      <span class="inv-empty">— leeg —</span>
+    </div>
+  </div>
+
+  <!-- End card (hidden until game over) -->
+  <div id="end-card">
+    <div class="end-grade-letter" id="end-grade-letter">A</div>
+    <div class="end-title" id="end-title">Uitstekende eerste week</div>
+    <p class="end-desc" id="end-desc"></p>
+    <div class="end-tip" id="end-tip"></div>
+    <div class="stat-strip">
+      <div class="stat-cell">
+        <div class="stat-num" id="stat-pp">50</div>
+        <div class="stat-lbl">PP totaal</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" id="stat-grade">A</div>
+        <div class="stat-lbl">Graad</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" id="stat-flags">0</div>
+        <div class="stat-lbl">Goede keuzes</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" id="stat-items">0</div>
+        <div class="stat-lbl">Items</div>
+      </div>
+    </div>
+    <button class="end-restart" onclick="restartGame()">↺ Opnieuw spelen</button>
+  </div>
+
+</div><!-- /#game-container -->
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════════ */
+
+var G = {
+  pp:      50,
+  dag:     0,
+  inv:     [],         // array of item ids currently held
+  flags:   {},         // boolean flags set by choices
+  choices: []          // choice history (for stats)
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   ITEMS
+   ══════════════════════════════════════════════════════════════════ */
+
+var ITEMS = {
+  pas: {
+    label: 'Toegangspas',
+    state: 'geen',
+    cls: { geen: 'dim', actief: 'ok', vergeten: 'bad' }
+  },
+  laptop: {
+    label: 'Laptop',
+    state: 'geen',
+    cls: { geen: 'dim', aan: 'ok', leeg: 'warn', kapot: 'bad' }
+  },
+  opdracht: {
+    label: 'Opdracht',
+    state: 'geen',
+    cls: { geen: 'dim', nieuw: 'ok', bezig: 'warn', af: 'ok', laat: 'bad' }
+  },
+  koffie: {
+    label: 'Koffie',
+    state: 'geen',
+    cls: { geen: 'dim', vol: 'ok', leeg: 'warn', gemorst: 'bad' }
+  },
+  notitie: {
+    label: 'Notities',
+    state: 'geen',
+    cls: { geen: 'dim', leeg: 'warn', vol: 'ok', verloren: 'bad' }
+  }
+};
+
+/* ── Item helpers ───────────────────────────────────────────────── */
+
+function give(id, state) {
+  if (!ITEMS[id]) return;
+  ITEMS[id].state = state || 'actief';
+  if (!G.inv.includes(id)) G.inv.push(id);
+  renderInv();
+}
+
+function setS(id, state) {
+  if (!ITEMS[id]) return;
+  ITEMS[id].state = state;
+  renderInv();
+}
+
+function has(id) {
+  return G.inv.includes(id);
+}
+
+function renderInv() {
+  var container = document.getElementById('inv-chips');
+  if (!container) return;
+
+  var visible = G.inv.filter(function(id){ return ITEMS[id] && ITEMS[id].state !== 'geen'; });
+
+  if (visible.length === 0) {
+    container.innerHTML = '<span class="inv-empty">— leeg —</span>';
+    return;
+  }
+
+  container.innerHTML = visible.map(function(id) {
+    var item  = ITEMS[id];
+    var cls   = item.cls[item.state] || 'dim';
+    return '<span class="inv-chip ' + cls + '">' +
+      item.label + ' [' + item.state + ']' +
+    '</span>';
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PP SYSTEM
+   ══════════════════════════════════════════════════════════════════ */
+
+function addPP(n, why) {
+  G.pp = Math.max(0, Math.min(100, G.pp + n));
+  updateHUD();
+
+  if (why) {
+    var cls = n > 0 ? 't-amber' : 't-red';
+    var sign = n > 0 ? '+' : '';
+    appendLine('<span class="' + cls + '">' + sign + n + ' PP — ' + escHtml(why) + '</span>');
+  }
+}
+
+function updateHUD() {
+  var ppEl  = document.getElementById('hud-pp');
+  var dagEl = document.getElementById('hud-dag');
+  var bar   = document.getElementById('pp-bar');
+
+  if (ppEl)  ppEl.textContent  = G.pp;
+  if (dagEl) dagEl.textContent = G.dag;
+  if (bar) {
+    bar.style.width = G.pp + '%';
+    bar.className = 'pp-bar-fill' +
+      (G.pp >= 60 ? '' : G.pp >= 35 ? ' amber' : ' red');
+  }
+
+  if (ppEl) {
+    ppEl.className = 'hud-val' +
+      (G.pp >= 60 ? '' : G.pp >= 35 ? ' amber' : ' red');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   OUTPUT QUEUE — typewriter engine
+   ══════════════════════════════════════════════════════════════════ */
+
+var _queue    = [];
+var _running  = false;
+var _callback = null;
+
+function appendLine(html) {
+  _queue.push({ type: 'line', html: html });
+}
+
+function appendBlank() {
+  _queue.push({ type: 'blank' });
+}
+
+function runQueue() {
+  if (_running) return;
+  _running = true;
+  step();
+}
+
+function step() {
+  if (_queue.length === 0) {
+    _running = false;
+    if (_callback) {
+      var cb = _callback;
+      _callback = null;
+      cb();
+    }
+    return;
+  }
+
+  var item = _queue.shift();
+  var out  = document.getElementById('term-output');
+  if (!out) { step(); return; }
+
+  if (item.type === 'blank') {
+    var b = document.createElement('span');
+    b.className = 't-blank';
+    out.appendChild(b);
+    scrollTerm();
+    setTimeout(step, 60);
+    return;
+  }
+
+  // type: line — typewriter character by character
+  var span = document.createElement('span');
+  span.className = 't-line';
+  out.appendChild(span);
+  scrollTerm();
+
+  // We write the final HTML in one go but with a small delay per line
+  // (full char-by-char is too slow for long passages; this gives a snappy feel)
+  var delay = 18 + Math.min(item.html.replace(/<[^>]*>/g,'').length * 0.8, 120);
+
+  setTimeout(function() {
+    span.innerHTML = item.html;
+    scrollTerm();
+    setTimeout(step, 28);
+  }, delay);
+}
+
+function scrollTerm() {
+  var out = document.getElementById('term-output');
+  if (out) out.scrollTop = out.scrollHeight;
+}
+
+function clearOut() {
+  var out = document.getElementById('term-output');
+  if (out) out.innerHTML = '';
+  _queue   = [];
+  _running = false;
+  _callback = null;
+}
+
+function print(lines, callback) {
+  if (!Array.isArray(lines)) lines = [lines];
+  lines.forEach(function(l) {
+    if (l === '') appendBlank();
+    else appendLine(l);
+  });
+  _callback = callback || null;
+  runQueue();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CHOICES
+   ══════════════════════════════════════════════════════════════════ */
+
+function showChoices(list) {
+  // list = [{ label, action }]
+  var el = document.getElementById('choices');
+  if (!el) return;
+  el.innerHTML = '';
+
+  list.forEach(function(c, i) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML =
+      '<span class="choice-key">[' + (i + 1) + ']</span>' +
+      '<span class="choice-text">' + escHtml(c.label) + '</span>';
+    btn.setAttribute('data-idx', i);
+    btn.addEventListener('click', function() { pick(i); });
+    el.appendChild(btn);
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', _keyHandler);
+
+  window._currentChoices = list;
+}
+
+function clearChoices() {
+  var el = document.getElementById('choices');
+  if (el) el.innerHTML = '';
+  document.removeEventListener('keydown', _keyHandler);
+  window._currentChoices = null;
+}
+
+function _keyHandler(e) {
+  if (!window._currentChoices) return;
+  var n = parseInt(e.key, 10);
+  if (n >= 1 && n <= window._currentChoices.length) {
+    e.preventDefault();
+    pick(n - 1);
+  }
+}
+
+function pick(i) {
+  if (!window._currentChoices) return;
+  var choice = window._currentChoices[i];
+  if (!choice) return;
+
+  G.choices.push(i);
+  clearChoices();
+
+  // Echo chosen label to terminal
+  appendLine('<span class="t-amber">&gt; ' + escHtml(choice.label) + '</span>');
+  appendBlank();
+  runQueue();
+
+  // Run action after a short beat
+  setTimeout(function() { choice.action(); }, 220);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCENE RUNNER
+   ══════════════════════════════════════════════════════════════════ */
+
+var SCENES = {};
+
+function go(id) {
+  var sceneEl = document.getElementById('hud-scene');
+  if (sceneEl) sceneEl.textContent = id;
+
+  if (!SCENES[id]) {
+    appendLine('<span class="t-red">FOUT: scene "' + id + '" niet gevonden.</span>');
+    runQueue();
+    return;
+  }
+
+  SCENES[id]();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BOOTSTRAP
+   ══════════════════════════════════════════════════════════════════ */
+
+function startGame() {
+  document.getElementById('intro-screen').style.display  = 'none';
+  document.getElementById('game-container').style.display = 'flex';
+
+  clearOut();
+  clearChoices();
+  renderInv();
+  updateHUD();
+
+  go('dag0_avond');
+}
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+
+/* ══════════════════════════════════════════════════════════════════
+   END SCREEN
+   ══════════════════════════════════════════════════════════════════ */
+
+function showEnd() {
+  clearChoices();
+
+  var pp = G.pp;
+
+  // Grade thresholds
+  var grade, gradeClass, title, desc, tip;
+  if (pp >= 68) {
+    grade = 'A'; gradeClass = 'grade-a';
+    title = 'Uitstekende eerste week';
+    desc  = 'Je hebt indruk gemaakt op Mara en het team. Je las de situatie goed, stelde de juiste vragen en toonde initiatief zonder te overdrijven. Dat is zeldzaam in week één.';
+    tip   = '<strong>Tip voor je echte stage:</strong> Blijf vragen stellen — ook als je denkt dat je het snapt. De beste stagiairs blijven nieuwsgierig.';
+  } else if (pp >= 42) {
+    grade = 'B'; gradeClass = 'grade-b';
+    title = 'Solide start';
+    desc  = 'Je hebt je door de week heen geslagen met een mix van goede en minder handige keuzes. Er waren leermomenten — dat is precies de bedoeling van een stage.';
+    tip   = '<strong>Tip voor je echte stage:</strong> Vraag halverwege de eerste week om informele feedback. Dat laat zien dat je wilt groeien, en je hoort dingen die anders pas weken later komen.';
+  } else {
+    grade = 'C'; gradeClass = 'grade-c';
+    title = 'Moeilijke start — maar leerbaar';
+    desc  = 'De eerste week was zwaar. Het goede nieuws: je hebt nu gesimuleerde ervaring die normaal echte fouten kost. Speel opnieuw — je weet nu wat werkt.';
+    tip   = '<strong>Tip voor je echte stage:</strong> Bereid elk gesprek voor. Schrijf op wat je wilt vragen, en communiceer proactief over je voortgang — ook als het tegenzit.';
+  }
+
+  // Flag count
+  var positiveFlags = [
+    'onderzocht','weet_verwachting','goed_standup','snapt_jargon',
+    'vroeg_feedback','kent_bas','joris_hulp','afgetikt','prep','tip_dana'
+  ];
+  var flagCount = positiveFlags.filter(function(f){ return G.flags[f]; }).length;
+
+  // Remove any prior dynamic card
+  document.querySelectorAll('.end-card-dyn').forEach(function(el){ el.remove(); });
+  document.getElementById('end-card').style.display = 'none';
+
+  // Build card
+  var ppCls    = pp >= 68 ? 'green' : pp >= 42 ? 'amber' : 'red';
+  var gradeCls = grade === 'A' ? 'green' : grade === 'B' ? 'amber' : 'red';
+
+  var card = document.createElement('div');
+  card.className = 'end-card-dyn';
+  card.innerHTML =
+    '<div class="end-grade-letter ' + gradeClass + '">' + grade + '</div>' +
+    '<div class="end-title">' + escHtml(title) + '</div>' +
+    '<p class="end-desc">' + escHtml(desc) + '</p>' +
+    '<div class="end-tip">' + tip + '</div>' +
+    '<div class="stat-strip">' +
+      '<div class="stat-cell">' +
+        '<div class="stat-num ' + ppCls + '">' + pp + '</div>' +
+        '<div class="stat-lbl">PP totaal</div>' +
+      '</div>' +
+      '<div class="stat-cell">' +
+        '<div class="stat-num ' + gradeCls + '">' + grade + '</div>' +
+        '<div class="stat-lbl">Graad</div>' +
+      '</div>' +
+      '<div class="stat-cell">' +
+        '<div class="stat-num">' + flagCount + '</div>' +
+        '<div class="stat-lbl">Goede keuzes</div>' +
+      '</div>' +
+      '<div class="stat-cell">' +
+        '<div class="stat-num">' + G.inv.length + '</div>' +
+        '<div class="stat-lbl">Items</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="end-actions">' +
+      '<button class="end-restart" onclick="restartGame()">&#8635; Opnieuw spelen</button>' +
+      '<a class="end-link" href="index.html">&#8592; Terug naar Internly</a>' +
+    '</div>';
+
+  document.getElementById('game-container').appendChild(card);
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RESTART
+   ══════════════════════════════════════════════════════════════════ */
+
+function restartGame() {
+  // Reset state
+  G.pp      = 50;
+  G.dag     = 0;
+  G.inv     = [];
+  G.flags   = {};
+  G.choices = [];
+
+  // Reset items to null (no state)
+  Object.keys(ITEMS).forEach(function(id) {
+    ITEMS[id].state = null;
+  });
+
+  // Remove dynamic end cards; hide static placeholder
+  document.querySelectorAll('.end-card-dyn').forEach(function(el){ el.remove(); });
+  document.getElementById('end-card').style.display = 'none';
+
+  // Reset HUD + terminal
+  updateHUD();
+  clearOut();
+  clearChoices();
+  renderInv();
+
+  document.getElementById('game-container').scrollIntoView({ behavior: 'smooth' });
+
+  setTimeout(function() { go('boot'); }, 300);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   UTILITY
+   ══════════════════════════════════════════════════════════════════ */
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCENES — to be added in Part 2 & 3
+   ══════════════════════════════════════════════════════════════════ */
+
+// ════════════════════════════════════════════════════════════════
+// DAG 0 — Avond ervoor
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag0_avond'] = function() {
+  G.dag = 0;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '<span class="t-amber">DAG 0 — Zondagavond, 21:47</span>',
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '',
+    'Morgen begint je stage bij <span class="t-white">Vandaag Agency</span> — een contentbureau',
+    'in Amsterdam-Noord. Je begeleider heet <span class="t-white">Mara van den Berg</span>.',
+    'De agenda voor dag één staat vaag in je mail: "onboarding, 09:00".',
+    '',
+    'Je laptop ligt opgeladen op je bureau. Het is nog vroeg genoeg',
+    'om iets nuttigs te doen. Of niet.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Op tijd naar bed gaan. Uitgerust beginnen is alles.',
+        action: function() {
+          addPP(5, 'Goed geslapen — frisse start');
+          print([
+            'Je legt je telefoon weg om 22:00. Geen doomscrolling.',
+            'Om 07:15 word je wakker voor de wekker. Professioneel.',
+            ''
+          ], function() { go('dag1_aankomst'); });
+        }
+      },
+      {
+        label: 'LinkedIn checken — wie is Mara? Wat doet Vandaag Agency?',
+        action: function() {
+          G.flags.onderzocht = true;
+          addPP(8, 'Voorbereid — je weet wie Mara is en wat het bureau doet');
+          print([
+            '<span class="t-blue">[ ITEM ] Notities over Vandaag Agency opgeslagen in je hoofd.</span>',
+            '',
+            'Mara van den Berg: 8 jaar ervaring, ex-TBWA, schrijft over content',
+            'strategie op LinkedIn. Het bureau werkt voor mid-market B2B klanten.',
+            '"Full-funnel" staat minstens drie keer in hun website copy.',
+            '',
+            'Je gaat om 23:00 slapen — een uur later dan gepland, maar met context.',
+            ''
+          ], function() { go('dag1_aankomst'); });
+        }
+      },
+      {
+        label: 'Eén aflevering Netflix. Morgen is morgen.',
+        action: function() {
+          G.flags.moe = true;
+          addPP(-3, 'Slecht geslapen — drie afleveringen later...');
+          print([
+            'Één aflevering wordt er drie. Je slaapt om 01:30.',
+            'De wekker om 07:00 voelt als een aanval.',
+            ''
+          ], function() { go('dag1_aankomst'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Aankomst
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag1_aankomst'] = function() {
+  G.dag = 1;
+  updateHUD();
+
+  var openingLine = G.flags.moe
+    ? 'Je staat voor het kantoor met kringen onder je ogen.'
+    : G.flags.onderzocht
+      ? 'Je staat voor het kantoor, hoofd vol context over Mara en het bureau.'
+      : 'Je staat voor het kantoor. Fris en op tijd.';
+
+  print([
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '<span class="t-amber">DAG 1 — Maandag, 08:52</span>',
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '',
+    openingLine,
+    'Vandaag Agency zit op de derde verdieping van een oud distributiecentrum.',
+    'De ingang heeft een glazen slagboom met een paslezer.',
+    '',
+    'Je hebt nog geen toegangspas. De receptie zit links van de lift.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Probeer de slagboom te passeren — iemand houdt hem vast.',
+        action: function() {
+          addPP(-4, 'Slagboom zonder pas — ongemakkelijk begin');
+          print([
+            'Je glimlacht naar een vrouw die net doorloopt. Ze kijkt verbaasd',
+            'maar houdt de deur open. Je voelt je direct een indringer.',
+            '',
+            'Boven aan de trap staat een beveiliger. "Pas?" Je hebt er geen.',
+            '"Dan moet je je eerst melden bij de receptie, beneden links."',
+            '',
+            'Je loopt terug. Het duurt acht minuten.',
+            ''
+          ], function() { go('dag1_receptie'); });
+        }
+      },
+      {
+        label: 'Even snel koffie halen bij de automaat in de hal.',
+        action: function() {
+          give('koffie', 'vol');
+          addPP(-2, 'Koffie gemorst op je mouw — geen geweldig begin');
+          print([
+            '<span class="t-blue">[ ITEM ] Koffie [vol] — een beker slecht koffiezetapparaat-koffie.</span>',
+            '',
+            'De automaat geeft een te volle beker. Je draait je om,',
+            'stoot tegen een rollator aan en morst koffie over je rechtermouw.',
+            '',
+            'Je probeert het weg te deppen met een papieren servetje.',
+            'Het smeer je in. Je loopt naar de receptie met een bruine vlek.',
+            ''
+          ], function() {
+            setS('koffie', 'gemorst');
+            go('dag1_receptie');
+          });
+        }
+      },
+      {
+        label: 'Direct naar de receptie. Dat is hier de logische plek.',
+        action: function() {
+          print([
+            'Je loopt rustig naar de receptie. Een man achter de balie',
+            'kijkt op: "Goedemorgen! Eerste dag?"',
+            ''
+          ], function() { go('dag1_receptie'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Receptie
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag1_receptie'] = function() {
+  print([
+    'De receptionist — naam: <span class="t-white">Bas</span> — toetst je naam in.',
+    '"Mara is nog in een kort overleg. Ze komt je zo halen."',
+    '',
+    'Hij geeft je een toegangspas met je naam en STAGIAIR erop.',
+    ''
+  ], function() {
+    give('pas', 'actief');
+    appendLine('<span class="t-blue">[ ITEM ] Toegangspas [actief] — je bent officieel binnen.</span>');
+    appendBlank();
+
+    if (!G.flags.onderzocht) {
+      appendLine('Bas vraagt terloops: "Ken je ons bureau een beetje al?"');
+      appendBlank();
+      runQueue();
+
+      setTimeout(function() {
+        showChoices([
+          {
+            label: 'Eerlijk zijn: "Ik heb de website bekeken maar niet heel diep."',
+            action: function() {
+              print([
+                '"Dat is prima," zegt Bas. "Mara legt alles uit. Ze is goed in onboarden."',
+                ''
+              ], function() { go('dag1_onboarding'); });
+            }
+          },
+          {
+            label: 'Doen alsof je alles weet: "Ja, full-funnel B2B — top bureau."',
+            action: function() {
+              addPP(-2, 'Bluf doorzien — Bas kent het bureau van binnen uit');
+              print([
+                'Bas trekt een wenkbrauw op. "Dat staat inderdaad op de website."',
+                'De stilte daarna duurt net iets te lang.',
+                ''
+              ], function() { go('dag1_onboarding'); });
+            }
+          }
+        ]);
+      }, 400);
+    } else {
+      appendLine('Je noemt iets wat je hebt gelezen over hun aanpak. Bas kijkt aangenaam verrast.');
+      appendBlank();
+      runQueue();
+      setTimeout(function() { go('dag1_onboarding'); }, 600);
+    }
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Onboarding met Mara
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag1_onboarding'] = function() {
+  print([
+    '<span class="t-dim">— 09:03 —</span>',
+    '',
+    '<span class="t-white">Mara</span> loopt op je af met de energie van iemand die al drie uur werkt.',
+    '"Goed dat je er bent! Kom mee, ik geef je een rondleiding en brief je meteen in."',
+    '',
+    'Ze lopen langs open werkplekken, een grote schermwand met klantdashboards,',
+    'en een keuken die ruikt naar verse koffie en licht naar stress.',
+    '',
+    'In een vergaderkamertje gaat ze zitten. "Oké. Vragen?"',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Wat zijn je verwachtingen van mij deze week?',
+        action: function() {
+          G.flags.weet_verwachting = true;
+          addPP(6, 'Slimme vraag — verwachtingen ophalen is pro');
+          print([
+            'Mara leunt achteruit. "Goeie vraag. Ik wil dat je aan het einde van',
+            'de week twee dingen kunt: begrijpen hoe we werken, en één concrete',
+            'deliverable hebben opgeleverd voor Klant B."',
+            '',
+            'Ze noemt een naam: Studio Roos. Noteer je.',
+            ''
+          ], function() {
+            give('notitie', 'vol');
+            appendLine('<span class="t-blue">[ ITEM ] Notities [vol] — verwachtingen en klantnaam opgeschreven.</span>');
+            appendBlank();
+            runQueue();
+            setTimeout(function() { go('dag1_onboarding_laptop'); }, 400);
+          });
+        }
+      },
+      {
+        label: 'Wat is het wifi-wachtwoord?',
+        action: function() {
+          addPP(-5, 'Wifi vragen als eerste — Mara noteert dit mentaal');
+          print([
+            'Mara knippert met haar ogen. "Dat... staat op een briefje bij de koffie."',
+            'Er valt een stilte.',
+            '',
+            'Je bedenkt dat dit niet de beste openingsvraag was.',
+            ''
+          ], function() {
+            showChoices([
+              {
+                label: 'Terugkomen met een betere vraag: "Wat zijn je verwachtingen van mij?"',
+                action: function() {
+                  G.flags.weet_verwachting = true;
+                  addPP(3, 'Hersteld — toch de goede vraag gesteld');
+                  print([
+                    '"Dat is beter," zegt Mara, een tikje droog.',
+                    'Ze legt haar verwachtingen uit. Je luistert aandachtig.',
+                    ''
+                  ], function() { go('dag1_onboarding_laptop'); });
+                }
+              },
+              {
+                label: 'Zwijgen en wachten tot Mara verder gaat.',
+                action: function() {
+                  print([
+                    'Mara vult de stilte zelf in. Ze legt de week uit,',
+                    'maar je hebt het gevoel dat je een stap achterloopt.',
+                    ''
+                  ], function() { go('dag1_onboarding_laptop'); });
+                }
+              }
+            ]);
+          });
+        }
+      },
+      {
+        label: 'Wanneer is de lunch?',
+        action: function() {
+          addPP(-2, 'Lunch vragen als eerste — beetje vroeg');
+          print([
+            '"Om 12:30, in de keuken of buiten." Mara lacht kort.',
+            '"Maar eerst even over de inhoud?"',
+            '',
+            'Je knikt snel. Het gesprek gaat verder, maar de toon is gezet.',
+            ''
+          ], function() { go('dag1_onboarding_laptop'); });
+        }
+      },
+      {
+        label: 'Geen vragen — luisteren en absorberen.',
+        action: function() {
+          addPP(2, 'Rustig beginnen — Mara apprecieert de luisterhouding');
+          print([
+            '"Geen vragen? Mooi. Dan vertel ik je gewoon alles wat je nodig hebt."',
+            'Mara neemt het initiatief. Je krijgt een goed beeld.',
+            ''
+          ], function() { go('dag1_onboarding_laptop'); });
+        }
+      }
+    ]);
+  });
+};
+
+SCENES['dag1_onboarding_laptop'] = function() {
+  print([
+    'Mara schuift een MacBook over tafel. "Dit is je laptop voor de stage.',
+    'Alles staat erop wat je nodig hebt."',
+    ''
+  ], function() {
+    give('laptop', 'aan');
+    give('opdracht', 'nieuw');
+    appendLine('<span class="t-blue">[ ITEM ] Laptop [aan] — volledig geconfigureerd, klaar voor gebruik.</span>');
+    appendLine('<span class="t-blue">[ ITEM ] Opdracht [nieuw] — eerste briefing voor Studio Roos ontvangen.</span>');
+    appendBlank();
+    runQueue();
+    setTimeout(function() { go('dag1_standup'); }, 500);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Standup 09:15
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag1_standup'] = function() {
+  print([
+    '<span class="t-dim">— 09:15 — Standup in de open ruimte —</span>',
+    '',
+    'Het hele team staat in een cirkel. Acht mensen, waaronder',
+    '<span class="t-white">Joris</span> (senior contentstrategist) en <span class="t-white">Dana</span> (accountmanager).',
+    '',
+    'De beurt gaat rond. Wat doe je vandaag? Iedereen zegt iets concreets.',
+    'Dan ben jij aan de beurt. Mara kijkt je aan.',
+    '"En jij? Wat ga jij vandaag doen?"',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Een eerste analyse maken van de opdracht voor Studio Roos.',
+        action: function() {
+          G.flags.goed_standup = true;
+          addPP(6, 'Concrete deliverable in standup — team weet wat je doet');
+          print([
+            'Joris knikt. Mara schrijft iets op haar notitieblok.',
+            '"Goed. Dan weten we waar je mee bezig bent."',
+            ''
+          ], function() { go('dag1_jargon'); });
+        }
+      },
+      {
+        label: 'Mezelf oriënteren op de werkwijze van het bureau.',
+        action: function() {
+          addPP(-3, 'Te vaag — Mara vraagt door');
+          print([
+            '"Oké," zegt Mara. "Maar wat levert dat op? Wat is je output vandaag?"',
+            ''
+          ], function() {
+            showChoices([
+              {
+                label: 'Een samenvatting van de briefing van Studio Roos.',
+                action: function() {
+                  addPP(2, 'Hersteld na doorvraag — goed gecorrigeerd');
+                  print([
+                    '"Perfect," zegt Mara. "Dan weten we het."',
+                    'Je voelt de druk van de cirkel, maar je hebt je hersteld.',
+                    ''
+                  ], function() { go('dag1_jargon'); });
+                }
+              },
+              {
+                label: 'Herhalen dat je je nog oriënteert.',
+                action: function() {
+                  addPP(-2, 'Dubbel vaag — Mara laat het zitten maar noteert het');
+                  print([
+                    'Mara haalt haar schouders op en gaat verder.',
+                    'Je voelt dat je een punt hebt gemist.',
+                    ''
+                  ], function() { go('dag1_jargon'); });
+                }
+              }
+            ]);
+          });
+        }
+      },
+      {
+        label: 'Mijn onboarding flow verder doorlopen en het team leren kennen.',
+        action: function() {
+          addPP(-6, 'Kantoorjargon in standup — Mara corrigeert publiekelijk');
+          print([
+            'Mara stopt. "Onboarding flow?" Ze kijkt je vriendelijk maar direct aan.',
+            '"We zeggen hier: inwerkperiode. En wat ga je concreet doen?"',
+            '',
+            'Je gezicht wordt warm. Het team wacht.',
+            ''
+          ], function() {
+            showChoices([
+              {
+                label: 'De briefing van Studio Roos lezen en samenvatten.',
+                action: function() {
+                  addPP(3, 'Goed hersteld na publieke correctie');
+                  print([
+                    '"Dát is een antwoord," zegt Mara. Lichte glimlach.',
+                    'Je overleeft de standup. Nipt.',
+                    ''
+                  ], function() { go('dag1_jargon'); });
+                }
+              }
+            ]);
+          });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Jargon puzzle
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag1_jargon'] = function() {
+  print([
+    '<span class="t-dim">— 10:45 — Terug aan je bureau —</span>',
+    '',
+    'Je leest de briefing voor Studio Roos. Halverwege stuit je op deze zin:',
+    '',
+    '<span class="t-white">"We zoeken een full-funnel benadering voor de mid-market."</span>',
+    '',
+    'Je weet wat funnel is. Maar full-funnel? Mid-market? In deze context?',
+    'Je wil het goed begrijpen voor je iets doet.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Snel googelen — drie minuten, je weet het dan zeker.',
+        action: function() {
+          G.flags.snapt_jargon = true;
+          addPP(3, 'Zelfstandig opgezocht — goede instinct');
+          print([
+            'Full-funnel: van awareness tot conversie, alles in één aanpak.',
+            'Mid-market: bedrijven tussen 50–500 medewerkers. Geen startup, geen corporate.',
+            '',
+            'Je snapt de opdracht nu volledig. Je maakt een eerste notitie.',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            appendLine('<span class="t-blue">[ ITEM ] Opdracht [bezig] — analyse gestart.</span>');
+            appendBlank();
+            runQueue();
+            setTimeout(function() { go('dag1_einde'); }, 400);
+          });
+        }
+      },
+      {
+        label: 'Joris vragen — hij is senior strateeg, die weet dit.',
+        action: function() {
+          G.flags.snapt_jargon = true;
+          addPP(2, 'Vraag gesteld aan de juiste persoon');
+          print([
+            'Joris draait zijn stoel om. "Goeie vraag. Full-funnel betekent dat je',
+            'geen losse campagnes doet maar een complete klantreis ontwerpt.",',
+            '',
+            '"Mid-market zijn de bedrijven die te groot zijn voor een standaard',
+            'pakket, maar te klein voor enterprise. Lastige doelgroep — dát is',
+            'precies waarom Studio Roos ons heeft ingehuurd."',
+            '',
+            'Hij lacht. "Vraag altijd door. Niemand hier bijt."',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            appendLine('<span class="t-blue">[ ITEM ] Opdracht [bezig] — analyse gestart met Joris\' context.</span>');
+            appendBlank();
+            runQueue();
+            setTimeout(function() { go('dag1_einde'); }, 400);
+          });
+        }
+      },
+      {
+        label: 'Skippern en verder lezen — de context volgt vanzelf.',
+        action: function() {
+          G.flags.mist_jargon = true;
+          addPP(-3, 'Jargon geskipt — je mist context voor je analyse');
+          print([
+            'Je leest verder. De zin blijft hangen.',
+            'Later blijkt dat je de focus van de opdracht verkeerd hebt begrepen.',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            go('dag1_einde');
+          });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Einde dag
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag1_einde'] = function() {
+  print([
+    '<span class="t-dim">— 17:15 — Mara loopt langs je bureau —</span>',
+    '',
+    '"Hoe was dag één? Vertel."',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Concreet: "Briefing gelezen, analyse gestart, twee openstaande vragen."',
+        action: function() {
+          addPP(5, 'Concrete statusupdate — Mara weet precies waar je staat');
+          print([
+            '"Mooi. Wat zijn de vragen?"',
+            'Je stelt ze. Ze beantwoordt ze in twee minuten.',
+            '"Goed einde van dag één."',
+            ''
+          ], function() { go('dag2_slack'); });
+        }
+      },
+      {
+        label: 'Enthousiast maar vaag: "Super leuk! Veel geleerd, heel veel indrukken."',
+        action: function() {
+          addPP(1, 'Enthousiasme — maar Mara wil weten wát je deed');
+          print([
+            'Mara glimlacht beleeft. "Fijn. Wat heb je concreet gedaan?"',
+            'Je vertelt het alsnog. Ze knikt.',
+            '"Morgen concrete voortgang graag in de standup."',
+            ''
+          ], function() { go('dag2_slack'); });
+        }
+      },
+      {
+        label: 'Proactief: "Goed! Ik heb ook een vraag: doe ik het goed zo?"',
+        action: function() {
+          G.flags.vroeg_feedback = true;
+          addPP(6, 'Proactief feedback gevraagd — Mara is onder de indruk');
+          print([
+            'Mara stopt. Denkt even na.',
+            '"Eerlijk? Ja. Je standup kon beter, maar je hebt het snel hersteld.',
+            'En dat je dit al op dag één vraagt — dat is een goed teken."',
+            '',
+            '"Kom morgenochtend om 08:45 even langs voor je standup.',
+            'Dan kunnen we kort voorbereiden."',
+            ''
+          ], function() { go('dag2_slack'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 2 — Slack
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag2_slack'] = function() {
+  G.dag = 2;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '<span class="t-amber">DAG 2 — Dinsdag, 09:04</span>',
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '',
+    'Je opent Slack. Twee meldingen:',
+    '',
+    '• <span class="t-white">Bas (DM)</span>: "Hey! Heb jij toevallig een foto voor het team-overzicht?"',
+    '• <span class="t-white">#random</span>: Joris deelt een meme over deadlines. Zeven reacties.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Bas antwoorden in DM — een foto sturen en jezelf kort voorstellen.',
+        action: function() {
+          G.flags.kent_bas = true;
+          addPP(3, 'Goede relatie opgebouwd met Bas bij de receptie');
+          print([
+            'Je stuurt een recente foto en schrijft: "Hey Bas! Hier is hij.",',
+            '"Leuk om je gisteren al te ontmoeten."',
+            '',
+            'Bas stuurt terug: "<span class="t-white">Nice! En bedankt voor gisteren,',
+            'je was een van de weinige stagiairs die meteen doorhad waar de receptie was.</span>"',
+            ''
+          ], function() { go('dag2_email'); });
+        }
+      },
+      {
+        label: 'Reageren op de meme in #random — een emoji en een grappige reactie.',
+        action: function() {
+          addPP(-3, 'Te vroeg aanwezig in #random — Joris stuurt een waarschuwing');
+          print([
+            'Je plaatst een reactie. 🙈 + "tell me about it lol".',
+            '',
+            'Drie minuten later krijg je een DM van Joris:',
+            '"Hey — kleine tip: als nieuweling in het team is het beter',
+            'om #random even te lezen voor je erin duikt. Mensen letten op.",',
+            '"Niet erg, maar fijn om te weten."',
+            ''
+          ], function() { go('dag2_email'); });
+        }
+      },
+      {
+        label: '#random negeren — focussen op de echte taak.',
+        action: function() {
+          addPP(1, 'Professionele focus — Slack-kanalen juist geprioriteerd');
+          print([
+            'Je markeert #random als gelezen zonder te reageren.',
+            'Joris knikt je later in de gang toe. Of verbeeldt je dat je dat?',
+            ''
+          ], function() { go('dag2_email'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 2 — Eerste externe email
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag2_email'] = function() {
+  print([
+    '<span class="t-dim">— 10:20 —</span>',
+    '',
+    'Dana vraagt je om een introductiemail te sturen naar <span class="t-white">Studio Roos</span>.',
+    '"Gewoon kort: wie je bent, dat je werkt aan hun brief, dat je contact opneemt',
+    'als je vragen hebt."',
+    '',
+    'Je ziet dat er een e-mailtemplatesmap is in de gedeelde drive.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Eerst het template ophalen, aanpassen, dan sturen.',
+        action: function() {
+          addPP(5, 'Template gebruikt — professionele, consistente mail');
+          print([
+            'Je vindt het template. Het heeft een vaste stijl, disclaimer en afsluiting',
+            'die past bij de huisstijl van Vandaag Agency.',
+            '',
+            'Je past het aan en stuurt. Een uur later: "Fijn, we kijken ernaar uit!"',
+            ''
+          ], function() { go('dag2_vergadering'); });
+        }
+      },
+      {
+        label: 'Direct sturen — je weet wat je wilt schrijven.',
+        action: function() {
+          addPP(-4, 'Geen template — mail mist huisstijl en disclaimer');
+          print([
+            'Je schrijft een nette mail en stuurt. Vijf minuten later is Dana naast je.',
+            '"Hé — heb je het template gebruikt?"',
+            '"Nee, ik had—"',
+            '"We sturen altijd vanuit het template. Huisstijl. Stuur een correctiemail."',
+            '',
+            'Je stuurt een tweede mail. Professioneel, maar twee keer verstuurd.',
+            ''
+          ], function() { go('dag2_vergadering'); });
+        }
+      },
+      {
+        label: 'Mara eerst laten checken voor je stuurt.',
+        action: function() {
+          addPP(4, 'Goede instinct — Mara complimenteert de voorzichtigheid');
+          print([
+            '"Slim," zegt Mara. Ze leest je concept. "Gebruik wel het template —',
+            'staat in de gedeelde drive onder /templates/extern."',
+            '"Maar goed dat je vroeg. Dat scheelt ons correctiemails."',
+            ''
+          ], function() { go('dag2_vergadering'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 2 — Vergadering & deadline
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag2_vergadering'] = function() {
+  print([
+    '<span class="t-dim">— 14:00 — Klantgesprek via Teams —</span>',
+    '',
+    'De klant — een marketingmanager van Studio Roos — praat snel.',
+    '"We willen dit volledig platslaan en dan over de schutting gooien naar jullie."',
+    '',
+    'Je hoort de zin. Platslaan? Over de schutting gooien?',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Meenicken — je hebt de jargon-benadering al opgepikt.',
+        action: function() {
+          addPP(3, 'Jargon gedecodeerd — je volgt het gesprek volledig');
+          print([
+            'Platslaan = vereenvoudigen. Over de schutting gooien = overdragen.',
+            'Je noteert: "Studio Roos wil alles versimpeld aanleveren en wij pakken het op."',
+            ''
+          ], function() { go('dag2_deadline'); });
+        }
+      },
+      {
+        label: 'Verduidelijkende vraag stellen in de meeting.',
+        action: function() {
+          addPP(5, 'Goede vraag — klant blij met het initiatief');
+          print([
+            '"Sorry, als ik even mag — met platslaan bedoelt u vereenvoudigen naar',
+            'één heldere briefing, en over de schutting gooien is dan het overdragen',
+            'aan ons team?"',
+            '',
+            'De klant lacht. "Precies! Fijn dat iemand dat even checkt.',
+            'Soms praat ik te snel in mijn eigen taal."',
+            '',
+            'Mara geeft je een bijna onzichtbaar knikje.',
+            ''
+          ], function() { go('dag2_deadline'); });
+        }
+      },
+      {
+        label: 'Letterlijk noteren: "alles platslaan en over de schutting gooien".',
+        action: function() {
+          addPP(-2, 'Letterlijke notitie — onduidelijke actiepunten achteraf');
+          print([
+            'Na het gesprek lees je je notities terug.',
+            '"Platslaan en schutting" — wat betekende dat ook alweer?',
+            'Je vraagt het later aan Dana. Die zucht zachtjes.',
+            ''
+          ], function() { go('dag2_deadline'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 3 — Status aan Joris
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag3_status'] = function() {
+  G.dag = 3;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '<span class="t-amber">DAG 3 — Woensdag, 11:30</span>',
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '',
+    'Joris checkt in. "Hoe staat het ervoor met de analyse voor Studio Roos?',
+    'Mara vroeg me even mee te kijken."',
+    '',
+    'Je hebt de helft. Klant B is lastiger dan verwacht. Je hebt nog twee vragen',
+    'die je niet zelf kunt beantwoorden.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Ik ben halverwege. Er zijn twee punten waar ik hulp bij kan gebruiken."',
+        action: function() {
+          addPP(2, 'Eerlijk over voortgang — Joris weet waar je staat');
+          print([
+            '"Prima," zegt Joris. "Wat zijn de punten?"',
+            'Je legt ze uit. Hij helpt je in tien minuten verder.',
+            '"Zo doe je dat hier. Altijd eerlijk over waar je staat."',
+            ''
+          ], function() { go('dag3_document'); });
+        }
+      },
+      {
+        label: '"Bijna klaar — ik denk dat ik het vandaag afrond."',
+        action: function() {
+          G.flags.loog = true;
+          addPP(-4, 'Gelogen over voortgang — Joris merkt het morgen');
+          print([
+            '"Top," zegt Joris. Hij loopt weg.',
+            '',
+            'Je staart naar je scherm. Bijna klaar was een leugen.',
+            'Je hebt nog een halve dag werk en twee onbeantwoorde vragen.',
+            'Morgen wordt lastig.',
+            ''
+          ], function() { go('dag3_document'); });
+        }
+      },
+      {
+        label: '"Ik heb hulp nodig met Klant B — de briefing is onduidelijk."',
+        action: function() {
+          G.flags.joris_hulp = true;
+          addPP(5, 'Om hulp gevraagd op het juiste moment — Joris deelt inzicht');
+          print([
+            'Joris trekt een stoel bij. "Klant B. Oké, daar zit een verhaal achter."',
+            '',
+            '"Studio Roos wil eigenlijk twee dingen tegelijk: nieuwe klanten EN',
+            'bestaande klanten behouden. Dat staat niet in de briefing maar',
+            'daar draait het wel om. Ik zat zelf bij het eerste gesprek."',
+            '',
+            '"Als jij dát als startpunt neemt in je analyse, slaat het nergens op."',
+            'Hij lacht. "Welkom bij agency-werk."',
+            ''
+          ], function() { go('dag3_document'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 3 — Avond: 34-pagina document
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag3_document'] = function() {
+  print([
+    '<span class="t-dim">— 18:45 — Thuis —</span>',
+    '',
+    'Je opent je mail. Er is een bericht van Dana:',
+    '"Hey, ter voorbereiding op donderdag — hier is de achtergrond van Studio Roos.",',
+    '"34 pagina\'s. Niet allemaal even relevant maar wel handig om te hebben gelezen."',
+    '',
+    'Je opent het PDF. 34 pagina\'s met jaarverslagen, marktanalyses en merkdocumenten.',
+    'Het is 18:47.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Alles lezen. Je wilt goed voorbereid zijn.',
+        action: function() {
+          G.dag = 4;
+          updateHUD();
+          addPP(-3, 'Tot 02:30 gelezen — te uitgeput voor dag 4');
+          print([
+            'Je leest. En leest. Om 02:30 doe je je laptop dicht.',
+            'Dag vier begint om 08:30 en jij hebt vijf uur slaap.',
+            '',
+            '<span class="t-amber">DAG 4 — Donderdag — je functioneert op koffie en wilskracht.</span>',
+            ''
+          ], function() { go('dag5_voorbereiding'); });
+        }
+      },
+      {
+        label: 'Samenvatting lezen, dan de relevante secties.',
+        action: function() {
+          G.dag = 4;
+          G.flags.afgetikt = true;
+          updateHUD();
+          addPP(5, 'Slim lezen — klaar om 23:00, uitgerust voor dag 4');
+          print([
+            'Je leest de executive summary (4 pagina\'s) en zoekt op "mid-market",',
+            '"content" en "doelgroep". Vijftien pagina\'s zijn relevant.',
+            '',
+            'Om 23:00 ben je klaar. Notities gemaakt. Klaar voor morgen.',
+            '',
+            '<span class="t-amber">DAG 4 — Donderdag — je bent de best voorbereide persoon in de meeting.</span>',
+            ''
+          ], function() { go('dag5_voorbereiding'); });
+        }
+      },
+      {
+        label: 'Mara mailen: "Moet ik dit volledig lezen? Wat is het doel?"',
+        action: function() {
+          G.dag = 4;
+          updateHUD();
+          addPP(7, 'Scope geverifieerd bij Mara — proactief en efficiënt');
+          print([
+            'Mara antwoordt binnen tien minuten:',
+            '"Goed dat je vraagt. Lees pagina 1-6 en sectie 4 (p.18-24).',
+            'De rest is achtergrond — handig maar niet kritisch voor vrijdag."',
+            '',
+            'Je leest vijftien pagina\'s. Om 22:00 ben je klaar.',
+            '',
+            '<span class="t-amber">DAG 4 — Donderdag — Mara weet dat jij slim prioriteert.</span>',
+            ''
+          ], function() { go('dag5_voorbereiding'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 5 — Vrijdag voorbereiding
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag5_voorbereiding'] = function() {
+  G.dag = 5;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '<span class="t-amber">DAG 5 — Vrijdag, 08:30</span>',
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '',
+    'Vandaag is de terugkoppeling met Mara. Ze wil horen hoe jij je week hebt',
+    'beleefd, wat je hebt geleerd, en hoe je ervoor staat.',
+    '',
+    'Je hebt dertig minuten voor het gesprek begint.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Drie kernpunten opschrijven: wat ging goed, wat kan beter, wat leerde je.',
+        action: function() {
+          G.flags.prep = true;
+          addPP(5, 'Gestructureerde voorbereiding — Mara merkt het meteen');
+          print([
+            'Je schrijft:',
+            '1. Goed: briefing gelezen en jargon opgezocht.',
+            '2. Beter: standup kon concreter vanaf dag één.',
+            '3. Geleerd: altijd een template checken voor externe mails.',
+            '',
+            'Drie concrete punten. Je voelt je klaar.',
+            ''
+          ], function() { go('dag5_terugkoppeling'); });
+        }
+      },
+      {
+        label: 'Vertrouwen op wat je weet — je hebt de week meegemaakt.',
+        action: function() {
+          addPP(1, 'Onvoorbereide maar authentieke inbreng');
+          print([
+            'Je loopt naar het gesprek zonder notities.',
+            'Je weet wat je hebt gedaan. Dat is genoeg.',
+            ''
+          ], function() { go('dag5_terugkoppeling'); });
+        }
+      },
+      {
+        label: 'Dana vragen wat Mara belangrijk vindt in zo\'n gesprek.',
+        action: function() {
+          G.flags.tip_dana = true;
+          addPP(4, 'Slimme voorbereiding — Dana geeft waardevolle tip');
+          print([
+            'Dana lacht. "Mara houdt van eerlijkheid. Geen verkooppraatje.",',
+            '"Ze vraagt altijd: wat zou je anders doen? Bereid dat voor."',
+            '',
+            'Je schrijft het op. Waardevolle context.',
+            ''
+          ], function() { go('dag5_terugkoppeling'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 5 — Terugkoppeling
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag5_terugkoppeling'] = function() {
+  print([
+    '<span class="t-dim">— 09:15 — Vergaderkamertje, Mara tegenover je —</span>',
+    '',
+    'Mara vat de week samen. Je hebt je goed gered.',
+    'De analyse voor Studio Roos is opgeleverd — misschien niet perfect,',
+    'maar compleet en op tijd.',
+    '',
+    'Dan stelt ze de vraag: "Als je één ding zou mogen overdoen deze week —',
+    'wat zou je anders doen?"',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Dag één standup beter voorbereiden. Te vaag gestart."',
+        action: function() {
+          addPP(6, 'Strategische zelfreflectie — Mara is onder de indruk');
+          print([
+            'Mara knikt langzaam.',
+            '"Precies het juiste antwoord. Niet omdat het perfect is,',
+            'maar omdat je snapt wat ertoe doet in dit werk.",',
+            '"Een goede standup zet de toon voor je hele dag. Je hebt dat gezien."',
+            '',
+            '"Ik zie je graag terugkomen volgende week."',
+            ''
+          ], function() { go('einde'); });
+        }
+      },
+      {
+        label: '"Meer tijd plannen voor de grote taken."',
+        action: function() {
+          addPP(2, 'Valide punt — maar wat generiek');
+          print([
+            '"Oké," zegt Mara. "Hoe bedoel je dat concreet?"',
+            'Je legt het uit. Ze knikt.',
+            '"Timeblocking. Probeer dat volgende week."',
+            ''
+          ], function() { go('einde'); });
+        }
+      },
+      {
+        label: '"Ik denk dat ik het eigenlijk goed heb gedaan voor een eerste week."',
+        action: function() {
+          addPP(-3, 'Geen zelfreflectie — Mara verwacht meer zelfkritisch vermogen');
+          print([
+            'Mara kijkt je even aan.',
+            '"Dat klopt deels. Maar als je geen verbeterpunten ziet na week één,',
+            'dan leer je niet. Stagiairs die zeggen dat ze het goed deden,',
+            'groeien minder snel."',
+            '',
+            'Ze zegt het vriendelijk. Maar het landt.',
+            ''
+          ], function() { go('einde'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EINDE
+// ════════════════════════════════════════════════════════════════
+
+SCENES['einde'] = function() {
+  setS('opdracht', 'af');
+
+  print([
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '<span class="t-green">STAGE WEEK 1 — AFGEROND</span>',
+    '<span class="t-dim">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>',
+    '',
+    'Je loopt om 17:30 het kantoor van Vandaag Agency uit.',
+    'De lucht boven Amsterdam-Noord is oranje.',
+    '',
+    'Je hebt vijf dagen meegedraaid. Je hebt fouten gemaakt.',
+    'Je hebt dingen goed gedaan. Je hebt iets geleerd over',
+    'hoe een bureau werkt — en over hoe jij werkt.',
+    '',
+    '<span class="t-amber">Berekening eindresultaat...</span>',
+    ''
+  ], function() {
+    setTimeout(showEnd, 600);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 2 — Deadline (placed here to keep order; called from dag2_vergadering)
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag2_deadline'] = function() {
+  print([
+    '<span class="t-dim">— Na de vergadering —</span>',
+    '',
+    'Mara loopt met je mee naar je bureau.',
+    '"Ik zag in je notities dat je de deadline voor de conceptversie niet hebt',
+    'opgeschreven. Die is vrijdag 16:00. Die stond in de briefing."',
+    '',
+    'Ze zegt het rustig — geen aanval. Maar het hangt even in de lucht.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Direct actie: deadline toevoegen en bevestigen dat je op schema ligt.',
+        action: function() {
+          addPP(3, 'Directe actie op feedback — goed herstel');
+          print([
+            '"Oké, vrijdag 16:00. Ik heb het nu in mijn agenda. Ik zit op schema."',
+            'Mara knikt. "Goed. Laat me weten als je vast loopt."',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            go('dag3_status');
+          });
+        }
+      },
+      {
+        label: 'Uitleggen waarom je het hebt gemist — je was gefocust op de inhoud.',
+        action: function() {
+          addPP(-3, 'Excuus gegeven in plaats van oplossing — Mara verwacht actie');
+          print([
+            '"Ik snap het," zegt Mara. "Maar de deadline bestaat nog steeds.",',
+            '"Kun je me nu bevestigen dat je weet wanneer het af moet zijn?"',
+            '',
+            'Je noemt de deadline. Stijf, maar correct.',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            go('dag3_status');
+          });
+        }
+      }
+    ]);
+  });
+};
+
+
+// ════════════════════════════════════════════════════════════════
+// REDIRECT: old entry point → new boot scene
+// ════════════════════════════════════════════════════════════════
+SCENES['dag0_avond'] = function() { go('boot'); };
+
+// ════════════════════════════════════════════════════════════════
+// BOOT — systeem opstarten, ASCII logo
+// ════════════════════════════════════════════════════════════════
+SCENES['boot'] = function() {
+  clearOut();
+  print([
+    '<span class="t-dim">INTERNLY_SIM.EXE — versie 1.0</span>',
+    '<span class="t-dim">Kernel laden...</span>',
+    '',
+    '<span class="t-green">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span> 100%',
+    '',
+    '<span class="t-dim">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span>',
+    '<span class="t-green">&#9474;  INTERNLY SIMULATOR v1.0              &#9474;</span>',
+    '<span class="t-green">&#9474;  Jouw eerste stageweek                 &#9474;</span>',
+    '<span class="t-green">&#9474;  Vandaag Agency &mdash; Amsterdam-Noord       &#9474;</span>',
+    '<span class="t-dim">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span>',
+    '',
+    '<span class="t-amber">Systeem gereed.</span>',
+    '',
+    'Je begint maandag als stagiair bij Vandaag Agency,',
+    'een contentbureau in Amsterdam-Noord.',
+    'Je begeleider is <span class="t-white">Mara van den Berg</span>.',
+    'Je hebt vijf dagen om indruk te maken.',
+    '',
+    '<span class="t-dim">Elke keuze telt. PP = Professionele Punten.</span>',
+    '<span class="t-dim">Startscore: 50 PP. Succes.</span>',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Start simulatie',
+        action: function() { go('dag0'); }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 0 — Zondagavond, avond voor de stage
+// ════════════════════════════════════════════════════════════════
+SCENES['dag0'] = function() {
+  G.dag = 0;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 0 &mdash; Zondag, 21:47</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Je zit aan je bureau. Morgen begint de stage bij',
+    '<span class="t-white">Vandaag Agency</span> in Amsterdam-Noord.',
+    'De ontvangstbevestiging zegt: 09:00, ingang hoofdgebouw.',
+    'Verder: niets.',
+    '',
+    'Je laptop staat open. Het is nog vroeg genoeg om',
+    'iets nuttigs te doen. Of niet.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Op tijd naar bed. Uitgerust beginnen is alles.',
+        action: function() {
+          addPP(5, 'Goed geslapen &mdash; frisse start');
+          print([
+            'Je legt de telefoon weg om 22:00.',
+            'Geen socials, geen nieuws. Om 07:15 word je wakker voor de wekker.',
+            'Je lichaam voelt koel en scherp.',
+            ''
+          ], function() { go('dag1_ochtend'); });
+        }
+      },
+      {
+        label: 'LinkedIn: wie is Mara? Wat doet Vandaag Agency eigenlijk?',
+        action: function() {
+          G.flags.onderzocht = true;
+          addPP(8, 'Voorbereid &mdash; je weet wie Mara is en hoe het bureau werkt');
+          print([
+            '<span class="t-blue">[ + ] Achtergrondkennis opgeslagen.</span>',
+            '',
+            '<span class="t-white">Mara van den Berg</span>: 9 jaar bureau-ervaring, ex-TBWA Amsterdam.',
+            'Schrijft zelf over contentstrategie. Directe toon in posts.',
+            '',
+            '<span class="t-white">Vandaag Agency</span>: B2B contentmarketing, 22 medewerkers.',
+            'Klanten: mid-market bedrijven, 50-500 medewerkers.',
+            '"Full-funnel" staat vijf keer op de website.',
+            '',
+            'Je slaapt om 23:00. Een uur later dan gepland, maar met context.',
+            ''
+          ], function() { go('dag1_ochtend'); });
+        }
+      },
+      {
+        label: 'Eén aflevering Netflix. Morgen is morgen.',
+        action: function() {
+          G.flags.moe = true;
+          addPP(-3, 'Drie afleveringen later &mdash; te weinig slaap');
+          print([
+            'Een aflevering wordt er drie.',
+            'Je doet je laptop dicht om 01:23.',
+            'De wekker om 07:00 voelt als een aanslag.',
+            ''
+          ], function() { go('dag1_ochtend'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 1 — Maandagochtend, aankomst
+// ════════════════════════════════════════════════════════════════
+SCENES['dag1_ochtend'] = function() {
+  G.dag = 1;
+  updateHUD();
+
+  var openingsregel = G.flags.moe
+    ? 'Je staat voor de ingang met kringen onder je ogen en een thermosbeker.'
+    : G.flags.onderzocht
+      ? 'Je staat voor de ingang. Je weet wie er binnen werkt en wat het bureau doet.'
+      : 'Je staat voor de ingang. Op tijd. Niks in je hoofd dan een goede eerste indruk.';
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 1 &mdash; Maandag, 08:51</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    openingsregel,
+    '',
+    'Vandaag Agency zit op de derde verdieping van een oud',
+    'distributiepand. Hoge plafonds, houten vloeren, te veel planten.',
+    '',
+    'De ingang heeft een glazen slagboom met een paslezer.',
+    'Rechts is een koffieautomaat. Links is de receptie.',
+    'Je hebt nog geen toegangspas.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Probeer de slagboom &mdash; iemand houdt hem toch wel open.',
+        action: function() { go('lift_fout'); }
+      },
+      {
+        label: 'Eerst koffie halen bij de automaat. Goed begin.',
+        action: function() { go('koffie_incident'); }
+      },
+      {
+        label: 'Direct naar de receptie. Dat is hier de logische plek.',
+        action: function() {
+          print([
+            'Je loopt naar de balie. Rustig, direct.',
+            'Een man van een jaar of dertig kijkt op van zijn scherm.',
+            '"Goedemorgen! Eerste dag?"',
+            ''
+          ], function() { go('receptie'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// LIFT_FOUT — slagboom zonder pas
+// ════════════════════════════════════════════════════════════════
+SCENES['lift_fout'] = function() {
+  addPP(-4, 'Slagboom zonder pas &mdash; een beveiliger stuurt je terug');
+  print([
+    'Je gaat achter een man met een rugzak aan. Hij houdt de slagboom',
+    'niet open. Die klapt terug voor je gezicht.',
+    '',
+    'Je probeert opnieuw. Een vrouw in een geel jasje kijkt je aan.',
+    '"Heb je een pas?"',
+    '"Ik begin vandaag. Ik heb er nog geen."',
+    '"Dan moet je je eerst melden bij de receptie. Linksaf."',
+    '',
+    'Ze loopt door. Jij niet.',
+    'Je staat vier minuten op de verkeerde plek voor je begint.',
+    ''
+  ], function() { go('receptie'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// KOFFIE_INCIDENT — mouw bevuild
+// ════════════════════════════════════════════════════════════════
+SCENES['koffie_incident'] = function() {
+  give('koffie', 'gemorst');
+  addPP(-2, 'Koffie over je mouw &mdash; geen ideale eerste twintig seconden');
+  print([
+    '<span class="t-blue">[ + ] Koffie [gemorst] &mdash; automaat geeft een te volle beker.</span>',
+    '',
+    'De beker is te vol. Je draait je om en stoot met je elleboog',
+    'tegen de rand van de automaat. Koffie over je rechtermouw.',
+    '',
+    'Je dept met een papieren servetje. Het veegt uit.',
+    'Je loopt naar de receptie met een bruine vlek ter grootte van een euromunt.',
+    ''
+  ], function() { go('receptie'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// RECEPTIE — pas ophalen, onderzoek-check
+// ════════════════════════════════════════════════════════════════
+SCENES['receptie'] = function() {
+  var naam = 'Bas';
+
+  print([
+    'De receptionist heet <span class="t-white">Bas</span>.',
+    'Hij typt je naam in, knikt, en pakt een pas uit een la.',
+    '"Mara is nog in een kort overleg. Tien minuutjes."',
+    ''
+  ], function() {
+    give('pas', 'actief');
+    appendLine('<span class="t-blue">[ + ] Toegangspas [actief] &mdash; STAGIAIR, dag 1.</span>');
+    appendBlank();
+    runQueue();
+
+    setTimeout(function() {
+      if (G.flags.onderzocht) {
+        print([
+          'Bas vraagt terloops: "Heb je ons bureau een beetje gekend?"',
+          '',
+          'Je noemt Mara\'s LinkedIn, de B2B-focus en de full-funnel aanpak.',
+          'Bas trekt een wenkbrauw op. "Meeste stagiairs googelen alleen het adres."',
+          ''
+        ], function() { go('tweede_verdieping'); });
+      } else {
+        print([
+          'Bas vraagt terloops: "Heb je ons bureau al een beetje kunnen opzoeken?"',
+          ''
+        ], function() {
+          showChoices([
+            {
+              label: 'Eerlijk: "Ik heb de website bekeken maar niet echt verdiept."',
+              action: function() {
+                print([
+                  '"Dat is prima," zegt Bas. "Mara legt alles goed uit."',
+                  ''
+                ], function() { go('tweede_verdieping'); });
+              }
+            },
+            {
+              label: 'Doen alsof: "Ja, full-funnel B2B &mdash; interessant bureau."',
+              action: function() {
+                addPP(-2, 'Bluf &mdash; Bas merkt dat het oppervlakkig is');
+                print([
+                  '"Dat staat inderdaad op de website," zegt Bas, neutraal.',
+                  'De stilte daarna duurt net iets te lang.',
+                  ''
+                ], function() { go('tweede_verdieping'); });
+              }
+            }
+          ]);
+        });
+      }
+    }, 300);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// TWEEDE_VERDIEPING — Mara onboarding
+// ════════════════════════════════════════════════════════════════
+SCENES['tweede_verdieping'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 09:06 &mdash; Derde verdieping &mdash;</span>',
+    '',
+    '<span class="t-white">Mara van den Berg</span> loopt op je af alsof ze al drie uur aan het werk is,',
+    'want dat is ook zo. Strak staartje, koffie in haar linkerhand.',
+    '"Goed dat je er bent. Kom mee, ik geef je een rondleiding en',
+    'brief je meteen in &mdash; dan kun jij daarna aan de slag."',
+    '',
+    'Je loopt langs open werkplekken, een moodboard met klantmerken,',
+    'en een keuken die naar koffie en lichte stress ruikt.',
+    '',
+    'In een glazen vergaderkamertje gaat ze zitten.',
+    '"Oké. Vragen voor we beginnen?"',
+    ''
+  ], function() {
+    give('laptop', 'aan');
+    give('notitie', 'leeg');
+    appendLine('<span class="t-blue">[ + ] Laptop [aan] &mdash; MacBook Air, geconfigureerd voor stagiairs.</span>');
+    appendLine('<span class="t-blue">[ + ] Notities [leeg] &mdash; blanco A5-schrift op tafel.</span>');
+    appendBlank();
+    runQueue();
+
+    setTimeout(function() {
+      showChoices([
+        {
+          label: '"Wat zijn je verwachtingen van mij voor deze week?"',
+          action: function() { go('onboarding_goed'); }
+        },
+        {
+          label: '"Wat is het wifi-wachtwoord?"',
+          action: function() { go('onboarding_wifi'); }
+        },
+        {
+          label: '"Wanneer is de lunch hier gewoonlijk?"',
+          action: function() { go('onboarding_lunch'); }
+        },
+        {
+          label: 'Geen vragen &mdash; gewoon luisteren.',
+          action: function() { go('onboarding_stil'); }
+        }
+      ]);
+    }, 350);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// ONBOARDING_GOED — verwachtingen vragen
+// ════════════════════════════════════════════════════════════════
+SCENES['onboarding_goed'] = function() {
+  G.flags.weet_verwachting = true;
+  addPP(6, 'Verwachtingen ophalen &mdash; Mara noemt dit later een goed teken');
+  print([
+    'Mara leunt achterover.',
+    '"Goede vraag. Ik wil drie dingen van je deze week:"',
+    '',
+    '"Eén: begrijp hoe wij werken voor je zelf begint te produceren.",',
+    '"Twee: lever vrijdag een conceptanalyse op voor Studio Roos.",',
+    '"Drie: stel vragen als je iets niet snapt &mdash; ook het kleine."',
+    '',
+    'Ze kijkt je aan. "Heb je dat?"',
+    'Je knikt. Je schrijft het op.',
+    ''
+  ], function() {
+    setS('notitie', 'vol');
+    appendLine('<span class="t-blue">[ ~ ] Notities [vol] &mdash; verwachtingen van Mara opgeschreven.</span>');
+    appendBlank();
+    runQueue();
+    setTimeout(function() { go('kantoor_rondkijk'); }, 350);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// ONBOARDING_WIFI — wifi wachtwoord vragen
+// ════════════════════════════════════════════════════════════════
+SCENES['onboarding_wifi'] = function() {
+  addPP(-5, 'Wifi vragen als eerste &mdash; Mara noteert dit mentaal');
+  print([
+    'Mara knippert eenmaal.',
+    '"Het staat op een briefje bij de koffieautomaat. Oranje post-it."',
+    '',
+    'Er valt een stilte van vier tellen.',
+    'Je bedenkt dat dit niet je beste openingszet was.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Terugkomen: "Mijn echte vraag: wat verwacht je van mij deze week?"',
+        action: function() {
+          G.flags.weet_verwachting = true;
+          addPP(3, 'Hersteld &mdash; toch de juiste vraag gesteld');
+          print([
+            '"Beter," zegt Mara, droog maar niet onvriendelijk.',
+            'Ze legt haar verwachtingen uit. Je luistert aandachtig.',
+            ''
+          ], function() { go('kantoor_rondkijk'); });
+        }
+      },
+      {
+        label: 'Zwijgen en wachten tot Mara verder gaat.',
+        action: function() {
+          print([
+            'Mara vult de stilte zelf in. Ze legt de week uit.',
+            'Je hebt het gevoel dat je een stap achterloopt.',
+            ''
+          ], function() { go('kantoor_rondkijk'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// ONBOARDING_LUNCH — lunch vragen
+// ════════════════════════════════════════════════════════════════
+SCENES['onboarding_lunch'] = function() {
+  addPP(-2, 'Lunch vragen als eerste &mdash; een beetje vroeg');
+  print([
+    '"Om 12:30, in de keuken of op het terras als het droog is."',
+    'Mara kijkt je even aan. "Maar zullen we eerst even over de inhoud?"',
+    '',
+    'Je knikt. De toon is gezet, maar het gesprek gaat verder.',
+    ''
+  ], function() { go('kantoor_rondkijk'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// ONBOARDING_STIL — geen vragen
+// ════════════════════════════════════════════════════════════════
+SCENES['onboarding_stil'] = function() {
+  addPP(2, 'Rustige luisterhouding &mdash; Mara neemt het initiatief');
+  print([
+    '"Geen vragen? Prima, dan vertel ik gewoon alles wat je nodig hebt."',
+    '',
+    'Mara neemt het woord. Gestructureerd, effici&euml;nt.',
+    'Je krijgt een helder beeld van wat er de komende week van je wordt verwacht.',
+    ''
+  ], function() { go('kantoor_rondkijk'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// KANTOOR_RONDKIJK — kennismaking met Joris en Dana
+// ════════════════════════════════════════════════════════════════
+SCENES['kantoor_rondkijk'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 09:11 &mdash; Rondleiding door het kantoor &mdash;</span>',
+    '',
+    'Mara stelt je voor aan twee collega\'s:',
+    '',
+    '<span class="t-white">Joris Bakker</span> &mdash; senior contentstrateeg, elf jaar ervaring.',
+    'Kalm, groot bureau vol post-its, koffie in een thermosbeker.',
+    '"Welkom. Stel gerust vragen. Iedereen doet dat hier."',
+    '',
+    '<span class="t-white">Dana Okonkwo</span> &mdash; accountmanager, aanspreekpunt voor klanten.',
+    'Staat half op terwijl ze je hand schudt, headset om haar nek.',
+    '"Hey! Ik werk met Studio Roos &mdash; jouw briefing. We koppelen snel aan."',
+    '',
+    'De standup begint over vier minuten.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Jezelf voorstellen aan de rest van het team bij de koffie.',
+        action: function() {
+          addPP(2, 'Proactief netwerken &mdash; drie collega\'s weten wie je bent v&oacute;&oacute;r de standup');
+          print([
+            'Je doet drie korte voorstelrondjes. Handdrukken, namen, een glimlach.',
+            'Iedereen lijkt gehaast maar vriendelijk.',
+            '"Leuk dat je er bent," zegt iemand bij het aanrecht.',
+            ''
+          ], function() { go('standup'); });
+        }
+      },
+      {
+        label: 'Rustig observeren &mdash; kijken hoe het kantoor werkt.',
+        action: function() {
+          addPP(1, 'Observerende houding &mdash; je leert het ritme kennen');
+          print([
+            'Je staat aan de zijkant en kijkt hoe mensen bewegen.',
+            'Wie praat met wie. Wie heeft hoofdtelefoon op.',
+            'Joris staat elke vijf minuten op en loopt naar het raam.',
+            ''
+          ], function() { go('standup'); });
+        }
+      },
+      {
+        label: 'Even snel je telefoon checken voor de standup begint.',
+        action: function() {
+          addPP(-1, 'Telefoon in het kantoor &mdash; Mara ziet het');
+          print([
+            'Je scrollt even door je berichten.',
+            'Als je opkijkt staat Mara twee meter verderop.',
+            'Ze zegt niets maar je weet het.',
+            ''
+          ], function() { go('standup'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// STANDUP — 09:15
+// ════════════════════════════════════════════════════════════════
+SCENES['standup'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 09:15 &mdash; Dagelijkse standup &mdash;</span>',
+    '',
+    'Het team staat in een cirkel bij de grote tafel. Acht mensen.',
+    'Iedereen zegt in &eacute;&eacute;n of twee zinnen wat ze vandaag doen.',
+    'Concreet. Kort. Geen toelichting tenzij gevraagd.',
+    '',
+    'Dan ben jij aan de beurt.',
+    'Mara kijkt je aan. "En jij? Wat ga jij vandaag doen?"',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Een eerste analyse maken van de briefing voor Studio Roos."',
+        action: function() {
+          G.flags.goed_standup = true;
+          addPP(6, 'Concrete deliverable &mdash; team weet precies wat je doet');
+          print([
+            'Joris knikt. Mara schrijft iets op.',
+            '"Goed. Dan weten we waar je mee bezig bent."',
+            'De standup gaat door. Jij hebt je bijdrage geleverd.',
+            ''
+          ], function() { go('eerste_taak'); });
+        }
+      },
+      {
+        label: '"Mezelf verder ori&euml;nteren op de werkwijze van het bureau."',
+        action: function() { go('standup_vaag'); }
+      },
+      {
+        label: '"Mijn onboarding flow doorlopen en het team leren kennen."',
+        action: function() { go('standup_jargon'); }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// STANDUP_VAAG — Mara vraagt door
+// ════════════════════════════════════════════════════════════════
+SCENES['standup_vaag'] = function() {
+  addPP(-3, 'Te vaag in de standup &mdash; Mara vraagt door');
+  print([
+    '"Oké," zegt Mara. "Maar wat levert dat op? Wat is je output vandaag?"',
+    '',
+    'Acht mensen kijken je aan. De stilte is niet onvriendelijk maar ook niet leeg.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Een samenvatting van de briefing van Studio Roos."',
+        action: function() {
+          addPP(2, 'Goed hersteld na doorvraag');
+          print([
+            '"Dat is een antwoord," zegt Mara. "Prima."',
+            'De cirkel gaat verder. Je hebt je hersteld.',
+            ''
+          ], function() { go('eerste_taak'); });
+        }
+      },
+      {
+        label: 'Herhalen dat je je nog ori&euml;nteert &mdash; meer tijd nodig.',
+        action: function() {
+          addPP(-2, 'Dubbel vaag &mdash; Mara laat het zitten, noteert het');
+          print([
+            'Mara haalt haar schouders op en gaat verder.',
+            'Je voelt dat je een kans hebt laten liggen.',
+            ''
+          ], function() { go('eerste_taak'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// STANDUP_JARGON — Mara corrigeert publiekelijk
+// ════════════════════════════════════════════════════════════════
+SCENES['standup_jargon'] = function() {
+  addPP(-6, 'Kantoorjargon in de standup &mdash; Mara corrigeert voor het team');
+  print([
+    'Mara stopt. Ze kijkt je vriendelijk maar direct aan.',
+    '"Onboarding flow?" Ze legt haar hand op tafel.',
+    '"We zeggen hier: <span class="t-white">inwerkperiode</span>. Houd het gewoon Nederlands.",',
+    '"En wat ga je concreet doen?"',
+    '',
+    'Joris kijkt naar zijn schoen. Dana drinkt een slok koffie.',
+    'Je voelt acht paar ogen.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"De briefing van Studio Roos lezen en samenvatten."',
+        action: function() {
+          addPP(3, 'Goed hersteld na publieke correctie');
+          print([
+            '"D&aacute;t is een antwoord," zegt Mara. Lichte glimlach.',
+            'De standup gaat verder. Je hebt overleefd. Nipt.',
+            ''
+          ], function() { go('eerste_taak'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EERSTE_TAAK — bureau, opdracht krijgen, Joris-tip
+// ════════════════════════════════════════════════════════════════
+SCENES['eerste_taak'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 09:26 &mdash; Terug aan het bureau &mdash;</span>',
+    '',
+    'Joris legt een uitgeprinte briefing naast je laptop.',
+    '"Dit is de opdracht voor Studio Roos. Lees het rustig door.",',
+    '"Als je vragen hebt: stel ze. Hier wordt dat gewaardeerd."',
+    '',
+    'Hij draait zich om, dan weer terug:',
+    '"&Eacute;&eacute;n ding: als je iets niet snapt, google het &eacute;erst.',
+    'Dan weet je zelf al het antwoord of je vraag is scherper."',
+    ''
+  ], function() {
+    give('opdracht', 'nieuw');
+    appendLine('<span class="t-blue">[ + ] Opdracht [nieuw] &mdash; briefing Studio Roos, 3 pagina\'s.</span>');
+    appendBlank();
+    runQueue();
+    setTimeout(function() { go('middag_dag1'); }, 400);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// MIDDAG_DAG1 — lunchkeuze
+// ════════════════════════════════════════════════════════════════
+SCENES['middag_dag1'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 12:30 &mdash; Lunch &mdash;</span>',
+    '',
+    'Het team loopt naar de keuken. Iemand heeft boterhammen meegenomen,',
+    'iemand heeft iets van buiten gehaald.',
+    '"Ga je mee?" vraagt Dana.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Mee lunchen &mdash; even kennismaken met het team.',
+        action: function() { go('lunch'); }
+      },
+      {
+        label: 'Doorwerken &mdash; je bent nog bezig met de briefing.',
+        action: function() {
+          addPP(-1, 'Lunch overgeslagen &mdash; gemiste kans voor teamdynamiek');
+          print([
+            'Dana knikt. "Fair enough."',
+            'Je werkt door. Om 13:15 wordt het leeg en stil.',
+            ''
+          ], function() { go('middag_werk'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// LUNCH — Dana-gesprek, notitie vol
+// ════════════════════════════════════════════════════════════════
+SCENES['lunch'] = function() {
+  addPP(2, 'Mee geluncht &mdash; Dana deelt context over Studio Roos');
+  print([
+    'Je zit naast Dana. Ze heeft een salade en drie lopende gesprekken tegelijk.',
+    '',
+    '"Studio Roos is een lastige klant," zegt ze, zonder omhaal.',
+    '"Ze weten wat ze willen maar kunnen het moeilijk verwoorden.",',
+    '"Als je iets niet begrijpt in de briefing: mail mij, niet de klant."',
+    '',
+    'Ze geeft je haar directe nummer.',
+    '"Voor als het dringend is."',
+    '',
+    'Je schrijft alles op.',
+    ''
+  ], function() {
+    setS('notitie', 'vol');
+    appendLine('<span class="t-blue">[ ~ ] Notities [vol] &mdash; context over Studio Roos en aanspreekpunten.</span>');
+    appendBlank();
+    runQueue();
+    setTimeout(function() { go('middag_werk'); }, 350);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// MIDDAG_WERK — jargon-puzzel: full-funnel mid-market
+// ════════════════════════════════════════════════════════════════
+SCENES['middag_werk'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 13:20 &mdash; Terug aan het bureau &mdash;</span>',
+    '',
+    'Je leest de briefing opnieuw. Halverwege pagina twee staat:',
+    '',
+    '<span class="t-white">"We zoeken een full-funnel benadering voor de mid-market segment</span>',
+    '<span class="t-white">met focus op latent bewustzijn en demand generation."</span>',
+    '',
+    'Je weet wat een funnel is. Maar full-funnel in deze context?',
+    'Mid-market? Latent bewustzijn? Je wil het goed begrijpen.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Googelen &mdash; drie minuten, dan weet je het zeker.',
+        action: function() { go('jargon_google'); }
+      },
+      {
+        label: 'Joris vragen &mdash; hij is strateeg, hij weet dit.',
+        action: function() { go('jargon_joris'); }
+      },
+      {
+        label: 'Overslaan &mdash; de context volgt vanzelf wel.',
+        action: function() {
+          G.flags.mist_jargon = true;
+          addPP(-3, 'Jargon geskipt &mdash; je analyse mist later de kern');
+          print([
+            'Je leest verder. De zin blijft hangen.',
+            'Aan het einde van de middag heb je een analyse geschreven',
+            'die naast de kern zit. Je weet het zelf ook, een beetje.',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            go('einde_dag1');
+          });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// JARGON_GOOGLE
+// ════════════════════════════════════════════════════════════════
+SCENES['jargon_google'] = function() {
+  G.flags.snapt_jargon = true;
+  addPP(3, 'Zelfstandig opgezocht &mdash; goede gewoonte');
+  print([
+    'Je googelt. Vier minuten later:',
+    '',
+    '<span class="t-white">Full-funnel</span>: je bedient klanten in elke fase &mdash;',
+    'van nooit-van-je-gehoord tot loyale afnemer.',
+    '<span class="t-white">Mid-market</span>: bedrijven met 50-500 medewerkers.',
+    'Te groot voor standaardpakketten, te klein voor enterprise-teams.',
+    '<span class="t-white">Latent bewustzijn</span>: de klant weet nog niet dat hij een probleem heeft.',
+    '',
+    'Je snapt de opdracht nu volledig.',
+    'Je begint met schrijven.',
+    ''
+  ], function() {
+    setS('opdracht', 'bezig');
+    appendLine('<span class="t-blue">[ ~ ] Opdracht [bezig] &mdash; analyse gestart met goede kaders.</span>');
+    appendBlank();
+    runQueue();
+    setTimeout(function() { go('einde_dag1'); }, 350);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// JARGON_JORIS
+// ════════════════════════════════════════════════════════════════
+SCENES['jargon_joris'] = function() {
+  G.flags.snapt_jargon = true;
+  addPP(2, 'Juiste persoon gevraagd &mdash; Joris deelt context die niet online staat');
+  print([
+    'Joris draait zijn stoel naar je toe.',
+    '"Full-funnel betekent dat je geen losse campagnes maakt,',
+    'maar een complete klantreis van A tot Z ontwerpt.",',
+    '"Mid-market zijn de bedrijven die te groot zijn voor een template',
+    'maar te klein voor een dedicated team bij de klant zelf.",',
+    '"En latent bewustzijn &mdash; dat is de heilige graal.",',
+    '"De klant weet nog niet dat hij jouw oplossing nodig heeft.",',
+    '"Als je d&aacute;t weet te activeren: je bent goud waard."',
+    '',
+    'Hij leunt achterover.',
+    '"Goed dat je het vroeg. Meeste stagiairs googelen dit.',
+    'Maar voor Studio Roos speelt er nog iets anders dat online niet staat.",',
+    '"Vraag Dana er straks naar. Klant B."',
+    ''
+  ], function() {
+    setS('opdracht', 'bezig');
+    appendLine('<span class="t-blue">[ ~ ] Opdracht [bezig] &mdash; analyse gestart met Joris\' insider-context.</span>');
+    appendBlank();
+    runQueue();
+    setTimeout(function() { go('einde_dag1'); }, 350);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EINDE_DAG1 — statusupdate aan Mara
+// ════════════════════════════════════════════════════════════════
+SCENES['einde_dag1'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 17:15 &mdash; Mara loopt langs je bureau &mdash;</span>',
+    '',
+    '"Hoe was dag &eacute;&eacute;n? Vertel."',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Briefing gelezen, analyse gestart, twee openstaande vragen."',
+        action: function() {
+          addPP(5, 'Concrete statusupdate &mdash; Mara weet precies waar je staat');
+          print([
+            '"Mooi. Wat zijn de vragen?"',
+            'Je stelt ze. Ze beantwoordt ze in twee minuten.',
+            '"Goed einde van dag &eacute;&eacute;n."',
+            ''
+          ], function() { go('dag2_overgang'); });
+        }
+      },
+      {
+        label: '"Super leuk! Veel indrukken, veel geleerd."',
+        action: function() {
+          addPP(1, 'Enthousiast maar vaag &mdash; Mara wil weten w&aacute;t je deed');
+          print([
+            'Mara glimlacht beleeft. "Fijn. Maar wat heb je concreet gedaan vandaag?"',
+            'Je vertelt het alsnog. Ze knikt.',
+            '"Morgen graag concrete voortgang in de standup."',
+            ''
+          ], function() { go('dag2_overgang'); });
+        }
+      },
+      {
+        label: '"Goed! En &mdash; mag ik je iets vragen &mdash; doe ik het goed zo?"',
+        action: function() {
+          G.flags.vroeg_feedback = true;
+          addPP(6, 'Proactief feedback gevraagd &mdash; Mara is zichtbaar onder de indruk');
+          print([
+            'Mara stopt.',
+            '',
+            '"Eerlijk? Ja. De standup kon beter &mdash; te vaag in het begin.",',
+            '"Maar dat je dit al op dag &eacute;&eacute;n vraagt: dat is een goed teken.",',
+            '"Kom morgen om 08:45 even langs voor de standup begint.",',
+            '"Dan bereiden we het samen voor."',
+            ''
+          ], function() { go('dag2_overgang'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG2_OVERGANG — brug naar dag 2, PP-samenvatting
+// ════════════════════════════════════════════════════════════════
+SCENES['dag2_overgang'] = function() {
+  var ppKleur = G.pp >= 60 ? 't-green' : G.pp >= 35 ? 't-amber' : 't-red';
+
+  print([
+    '',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    'Einde dag 1. Je loopt naar buiten.',
+    'De zon staat laag boven het IJ.',
+    '',
+    '<span class="' + ppKleur + '">PP na dag 1: ' + G.pp + ' / 100</span>',
+    '',
+    G.pp >= 60
+      ? '<span class="t-green">Dag &eacute;&eacute;n: solide neergezet.</span>'
+      : G.pp >= 35
+        ? '<span class="t-amber">Dag &eacute;&eacute;n: wisselend, maar je bent er nog.</span>'
+        : '<span class="t-red">Dag &eacute;&eacute;n: zwaar. Morgen is een nieuwe kans.</span>',
+    '',
+    '<span class="t-dim">Laden dag 2...</span>',
+    ''
+  ], function() {
+    setTimeout(function() { go('dag2'); }, 800);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 2 — Dinsdag, Slack
+// ════════════════════════════════════════════════════════════════
+SCENES['dag2'] = function() {
+  G.dag = 2;
+  updateHUD();
+
+  var maraExtra = G.flags.vroeg_feedback
+    ? '<span class="t-green">[ Mara ] Je hebt een kort gesprek gehad met Mara om 08:45.</span>\n' +
+      '<span class="t-green">Ze zei: "Zeg vandaag je klus concreet. Studio Roos-analyse."</span>\n'
+    : '';
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 2 &mdash; Dinsdag, 09:03</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    maraExtra,
+    'Je opent Slack. Twee meldingen:',
+    '',
+    '&bull; <span class="t-white">Bas (DM)</span>: "Hey! Heb je toevallig een foto voor het teamoverzicht?"',
+    '&bull; <span class="t-white">#random</span>: Joris deelt een meme over deadlines. Zeven reacties.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Bas beantwoorden in DM &mdash; foto sturen en je kort voorstellen.',
+        action: function() {
+          G.flags.kent_bas = true;
+          addPP(3, 'Goede relatie opgebouwd met Bas &mdash; handig contact bij de receptie');
+          print([
+            'Je stuurt een recente foto en schrijft:',
+            '"Hey Bas, hier is hij! Leuk om je maandag al te ontmoeten."',
+            '',
+            'Bas stuurt terug: "Nice! Je was een van de weinige stagiairs',
+            'die meteen wist waar de receptie zat. Welkom bij de club."',
+            ''
+          ], function() { go('dag2_email'); });
+        }
+      },
+      {
+        label: 'Reageren op de meme in #random &mdash; een emoji en een grap.',
+        action: function() {
+          addPP(-3, 'Te vroeg actief in #random &mdash; Joris stuurt een waarschuwing');
+          go('slack_fout');
+        }
+      },
+      {
+        label: '#random negeren &mdash; focussen op de echte taak.',
+        action: function() {
+          addPP(1, 'Goed geprioriteerd &mdash; Slack-kanalen in juiste volgorde');
+          print([
+            'Je markeert #random als gelezen zonder te reageren.',
+            'Joris kijkt je later even aan in de keuken. Goedkeurend, lijkt het.',
+            ''
+          ], function() { go('dag2_email'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// SLACK_FOUT — Joris waarschuwt
+// ════════════════════════════════════════════════════════════════
+SCENES['slack_fout'] = function() {
+  print([
+    'Je plaatst een reactie in #random: &#128584; + "tell me about it lol"',
+    '',
+    'Drie minuten later: een DM van Joris.',
+    '',
+    '"Hey &mdash; kleine tip voor je verdere stage.",',
+    '"Als je nieuw bent in een team, is het beter om kanalen even',
+    'te lezen voor je erin duikt. Mensen letten op nieuwe mensen.",',
+    '"Niet erg, maar fijn om te weten."',
+    '',
+    'Je leest het twee keer. Je typt: "Dank je, goed om te weten."',
+    ''
+  ], function() { go('dag2_email'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG2_EMAIL — eerste externe mail aan Studio Roos
+// ════════════════════════════════════════════════════════════════
+SCENES['dag2_email'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 10:18 &mdash;</span>',
+    '',
+    'Dana vraagt je om een introductiemail te sturen naar Studio Roos.',
+    '"Kort: wie je bent, dat je werkt aan hun brief,',
+    'dat je contact opneemt als je vragen hebt.",',
+    '"Er is een templatemap in de gedeelde drive &mdash; gebruik die."',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Template ophalen, aanpassen aan de situatie, dan sturen.',
+        action: function() { go('email_goed'); }
+      },
+      {
+        label: 'Direct schrijven en versturen &mdash; je weet wat je wilt zeggen.',
+        action: function() { go('email_fout'); }
+      },
+      {
+        label: 'Mara eerst laten checken voor je op verzenden drukt.',
+        action: function() { go('email_check'); }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EMAIL_GOED
+// ════════════════════════════════════════════════════════════════
+SCENES['email_goed'] = function() {
+  addPP(5, 'Template gebruikt &mdash; professionele, consistente mail verstuurd');
+  print([
+    'Je vindt het template onder /templates/extern/introductie_stagiair.docx.',
+    'Het heeft een vaste opmaak, de juiste handtekening en een disclaimer.',
+    '',
+    'Je past de naam en projectnaam aan. Leest het na. Verstuurt.',
+    '',
+    'Een uur later: een reactie van Studio Roos.',
+    '"Fijn! We kijken ernaar uit om met jullie samen te werken."',
+    ''
+  ], function() { go('vergadering'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EMAIL_FOUT
+// ════════════════════════════════════════════════════════════════
+SCENES['email_fout'] = function() {
+  addPP(-4, 'Geen template &mdash; mail mist huisstijl en vereiste disclaimer');
+  print([
+    'Je schrijft een nette mail en verstuurt.',
+    '',
+    'Vijf minuten later staat Dana naast je bureau.',
+    '"Heb je het template gebruikt?"',
+    '"Ik had &mdash;"',
+    '"We sturen altijd vanuit het template. Huisstijl, GDPR-disclaimer.',
+    'Stuur een correctiemail."',
+    '',
+    'Je stuurt een tweede mail met excuses en het correcte formaat.',
+    'Twee mails verstuurd waar &eacute;&eacute;n voldeed. Studio Roos zegt niets.',
+    'Maar Dana noteert het.',
+    ''
+  ], function() { go('vergadering'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EMAIL_CHECK
+// ════════════════════════════════════════════════════════════════
+SCENES['email_check'] = function() {
+  addPP(4, 'Mara laten checken &mdash; ze complimenteert het instinct');
+  print([
+    '"Slim," zegt Mara. Ze leest je concept.',
+    '"Gebruik het template &mdash; staat onder /templates/extern.",',
+    '"Maar goed dat je vroeg. Dit scheelt ons twee correctiemails per kwartaal."',
+    '',
+    'Je haalt het template. Past het aan. Verstuurt.',
+    'Mara ziet jou de mail versturen en geeft een klein knikje.',
+    ''
+  ], function() { go('vergadering'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// VERGADERING — klantgesprek, jargon-puzzel
+// ════════════════════════════════════════════════════════════════
+SCENES['vergadering'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 14:00 &mdash; Teams-vergadering met Studio Roos &mdash;</span>',
+    '',
+    'Jij, Mara en Dana bellen met de marketingmanager van Studio Roos.',
+    'Ze praat snel en gebruikt veel intern jargon.',
+    '',
+    '"We willen dit volledig <span class="t-white">platslaan</span> en dan',
+    '<span class="t-white">over de schutting gooien</span> naar jullie.",',
+    '"Wij leveren de ruwe input, jullie maken er iets moois van."',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Meenicken &mdash; je hebt het opgepikt.',
+        action: function() {
+          addPP(3, 'Jargon gedecodeerd &mdash; je volgt het gesprek volledig');
+          print([
+            'Platslaan: vereenvoudigen tot kern.',
+            'Over de schutting gooien: overdragen zonder verdere begeleiding.',
+            '',
+            'Je noteert: "Studio Roos levert ruwe input, wij structureren en schrijven."',
+            ''
+          ], function() { go('vergadering_vervolg'); });
+        }
+      },
+      {
+        label: 'Een verduidelijkende vraag stellen in de meeting.',
+        action: function() { go('vergadering_vraag'); }
+      },
+      {
+        label: 'Letterlijk noteren: "platslaan en over de schutting gooien".',
+        action: function() {
+          addPP(-2, 'Letterlijke notitie &mdash; je actiepunten kloppen achteraf niet');
+          print([
+            'Je schrijft het op. Woord voor woord.',
+            'Na de call lees je je aantekeningen terug.',
+            '"Platslaan en schutting &mdash;" je fronst.',
+            'Dana ziet het en legt het alsnog uit.',
+            '"Altijd vragen als je iets niet snapt. Echt altijd."',
+            ''
+          ], function() { go('vergadering_vervolg'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// VERGADERING_VRAAG — client complimenteert het team
+// ════════════════════════════════════════════════════════════════
+SCENES['vergadering_vraag'] = function() {
+  addPP(5, 'Verduidelijkende vraag &mdash; klant complimenteert het team');
+  print([
+    '"Sorry, even checken &mdash; met platslaan bedoelt u vereenvoudigen',
+    'naar &eacute;&eacute;n heldere briefing, en over de schutting gooien',
+    'is dan het overdragen aan ons zodat wij het uitwerken?"',
+    '',
+    'De marketingmanager lacht.',
+    '"Precies! Fijn dat iemand dat even checkt.",',
+    '"Ik praat soms te snel in mijn eigen jargon."',
+    '',
+    'Mara kijkt je aan. Een bijna onzichtbaar knikje.',
+    ''
+  ], function() { go('vergadering_vervolg'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// VERGADERING_VERVOLG — gemiste deadline, recovery
+// ════════════════════════════════════════════════════════════════
+SCENES['vergadering_vervolg'] = function() {
+  print([
+    '<span class="t-dim">&mdash; Na de vergadering &mdash;</span>',
+    '',
+    'Mara loopt met je mee naar je bureau.',
+    '"Ik zag in je aantekeningen dat je de deadline voor het concept',
+    'niet had opgeschreven. Die is <span class="t-white">vrijdag 16:00</span>.',
+    'Die stond op pagina drie van de briefing."',
+    '',
+    'Ze zegt het rustig. Geen aanval. Maar het hangt even in de lucht.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Direct actie: deadline toevoegen en bevestigen dat je op schema zit.',
+        action: function() {
+          addPP(3, 'Directe actie op feedback &mdash; geen excuses, wel oplossing');
+          print([
+            '"Vrijdag 16:00. Ik heb het nu in mijn agenda.",',
+            '"Ik zit op schema."',
+            'Mara knikt. "Goed. Laat het me weten als je vastloopt."',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            go('dag3');
+          });
+        }
+      },
+      {
+        label: 'Uitleggen dat je gefocust was op de inhoud van het gesprek.',
+        action: function() {
+          addPP(-3, 'Excuus gegeven &mdash; Mara verwacht een oplossing, geen verklaring');
+          print([
+            '"Ik snap het," zegt Mara. "Maar de deadline bestaat nog steeds.",',
+            '"Kun je me nu bevestigen wanneer het af moet zijn?"',
+            '',
+            'Je noemt de datum. Ze knikt, strak.',
+            ''
+          ], function() {
+            setS('opdracht', 'bezig');
+            go('dag3');
+          });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG 3 — Woensdag, statusupdate aan Joris
+// ════════════════════════════════════════════════════════════════
+SCENES['dag3'] = function() {
+  G.dag = 3;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 3 &mdash; Woensdag, 11:28</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Joris checkt in. "Hoe staat het met de analyse voor Studio Roos?',
+    'Mara vroeg of ik even mee kon kijken."',
+    '',
+    'Je hebt de helft. Klant B is lastiger dan verwacht.',
+    'Er zijn twee punten die je niet zelf kunt beantwoorden.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Ik ben halverwege. Twee punten waar ik hulp bij kan gebruiken."',
+        action: function() {
+          addPP(2, 'Eerlijk over voortgang &mdash; Joris weet waar je staat');
+          print([
+            '"Prima," zegt Joris. "Wat zijn ze?"',
+            'Je legt ze uit. Hij helpt je in tien minuten vooruit.',
+            '"Zo doe je dat hier. Altijd eerlijk over waar je staat."',
+            ''
+          ], function() { go('dag3_avond'); });
+        }
+      },
+      {
+        label: '"Bijna klaar &mdash; ik denk dat ik het vandaag afrond."',
+        action: function() {
+          G.flags.loog = true;
+          addPP(-4, 'Voortgang overdreven &mdash; Joris ziet het vrijdag terug');
+          print([
+            '"Top," zegt Joris. Hij draait zich om.',
+            '',
+            'Je staart naar je scherm. Bijna klaar was een leugen.',
+            'Je hebt nog een halve dag werk en twee open vragen.',
+            'Vrijdag is dichterbij dan het lijkt.',
+            ''
+          ], function() { go('dag3_avond'); });
+        }
+      },
+      {
+        label: '"Ik heb hulp nodig bij Klant B &mdash; de briefing is onduidelijk."',
+        action: function() { go('dag3_hulp'); }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG3_HULP — Joris onthult verborgen briefingcontext
+// ════════════════════════════════════════════════════════════════
+SCENES['dag3_hulp'] = function() {
+  G.flags.joris_hulp = true;
+  addPP(5, 'Hulp gevraagd op het juiste moment &mdash; Joris deelt cruciale context');
+  print([
+    'Joris trekt een stoel bij.',
+    '"Klant B. Oké, d&aacute;&aacute;r zit een verhaal achter."',
+    '',
+    '"Studio Roos wil eigenlijk twee dingen tegelijk:",',
+    '"nieuwe klanten aantrekken &eacute;n bestaande klanten behouden.",',
+    '"Dat staat niet expliciet in de briefing, maar d&aacute;&aacute;r draait het om.",',
+    '"Ik was erbij bij het eerste gesprek, zes maanden geleden."',
+    '',
+    '"Als jij die dubbele agenda niet als vertrekpunt neemt,',
+    'slaat je analyse nergens op. Ze zullen het niet zeggen,',
+    'maar ze denken het wel."',
+    '',
+    'Hij staat op. Pakt zijn koffie.',
+    '"Welkom bij agency-werk."',
+    ''
+  ], function() { go('dag3_avond'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG3_AVOND — 34 pagina\'s achtergrond
+// ════════════════════════════════════════════════════════════════
+SCENES['dag3_avond'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 18:52 &mdash; Thuis &mdash;</span>',
+    '',
+    'Je opent je mail. Dana heeft een bericht gestuurd:',
+    '',
+    '"Hey, ter voorbereiding op donderdag &mdash; hier is wat meer',
+    'achtergrond over Studio Roos. Niet allemaal even relevant,',
+    'maar handig om te hebben gelezen."',
+    '',
+    'Bijlage: <span class="t-white">studio_roos_achtergrond_v3_FINAL.pdf</span>',
+    'Pagina\'s: <span class="t-red">34</span>',
+    'Het is 18:52.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Alles lezen. Je wilt echt goed voorbereid zijn.',
+        action: function() {
+          G.dag = 4;
+          updateHUD();
+          addPP(-3, 'Tot 02:30 gelezen &mdash; te uitgeput voor dag 4');
+          print([
+            'Je leest. En leest. En leest.',
+            'Om 02:30 doe je de laptop dicht.',
+            '',
+            'Dag vier begint in vijf uur.',
+            '',
+            '<span class="t-amber">DAG 4 &mdash; Donderdag &mdash; koffie is je enige vriend.</span>',
+            ''
+          ], function() { go('dag5_voorbereiding'); });
+        }
+      },
+      {
+        label: 'Slim lezen: samenvatting en de relevante secties.',
+        action: function() {
+          G.dag = 4;
+          G.flags.afgetikt = true;
+          updateHUD();
+          addPP(5, 'Slim gelezen &mdash; klaar om 22:45, uitgerust voor dag 4');
+          print([
+            'Je leest de executive summary (vier pagina\'s) en zoekt op:',
+            '"doelgroep", "mid-market", "contentstrategie".',
+            '',
+            'Vijftien pagina\'s zijn echt relevant. De rest is juridisch.',
+            '',
+            'Om 22:45 ben je klaar. Notities gemaakt. Laptop dicht.',
+            '',
+            '<span class="t-amber">DAG 4 &mdash; Donderdag &mdash; je bent de best voorbereide persoon in de kamer.</span>',
+            ''
+          ], function() { go('dag5_voorbereiding'); });
+        }
+      },
+      {
+        label: 'Mara mailen: "Moet ik dit volledig lezen? Wat is het doel?"',
+        action: function() {
+          G.dag = 4;
+          updateHUD();
+          addPP(7, 'Scope geverifieerd bij Mara &mdash; proactief en effici&euml;nt');
+          print([
+            'Je stuurt de mail. Mara antwoordt binnen negen minuten:',
+            '',
+            '"Goed dat je vraagt. Lees pagina 1-6 en sectie 4 (p.18-24).",',
+            '"De rest is achtergrond &mdash; handig maar niet kritisch voor morgen.",',
+            '"En goed dat je dit vroeg. Weinig stagiairs doen dat."',
+            '',
+            'Je leest dertien pagina\'s. Om 21:50 ben je klaar.',
+            '',
+            '<span class="t-amber">DAG 4 &mdash; Donderdag &mdash; Mara weet dat jij slim prioriteert.</span>',
+            ''
+          ], function() { go('dag5_voorbereiding'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// PART 3 — DAG 5 — Vrijdag
+// Overrides Part 1 stubs; last definition wins in JS plain objects.
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag5_voorbereiding'] = function() {
+  G.dag = 5;
+  updateHUD();
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 5 &mdash; Vrijdag, 08:15</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Om 09:15 is er een terugkoppeling met Mara.',
+    'Een uur, vergaderkamertje B.',
+    '',
+    'Je zit aan je bureau. Koffie nog warm.',
+    'Je hebt bijna een uur. Je opent je notitieboek.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Drie kernpunten opschrijven: wat ging goed, wat kan beter, wat leerde je.',
+        action: function() {
+          G.flags.prep = true;
+          addPP(5, 'Gestructureerde voorbereiding &mdash; Mara merkt het meteen');
+          print([
+            'Je schrijft:',
+            '',
+            '<span class="t-green">+</span> Goed: opdracht afgeleverd, briefing grondig doorgenomen.',
+            '<span class="t-red">&mdash;</span> Beter: dag&eacute;&eacute;n standup was te vaag &mdash; concrete update had',
+            '  eerder kunnen laten zien dat je het begreep.',
+            '<span class="t-amber">&#10097;</span> Geleerd: altijd een template checken voor externe mails.',
+            '',
+            'Drie punten. Concreet. Je voelt je klaar.',
+            ''
+          ], function() { go('dag5_terugkoppeling'); });
+        }
+      },
+      {
+        label: 'Vertrouwen op wat je weet &mdash; je hebt de week zelf meegemaakt.',
+        action: function() {
+          addPP(1, 'Onvoorbereide maar authentieke inbreng');
+          print([
+            'Je sluit het notitieboek.',
+            'Je weet wat je hebt gedaan. Je weet waar je moeite mee had.',
+            'Dat is genoeg. Toch?',
+            '',
+            'Je loopt om 09:14 het kamertje in.',
+            ''
+          ], function() { go('dag5_terugkoppeling'); });
+        }
+      },
+      {
+        label: 'Dana vragen wat Mara normaal gesproken belangrijk vindt in zo\'n gesprek.',
+        action: function() {
+          G.flags.tip_dana = true;
+          addPP(4, 'Slimme voorbereiding &mdash; Dana geeft waardevolle tip');
+          print([
+            'Je loopt naar Dana\'s bureau.',
+            '"Hoe doet Mara dit soort gesprekken normaal gesproken?"',
+            '',
+            'Dana legt haar pen neer.',
+            '"Ze heeft een vast patroon. Ze vraagt altijd: wat zou je anders doen?",',
+            '"Niet als aanval &mdash; ze wil zien of je leert.",',
+            '"Bereid d&aacute;t voor. En wees eerlijk. Ze prikt erdoor als je een PR-verhaal houdt."',
+            '',
+            'Je schrijft het op. Waardevolle context.',
+            ''
+          ], function() { go('dag5_terugkoppeling'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG5_TERUGKOPPELING — Het gesprek met Mara
+// ════════════════════════════════════════════════════════════════
+
+SCENES['dag5_terugkoppeling'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 09:15 &mdash; Vergaderkamertje B &mdash;</span>',
+    '',
+    'Mara heeft een vel papier voor zich. Jouw naam staat erop,',
+    'en een paar notities in haar handschrift.',
+    '',
+    '"Ik begin met wat ik heb gezien," zegt ze.',
+    '"Je hebt de opdracht afgerond. Je hebt gevraagd als je iets niet wist.',
+    'Je was er elke dag op tijd."',
+    '',
+    'Ze legt haar pen neer.',
+    '',
+    '"Nu de vraag die ik altijd stel na week &eacute;&eacute;n:",',
+    '"Als je &eacute;&eacute;n ding mocht overdoen &mdash; wat zou je anders doen?"',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: '"Dag &eacute;&eacute;n standup. Ik was te vaag. Ik had concreter moeten zeggen wat ik ging doen."',
+        action: function() {
+          addPP(6, 'Strategische zelfreflectie &mdash; Mara is onder de indruk');
+          print([
+            'Mara knikt. Langzaam, maar echt.',
+            '"Precies het goede antwoord &mdash; niet omdat het de perfecte fout is,',
+            'maar omdat je snapt w&aacute;&aacute;r het schuurt.",',
+            '"Een standup is geen verslag. Het is een belofte voor de dag.",',
+            '"Als jij dat nu al begrijpt, ben je ver."',
+            '',
+            'Ze kijkt je aan.',
+            '"Ik zie je graag terug volgende week."',
+            ''
+          ], function() { go('einde'); });
+        }
+      },
+      {
+        label: '"Ik had meer tijd moeten plannen voor de grote taken. Ik werd te snel afgeleid."',
+        action: function() {
+          addPP(-2, 'Valide punt, maar Mara verwacht meer diepte');
+          print([
+            '"Hm," zegt Mara. Ze wacht even.',
+            '"Timemanagement. Oké. Maar wat ging er dan mis? Welk moment?',
+            'Welke dag? Waardoor raakte je afgeleid?"',
+            '',
+            'Je zoekt naar een voorbeeld. Het duurt even.',
+            '"Donderdag. De PDF. Ik begon te laat."',
+            '',
+            '"Oké. Dat is concreet." Ze schrijft iets op.',
+            '"Kijk volgende week naar timeblocking. Maar oefen ook &mdash;',
+            'meer specifiek zijn in je antwoorden."',
+            ''
+          ], function() { go('einde'); });
+        }
+      },
+      {
+        label: '"Ik denk eerlijk gezegd dat ik het voor een eerste week goed heb gedaan."',
+        action: function() {
+          addPP(-3, 'Geen zelfreflectie &mdash; Mara verwacht meer zelfkritisch vermogen');
+          print([
+            'Mara kijkt je even aan. Niet boos. Maar ook niet tevreden.',
+            '"Dat klopt deels," zegt ze. "Je hebt het gered.",',
+            '"Maar stagiairs die in week &eacute;&eacute;n zeggen dat ze het goed hebben gedaan,',
+            'leren minder snel dan stagiairs die al een verbeterpunt benoemen.",',
+            '"Het gaat me niet om zelfkritiek om de zelfkritiek &mdash;',
+            'het gaat me om of je al kijkt hoe je scherper kunt worden."',
+            '',
+            'Het landt. Ze bedoelt het niet gemeen.',
+            'Maar het landt.',
+            ''
+          ], function() { go('einde'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EINDE — Afsluiting + eindscherm
+// ════════════════════════════════════════════════════════════════
+
+SCENES['einde'] = function() {
+  setS('opdracht', 'af');
+
+  var flagLines = [];
+  if (G.flags.vroeg_feedback)  flagLines.push('<span class="t-green">&#10003;</span> Proactief feedback gevraagd');
+  if (G.flags.snapt_jargon)    flagLines.push('<span class="t-green">&#10003;</span> Jargon zelfstandig opgezocht');
+  if (G.flags.kent_bas)        flagLines.push('<span class="t-green">&#10003;</span> Netwerkcontact gelegd (Bas)');
+  if (G.flags.joris_hulp)      flagLines.push('<span class="t-green">&#10003;</span> Hulp gevraagd op juist moment');
+  if (G.flags.afgetikt)        flagLines.push('<span class="t-green">&#10003;</span> 34 pagina\'s slim gelezen');
+  if (G.flags.loog)            flagLines.push('<span class="t-red">&#10007;</span> Voortgang overdreven naar Joris');
+  if (G.flags.mist_jargon)     flagLines.push('<span class="t-red">&#10007;</span> Jargon genegeerd in week 1');
+  if (G.flags.moe)             flagLines.push('<span class="t-amber">&#9900;</span> Dag 1 begonnen met slaaptekort');
+
+  var achievementBlock = flagLines.length > 0
+    ? ['<span class="t-dim">Momenten die telden:</span>', ''].concat(flagLines).concat([''])
+    : [];
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-green">STAGE WEEK 1 &mdash; AFGEROND</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Je loopt om 17:30 het kantoor van Vandaag Agency uit.',
+    'De lucht boven Amsterdam-Noord is oranje.',
+    '',
+    'Vijf dagen. Vier standups. &Eacute;&eacute;n opdracht afgeleverd.',
+    'Fouten gemaakt. Dingen goed gedaan.',
+    'Geleerd hoe een bureau werkt &mdash; en hoe jij werkt.',
+    ''
+  ].concat(achievementBlock).concat([
+    '<span class="t-amber">Berekening eindresultaat...</span>',
+    ''
+  ]), function() {
+    setTimeout(showEnd, 700);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// PART 3 — dag4_* + vrijdag + terugkoppeling + einde (final)
+// Override dag3_avond routing; add all named Part 3 scenes.
+// Last SCENES[key] assignment wins — engine untouched.
+// ════════════════════════════════════════════════════════════════
+
+// Override dag3_avond: same narrative, routes to named dag4 scenes
+SCENES['dag3_avond'] = function() {
+  print([
+    '<span class="t-dim">&mdash; 18:52 &mdash; Thuis &mdash;</span>',
+    '',
+    'Je opent je mail. Dana heeft een bericht gestuurd:',
+    '',
+    '"Hey, ter voorbereiding op donderdag &mdash; hier is wat meer',
+    'achtergrond over Studio Roos. Niet allemaal even relevant,',
+    'maar handig om te hebben gelezen."',
+    '',
+    'Bijlage: <span class="t-white">studio_roos_achtergrond_v3_FINAL.pdf</span>',
+    'Pagina\'s: <span class="t-red">34</span>',
+    'Het is 18:52.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Alles lezen. Je wilt echt goed voorbereid zijn.',
+        action: function() { go('dag4_uitgeput'); }
+      },
+      {
+        label: 'Slim lezen: samenvatting en de relevante secties.',
+        action: function() { go('dag4_klaar'); }
+      },
+      {
+        label: 'Mara mailen: "Moet ik dit volledig lezen? Wat is het doel?"',
+        action: function() { go('dag4_mara'); }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG4_UITGEPUT — alles gelezen, klaar om 02:30
+// ════════════════════════════════════════════════════════════════
+SCENES['dag4_uitgeput'] = function() {
+  G.dag = 4;
+  updateHUD();
+  addPP(-3, 'Tot 02:30 gelezen &mdash; te uitgeput voor dag 4');
+  print([
+    'Je leest. En leest. En leest.',
+    '',
+    'Juridische bijlagen. Achtergrondrapporten. Klantinterviews uit 2019.',
+    'Alles. Je wil niets missen.',
+    '',
+    'Om 02:28 doe je de laptop dicht.',
+    'Dag vier begint in minder dan vijf uur.',
+    '',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 4 &mdash; Donderdag &mdash; koffie is je enige vriend.</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Je draait dag vier op drie uur slaap.',
+    'De vergadering met het team loopt soepel &mdash; je hebt de stof.',
+    'Maar je zit tijdens de lunch met je hoofd op je armen.',
+    '',
+    'Dana ziet het. "Goed gelezen gisteravond?"',
+    '"Alles," zeg je. Ze knikt begrijpend. "Dat dacht ik al."',
+    ''
+  ], function() { go('vrijdag'); });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG4_KLAAR — slim gelezen, klaar om 23:00
+// ════════════════════════════════════════════════════════════════
+SCENES['dag4_klaar'] = function() {
+  G.dag = 4;
+  G.flags.afgetikt = true;
+  updateHUD();
+  addPP(5, 'Slim gelezen &mdash; uitgerust en goed voorbereid voor dag 4');
+  print([
+    'Je leest de executive summary: vier pagina\'s.',
+    'Daarna zoek je drie termen op die je niet kent:',
+    '"mid-market", "contentstrategie", "doelgroepmatrix".',
+    '',
+    'Vijftien pagina\'s zijn echt relevant. De rest is juridisch en historisch.',
+    '',
+    'Om 22:52 doe je de laptop dicht.',
+    'Je maakt een korte notitie: drie kernpunten voor de vergadering morgen.',
+    '',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 4 &mdash; Donderdag &mdash; je bent de best voorbereide persoon in de kamer.</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'De vergadering gaat goed. Joris vraagt een vraag &mdash;',
+    'jij weet het antwoord. Niet omdat je slim bent,',
+    'maar omdat je de juiste vijftien pagina\'s hebt gelezen.',
+    ''
+  ], function() {
+    setS('opdracht', 'af');
+    go('vrijdag');
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// DAG4_MARA — Mara mailt terug, scope bepaald
+// ════════════════════════════════════════════════════════════════
+SCENES['dag4_mara'] = function() {
+  G.dag = 4;
+  updateHUD();
+  addPP(7, 'Scope geverifieerd bij Mara &mdash; proactief en effici&euml;nt');
+  print([
+    'Je stuurt de mail. Het is 19:04.',
+    '',
+    'Mara antwoordt om 19:13:',
+    '',
+    '"Goed dat je vraagt. Lees pagina 1&ndash;6 en sectie 4 (p.18&ndash;24).',
+    'De rest is achtergrond &mdash; handig maar niet kritisch voor morgen.',
+    'En fijn dat je dit proactief checkt. Weinig stagiairs doen dat."',
+    '',
+    'Je leest dertien pagina\'s. Gefocust. Geen overbodige pagina.',
+    'Om 21:47 ben je klaar &mdash; met aangevulde notities.',
+    '',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 4 &mdash; Donderdag &mdash; Mara weet dat jij slim prioriteert.</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'De vergadering donderdag loopt soepel.',
+    'Mara zegt niets speciaals &mdash; maar ze kijkt je even aan als',
+    'de contactstrategie voor Klant B besproken wordt.',
+    'Jij kunt meevolgen. Dat doet ze op.',
+    ''
+  ], function() {
+    setS('opdracht', 'af');
+    go('vrijdag');
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// VRIJDAG — dag 5 ochtend, voorbereiding op terugkoppeling
+// ════════════════════════════════════════════════════════════════
+SCENES['vrijdag'] = function() {
+  G.dag = 5;
+  updateHUD();
+
+  var maraOpening = G.flags.afgetikt || G.flags.tip_dana
+    ? '"Goed. Ik heb gehoord dat je gisteren goed beslagen ten ijs kwam."'
+    : '"Goed. Einde van je eerste week."';
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-amber">DAG 5 &mdash; Vrijdag, 08:20</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Om 09:15 is er een terugkoppeling met Mara.',
+    'Je loopt haar tegen in de gang om 08:19.',
+    '',
+    maraOpening,
+    '',
+    'Ze loopt door. Jij ook &mdash; naar je bureau.',
+    'Je hebt vijftig minuten.',
+    ''
+  ], function() {
+    showChoices([
+      {
+        label: 'Drie kernpunten opschrijven: wat ging goed, wat kan beter, wat leerde je.',
+        action: function() {
+          G.flags.prep = true;
+          addPP(5, 'Gestructureerde voorbereiding &mdash; Mara merkt het');
+          print([
+            'Je schrijft:',
+            '',
+            '<span class="t-green">+</span> Goed: briefing grondig doorgenomen, hulp gevraagd toen nodig.',
+            '<span class="t-red">&mdash;</span> Beter: dag&eacute;&eacute;n standup was te vaag &mdash; te weinig concreet.',
+            '<span class="t-amber">&#10097;</span> Geleerd: altijd template checken voor externe mails.',
+            '',
+            'Drie punten. Concreet. Je voelt je klaar.',
+            ''
+          ], function() { go('terugkoppeling'); });
+        }
+      },
+      {
+        label: 'Vertrouwen op wat je weet &mdash; je hebt de week meegemaakt.',
+        action: function() {
+          addPP(1, 'Onvoorbereide maar authentieke inbreng');
+          print([
+            'Je sluit het notitieboek. Je loopt om 09:14 het kamertje in.',
+            'Zonder voorbereiding. Maar je weet wat je hebt gedaan.',
+            ''
+          ], function() { go('terugkoppeling'); });
+        }
+      },
+      {
+        label: 'Dana vragen wat Mara normaal belangrijk vindt in dit soort gesprekken.',
+        action: function() {
+          G.flags.tip_dana = true;
+          addPP(4, 'Slimme voorbereiding &mdash; Dana geeft concrete tip');
+          print([
+            'Je loopt naar Dana.',
+            '"Mara heeft altijd &eacute;&eacute;n vraag," zegt Dana zonder omhaal.',
+            '"Wat zou je anders doen? Niet als aanval &mdash; ze wil weten of je leert.",',
+            '"Bereid d&aacute;&aacute;r iets voor. En wees eerlijk. Ze prikt door een PR-verhaal heen."',
+            '',
+            'Je schrijft het op.',
+            ''
+          ], function() { go('terugkoppeling'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// TERUGKOPPELING — Mara-gesprek, flag-aware opening
+// ════════════════════════════════════════════════════════════════
+SCENES['terugkoppeling'] = function() {
+
+  // Build Mara's opening based on what she noticed during the week
+  var observations = [];
+  if (G.flags.vroeg_feedback)
+    observations.push('"Je hebt halverwege de week zelf om feedback gevraagd. Dat viel op."');
+  if (G.flags.joris_hulp)
+    observations.push('"Joris zei dat je hem een goede vraag stelde over Klant B. Goed moment om hulp te vragen."');
+  if (G.flags.goed_standup)
+    observations.push('"Ik hoorde een concrete standup van je &mdash; dat was niet dag&eacute;&eacute;n, maar het klikte."');
+  if (G.flags.loog)
+    observations.push('"Joris noemde ook dat de voortgangsinschatting op woensdag wat optimistisch bleek."');
+  if (G.flags.moe && !G.flags.vroeg_feedback)
+    observations.push('"Maandag zag je er wat moe uit. Begrijpelijk &mdash; eerste dag is spannend."');
+
+  var maraLines = [
+    '<span class="t-dim">&mdash; 09:15 &mdash; Vergaderkamertje B &mdash;</span>',
+    '',
+    'Mara heeft een vel papier voor zich.',
+    'Jouw naam staat erop, met een paar notities in haar handschrift.',
+    '',
+    '"Laat me vertellen wat ik heb gezien," begint ze.',
+    '"Je hebt de opdracht afgeleverd. Je was elke dag op tijd.',
+    'Je stelde vragen als je iets niet wist."',
+    ''
+  ];
+  observations.forEach(function(obs) { maraLines.push(obs); maraLines.push(''); });
+  maraLines.push('"Dan de vraag die ik altijd stel na week &eacute;&eacute;n:"');
+  maraLines.push('"Als je &eacute;&eacute;n ding mocht overdoen &mdash; wat zou je anders doen?"');
+  maraLines.push('');
+
+  print(maraLines, function() {
+    showChoices([
+      {
+        label: '"De standup op dag &eacute;&eacute;n. Ik was te vaag. Ik had concreter kunnen zeggen wat ik ging doen."',
+        action: function() {
+          addPP(6, 'Strategische zelfreflectie &mdash; Mara is onder de indruk');
+          print([
+            'Mara knikt. Langzaam, maar echt.',
+            '"Precies het goede antwoord &mdash; niet omdat standup het perfecte antwoord is,',
+            'maar omdat je snapt w&aacute;&aacute;r het schuurt.",',
+            '"Een standup is geen verslag. Het is een belofte voor je dag.",',
+            '"Als jij dat na week &eacute;&eacute;n al doorhebt, ben je ver."',
+            '',
+            'Ze kijkt je aan.',
+            '"Ik zie je graag terug volgende week."',
+            ''
+          ], function() { go('einde'); });
+        }
+      },
+      {
+        label: '"Meer tijd inplannen voor de grotere taken. Ik werd te snel afgeleid."',
+        action: function() {
+          addPP(-2, 'Valide punt &mdash; maar Mara verwacht meer diepgang');
+          print([
+            '"Hm," zegt Mara. Ze wacht even.',
+            '"Welk moment? Welke dag? Waardoor raakte je afgeleid &mdash; specifiek?"',
+            '',
+            'Je zoekt naar een voorbeeld.',
+            '"Dinsdag. De mail voor Klant A. Ik had er te lang over nagedacht."',
+            '',
+            '"Oké. Dat is concreet." Ze schrijft iets op.',
+            '"Probeer volgende week timeblocking. En oefen ook &mdash; wees specifieker in je antwoorden."',
+            ''
+          ], function() { go('einde'); });
+        }
+      },
+      {
+        label: '"Ik denk eerlijk gezegd dat ik het voor een eerste week goed heb gedaan."',
+        action: function() {
+          addPP(-3, 'Geen zelfreflectie &mdash; Mara verwacht meer zelfkritisch vermogen');
+          print([
+            'Mara kijkt je even aan. Niet boos. Maar ook niet tevreden.',
+            '"Dat klopt deels," zegt ze. "Je hebt het gered.",',
+            '"Maar stagiairs die na week &eacute;&eacute;n zeggen dat ze het goed deden,',
+            'leren minder snel.",',
+            '"Het gaat me niet om zelfkritiek om de kritiek &mdash;',
+            'het gaat me om of je al kijkt hoe je sc&eacute;rper kunt worden."',
+            '',
+            'Ze bedoelt het niet gemeen. Maar het landt.',
+            ''
+          ], function() { go('einde'); });
+        }
+      }
+    ]);
+  });
+};
+
+// ════════════════════════════════════════════════════════════════
+// EINDE (final) — Post-it + slotzin + showEnd
+// ════════════════════════════════════════════════════════════════
+SCENES['einde'] = function() {
+  setS('opdracht', 'af');
+
+  // Three words based on play-through
+  var w1 = G.flags.goed_standup || G.flags.vroeg_feedback ? 'Proactief.' : 'Overleefd.';
+  var w2 = G.flags.joris_hulp   || G.flags.snapt_jargon  ? 'Gevraagd.'  : 'Geprobeerd.';
+  var w3 = G.flags.afgetikt     || G.flags.prep           ? 'Gegroeid.'  : 'Geleerd.';
+
+  print([
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '<span class="t-green">STAGE WEEK 1 &mdash; AFGEROND</span>',
+    '<span class="t-dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>',
+    '',
+    'Je loopt om 17:30 het kantoor van Vandaag Agency uit.',
+    'De lucht boven Amsterdam-Noord is oranje.',
+    '',
+    'Op het whiteboard bij de ingang hangt een gele Post-it.',
+    'Er staan drie woorden op in jouw handschrift,',
+    'geschreven op maandagochtend als introductieactiviteit.',
+    '',
+    '<span class="t-dim">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span>',
+    '<span class="t-dim">&#9474;</span>  <span class="t-amber">Post-it &mdash; week 1</span>       <span class="t-dim">&#9474;</span>',
+    '<span class="t-dim">&#9474;</span>                      <span class="t-dim">&#9474;</span>',
+    '<span class="t-dim">&#9474;</span>  <span class="t-white">' + w1 + '</span>               <span class="t-dim">&#9474;</span>',
+    '<span class="t-dim">&#9474;</span>  <span class="t-white">' + w2 + '</span>               <span class="t-dim">&#9474;</span>',
+    '<span class="t-dim">&#9474;</span>  <span class="t-white">' + w3 + '</span>               <span class="t-dim">&#9474;</span>',
+    '<span class="t-dim">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span>',
+    '',
+    'Je pakt de Post-it mee.',
+    '',
+    '<span class="t-dim">Simulatie voltooid.</span>',
+    ''
+  ], function() {
+    setTimeout(showEnd, 800);
+  });
+};
+
+// Override dag5_voorbereiding → vrijdag (keeps old stub reachable paths working)
+SCENES['dag5_voorbereiding']    = function() { go('vrijdag'); };
+SCENES['dag5_terugkoppeling']   = function() { go('terugkoppeling'); };
+
+</script>
+</body>
+</html>

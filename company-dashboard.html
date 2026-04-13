@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Bedrijfsdashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/push.js"></script>
+  <style>
+    :root {
+      --green:      #1a7a48;
+      --green-dark: #0f5c36;
+      --green-bg:   #e8f5ee;
+      --orange:     #FF7E42;
+      --orange-dark:#e05c1a;
+      --orange-bg:  #fdf0e8;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --white:      #ffffff;
+      --border:     #f0f0ee;
+      --border2:    #e2e8f0;
+      --red:        #b82020;
+      --red-bg:     #fdeaea;
+      --amber:      #a06010;
+      --amber-bg:   #fdf3e0;
+      --r:          16px;
+      --r-sm:       8px;
+      --sidebar-w:  240px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--ink);
+      height: 56px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-link {
+      color: rgba(255,255,255,.6); text-decoration: none;
+      font-size: .85rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar-link:hover { color: #fff; }
+    .role-pill {
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.85);
+      font-size: .75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+      letter-spacing: .02em;
+    }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar-inner { padding: 20px 12px; flex: 1; }
+    .sidebar-section { margin-bottom: 24px; }
+    .sidebar-label {
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ink4); padding: 0 8px; margin-bottom: 6px;
+      display: block;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%; padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: .88rem;
+      color: var(--ink2); text-align: left;
+      transition: background .12s, color .12s;
+      margin-bottom: 2px; position: relative;
+    }
+    .nav-btn:hover { background: var(--bg); }
+    .nav-btn.active {
+      background: var(--green-bg);
+      color: var(--green); font-weight: 600;
+    }
+    .nav-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--orange); color: #fff;
+      font-size: .65rem; font-weight: 700;
+      padding: 2px 6px; border-radius: 10px;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1; padding: 32px 32px 80px;
+      max-width: 900px;
+      overflow: auto;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── PAGE HEADER ── */
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 4px;
+    }
+    .page-sub { font-size: .88rem; color: var(--ink3); margin-bottom: 24px; }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px 18px;
+    }
+    .stat-label {
+      font-size: .7rem; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--ink4); margin-bottom: 6px;
+    }
+    .stat-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.9rem; font-weight: 700;
+      color: var(--ink); line-height: 1;
+    }
+    .stat-note { font-size: .75rem; color: var(--ink4); margin-top: 3px; }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* ── POSTING CARDS ── */
+    .posting-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px; margin-bottom: 10px;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .posting-card:hover {
+      border-color: #c9e8d5;
+      box-shadow: 0 2px 12px rgba(26,122,72,.07);
+    }
+    .pc-head {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 10px; margin-bottom: 8px;
+    }
+    .pc-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .98rem; font-weight: 700; color: var(--ink);
+    }
+    .pc-meta { font-size: .8rem; color: var(--ink3); margin-top: 2px; }
+
+    .status-badge {
+      font-size: .7rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .s-active  { background: var(--green-bg);  color: var(--green); }
+    .s-paused  { background: var(--amber-bg);   color: var(--amber); }
+    .s-closed  { background: #f0f0ee; color: #6b7280; }
+
+    .pc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 8px; }
+    .tag {
+      background: #f0f0ee; color: #6b7280;
+      padding: 3px 9px; border-radius: 20px; font-size: .73rem;
+    }
+    .tag-target { background: var(--orange-bg); color: var(--orange); }
+    .tag-green  { background: var(--green-bg);  color: var(--green); }
+
+    .pc-desc { font-size: .85rem; color: var(--ink3); line-height: 1.5; }
+
+    .pc-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .btn-xs {
+      padding: 9px 14px; border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .78rem; font-weight: 600;
+      cursor: pointer; border: 1.5px solid transparent; transition: all .12s;
+      min-height: 36px;
+    }
+    .btn-pause   { background: var(--amber-bg);  color: var(--amber);  border-color: rgba(160,96,16,.2); }
+    .btn-pause:hover { background: #fde8b0; }
+    .btn-activate { background: var(--green-bg); color: var(--green);  border-color: rgba(26,122,72,.2); }
+    .btn-activate:hover { background: #e8f5ee; }
+    .btn-del     { background: var(--red-bg);    color: var(--red);    border-color: rgba(184,32,32,.15); }
+    .btn-del:hover { background: #fccaca; }
+
+    /* ── FORM ── */
+    .form-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 24px; margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .9rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: .84rem; font-weight: 600;
+      color: var(--ink2); margin-bottom: 5px;
+    }
+    .req { color: var(--orange); margin-left: 2px; }
+    .hint { font-weight: 400; color: var(--ink4); font-size: .76rem; margin-left: 6px; }
+    .field input[type="text"],
+    .field input[type="date"],
+    .field input[type="number"],
+    .field select,
+    .field textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: .9rem; color: var(--ink);
+      background: var(--white); outline: none;
+      transition: border-color .15s; box-sizing: border-box;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--green);
+    }
+    .field textarea { resize: vertical; min-height: 85px; line-height: 1.55; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+
+    /* Tags input */
+    .tags-box {
+      border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm);
+      padding: 7px 12px; background: var(--white);
+      display: flex; flex-wrap: wrap; gap: 5px;
+      cursor: text; min-height: 42px; align-items: center;
+      transition: border-color .15s;
+    }
+    .tags-box:focus-within { border-color: var(--green); }
+    .tag-chip {
+      background: var(--green-bg); color: var(--green);
+      padding: 3px 9px; border-radius: 20px;
+      font-size: .76rem; font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .tag-chip button {
+      background: none; border: none; color: var(--green);
+      cursor: pointer; font-size: .85rem; padding: 0; line-height: 1;
+    }
+    .tags-input {
+      border: none; outline: none;
+      font-family: 'Outfit', sans-serif; font-size: .88rem;
+      color: var(--ink); flex: 1; min-width: 100px; background: transparent;
+    }
+    .tags-hint { font-size: .75rem; color: var(--ink4); margin-top: 4px; }
+
+    /* Radio buttons */
+    .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px; border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm); cursor: pointer;
+      transition: all .12s; background: var(--white); flex: 1;
+      min-width: 100px;
+    }
+    .radio-opt:hover { border-color: var(--green); background: #f8fdf9; }
+    .radio-opt.selected { border-color: var(--green); background: #f0faf4; }
+    .radio-opt input[type="radio"] { accent-color: var(--green); flex-shrink: 0; }
+    .radio-label { font-size: .85rem; color: var(--ink2); font-weight: 500; }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--green); color: #fff; border: none;
+      padding: 11px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-ghost {
+      background: transparent; border: 1.5px solid var(--border2);
+      color: var(--ink2); padding: 10px 22px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 500;
+      cursor: pointer; transition: all .12s;
+    }
+    .btn-ghost:hover { border-color: var(--ink3); }
+    .btn-orange {
+      background: var(--orange); color: #fff; border: none;
+      padding: 8px 18px; border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-orange:hover { background: var(--orange-dark); }
+
+    /* Empty state */
+    .empty {
+      text-align: center; padding: 48px 20px;
+      color: var(--ink4); font-size: .88rem; line-height: 1.9;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r);
+    }
+    .empty-icon { font-size: 2.2rem; display: block; margin-bottom: 12px; }
+
+    /* Info box */
+    .info-box {
+      background: var(--green-bg);
+      border: 1px solid rgba(26,122,72,.15);
+      border-left: 3px solid var(--green);
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      padding: 12px 16px; margin-bottom: 20px;
+      font-size: .85rem; color: var(--green); line-height: 1.6;
+    }
+
+    /* Notif */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff; padding: 12px 24px;
+      border-radius: var(--r); font-size: .88rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── FOCUS STATES ── */
+    :focus-visible {
+      outline: 2px solid var(--orange);
+      outline-offset: 2px;
+    }
+    .nav-btn:focus-visible { outline-offset: 0; }
+
+    /* ── SIDEBAR USER BLOCK ── */
+    .sidebar-user {
+      padding: 16px 12px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--ink); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .85rem; font-weight: 700; flex-shrink: 0;
+    }
+    .sidebar-user-info { min-width: 0; }
+    .sidebar-user-name {
+      font-size: .84rem; font-weight: 600; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sidebar-user-email {
+      font-size: .72rem; color: var(--ink4);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── SIDEBAR LOGOUT ── */
+    .btn-logout {
+      display: flex; align-items: center; gap: 9px;
+      width: calc(100% - 24px); margin: 8px 12px;
+      padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: 1.5px solid var(--border2);
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: .84rem; color: var(--ink3); text-align: left;
+      transition: all .12s;
+    }
+    .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
+
+    /* ── CONFIRM MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(13,21,32,.45); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: var(--white); border-radius: var(--r);
+      padding: 28px; max-width: 380px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,.2);
+    }
+    .modal-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .modal-body { font-size: .88rem; color: var(--ink3); line-height: 1.6; margin-bottom: 22px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── TOOLTIP ── */
+    .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+    .tooltip-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--border2); color: var(--ink3);
+      font-size: .65rem; font-weight: 700; cursor: help;
+      margin-left: 5px; flex-shrink: 0;
+    }
+    .tooltip-text {
+      display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%); background: var(--ink); color: #fff;
+      font-size: .75rem; line-height: 1.5; padding: 8px 12px;
+      border-radius: var(--r-sm); white-space: nowrap; max-width: 240px;
+      white-space: normal; z-index: 50; pointer-events: none;
+    }
+    .tooltip-wrap:hover .tooltip-text { display: block; }
+
+    /* Match card (berichten/matches screen) */
+    .card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 18px 20px; margin-bottom: 10px;
+      transition: border-color .15s;
+    }
+    .card:hover { border-color: #c9e8d5; }
+    .card-head {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 10px; margin-bottom: 4px;
+    }
+    .card-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .95rem; font-weight: 700; color: var(--ink);
+    }
+    .card-sub { font-size: .78rem; color: var(--ink3); margin-top: 2px; }
+    .tag.green  { background: var(--green-bg); color: var(--green); border: none; }
+    .tag.red    { background: var(--red-bg);   color: var(--red);   border: none; }
+    .tag.neutral { background: #f0f0ee; color: var(--ink3); border: none; }
+  </style>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-title" id="modal-title">Weet je het zeker?</div>
+    <div class="modal-body" id="modal-body">Deze actie kan niet ongedaan worden gemaakt.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button class="btn-xs btn-del" id="modal-confirm" style="padding:9px 18px;font-size:.88rem">Verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
+  <div class="topbar-right">
+    <a href="company-discover.html" class="topbar-link">Zoek stagiairs</a>
+    <a href="company-dashboard.html" class="topbar-link" style="color:#fff">Dashboard</a>
+    <a href="auth.html" class="topbar-link">Inloggen</a>
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" aria-label="Meldingen">
+      <span class="bell-icon">🔔</span>
+      <span class="bell-count" id="bellCount" style="display:none">0</span>
+      <div class="notif-dropdown" id="notifDropdown" style="display:none">
+        <div class="nd-header">
+          <span class="nd-title">Meldingen</span>
+          <button class="nd-mark-all" onclick="markAllRead(event)">Alles gelezen</button>
+        </div>
+        <div class="nd-list" id="notifList">
+          <div class="nd-empty">Geen meldingen</div>
+        </div>
+      </div>
+    </div>
+    <span class="role-pill">🏢 Bedrijf</span>
+  </div>
+</div>
+
+<!-- Mobile bottom tab bar -->
+<nav class="mobile-tabs" aria-label="Navigatie">
+  <button class="mt-tab active" onclick="show('dashboard')">
+    <span class="mt-icon">📊</span>
+    <span class="mt-label">Dashboard</span>
+  </button>
+  <button class="mt-tab" onclick="show('postings')">
+    <span class="mt-icon">📌</span>
+    <span class="mt-label">Vacatures</span>
+  </button>
+  <button class="mt-tab" onclick="show('matches')">
+    <span class="mt-icon">🤝</span>
+    <span class="mt-label">Matches</span>
+  </button>
+  <button class="mt-tab" onclick="show('berichten')">
+    <span class="mt-icon">💬</span>
+    <span class="mt-label">Berichten</span>
+  </button>
+  <button class="mt-tab" onclick="show('reviews')">
+    <span class="mt-icon">⭐</span>
+    <span class="mt-label">Reviews</span>
+  </button>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">?</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="userName">Laden…</div>
+        <div class="sidebar-user-email" id="userEmail"></div>
+      </div>
+    </div>
+
+    <div class="sidebar-inner">
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Beheer</span>
+        <button class="nav-btn active" id="nav-dashboard" onclick="show('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-btn" id="nav-postings" onclick="show('postings')">
+          <span class="nav-icon">📌</span> Mijn vacatures
+          <span class="nav-badge" id="badge-count" style="display:none">0</span>
+        </button>
+        <button class="nav-btn" id="nav-new" onclick="show('new')">
+          <span class="nav-icon">➕</span> Nieuwe vacature
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Matching</span>
+        <button class="nav-btn" id="nav-matches" onclick="show('matches')">
+          <span class="nav-icon">🤝</span> Matches
+        </button>
+        <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
+          <span class="nav-icon">💬</span> Berichten
+          <span class="nav-badge" id="badge-unread" style="display:none">0</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='company-discover.html'">
+          <span class="nav-icon">🔍</span> Zoek stagiairs
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Reputatie</span>
+        <button class="nav-btn" id="nav-reviews" onclick="show('reviews')">
+          <span class="nav-icon">⭐</span> Reviews
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Account</span>
+        <button class="nav-btn" id="nav-profile" onclick="show('profile')">
+          <span class="nav-icon">🏢</span> Bedrijfsprofiel
+        </button>
+      </div>
+
+    </div>
+
+    <button class="btn-logout" onclick="signOut()" title="Uitloggen">
+      <span class="nav-icon">🚪</span> Uitloggen
+    </button>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="page-title">Dashboard</div>
+      <p class="page-sub">Overzicht van jouw recruitmentactiviteit op Internly</p>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Actieve vacatures</div>
+          <div class="stat-val" id="stat-active">0</div>
+          <div class="stat-note">geplaatst</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Totaal geplaatst</div>
+          <div class="stat-val" id="stat-total">0</div>
+          <div class="stat-note">alle tijd</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Matches</div>
+          <div class="stat-val" id="stat-matches">0</div>
+          <div class="stat-note">dit kwartaal</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Trust Score</div>
+          <div class="stat-val" id="stat-trust">—</div>
+          <div class="stat-note" id="stat-grade">berekenen…</div>
+          <button onclick="forceTrustRecalculate()" style="margin-top:6px;font-size:.72rem;padding:3px 8px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;color:var(--ink3)">↻ Herberekenen</button>
+        </div>
+      </div>
+
+      <div class="sec-title">
+        Recente vacatures
+        <button class="btn-orange" onclick="show('new')">+ Nieuw</button>
+      </div>
+      <div id="recent-postings">
+        <div class="empty">
+          <span class="empty-icon">📭</span>
+          Nog geen vacatures geplaatst.<br>
+          Klik op <strong>Nieuwe vacature</strong> om te beginnen.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MIJN VACATURES ── -->
+    <div class="screen" id="screen-postings">
+      <div class="sec-title">
+        Mijn vacatures
+        <button class="btn-orange" onclick="show('new')">+ Nieuwe vacature</button>
+      </div>
+      <div id="all-postings">
+        <div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures.</div>
+      </div>
+    </div>
+
+    <!-- ── NIEUWE VACATURE ── -->
+    <div class="screen" id="screen-new">
+      <div class="page-title">Nieuwe vacature plaatsen</div>
+      <p class="page-sub">Vul de details in — studenten en scholen zien deze posting direct.</p>
+
+      <div class="form-card">
+        <div class="form-section-title">Bedrijf &amp; sector</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Bedrijfsnaam <span class="req">*</span></label>
+            <input type="text" id="f-company" placeholder="Jouw bedrijfsnaam">
+          </div>
+          <div class="field">
+            <label>Sector <span class="req">*</span></label>
+            <select id="f-sector">
+              <option value="">Kies sector</option>
+              <option>Engineering</option>
+              <option>IT</option>
+              <option>Marketing</option>
+              <option>Finance</option>
+              <option>Duurzaamheid</option>
+              <option>Design</option>
+              <option>HR</option>
+              <option>Hospitality</option>
+              <option>Gezondheid</option>
+              <option>Dieren</option>
+              <option>Niche</option>
+              <option>Anders</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="form-section-title">Vacaturedetails</div>
+
+        <div class="field">
+          <label>Vacaturetitel <span class="req">*</span></label>
+          <input type="text" id="f-title" placeholder="Bijv. Junior Data Analyst Stage">
+        </div>
+
+        <div class="field">
+          <label>Omschrijving <span class="req">*</span></label>
+          <textarea id="f-desc" placeholder="Wat ga je doen? Wat leer je? Wat verwacht je van de stagiair?"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Duur <span class="req">*</span></label>
+            <select id="f-duration">
+              <option value="">Kies duur</option>
+              <option>4 maanden</option>
+              <option>5 maanden</option>
+              <option>6 maanden</option>
+              <option>12 maanden</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Startdatum <span class="hint">optioneel</span></label>
+            <input type="date" id="f-start">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Postcode locatie <span class="hint">optioneel — voor reistijdfilter</span></label>
+          <input type="text" id="f-postcode" placeholder="Bijv. 1012 AB" maxlength="7">
+        </div>
+
+        <div class="field">
+          <label>Skills &amp; tags <span class="hint">typ en druk Enter</span></label>
+          <div class="tags-box" id="tagsBox" onclick="document.getElementById('tagsInput').focus()">
+            <input type="text" id="tagsInput" class="tags-input" placeholder="Bijv. Python, Marketing…" maxlength="30">
+          </div>
+          <div class="tags-hint">Max 8 tags — druk Enter of komma om toe te voegen.</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="form-section-title">Matching instellingen</div>
+
+        <div class="field">
+          <label>Bedoeld voor <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-opt selected" id="mt-student" onclick="setTarget('student')">
+              <input type="radio" name="mt" value="student" checked>
+              <div class="radio-label">👤 Studenten</div>
+            </label>
+            <label class="radio-opt" id="mt-school" onclick="setTarget('school')">
+              <input type="radio" name="mt" value="school">
+              <div class="radio-label">🎓 Scholen</div>
+            </label>
+            <label class="radio-opt" id="mt-beide" onclick="setTarget('beide')">
+              <input type="radio" name="mt" value="beide">
+              <div class="radio-label">👥 Beide</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Responsgarantie</label>
+            <select id="f-guarantee">
+              <option value="false">Geen garantie</option>
+              <option value="true">Ja — met garantie</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Reactie binnen (dagen) <span class="hint">optioneel</span></label>
+            <input type="number" id="f-responsedays" min="1" max="14" placeholder="Bijv. 3">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn-primary" id="submitBtn" onclick="submitPosting()">Vacature plaatsen →</button>
+          <button class="btn-ghost" onclick="show('postings')">Annuleren</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MATCHES ── -->
+    <div class="screen" id="screen-matches">
+      <div class="page-title">Matches</div>
+      <p class="page-sub">Studenten en scholen die gematcht zijn met jouw vacatures</p>
+      <div id="matches-list">
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
+      </div>
+    </div>
+
+    <!-- ── BERICHTEN ── -->
+    <div class="screen" id="screen-berichten">
+      <div class="page-title">Berichten</div>
+      <p class="page-sub">Directe gesprekken met studenten via de chat</p>
+      <div id="berichten-list">
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
+      </div>
+    </div>
+
+    <!-- ── REVIEWS ── -->
+    <div class="screen" id="screen-reviews">
+      <div class="page-title">Reviews</div>
+      <p class="page-sub">Beoordelingen van studenten over jouw bedrijf als stageplaats</p>
+      <div id="reviews-content">
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
+      </div>
+    </div>
+
+    <!-- ── PROFIEL ── -->
+    <div class="screen" id="screen-profile">
+      <div class="page-title">Bedrijfsprofiel</div>
+      <p class="page-sub">Deze informatie is zichtbaar voor studenten en scholen</p>
+
+      <!-- Overview -->
+      <div id="company-view-profiel" style="display:none">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="cpv-naam">—</div>
+            <div style="font-size:.88rem;color:var(--ink3);margin-top:2px" id="cpv-sector-size">—</div>
+            <a id="cpv-website" href="#" target="_blank" style="font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none;margin-top:4px;display:none">—</a>
+          </div>
+          <button onclick="toonBedrijfFormulier()" class="btn-ghost">✏️ Bewerken</button>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px">Over ons</div>
+          <p id="cpv-beschrijving" style="font-size:.9rem;color:var(--ink2);line-height:1.7;margin:0">—</p>
+        </div>
+        <div id="cpv-volledigheid" class="card" style="background:#fdf3e0;border-color:rgba(160,96,16,.2);font-size:.85rem"></div>
+      </div>
+
+      <!-- Form -->
+      <div id="company-view-form">
+      <div class="info-box">
+        Na het opslaan is je profiel zichtbaar in de matchpool. Studenten en scholen kunnen jou dan vinden via hun zoekpagina.
+      </div>
+
+      <div class="form-card">
+        <div class="form-section-title">Bedrijfsinformatie</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Bedrijfsnaam</label>
+            <input type="text" id="p-naam" placeholder="Jouw bedrijfsnaam">
+          </div>
+          <div class="field">
+            <label>Sector</label>
+            <input type="text" id="p-sector" placeholder="Bijv. IT, Finance">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Grootte</label>
+            <input type="text" id="p-size" placeholder="Bijv. 50-100 medewerkers">
+          </div>
+          <div class="field">
+            <label>Website</label>
+            <input type="text" id="p-website" placeholder="https://...">
+          </div>
+        </div>
+        <div class="field">
+          <label>Beschrijving</label>
+          <textarea id="p-desc" placeholder="Wie zijn jullie? Wat doen jullie? Waarom is een stage bij jullie waardevol?"></textarea>
+        </div>
+        <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Profiel opslaan →</button>
+        <div id="profileCompleteHint" style="margin-top:10px;font-size:.82rem;color:#6b7280;display:none"></div>
+      </div>
+      </div><!-- /#company-view-form -->
+
+      <div class="form-card" style="margin-top:16px">
+        <div class="form-section-title">Account &amp; beveiliging</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-size:.88rem;font-weight:600;color:var(--ink)">Wachtwoord wijzigen</div>
+            <div style="font-size:.78rem;color:var(--ink4);margin-top:2px">Je ontvangt een resetlink via e-mail</div>
+          </div>
+          <button class="btn-ghost" style="font-size:.82rem;padding:7px 16px" onclick="resetPassword()">Resetlink versturen</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── State ──
+const tags = [];
+let matchTarget       = 'student';
+let postings          = [];
+let currentUser       = null;
+let notifSubscription = null;
+
+// ── Notification system ───────────────────────────────────────────────────
+
+async function createNotification(userId, type, refId, refType, message) {
+  if (!userId) return;
+  try {
+    await db.from('notifications').insert({
+      user_id:  userId,
+      type,
+      ref_id:   refId   || null,
+      ref_type: refType || null,
+      message,
+      read:     false,
+    });
+  } catch(e) {
+    console.warn('createNotification fout (non-blocking):', e);
+  }
+}
+
+function formatRelativeTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Zojuist';
+  if (m < 60) return m + ' min geleden';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + ' uur geleden';
+  return Math.floor(h / 24) + 'd geleden';
+}
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  const { data } = await db
+    .from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  const items  = data || [];
+  const unread = items.filter(n => !n.read).length;
+  const countEl = document.getElementById('bellCount');
+  if (countEl) {
+    countEl.textContent = unread > 9 ? '9+' : unread;
+    countEl.style.display = unread > 0 ? 'flex' : 'none';
+  }
+
+  const listEl = document.getElementById('notifList');
+  if (!listEl) return;
+  if (items.length === 0) {
+    listEl.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
+    return;
+  }
+  listEl.innerHTML = items.map(n => `
+    <div class="nd-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+      <span class="nd-dot ${n.read ? 'read' : ''}"></span>
+      <div>
+        <div class="nd-msg">${escapeHtml(n.message)}</div>
+        <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function markAllRead(e) {
+  if (e) e.stopPropagation();
+  if (!currentUser) return;
+  await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+  loadNotifications();
+}
+
+function toggleNotifDropdown(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('notifDropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) loadNotifications();
+}
+
+async function handleNotifClick(id, refType, refId) {
+  if (id) await db.from('notifications').update({ read: true }).eq('id', id);
+  document.getElementById('notifDropdown').style.display = 'none';
+  if (refType === 'match' && refId) {
+    show('matches');
+  } else if (refType === 'conversation' && refId) {
+    show('berichten');
+  } else if (refType === 'review') {
+    show('reviews');
+  }
+  loadNotifications();
+}
+
+function startNotifSubscription() {
+  if (!currentUser || notifSubscription) return;
+  notifSubscription = db
+    .channel('notif-company-' + currentUser.id)
+    .on('postgres_changes', {
+      event:  'INSERT',
+      schema: 'public',
+      table:  'notifications',
+      filter: 'user_id=eq.' + currentUser.id,
+    }, payload => {
+      showToast(payload.new.message);
+      loadNotifications();
+    })
+    .subscribe();
+}
+
+function showToast(message) {
+  let t = document.getElementById('notif-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'notif-toast';
+    t.style.cssText = 'position:fixed;top:66px;right:16px;background:#0d1520;color:#fff;padding:10px 16px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;line-height:1.4;font-family:Outfit,sans-serif;transition:opacity .3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = '🔔 ' + message;
+  t.style.opacity = '1';
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => { t.style.opacity = '0'; }, 4000);
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  const bell = document.getElementById('notifBell');
+  const dd   = document.getElementById('notifDropdown');
+  if (dd && dd.style.display !== 'none' && bell && !bell.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
+
+// ── Auth ──
+async function loadUser() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+  currentUser = user;
+
+  const email = user.email || '';
+  const name  = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0] || 'Bedrijf';
+  const initials = name.slice(0, 2).toUpperCase();
+
+  document.getElementById('userAvatar').textContent = initials;
+  document.getElementById('userName').textContent   = name;
+  document.getElementById('userEmail').textContent  = email;
+
+  const loginLink = document.querySelector('.topbar-link[href="auth.html"]');
+  if (loginLink) { loginLink.textContent = email; loginLink.removeAttribute('href'); loginLink.style.cursor = 'default'; }
+}
+
+async function signOut() {
+  try { await db.auth.signOut(); }
+  catch(e) { console.error('Logout error:', e); }
+  finally {
+    sessionStorage.removeItem('internly_role');
+    window.location.href = 'auth.html';
+  }
+}
+
+async function resetPassword() {
+  if (!currentUser?.email) { notify('Niet ingelogd'); return; }
+  const { error } = await db.auth.resetPasswordForEmail(currentUser.email, {
+    redirectTo: window.location.origin + '/auth.html'
+  });
+  if (error) notify('Fout: ' + error.message);
+  else notify('✓ Resetlink verstuurd naar ' + currentUser.email);
+}
+
+// ── Modal ──
+let _modalCallback = null;
+function openModal(title, body, onConfirm) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent  = body;
+  _modalCallback = onConfirm;
+  document.getElementById('confirmModal').classList.add('show');
+  document.getElementById('modal-confirm').focus();
+}
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('show');
+  _modalCallback = null;
+}
+document.getElementById('modal-confirm').addEventListener('click', () => {
+  if (_modalCallback) _modalCallback();
+  closeModal();
+});
+document.getElementById('confirmModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ── Navigation ──
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mt-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  const nb = document.getElementById('nav-' + id);
+  if (nb) nb.classList.add('active');
+  if (id === 'postings')  renderList('all-postings', postings);
+  if (id === 'dashboard') { renderList('recent-postings', postings.slice(0, 3)); updateStats(); }
+  if (id === 'matches')   loadCompanyMatches();
+  if (id === 'berichten') loadBerichten();
+  if (id === 'reviews')   loadReviews();
+}
+
+// ── Stats ──
+function updateStats() {
+  document.getElementById('stat-active').textContent   = postings.filter(p => p.status === 'active').length;
+  document.getElementById('stat-total').textContent    = postings.length;
+  document.getElementById('stat-matches').textContent  = 0;
+}
+
+function updateTrustDisplay(score, grade, reviewCount) {
+  const el = document.getElementById('stat-trust');
+  const gl = document.getElementById('stat-grade');
+  if (el) el.textContent = score !== undefined ? score : '—';
+  if (gl) {
+    const labels = { A: 'Grade A — Betrouwbaar', B: 'Grade B — Gemiddeld', C: 'Grade C — Let op' };
+    let text = labels[grade] || '—';
+    if (reviewCount !== undefined && reviewCount > 0) {
+      text += ' · ' + reviewCount + ' review' + (reviewCount !== 1 ? 's' : '');
+    }
+    gl.textContent = text;
+    gl.style.color = grade === 'A' ? 'var(--green)' : grade === 'C' ? 'var(--red)' : 'var(--amber)';
+  }
+}
+
+// ── Load ──
+async function loadPostings() {
+  if (!currentUser) return;
+  const { data, error } = await db
+    .from('internship_postings')
+    .select('*')
+    .eq('created_by', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (error) { console.error('Load error:', error); return; }
+  postings = data || [];
+
+  const cnt = postings.length;
+  const badge = document.getElementById('badge-count');
+  if (cnt > 0) { badge.textContent = cnt; badge.style.display = 'inline'; }
+
+  updateStats();
+  renderList('recent-postings', postings.slice(0, 3));
+}
+
+// ── Render ──
+function statusBadge(s) {
+  if (s === 'active')  return `<span class="status-badge s-active">✓ Actief</span>`;
+  if (s === 'paused')  return `<span class="status-badge s-paused">⏸ Gepauzeerd</span>`;
+  return `<span class="status-badge s-closed">✕ Gesloten</span>`;
+}
+
+function targetLabel(t) {
+  return t === 'student' ? '👤 Studenten' : t === 'school' ? '🎓 Scholen' : '👥 Beide';
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderList(cid, data) {
+  const el = document.getElementById(cid);
+  if (!data || data.length === 0) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures geplaatst.<br>Klik op <strong>Nieuwe vacature</strong> om te beginnen.</div>`;
+    return;
+  }
+  el.innerHTML = data.map(p => {
+    const desc    = (p.description || '').substring(0, 140);
+    const hasMore = (p.description || '').length > 140;
+    return `
+    <div class="posting-card">
+      <div class="pc-head">
+        <div>
+          <div class="pc-title">${escapeHtml(p.title)}</div>
+          <div class="pc-meta">${escapeHtml(p.company_name)} · ${escapeHtml(p.sector || '—')} · ${escapeHtml(p.duration || '—')}</div>
+        </div>
+        ${statusBadge(p.status)}
+      </div>
+      <div class="pc-tags">
+        <span class="tag tag-target">${targetLabel(p.match_target)}</span>
+        ${p.guarantee ? `<span class="tag tag-green">⚡ Responsgarantie</span>` : ''}
+        ${(p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+      </div>
+      <div class="pc-desc">${escapeHtml(desc)}${hasMore ? '…' : ''}</div>
+      <div class="pc-actions">
+        ${p.status === 'active'
+          ? `<button class="btn-xs btn-pause" onclick="setStatus('${p.id}','paused')">⏸ Pauzeren</button>`
+          : `<button class="btn-xs btn-activate" onclick="setStatus('${p.id}','active')">✓ Activeren</button>`}
+        <button class="btn-xs btn-del" onclick="delPosting('${p.id}')">✕ Verwijderen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Tags ──
+document.getElementById('tagsInput').addEventListener('keydown', function(e) {
+  if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+    e.preventDefault();
+    addTag(this.value.trim().replace(/,/g, ''));
+    this.value = '';
+  }
+});
+function addTag(s) {
+  if (tags.length >= 8 || tags.includes(s) || !s) return;
+  tags.push(s);
+  const chip = document.createElement('div');
+  chip.className = 'tag-chip';
+  chip.appendChild(document.createTextNode(s));
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', () => removeTag(s, closeBtn));
+  chip.appendChild(closeBtn);
+  document.getElementById('tagsBox').insertBefore(chip, document.getElementById('tagsInput'));
+}
+function removeTag(s, btn) {
+  const i = tags.indexOf(s); if (i > -1) tags.splice(i, 1);
+  btn.closest('.tag-chip').remove();
+}
+
+// ── Target ──
+function setTarget(val) {
+  matchTarget = val;
+  ['student','school','beide'].forEach(v => {
+    document.getElementById('mt-' + v).classList.toggle('selected', v === val);
+  });
+}
+
+// ── Matches screen ────────────────────────────────────────────────────────────
+async function loadCompanyMatches() {
+  const el = document.getElementById('matches-list');
+  if (!currentUser) return;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+  try {
+    const { data: matchRows, error } = await db
+      .from('matches')
+      .select('id, status, party_a, type, created_at, internship_postings(title, company_name)')
+      .eq('party_b', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    if (!matchRows || matchRows.length === 0) {
+      el.innerHTML = `<div class="empty"><span class="empty-icon">🤝</span>Nog geen matches.<br>Plaats een vacature en wacht tot studenten reageren.</div>`;
+      return;
+    }
+
+    const statusLabel = { pending: 'In behandeling', accepted: 'Geaccepteerd', rejected: 'Afgewezen', active: 'Actief' };
+    const statusCls   = { pending: 'neutral', accepted: 'green', rejected: 'red', active: 'green' };
+
+    el.innerHTML = matchRows.map(m => {
+      const posting = m.internship_postings || {};
+      const sLabel  = statusLabel[m.status]  || m.status;
+      const sCls    = statusCls[m.status]    || 'neutral';
+      const hasConv = m.status === 'accepted' || m.status === 'active';
+      const isPending = m.status === 'pending';
+      return `
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-head">
+            <div>
+              <div class="card-title">${escapeHtml(posting.title || 'Stageplek')}</div>
+              <div class="card-sub">${escapeHtml(new Date(m.created_at).toLocaleDateString('nl-NL'))}</div>
+            </div>
+            <span class="tag ${sCls}">${escapeHtml(sLabel)}</span>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            ${isPending ? `
+              <button class="btn-xs btn-activate" onclick="acceptMatch('${m.id}','${m.party_a}')">✓ Accepteren</button>
+              <button class="btn-xs btn-del" onclick="rejectMatch('${m.id}','${m.party_a}')">✕ Afwijzen</button>
+            ` : ''}
+            ${hasConv ? `
+              <a href="chat.html?match=${escapeHtml(m.id)}"
+                 style="font-size:.82rem;color:var(--green);font-weight:700;text-decoration:none;
+                        background:var(--green-bg);padding:7px 14px;border-radius:20px;display:inline-block;min-height:36px;align-items:center;display:inline-flex">
+                💬 Open chat →
+              </a>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    console.error('loadCompanyMatches fout:', e);
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function acceptMatch(matchId, studentId) {
+  const { error } = await db.from('matches').update({ status: 'accepted' }).eq('id', matchId);
+  if (error) { notify('Fout: ' + error.message); return; }
+
+  // Create conversation
+  let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).maybeSingle();
+  if (!conv) {
+    const { data: newConv, error: convErr } = await db.from('conversations').insert({ match_id: matchId }).select('id').single();
+    if (convErr) { notify('Match geaccepteerd maar chat aanmaken mislukt: ' + convErr.message); }
+    conv = newConv;
+  }
+
+  // Notify student
+  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een bedrijf';
+  createNotification(studentId, 'application_accepted', matchId, 'match', companyName + ' heeft jouw match geaccepteerd — start het gesprek!');
+
+  sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
+  notify('✓ Match geaccepteerd');
+  loadCompanyMatches();
+}
+
+async function rejectMatch(matchId, studentId) {
+  const { error } = await db.from('matches').update({ status: 'rejected' }).eq('id', matchId);
+  if (error) { notify('Fout: ' + error.message); return; }
+
+  // Notify student
+  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een bedrijf';
+  createNotification(studentId, 'application_rejected', matchId, 'match', companyName + ' heeft de match helaas afgewezen');
+
+  sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
+  notify('Match afgewezen');
+  loadCompanyMatches();
+}
+
+// ── Berichten screen ──────────────────────────────────────────────────────────
+async function loadBerichten() {
+  const el = document.getElementById('berichten-list');
+  if (!currentUser) return;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+  try {
+    const { data: matchRows, error: mErr } = await db
+      .from('matches')
+      .select('id, party_a, created_at, internship_postings(title)')
+      .eq('party_b', currentUser.id)
+      .in('status', ['accepted', 'active'])
+      .order('created_at', { ascending: false });
+
+    if (mErr) throw mErr;
+    if (!matchRows || matchRows.length === 0) {
+      el.innerHTML = `<div class="empty"><span class="empty-icon">💬</span>Nog geen berichten.<br>Zodra een student je match accepteert, verschijnt het gesprek hier.</div>`;
+      const badge = document.getElementById('badge-unread');
+      if (badge) badge.style.display = 'none';
+      return;
+    }
+
+    const matchIds = matchRows.map(m => m.id);
+    const { data: convRows } = await db
+      .from('conversations')
+      .select('id, match_id')
+      .in('match_id', matchIds);
+    const convByMatch = {};
+    (convRows || []).forEach(c => { convByMatch[c.match_id] = c.id; });
+
+    const convIds = (convRows || []).map(c => c.id);
+    let unreadByConv = {};
+    if (convIds.length > 0) {
+      const { data: unreadRows } = await db
+        .from('messages')
+        .select('conversation_id')
+        .in('conversation_id', convIds)
+        .neq('sender_id', currentUser.id)
+        .eq('read', false);
+      (unreadRows || []).forEach(r => {
+        unreadByConv[r.conversation_id] = (unreadByConv[r.conversation_id] || 0) + 1;
+      });
+    }
+
+    const totalUnread = Object.values(unreadByConv).reduce((s, n) => s + n, 0);
+    const badge = document.getElementById('badge-unread');
+    if (badge) {
+      if (totalUnread > 0) { badge.textContent = totalUnread > 9 ? '9+' : totalUnread; badge.style.display = 'inline'; }
+      else { badge.style.display = 'none'; }
+    }
+
+    el.innerHTML = matchRows.map(m => {
+      const posting = m.internship_postings || {};
+      const convId  = convByMatch[m.id];
+      const unread  = convId ? (unreadByConv[convId] || 0) : 0;
+      return `
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-head">
+            <div>
+              <div class="card-title">${escapeHtml(posting.title || 'Stageplek')}</div>
+              <div class="card-sub">${escapeHtml(new Date(m.created_at).toLocaleDateString('nl-NL'))}</div>
+            </div>
+            ${unread > 0 ? `<span class="tag neutral" style="background:var(--orange-bg);color:var(--orange);border:none">${unread} nieuw</span>` : ''}
+          </div>
+          <div style="margin-top:8px">
+            <a href="chat.html?match=${escapeHtml(m.id)}"
+               style="font-size:.85rem;color:var(--green);font-weight:700;text-decoration:none;
+                      background:var(--green-bg);padding:6px 14px;border-radius:20px;display:inline-block">
+              💬 Open gesprek →
+            </a>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    console.error('loadBerichten fout:', e);
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ── Reviews screen ────────────────────────────────────────────────────────────
+async function loadReviews() {
+  const el = document.getElementById('reviews-content');
+  if (!currentUser) return;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+  try {
+    const { data: reviewRows, error } = await db
+      .from('reviews')
+      .select('id, rating, body, created_at, reviewer_id, flagged')
+      .eq('reviewee_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!reviewRows || reviewRows.length === 0) {
+      el.innerHTML = `
+        <div class="empty">
+          <span class="empty-icon">⭐</span>
+          Nog geen reviews ontvangen.<br>
+          <small style="font-size:.82rem">Reviews verschijnen hier zodra studenten een beoordeling achterlaten na hun stage.</small>
+        </div>`;
+      return;
+    }
+
+    // Calculate stats
+    const count  = reviewRows.length;
+    const avg    = reviewRows.reduce((s, r) => s + r.rating, 0) / count;
+    const avgStr = avg.toFixed(1);
+
+    // Distribution
+    const dist = [5,4,3,2,1].map(star => ({
+      star,
+      count: reviewRows.filter(r => r.rating === star).length,
+    }));
+
+    // Reviewer names (batch fetch)
+    const reviewerIds = [...new Set(reviewRows.map(r => r.reviewer_id).filter(Boolean))];
+    const reviewerMap = {};
+    if (reviewerIds.length > 0) {
+      const { data: profiles } = await db
+        .from('profiles')
+        .select('id, naam, name, email')
+        .in('id', reviewerIds);
+      (profiles || []).forEach(p => {
+        reviewerMap[p.id] = p.naam || p.name || p.email?.split('@')[0] || 'Student';
+      });
+    }
+
+    // Stars HTML helper
+    const starsHtml = (rating) => {
+      return [1,2,3,4,5].map(i =>
+        `<span class="${i <= rating ? 'review-star-filled' : 'review-star-empty'}">★</span>`
+      ).join('');
+    };
+
+    const summaryHtml = `
+      <div class="review-summary">
+        <div style="text-align:center">
+          <div class="review-avg-big">${avgStr}</div>
+          <div class="review-stars-display" style="justify-content:center;margin:6px 0">${starsHtml(Math.round(avg))}</div>
+          <div class="review-avg-sub">${count} review${count !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="review-dist">
+          ${dist.map(d => `
+            <div class="review-dist-row">
+              <span style="min-width:14px">★ ${d.star}</span>
+              <div class="review-dist-bar">
+                <div class="review-dist-fill" style="width:${count > 0 ? Math.round(d.count/count*100) : 0}%"></div>
+              </div>
+              <span style="min-width:20px;text-align:right">${d.count}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    const cardsHtml = reviewRows.map(r => {
+      const reviewerName = reviewerMap[r.reviewer_id] || 'Student';
+      const initials = reviewerName.slice(0, 2).toUpperCase();
+      const dateStr = new Date(r.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+      const flaggedNote = r.flagged ? `<span style="font-size:.72rem;color:var(--red);margin-left:8px">⚑ gemeld</span>` : '';
+      return `
+        <div class="review-card">
+          <div class="review-card-head">
+            <div class="review-avatar">${escapeHtml(initials)}</div>
+            <div class="review-stars-display">${starsHtml(r.rating)}</div>
+            <span class="review-date">${escapeHtml(dateStr)}</span>
+            ${flaggedNote}
+            ${!r.flagged ? `<button onclick="flagReview('${r.id}')" title="Beoordeling melden" style="margin-left:auto;border:none;background:none;cursor:pointer;color:var(--ink4);font-size:.8rem;padding:2px 6px;border-radius:4px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink4)'">⚑</button>` : ''}
+          </div>
+          ${r.body ? `<div class="review-body">${escapeHtml(r.body)}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    el.innerHTML = summaryHtml + `<div class="sec-title" style="margin-top:4px">Alle beoordelingen</div>` + cardsHtml;
+
+  } catch(e) {
+    console.error('loadReviews fout:', e);
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ── Trust Score Engine (A=30%, B=25%, C=20%, D=25%) ──────────────────────────
+async function herberekeningTrustScore(companyUserId) {
+  if (!companyUserId) return;
+  const key = 'internly_trust_calculated_' + companyUserId;
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
+
+  try {
+    const { data: myPostings } = await db
+      .from('internship_postings')
+      .select('id')
+      .eq('created_by', companyUserId);
+    const postingIds = (myPostings || []).map(p => p.id);
+
+    // Pre-fetch matches once — used by both Component A and Component B
+    const { data: myMatches } = await db
+      .from('matches')
+      .select('status')
+      .eq('party_b', companyUserId);
+
+    // Component A: match response rate (30%)
+    // Measures how often the company responds (accepts or rejects) vs ignoring matches.
+    let componentA = 15; // default (50% equivalent — neutral for new companies)
+    {
+      const totalReceived = (myMatches || []).length;
+      const responded     = (myMatches || []).filter(m => m.status !== 'pending').length;
+      if (totalReceived > 0) componentA = (responded / totalReceived) * 100 * 0.30;
+    }
+
+    // Component B: acceptance quality (25%)
+    let componentB = 12.5; // default
+    const totalMatches = (myMatches || []).length;
+    const accepted     = (myMatches || []).filter(m => m.status === 'accepted').length;
+    if (totalMatches > 0) componentB = (accepted / totalMatches) * 100 * 0.25;
+
+    // Component C: profiel volledigheid (20%)
+    const { data: profile } = await db
+      .from('company_profiles')
+      .select('bedrijfsnaam, sector, size, website, beschrijving')
+      .eq('profile_id', companyUserId)
+      .maybeSingle();
+    let filled = 0;
+    if (profile) {
+      if (profile.bedrijfsnaam) filled++;
+      if (profile.sector)       filled++;
+      if (profile.size)         filled++;
+      if (profile.website)      filled++;
+      if (profile.beschrijving) filled++;
+    }
+    const componentC = (filled / 5) * 100 * 0.20;
+
+    // Component D: reviews (25%)
+    let componentD = 70 * 0.25; // default 17.5 (score=70, no reviews)
+    let reviewCount = 0;
+    const { data: reviewRows } = await db
+      .from('reviews')
+      .select('rating')
+      .eq('reviewee_id', companyUserId);
+    reviewCount = (reviewRows || []).length;
+    if (reviewCount > 0) {
+      const avgRating = reviewRows.reduce((s, r) => s + r.rating, 0) / reviewCount;
+      componentD = (avgRating / 5) * 100 * 0.25;
+    }
+
+    const score = Math.max(0, Math.min(100, Math.round(componentA + componentB + componentC + componentD)));
+    const grade = score >= 80 ? 'A' : score >= 50 ? 'B' : 'C';
+
+    updateTrustDisplay(score, grade, reviewCount);
+
+    await db.from('company_profiles').upsert(
+      { profile_id: companyUserId, trust_score: score, trust_grade: grade },
+      { onConflict: 'profile_id' }
+    );
+
+    if (postingIds.length > 0) {
+      await db.from('internship_postings')
+        .update({ trust_score: score, trust_grade: grade })
+        .eq('created_by', companyUserId);
+    }
+  } catch(e) {
+    console.error('Trust score berekening fout:', e);
+    sessionStorage.removeItem('internly_trust_calculated_' + companyUserId);
+  }
+}
+
+// ── Sector mapping: company sector → student opdracht_domein values ───────────
+const COMPANY_TO_STUDENT_SECTOR = {
+  'Marketing':    ['Marketing & Communicatie'],
+  'IT':           ['Software & Development', 'Data & Analytics'],
+  'Engineering':  ['Techniek & Engineering'],
+  'Finance':      ['Finance & Economie'],
+  'Duurzaamheid': ['Duurzaamheid & ESG'],
+  'Design':       ['Design & UX'],
+  'HR':           ['HR & Organisatie'],
+  'Gezondheid':   ['Zorg & Welzijn'],
+  'Hospitality':  ['Anders'],
+  'Dieren':       ['Anders'],
+  'Niche':        ['Data & Analytics', 'Anders'],
+  'Anders':       ['Anders'],
+};
+
+// ── Matching trigger ──────────────────────────────────────────────────────────
+async function triggerCompanyMatching(companyUserId, sector, postingId) {
+  if (!companyUserId || !sector || !postingId) return 0;
+  try {
+    // Map company sector to the student opdracht_domein values they use
+    const studentDomains = COMPANY_TO_STUDENT_SECTOR[sector] || [sector];
+
+    const { data: students } = await db
+      .from('student_profiles')
+      .select('profile_id, opdracht_domein')
+      .in('opdracht_domein', studentDomains)
+      .not('profile_id', 'is', null)
+      .limit(20);
+
+    if (!students || students.length === 0) return 0;
+
+    let created = 0;
+    for (const student of students) {
+      if (!student.profile_id) continue;
+
+      const { data: existing } = await db
+        .from('matches')
+        .select('id')
+        .eq('party_a', student.profile_id)
+        .eq('posting_id', postingId)
+        .maybeSingle();
+
+      if (existing) continue;
+
+      const { error: mErr } = await db.from('matches').insert({
+        party_a:      student.profile_id,
+        party_b:      companyUserId,
+        type:         'company_to_student',
+        status:       'pending',
+        initiated_by: companyUserId,
+        match_target: 'posting',
+        posting_id:   postingId,
+      });
+
+      if (!mErr) created++;
+    }
+    return created;
+  } catch(e) {
+    console.error('Company matching trigger fout:', e);
+    return 0;
+  }
+}
+
+// ── Submit ──
+async function submitPosting() {
+  const company = document.getElementById('f-company').value.trim();
+  const sector  = document.getElementById('f-sector').value;
+  const title   = document.getElementById('f-title').value.trim();
+  const desc    = document.getElementById('f-desc').value.trim();
+  const dur     = document.getElementById('f-duration').value;
+
+  if (!company || !sector || !title || !desc || !dur) {
+    notify('Vul alle verplichte velden in'); return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Plaatsen…';
+
+  const postcode = document.getElementById('f-postcode').value.trim().toUpperCase().replace(/\s+/g, ' ') || null;
+
+  const { data: inserted, error } = await db.from('internship_postings').insert({
+    created_by:    currentUser?.id || null,
+    company_name:  company,
+    sector,
+    title,
+    description:   desc,
+    duration:      dur,
+    start_date:    document.getElementById('f-start').value || null,
+    tags:          [...tags],
+    guarantee:     document.getElementById('f-guarantee').value === 'true',
+    response_days: parseInt(document.getElementById('f-responsedays').value) || null,
+    match_target:  matchTarget,
+    postcode,
+    status:        'active',
+  }).select('id').single();
+
+  btn.disabled = false; btn.textContent = 'Vacature plaatsen →';
+
+  if (error) { notify('Fout bij plaatsen. Probeer het opnieuw.'); return; }
+
+  const postingId  = inserted?.id;
+  const matchCount = postingId
+    ? await triggerCompanyMatching(currentUser?.id, sector, postingId)
+    : 0;
+
+  notify(matchCount > 0
+    ? `✓ Vacature geplaatst! ${matchCount} potentiële student${matchCount !== 1 ? 'en' : ''} gevonden.`
+    : '✓ Vacature geplaatst!');
+
+  ['f-company','f-title','f-desc','f-start','f-responsedays','f-postcode'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-sector').value = '';
+  document.getElementById('f-duration').value = '';
+  document.getElementById('f-guarantee').value = 'false';
+  tags.length = 0;
+  document.getElementById('tagsBox').querySelectorAll('.tag-chip').forEach(c => c.remove());
+  setTarget('student');
+
+  await loadPostings();
+  show('postings');
+}
+
+// ── Status ──
+async function setStatus(id, status) {
+  const { error } = await db.from('internship_postings').update({ status }).eq('id', id);
+  if (error) { notify('Fout: ' + error.message); return; }
+  notify(status === 'active' ? '✓ Vacature geactiveerd' : '⏸ Vacature gepauzeerd');
+  await loadPostings();
+  renderList('all-postings', postings);
+}
+
+// ── Delete ──
+async function delPosting(id) {
+  openModal(
+    'Vacature verwijderen',
+    'Weet je zeker dat je deze vacature definitief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.',
+    async () => {
+      const { error } = await db.from('internship_postings').delete().eq('id', id);
+      if (error) { notify('Fout: ' + error.message); return; }
+      notify('✓ Vacature verwijderd');
+      await loadPostings();
+      renderList('all-postings', postings);
+    }
+  );
+}
+
+// ── Company profile overview ─────────────────────────────────────────────────
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function toonBedrijfOverzicht(data) {
+  setText('cpv-naam',        data.bedrijfsnaam || '—');
+  setText('cpv-sector-size', [data.sector, data.size].filter(Boolean).join(' · ') || '—');
+  setText('cpv-beschrijving', data.beschrijving || 'Nog geen beschrijving toegevoegd.');
+
+  const websiteEl = document.getElementById('cpv-website');
+  if (websiteEl) {
+    if (data.website) {
+      websiteEl.textContent = data.website;
+      websiteEl.href        = data.website;
+      websiteEl.style.display = 'inline-block';
+    } else {
+      websiteEl.style.display = 'none';
+    }
+  }
+
+  // Volledigheid
+  const fieldValues = [data.bedrijfsnaam, data.sector, data.size, data.website, data.beschrijving];
+  const fieldLabels = ['bedrijfsnaam', 'sector', 'grootte', 'website', 'beschrijving'];
+  const filled  = fieldValues.filter(Boolean).length;
+  const missing = fieldLabels.filter((_, i) => !fieldValues[i]);
+  const vollEl  = document.getElementById('cpv-volledigheid');
+  if (vollEl) {
+    if (filled === 5) {
+      vollEl.innerHTML = '<span style="color:#1a7a48;font-weight:600">✓ Profiel volledig ingevuld</span>';
+    } else {
+      vollEl.innerHTML = '<span style="font-weight:600;color:#a06010">Profiel ' + filled + '/5 compleet</span>'
+        + '<span style="color:#6b7280;font-size:.82rem"> — vul nog in: ' + missing.join(', ') + '</span>';
+    }
+  }
+
+  document.getElementById('company-view-form').style.display    = 'none';
+  document.getElementById('company-view-profiel').style.display = 'block';
+}
+
+function toonBedrijfFormulier() {
+  document.getElementById('company-view-form').style.display    = 'block';
+  document.getElementById('company-view-profiel').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+// ── Profile completeness indicator ───────────────────────────────────────────
+function updateProfileCompleteness() {
+  const fields = [
+    { id: 'p-naam',    label: 'bedrijfsnaam' },
+    { id: 'p-sector',  label: 'sector' },
+    { id: 'p-size',    label: 'bedrijfsgrootte' },
+    { id: 'p-website', label: 'website' },
+    { id: 'p-desc',    label: 'beschrijving' },
+  ];
+  const missing = fields.filter(f => {
+    const el = document.getElementById(f.id);
+    return !el || !el.value.trim();
+  }).map(f => f.label);
+  const filled   = fields.length - missing.length;
+  const hint     = document.getElementById('profileCompleteHint');
+  if (!hint) return;
+  if (missing.length === 0) {
+    hint.style.display = 'none';
+    return;
+  }
+  hint.style.display = 'block';
+  hint.innerHTML = `Profiel <strong>${filled}/${fields.length}</strong> compleet — vul <em>${missing.join(', ')}</em> in voor een hogere Trust Score.`;
+}
+
+// ── Save profile ──
+async function saveProfile() {
+  if (!currentUser) { notify('Niet ingelogd'); return; }
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true; btn.textContent = 'Opslaan…';
+
+  const { error } = await db.from('company_profiles').upsert({
+    profile_id:   currentUser.id,
+    bedrijfsnaam: document.getElementById('p-naam').value.trim() || null,
+    sector:       document.getElementById('p-sector').value.trim() || null,
+    size:         document.getElementById('p-size').value.trim() || null,
+    website:      document.getElementById('p-website').value.trim() || null,
+    beschrijving: document.getElementById('p-desc').value.trim() || null,
+  }, { onConflict: 'profile_id' });
+
+  btn.disabled = false; btn.textContent = 'Profiel opslaan →';
+  if (error) { notify('Fout: ' + error.message); return; }
+  notify('✓ Profiel opgeslagen');
+  toonBedrijfOverzicht({
+    bedrijfsnaam: document.getElementById('p-naam').value.trim()    || null,
+    sector:       document.getElementById('p-sector').value.trim()  || null,
+    size:         document.getElementById('p-size').value.trim()    || null,
+    website:      document.getElementById('p-website').value.trim() || null,
+    beschrijving: document.getElementById('p-desc').value.trim()    || null,
+  });
+  sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
+  herberekeningTrustScore(currentUser.id);
+}
+
+// ── Flag review ──────────────────────────────────────────────────────────────
+async function flagReview(reviewId) {
+  const reason = prompt('Reden voor melding (verplicht):');
+  if (!reason || !reason.trim()) return;
+  const { error } = await db.from('reviews').update({
+    flagged:    true,
+    flag_reason: reason.trim(),
+    flagged_by: currentUser.id,
+    flagged_at: new Date().toISOString()
+  }).eq('id', reviewId);
+  if (error) { notify('Fout: ' + error.message); return; }
+  notify('Beoordeling gemeld — wordt beoordeeld door het Internly team');
+  loadReviews();
+}
+
+// ── Force Trust Score recalculation ──────────────────────────────────────────
+async function forceTrustRecalculate() {
+  if (!currentUser) return;
+  sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
+  document.getElementById('stat-trust').textContent = '…';
+  document.getElementById('stat-grade').textContent = 'berekenen…';
+  await herberekeningTrustScore(currentUser.id);
+  notify('Trust Score herberekend');
+}
+
+// ── Push prompt banner ────────────────────────────────────────────────────────
+function showPushPromptBanner() {
+  if (document.getElementById('push-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'push-banner';
+  banner.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#fff;border:1px solid var(--border2);border-radius:14px;padding:18px 20px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);font-size:.88rem;';
+  banner.innerHTML = `
+    <div style="font-weight:600;margin-bottom:6px;font-size:.95rem">Meldingen aanzetten?</div>
+    <div style="color:var(--ink3);margin-bottom:14px;line-height:1.5">Ontvang een melding zodra er een nieuwe match of reactie binnenkomt — ook als je dit tabblad sluit.</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="acceptPush()" style="flex:1;padding:8px;border-radius:8px;border:none;background:var(--orange);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem">Ja, aanzetten</button>
+      <button onclick="dismissPush()" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:none;cursor:pointer;font-size:.85rem;color:var(--ink3)">Nee, bedankt</button>
+    </div>`;
+  document.body.appendChild(banner);
+}
+
+async function acceptPush() {
+  localStorage.setItem('internly_push_asked', '1');
+  const banner = document.getElementById('push-banner');
+  if (banner) banner.remove();
+  if (currentUser) {
+    try { await registerPushNotifications(db, currentUser.id); } catch(_) {}
+  }
+}
+
+function dismissPush() {
+  localStorage.setItem('internly_push_asked', '1');
+  const banner = document.getElementById('push-banner');
+  if (banner) banner.remove();
+}
+
+// ── Notify ──
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  // Rolcheck — alleen bedrijf-gebruikers mogen dit dashboard zien
+  const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const userRole = roleRow?.role;
+  if (userRole && userRole !== 'bedrijf') {
+    const routes = { student: 'discover.html', school: 'school-dashboard.html' };
+    window.location.href = routes[userRole] || 'auth.html';
+    return;
+  }
+
+  await loadUser();
+  await loadPostings();
+
+  const { data: cp } = await db.from('company_profiles')
+    .select('*')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+  if (cp) {
+    if (cp.trust_score !== null) updateTrustDisplay(cp.trust_score, cp.trust_grade);
+    // Pre-populate profile form fields
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+    set('p-naam',    cp.bedrijfsnaam);
+    set('p-sector',  cp.sector);
+    set('p-size',    cp.size);
+    set('p-website', cp.website);
+    set('p-desc',    cp.beschrijving);
+    toonBedrijfOverzicht(cp);
+  }
+
+  loadUnreadBadge(user.id);
+  herberekeningTrustScore(user.id);
+
+  if (!localStorage.getItem('internly_push_asked') && 'Notification' in window) {
+    showPushPromptBanner();
+  }
+
+  await loadNotifications();
+  startNotifSubscription();
+});
+
+async function loadUnreadBadge(userId) {
+  try {
+    const { data: matchRows } = await db
+      .from('matches')
+      .select('id')
+      .eq('party_b', userId)
+      .in('status', ['accepted', 'active']);
+    const matchIds = (matchRows || []).map(m => m.id);
+    if (matchIds.length === 0) return;
+
+    const { data: convRows } = await db
+      .from('conversations')
+      .select('id')
+      .in('match_id', matchIds);
+    const convIds = (convRows || []).map(c => c.id);
+    if (convIds.length === 0) return;
+
+    const { data: unread } = await db
+      .from('messages')
+      .select('id')
+      .in('conversation_id', convIds)
+      .neq('sender_id', userId)
+      .eq('read', false);
+
+    const count = (unread || []).length;
+    const badge = document.getElementById('badge-unread');
+    if (badge && count > 0) {
+      badge.textContent = count > 9 ? '9+' : count;
+      badge.style.display = 'inline';
+    }
+  } catch(e) {
+    console.error('loadUnreadBadge fout:', e);
+  }
+}
+
+window.addEventListener('beforeunload', () => {
+  if (notifSubscription) notifSubscription.unsubscribe();
+});
+</script>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

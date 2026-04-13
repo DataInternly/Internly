@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f3ef;
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column;
+      /* iOS Safari fallback, then dvh for modern browsers */
+      height: 100vh;
+      height: -webkit-fill-available;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      padding: 0 24px; height: 56px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: #FF7E42; }
+    .back-btn {
+      background: rgba(255,255,255,.15); border: none; color: #fff;
+      padding: 5px 12px; border-radius: 20px; font-family: 'Outfit', sans-serif;
+      font-size: .82rem; font-weight: 500; cursor: pointer;
+      transition: background .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+      min-height: 44px;
+    }
+    .back-btn:hover { background: rgba(255,255,255,.25); }
+    .topbar-match-info { flex: 1; min-width: 0; }
+    .topbar-match-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 700; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .topbar-match-sub { font-size: .78rem; color: rgba(255,255,255,.65); }
+
+    /* ── Chat layout ── */
+    .chat-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      max-width: 720px; width: 100%; margin: 0 auto;
+      overflow: hidden;
+      /* Safe area inset for iPhone notch */
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ── Messages area ── */
+    .messages-area {
+      flex: 1; overflow-y: auto; padding: 20px 16px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .messages-area::-webkit-scrollbar { width: 5px; }
+    .messages-area::-webkit-scrollbar-thumb { background: #c9e8d5; border-radius: 3px; }
+    .messages-area::-webkit-scrollbar-track { background: transparent; }
+
+    /* Day separator */
+    .day-sep {
+      text-align: center; font-size: .73rem; color: #9ca3af;
+      margin: 6px 0; position: relative;
+    }
+    .day-sep::before, .day-sep::after {
+      content: ''; position: absolute; top: 50%;
+      width: calc(50% - 50px); height: 1px; background: #f0f0ee;
+    }
+    .day-sep::before { left: 0; }
+    .day-sep::after  { right: 0; }
+
+    /* Message bubbles */
+    .msg-row {
+      display: flex; align-items: flex-end; gap: 8px;
+    }
+    .msg-row.own  { justify-content: flex-end; }
+    .msg-row.other { justify-content: flex-start; }
+
+    .msg-avatar {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: #e8f5ee; color: #1a7a48;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: .68rem; font-weight: 700;
+    }
+    .msg-row.own .msg-avatar { display: none; }
+
+    .bubble-wrap { max-width: 72%; display: flex; flex-direction: column; }
+    .msg-row.own  .bubble-wrap { align-items: flex-end; }
+    .msg-row.other .bubble-wrap { align-items: flex-start; }
+
+    .bubble {
+      padding: 10px 14px; border-radius: 16px; font-size: .9rem; line-height: 1.5;
+      word-break: break-word; white-space: pre-wrap;
+    }
+    .msg-row.own   .bubble { background: #1a7a48; color: #fff; border-bottom-right-radius: 4px; }
+    .msg-row.other .bubble { background: #fff; color: #0d1520; border: 1px solid #f0f0ee; border-bottom-left-radius: 4px; }
+
+    .msg-time {
+      font-size: .7rem; color: #9ca3af; margin-top: 3px; padding: 0 2px;
+    }
+
+    /* ── Input bar ── */
+    .input-bar {
+      background: #fff; border-top: 1px solid #e2e8f0;
+      padding: 12px 16px; flex-shrink: 0;
+      display: flex; align-items: flex-end; gap: 10px;
+    }
+    .msg-textarea {
+      flex: 1; resize: none; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 10px 14px; font-family: 'Outfit', sans-serif;
+      font-size: 16px; /* prevents iOS zoom */
+      color: #0d1520; line-height: 1.45; max-height: 120px; overflow-y: auto;
+      outline: none; transition: border-color .15s;
+    }
+    .msg-textarea:focus { border-color: #1a7a48; }
+    .send-btn {
+      background: #1a7a48; color: #fff; border: none;
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.1rem;
+      transition: background .15s, transform .1s;
+    }
+    .send-btn:hover { background: #0f5c36; }
+    .send-btn:active { transform: scale(.94); }
+    .send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+
+    /* ── Empty / Loading ── */
+    .chat-empty {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px; color: #9ca3af; font-size: .9rem;
+      text-align: center; padding: 40px 20px;
+    }
+    .chat-empty .icon { font-size: 2.5rem; }
+
+    /* ── Notif ── */
+    .notif {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 10px 20px;
+      border-radius: 10px; font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.2); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="matches.html" class="back-btn">← Terug</a>
+  <div class="topbar-match-info">
+    <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
+    <div class="topbar-match-sub" id="topbarMatchSub"></div>
+  </div>
+  <div class="lang-switcher" style="margin-left:auto;flex-shrink:0">
+    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+  </div>
+</div>
+
+<!-- CHAT WRAP -->
+<div class="chat-wrap" id="chatWrap">
+
+  <div class="messages-area" id="messagesArea">
+    <div class="chat-empty">
+      <span class="icon">⏳</span>
+      Berichten laden…
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <textarea
+      class="msg-textarea"
+      id="msgInput"
+      placeholder="Typ een bericht… (Enter om te verzenden, Shift+Enter voor nieuwe regel)"
+      rows="1"
+    ></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Versturen">➤</button>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser    = null;
+  let convId         = null;
+  let matchId        = null;
+  let realtimeSub    = null;
+  let otherPartyId   = null;  // used for notification trigger
+  let otherPartyName = 'Gesprekspartner';
+
+  // ── Notification helper ───────────────────────────────────────────────────
+
+  async function createNotification(userId, type, refId, refType, message) {
+    if (!userId) return;
+    try {
+      await db.from('notifications').insert({
+        user_id:  userId,
+        type,
+        ref_id:   refId   || null,
+        ref_type: refType || null,
+        message,
+        read:     false,
+      });
+    } catch(e) {
+      console.warn('createNotification fout (non-blocking):', e);
+    }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function formatTime(iso) {
+    return new Date(iso).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function formatDay(iso) {
+    const d = new Date(iso);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'Vandaag';
+    if (d.toDateString() === yesterday.toDateString()) return 'Gisteren';
+    return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function notify(msg) {
+    const el = document.getElementById('notif');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  // ── Auto-resize textarea ──────────────────────────────────────────────────
+
+  const msgInput = document.getElementById('msgInput');
+  msgInput.addEventListener('input', () => {
+    msgInput.style.height = 'auto';
+    msgInput.style.height = Math.min(msgInput.scrollHeight, 120) + 'px';
+  });
+  msgInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // ── iOS keyboard: resize chat-wrap to keep input visible ─────────────────
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      const chatWrap = document.getElementById('chatWrap');
+      if (chatWrap) {
+        const availableHeight = window.visualViewport.height - 56; // minus topbar
+        chatWrap.style.height = availableHeight + 'px';
+      }
+      // Scroll to bottom so latest message stays visible
+      const area = document.getElementById('messagesArea');
+      if (area) area.scrollTop = area.scrollHeight;
+    });
+  }
+
+  // ── Render messages ───────────────────────────────────────────────────────
+
+  function renderMessages(messages) {
+    const area = document.getElementById('messagesArea');
+
+    if (!messages || messages.length === 0) {
+      area.innerHTML = `
+        <div class="chat-empty">
+          <span class="icon">💬</span>
+          Nog geen berichten. Stuur een bericht om het gesprek te starten!
+        </div>`;
+      return;
+    }
+
+    let html = '';
+    let lastDay = '';
+
+    messages.forEach(msg => {
+      const day = formatDay(msg.created_at);
+      if (day !== lastDay) {
+        html += `<div class="day-sep">${escapeHtml(day)}</div>`;
+        lastDay = day;
+      }
+
+      const isOwn     = msg.sender_id === currentUser?.id;
+      const rowClass  = isOwn ? 'own' : 'other';
+      const senderInit = escapeHtml((msg._senderName || 'X').slice(0, 2).toUpperCase());
+      const text      = escapeHtml(msg.content || '');
+      const time      = escapeHtml(formatTime(msg.created_at));
+
+      html += `
+        <div class="msg-row ${rowClass}">
+          ${!isOwn ? `<div class="msg-avatar">${senderInit}</div>` : ''}
+          <div class="bubble-wrap">
+            <div class="bubble">${text}</div>
+            <span class="msg-time">${time}</span>
+          </div>
+        </div>`;
+    });
+
+    area.innerHTML = html;
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function appendMessage(msg) {
+    const area = document.getElementById('messagesArea');
+    const empty = area.querySelector('.chat-empty');
+    if (empty) empty.remove();
+
+    const isOwn    = msg.sender_id === currentUser?.id;
+    const rowClass = isOwn ? 'own' : 'other';
+    const senderInit = escapeHtml((msg._senderName || 'X').slice(0, 2).toUpperCase());
+    const text     = escapeHtml(msg.content || '');
+    const time     = escapeHtml(formatTime(msg.created_at));
+
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + rowClass;
+    row.innerHTML = `
+      ${!isOwn ? `<div class="msg-avatar">${senderInit}</div>` : ''}
+      <div class="bubble-wrap">
+        <div class="bubble">${text}</div>
+        <span class="msg-time">${time}</span>
+      </div>`;
+    area.appendChild(row);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  // ── Load ──────────────────────────────────────────────────────────────────
+
+  async function loadConversation(mId) {
+    const { data: match } = await db
+      .from('matches')
+      .select('id, party_a, party_b, status, internship_postings(title, company_name)')
+      .eq('id', mId)
+      .single();
+
+    if (!match) {
+      document.getElementById('messagesArea').innerHTML = `
+        <div class="chat-empty">
+          <span class="icon">⚠️</span>Match niet gevonden.
+        </div>`;
+      return;
+    }
+
+    if (match.party_a !== currentUser.id && match.party_b !== currentUser.id) {
+      document.getElementById('messagesArea').innerHTML = `
+        <div class="chat-empty">
+          <span class="icon">🔒</span>Je hebt geen toegang tot dit gesprek.
+        </div>`;
+      return;
+    }
+
+    const posting = match.internship_postings || {};
+    document.getElementById('topbarMatchName').textContent = posting.title || 'Chat';
+    document.getElementById('topbarMatchSub').textContent  = posting.company_name || '';
+
+    // Resolve other party
+    otherPartyId = match.party_a === currentUser.id ? match.party_b : match.party_a;
+    if (otherPartyId) {
+      const { data: profile } = await db
+        .from('profiles')
+        .select('naam, name, email')
+        .eq('id', otherPartyId)
+        .maybeSingle();
+      if (profile) {
+        otherPartyName = profile.naam || profile.name || profile.email?.split('@')[0] || 'Gesprekspartner';
+      }
+    }
+
+    // Load or create conversation
+    let { data: conv } = await db
+      .from('conversations')
+      .select('id')
+      .eq('match_id', mId)
+      .maybeSingle();
+
+    if (!conv) {
+      const { data: newConv } = await db
+        .from('conversations')
+        .insert({ match_id: mId })
+        .select('id')
+        .single();
+      conv = newConv;
+    }
+
+    if (!conv) {
+      document.getElementById('messagesArea').innerHTML = `
+        <div class="chat-empty"><span class="icon">⚠️</span>Gesprek kon niet worden geladen.</div>`;
+      return;
+    }
+
+    convId = conv.id;
+    await loadMessages();
+    subscribeRealtime();
+    markMessagesRead();
+  }
+
+  async function loadMessages() {
+    if (!convId) return;
+    const { data: messages, error } = await db
+      .from('messages')
+      .select('id, sender_id, content, created_at, read')
+      .eq('conversation_id', convId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Berichten laden fout:', error);
+      return;
+    }
+    const annotated = (messages || []).map(m => ({
+      ...m,
+      _senderName: m.sender_id === currentUser?.id
+        ? (currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jij')
+        : otherPartyName,
+    }));
+    renderMessages(annotated);
+  }
+
+  async function markMessagesRead() {
+    if (!convId || !currentUser) return;
+    await db.from('messages')
+      .update({ read: true })
+      .eq('conversation_id', convId)
+      .neq('sender_id', currentUser.id)
+      .eq('read', false);
+  }
+
+  // ── Realtime ──────────────────────────────────────────────────────────────
+
+  function subscribeRealtime() {
+    if (realtimeSub) realtimeSub.unsubscribe();
+    realtimeSub = db
+      .channel('messages-' + convId)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
+        payload => {
+          const msg = { ...payload.new, _senderName: otherPartyName };
+          if (msg.sender_id !== currentUser?.id) {
+            appendMessage(msg);
+            markMessagesRead();
+          }
+        }
+      )
+      .subscribe();
+  }
+
+  // ── Send ──────────────────────────────────────────────────────────────────
+
+  async function sendMessage() {
+    if (!convId || !currentUser) return;
+    const input = document.getElementById('msgInput');
+    const content = input.value.trim();
+    if (!content) return;
+
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    input.value = '';
+    input.style.height = 'auto';
+
+    const myName = currentUser.user_metadata?.naam
+      || currentUser.user_metadata?.name
+      || currentUser.email?.split('@')[0]
+      || 'Gebruiker';
+
+    // Optimistic append
+    const optimistic = {
+      id:              'opt-' + Date.now(),
+      sender_id:       currentUser.id,
+      _senderName:     myName,
+      content,
+      created_at:      new Date().toISOString(),
+      conversation_id: convId,
+    };
+    appendMessage(optimistic);
+
+    const { error } = await db.from('messages').insert({
+      conversation_id: convId,
+      sender_id:       currentUser.id,
+      content,
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      notify('Fout bij verzenden: ' + error.message);
+      console.error('Send error:', error);
+      return;
+    }
+
+    // Notify recipient (fire-and-forget)
+    if (otherPartyId) {
+      createNotification(
+        otherPartyId,
+        'new_message',
+        convId,
+        'conversation',
+        myName + ' heeft je een bericht gestuurd'
+      );
+    }
+  }
+
+  // ── All-conversations view ────────────────────────────────────────────────
+
+  async function loadAllConversations(userId) {
+    const main = document.getElementById('messagesArea');
+    if (main) main.innerHTML = '<div class="chat-empty"><span class="icon">⏳</span>Gesprekken laden…</div>';
+
+    const { data, error } = await db
+      .from('conversations')
+      .select(`
+        id,
+        created_at,
+        match_id,
+        matches (
+          id, party_a, party_b, type, status, posting_id,
+          internship_postings ( title, company_name )
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      showEmptyState();
+      return;
+    }
+
+    const mine = data.filter(c =>
+      c.matches &&
+      (c.matches.party_a === userId || c.matches.party_b === userId)
+    );
+
+    if (mine.length === 0) {
+      showEmptyState();
+      return;
+    }
+
+    renderConversationList(mine, userId);
+  }
+
+  function showEmptyState() {
+    const main = document.getElementById('messagesArea');
+    if (!main) return;
+    main.innerHTML = `
+      <div style="
+        display:flex; flex-direction:column; align-items:center;
+        justify-content:center; height:100%; padding:48px 24px;
+        text-align:center;
+      ">
+        <div style="font-size:3rem; margin-bottom:16px;">💬</div>
+        <div style="
+          font-family:'Bricolage Grotesque',sans-serif;
+          font-size:1.2rem; font-weight:700;
+          color:#0d1520; margin-bottom:8px;
+        ">Nog geen gesprekken</div>
+        <div style="
+          font-size:.9rem; color:#6b7280;
+          max-width:300px; line-height:1.6; margin-bottom:24px;
+        ">
+          Chat is beschikbaar zodra je een match hebt gemaakt.
+          Ga naar Matches om te beginnen.
+        </div>
+        <a href="matches.html" style="
+          background:#FF7E42; color:#fff; text-decoration:none;
+          padding:11px 28px; border-radius:50px;
+          font-family:'Outfit',sans-serif; font-size:.9rem; font-weight:700;
+        ">Ga naar Matches →</a>
+      </div>
+    `;
+  }
+
+  async function renderConversationList(conversations, userId) {
+    const main = document.getElementById('messagesArea');
+    if (!main) return;
+
+    const items = await Promise.all(conversations.map(async (conv) => {
+      const match = conv.matches;
+      const otherPartyId = match.party_a === userId ? match.party_b : match.party_a;
+
+      const { data: profile } = await db
+        .from('profiles')
+        .select('naam, role')
+        .eq('id', otherPartyId)
+        .single();
+
+      const { data: lastMsg } = await db
+        .from('messages')
+        .select('content, created_at, read, sender_id')
+        .eq('conversation_id', conv.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      const unread = lastMsg && !lastMsg.read && lastMsg.sender_id !== userId ? 1 : 0;
+
+      return { conv, profile, lastMsg, unread };
+    }));
+
+    const naam = (n) => (n || '?').replace(/'/g, "\\'");
+
+    main.innerHTML = `
+      <div style="padding:16px;">
+        <div style="
+          font-family:'Bricolage Grotesque',sans-serif;
+          font-size:1.1rem; font-weight:700;
+          color:#0d1520; margin-bottom:16px;
+        ">Gesprekken</div>
+        ${items.map(({ conv, profile, lastMsg, unread }) => `
+          <div onclick="window.location.href='chat.html?match=${conv.match_id}'"
+            style="
+              background:#fff; border:1.5px solid ${unread ? '#1a7a48' : '#f0f0ee'};
+              border-radius:12px; padding:14px 16px; margin-bottom:10px;
+              cursor:pointer; display:flex; align-items:center; gap:12px;
+              transition:border-color .15s, box-shadow .15s;
+              min-height:44px;
+            "
+            onmouseover="this.style.boxShadow='0 2px 12px rgba(0,0,0,.08)'"
+            onmouseout="this.style.boxShadow='none'">
+            <div style="
+              width:42px; height:42px; border-radius:50%;
+              background:${unread ? '#e8f5ee' : '#f4f3ef'};
+              display:flex; align-items:center; justify-content:center;
+              font-family:'Bricolage Grotesque',sans-serif;
+              font-size:.9rem; font-weight:700;
+              color:${unread ? '#1a7a48' : '#6b7280'};
+              flex-shrink:0;
+            ">
+              ${(profile?.naam || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2)}
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="
+                font-weight:600; font-size:.92rem; color:#0d1520;
+                white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+              ">${escapeHtml(profile?.naam || 'Onbekend')}</div>
+              <div style="
+                font-size:.8rem; color:#6b7280;
+                white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+              ">${lastMsg ? escapeHtml(lastMsg.content.slice(0, 50)) + (lastMsg.content.length > 50 ? '…' : '') : 'Nog geen berichten'}</div>
+            </div>
+            ${unread ? `<div style="
+              width:10px; height:10px; border-radius:50%;
+              background:#1a7a48; flex-shrink:0;
+            "></div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { window.location.href = 'auth.html'; return; }
+    currentUser = user;
+
+    const params = new URLSearchParams(window.location.search);
+    matchId = params.get('match');
+
+    if (matchId) {
+      await loadConversation(matchId);
+    } else {
+      // List view — hide the input bar, update topbar title
+      const inputBar = document.querySelector('.input-bar');
+      if (inputBar) inputBar.style.display = 'none';
+      document.getElementById('topbarMatchName').textContent = 'Berichten';
+      document.getElementById('topbarMatchSub').textContent  = '';
+      await loadAllConversations(user.id);
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    if (realtimeSub) realtimeSub.unsubscribe();
+  });
+</script>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

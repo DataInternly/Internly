@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --orange:      #FF7E42;
+      --orange-dark: #e05c1a;
+      --orange-bg:   #fdf0e8;
+      --ink:         #0d1520;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
+      --ink4:        #9ca3af;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #f0f0ee;
+      --border2:     #e2e8f0;
+      --red:         #b82020;
+      --red-bg:      #fdeaea;
+      --green:       #1a7a48;
+      --green-bg:    #e8f5ee;
+      --r:           16px;
+      --r-sm:        8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--ink);
+      height: 56px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .admin-pill {
+      background: var(--orange);
+      color: #fff;
+      font-size: .72rem; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .topbar-link {
+      color: rgba(255,255,255,.6); text-decoration: none;
+      font-size: .85rem; font-weight: 500; cursor: pointer;
+      background: none; border: none;
+    }
+    .topbar-link:hover { color: #fff; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 220px;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar-inner { padding: 20px 12px; }
+    .nav-btn {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%; padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: .88rem;
+      color: var(--ink2); text-align: left;
+      transition: background .12s; margin-bottom: 2px;
+    }
+    .nav-btn:hover { background: var(--bg); }
+    .nav-btn.active { background: var(--orange-bg); color: var(--orange-dark); font-weight: 600; }
+
+    /* ── CONTENT ── */
+    .content {
+      flex: 1; padding: 32px 36px; overflow-y: auto;
+    }
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;
+    }
+    .page-sub { color: var(--ink3); font-size: .9rem; margin-bottom: 28px; }
+
+    /* ── SCREEN ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── STAT GRID ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 20px; text-align: center;
+    }
+    .stat-label { font-size: .75rem; font-weight: 600; color: var(--ink4); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+    .stat-val { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; }
+    .stat-note { font-size: .75rem; color: var(--ink3); margin-top: 4px; }
+
+    /* ── SEC TITLE ── */
+    .sec-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; margin-top: 28px;
+    }
+    .sec-title:first-child { margin-top: 0; }
+
+    /* ── TABLE ── */
+    .admin-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--white); border-radius: var(--r);
+      overflow: hidden; border: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .admin-table th {
+      background: var(--bg); text-align: left;
+      padding: 10px 14px; font-size: .72rem;
+      font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--ink4);
+      border-bottom: 1px solid var(--border);
+    }
+    .admin-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: var(--bg); }
+
+    /* ── BUTTONS ── */
+    .btn-sm {
+      padding: 5px 12px; border-radius: 6px; font-size: .8rem;
+      font-family: 'Outfit', sans-serif; font-weight: 600;
+      cursor: pointer; border: none; transition: background .12s;
+    }
+    .btn-red    { background: var(--red-bg); color: var(--red); }
+    .btn-red:hover { background: #f8c5c5; }
+    .btn-green  { background: var(--green-bg); color: var(--green); }
+    .btn-green:hover { background: #c5e8d4; }
+    .btn-orange { background: var(--orange); color: #fff; }
+    .btn-orange:hover { background: var(--orange-dark); }
+
+    /* ── FLAG BADGE ── */
+    .flag-badge {
+      display: inline-block; font-size: .7rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+      background: var(--red-bg); color: var(--red);
+    }
+
+    /* ── REVIEW CARD ── */
+    .review-flag-card {
+      background: var(--white);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 16px 18px; margin-bottom: 12px;
+    }
+    .review-flag-card .rfc-head {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;
+    }
+    .rfc-meta { flex: 1; font-size: .85rem; color: var(--ink3); line-height: 1.6; }
+    .rfc-meta strong { color: var(--ink); }
+    .rfc-body { font-size: .9rem; color: var(--ink2); background: var(--bg); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+    .rfc-reason { font-size: .82rem; color: var(--red); margin-bottom: 12px; }
+    .rfc-actions { display: flex; gap: 8px; }
+
+    /* ── TRUST OVERRIDE ── */
+    .trust-row input[type=number] {
+      width: 70px; padding: 5px 8px; border: 1px solid var(--border2);
+      border-radius: 6px; font-size: .85rem; font-family: 'Outfit', sans-serif;
+    }
+
+    /* ── EMPTY ── */
+    .empty {
+      text-align: center; padding: 40px 20px;
+      color: var(--ink3); font-size: .9rem;
+    }
+    .empty-icon { display: block; font-size: 2rem; margin-bottom: 10px; }
+
+    /* ── NOTIF TOAST ── */
+    #notif {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--ink); color: #fff;
+      padding: 10px 20px; border-radius: 30px; font-size: .88rem;
+      opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 999;
+    }
+    #notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">Intern<span>ly</span></a>
+  <div class="topbar-right">
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <span class="admin-pill">Admin</span>
+    <button class="topbar-link" onclick="doSignOut()">Uitloggen</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sidebar-inner">
+      <button class="nav-btn active" data-screen="stats"    onclick="show('stats')">📊 Platform stats</button>
+      <button class="nav-btn"        data-screen="flagged"  onclick="show('flagged')">⚑ Gemelde reviews</button>
+      <button class="nav-btn"        data-screen="trust"    onclick="show('trust')">⭐ Trust overrides</button>
+      <button class="nav-btn"        data-screen="waitlist" onclick="show('waitlist')">📋 Waitlist</button>
+    </div>
+  </nav>
+
+  <!-- ── CONTENT ── -->
+  <main class="content">
+
+    <!-- ── STATS ── -->
+    <div class="screen active" id="screen-stats">
+      <div class="page-title">Platform stats</div>
+      <p class="page-sub">Live tellingen — ververst bij elke paginaopening.</p>
+      <div class="stat-grid" id="stats-grid">
+        <div class="stat-card"><div class="stat-label">Studenten</div><div class="stat-val" id="s-students">—</div></div>
+        <div class="stat-card"><div class="stat-label">Bedrijven</div><div class="stat-val" id="s-companies">—</div></div>
+        <div class="stat-card"><div class="stat-label">Scholen</div><div class="stat-val" id="s-schools">—</div></div>
+        <div class="stat-card"><div class="stat-label">Vacatures actief</div><div class="stat-val" id="s-postings">—</div></div>
+        <div class="stat-card"><div class="stat-label">Sollicitaties</div><div class="stat-val" id="s-applications">—</div></div>
+        <div class="stat-card"><div class="stat-label">Matches</div><div class="stat-val" id="s-matches">—</div></div>
+        <div class="stat-card"><div class="stat-label">Berichten</div><div class="stat-val" id="s-messages">—</div></div>
+        <div class="stat-card"><div class="stat-label">Waitlist</div><div class="stat-val" id="s-waitlist">—</div></div>
+        <div class="stat-card"><div class="stat-label">Reviews</div><div class="stat-val" id="s-reviews">—</div></div>
+        <div class="stat-card"><div class="stat-label">Gemelde reviews</div><div class="stat-val" id="s-flagged">—</div></div>
+      </div>
+    </div>
+
+    <!-- ── FLAGGED REVIEWS ── -->
+    <div class="screen" id="screen-flagged">
+      <div class="page-title">Gemelde beoordelingen</div>
+      <p class="page-sub">Reviews die door gebruikers zijn gemeld. Verwijder of markeer als veilig.</p>
+      <div id="flagged-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
+    </div>
+
+    <!-- ── TRUST OVERRIDES ── -->
+    <div class="screen" id="screen-trust">
+      <div class="page-title">Trust Score overrides</div>
+      <p class="page-sub">Handmatige overschrijving van de berekende Trust Score per bedrijf.</p>
+      <div id="trust-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
+    </div>
+
+    <!-- ── WAITLIST ── -->
+    <div class="screen" id="screen-waitlist">
+      <div class="page-title">Waitlist</div>
+      <p class="page-sub">Alle inschrijvingen via de homepage.</p>
+      <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <button class="btn-sm btn-orange" onclick="exportWaitlistCSV()">CSV exporteren</button>
+        <span id="waitlist-count" style="font-size:.85rem;color:var(--ink3)"></span>
+      </div>
+      <div id="waitlist-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
+    </div>
+
+  </main>
+</div>
+
+<div id="notif"></div>
+
+<script>
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ── Auth guard: admin only ────────────────────────────────────────────────
+  const ADMIN_EMAIL = 'hallo@internly.pro';
+
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function notify(msg) {
+    const el = document.getElementById('notif');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  // ── Screen navigation ─────────────────────────────────────────────────────
+  function show(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const screen = document.getElementById('screen-' + name);
+    if (screen) screen.classList.add('active');
+    const btn = document.querySelector(`[data-screen="${name}"]`);
+    if (btn) btn.classList.add('active');
+
+    if (name === 'flagged')  loadFlaggedReviews();
+    if (name === 'trust')    loadTrustOverrides();
+    if (name === 'waitlist') loadWaitlist();
+  }
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+  async function doSignOut() {
+    await db.auth.signOut();
+    window.location.href = 'auth.html';
+  }
+
+  // ── Platform stats ────────────────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const [
+        { count: students },
+        { count: companies },
+        { count: schools },
+        { count: postings },
+        { count: applications },
+        { count: matches },
+        { count: messages },
+        { count: waitlist },
+        { count: reviews },
+        { count: flagged },
+      ] = await Promise.all([
+        db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+        db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'bedrijf'),
+        db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'school'),
+        db.from('internship_postings').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+        db.from('applications').select('*', { count: 'exact', head: true }),
+        db.from('matches').select('*', { count: 'exact', head: true }),
+        db.from('messages').select('*', { count: 'exact', head: true }),
+        db.from('waitlist').select('*', { count: 'exact', head: true }),
+        db.from('reviews').select('*', { count: 'exact', head: true }),
+        db.from('reviews').select('*', { count: 'exact', head: true }).eq('flagged', true),
+      ]);
+
+      document.getElementById('s-students').textContent     = students ?? '?';
+      document.getElementById('s-companies').textContent    = companies ?? '?';
+      document.getElementById('s-schools').textContent      = schools ?? '?';
+      document.getElementById('s-postings').textContent     = postings ?? '?';
+      document.getElementById('s-applications').textContent = applications ?? '?';
+      document.getElementById('s-matches').textContent      = matches ?? '?';
+      document.getElementById('s-messages').textContent     = messages ?? '?';
+      document.getElementById('s-waitlist').textContent     = waitlist ?? '?';
+      document.getElementById('s-reviews').textContent      = reviews ?? '?';
+      document.getElementById('s-flagged').textContent      = flagged ?? '?';
+    } catch(e) {
+      console.error('loadStats fout:', e);
+    }
+  }
+
+  // ── Flagged reviews ───────────────────────────────────────────────────────
+  async function loadFlaggedReviews() {
+    const el = document.getElementById('flagged-list');
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+    try {
+      const { data: rows, error } = await db
+        .from('reviews')
+        .select('id, rating, body, created_at, flag_reason, flagged_at, reviewer_id, reviewee_id')
+        .eq('flagged', true)
+        .order('flagged_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (!rows || rows.length === 0) {
+        el.innerHTML = `<div class="empty"><span class="empty-icon">✅</span>Geen gemelde reviews.</div>`;
+        return;
+      }
+
+      // Batch fetch reviewer + reviewee names
+      const allIds = [...new Set([...rows.map(r => r.reviewer_id), ...rows.map(r => r.reviewee_id)].filter(Boolean))];
+      const nameMap = {};
+      if (allIds.length > 0) {
+        const { data: profiles } = await db.from('profiles').select('id, naam, name, email').in('id', allIds);
+        (profiles || []).forEach(p => {
+          nameMap[p.id] = p.naam || p.name || p.email?.split('@')[0] || p.id.slice(0, 8);
+        });
+      }
+
+      el.innerHTML = rows.map(r => {
+        const reviewerName = escapeHtml(nameMap[r.reviewer_id] || 'Onbekend');
+        const revieweeName = escapeHtml(nameMap[r.reviewee_id] || 'Onbekend');
+        const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString('nl-NL') : '?';
+        const flagDate = r.flagged_at ? new Date(r.flagged_at).toLocaleDateString('nl-NL') : '?';
+        const stars = [1,2,3,4,5].map(i => `<span style="color:${i <= r.rating ? '#f59e0b' : '#d1d5db'}">★</span>`).join('');
+        return `
+          <div class="review-flag-card">
+            <div class="rfc-head">
+              <div class="rfc-meta">
+                <strong>${reviewerName}</strong> over <strong>${revieweeName}</strong>
+                &nbsp;${stars}&nbsp; — <span style="font-size:.8rem">${dateStr}</span>
+              </div>
+              <span class="flag-badge">⚑ gemeld ${flagDate}</span>
+            </div>
+            ${r.body ? `<div class="rfc-body">${escapeHtml(r.body)}</div>` : ''}
+            ${r.flag_reason ? `<div class="rfc-reason">Meldreden: ${escapeHtml(r.flag_reason)}</div>` : ''}
+            <div class="rfc-actions">
+              <button class="btn-sm btn-red"   onclick="deleteReview('${r.id}')">Verwijderen</button>
+              <button class="btn-sm btn-green" onclick="markSafe('${r.id}')">Markeer als veilig</button>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch(e) {
+      console.error('loadFlaggedReviews fout:', e);
+      el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  async function deleteReview(reviewId) {
+    if (!confirm('Weet je zeker dat je deze review wilt verwijderen? Dit is onomkeerbaar.')) return;
+    const { error } = await db.from('reviews').delete().eq('id', reviewId);
+    if (error) { notify('Fout: ' + error.message); return; }
+    notify('Review verwijderd');
+    loadFlaggedReviews();
+    loadStats();
+  }
+
+  async function markSafe(reviewId) {
+    const { error } = await db.from('reviews').update({
+      flagged:    false,
+      flag_reason: null,
+      flagged_by: null,
+      flagged_at: null,
+    }).eq('id', reviewId);
+    if (error) { notify('Fout: ' + error.message); return; }
+    notify('Review gemarkeerd als veilig');
+    loadFlaggedReviews();
+    loadStats();
+  }
+
+  // ── Trust Score overrides ─────────────────────────────────────────────────
+  async function loadTrustOverrides() {
+    const el = document.getElementById('trust-list');
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+    try {
+      const { data: rows, error } = await db
+        .from('company_profiles')
+        .select('profile_id, bedrijfsnaam, trust_score, trust_grade')
+        .order('trust_score', { ascending: false, nullsFirst: false });
+
+      if (error) throw error;
+
+      if (!rows || rows.length === 0) {
+        el.innerHTML = `<div class="empty"><span class="empty-icon">🏢</span>Geen bedrijfsprofielen gevonden.</div>`;
+        return;
+      }
+
+      const table = `
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Bedrijf</th>
+              <th>Huidige score</th>
+              <th>Graad</th>
+              <th>Nieuwe score (0–100)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr class="trust-row" data-id="${r.profile_id}">
+                <td>${escapeHtml(r.bedrijfsnaam || '—')}</td>
+                <td>${r.trust_score !== null ? r.trust_score : '—'}</td>
+                <td>${r.trust_grade ? `<strong>${escapeHtml(r.trust_grade)}</strong>` : '—'}</td>
+                <td><input type="number" id="ts-${r.profile_id}" min="0" max="100" placeholder="${r.trust_score ?? ''}" value="${r.trust_score ?? ''}"></td>
+                <td><button class="btn-sm btn-orange" onclick="saveTrustOverride('${r.profile_id}')">Opslaan</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+
+      el.innerHTML = table;
+
+    } catch(e) {
+      console.error('loadTrustOverrides fout:', e);
+      el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  async function saveTrustOverride(profileId) {
+    const input = document.getElementById('ts-' + profileId);
+    const val = parseInt(input?.value, 10);
+    if (isNaN(val) || val < 0 || val > 100) { notify('Voer een getal in tussen 0 en 100'); return; }
+    const grade = val >= 80 ? 'A' : val >= 50 ? 'B' : 'C';
+    const { error } = await db.from('company_profiles')
+      .update({ trust_score: val, trust_grade: grade })
+      .eq('profile_id', profileId);
+    if (error) { notify('Fout: ' + error.message); return; }
+    // Also update postings
+    await db.from('internship_postings')
+      .update({ trust_score: val, trust_grade: grade })
+      .eq('created_by', profileId);
+    notify(`Trust Score opgeslagen: ${val} (${grade})`);
+    loadTrustOverrides();
+  }
+
+  // ── Waitlist ──────────────────────────────────────────────────────────────
+  async function loadWaitlist() {
+    const el = document.getElementById('waitlist-list');
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+    try {
+      const { data: rows, error } = await db
+        .from('waitlist')
+        .select('id, email, naam, rol, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const count = (rows || []).length;
+      const countEl = document.getElementById('waitlist-count');
+      if (countEl) countEl.textContent = `${count} inschrijving${count !== 1 ? 'en' : ''}`;
+
+      if (!rows || rows.length === 0) {
+        el.innerHTML = `<div class="empty"><span class="empty-icon">📋</span>Waitlist is leeg.</div>`;
+        return;
+      }
+
+      el.innerHTML = `
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>Naam</th>
+              <th>Rol</th>
+              <th>Ingeschreven</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td><a href="mailto:${escapeHtml(r.email)}" style="color:var(--ink);text-decoration:none">${escapeHtml(r.email)}</a></td>
+                <td>${escapeHtml(r.naam || '—')}</td>
+                <td>${escapeHtml(r.rol || '—')}</td>
+                <td style="color:var(--ink3);font-size:.82rem">${r.created_at ? new Date(r.created_at).toLocaleDateString('nl-NL') : '?'}</td>
+                <td>
+                  <button class="btn-sm btn-green" onclick="copyEmail('${escapeHtml(r.email)}')" title="Email kopiëren">📋</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+
+    } catch(e) {
+      console.error('loadWaitlist fout:', e);
+      el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  function copyEmail(email) {
+    navigator.clipboard.writeText(email).then(() => notify('Email gekopieerd: ' + email)).catch(() => notify('Kopiëren mislukt'));
+  }
+
+  async function exportWaitlistCSV() {
+    try {
+      const { data: rows, error } = await db
+        .from('waitlist')
+        .select('email, naam, rol, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      if (!rows || rows.length === 0) { notify('Waitlist is leeg'); return; }
+
+      const header = 'email,naam,rol,datum';
+      const lines = rows.map(r =>
+        [r.email, r.naam || '', r.rol || '', r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : '']
+          .map(v => `"${String(v).replace(/"/g, '""')}"`)
+          .join(',')
+      );
+      const csv = [header, ...lines].join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `internly-waitlist-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      notify(`${rows.length} rijen geëxporteerd`);
+    } catch(e) {
+      notify('Export mislukt: ' + e.message);
+    }
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', async () => {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user || user.email !== ADMIN_EMAIL) {
+      window.location.href = 'auth.html';
+      return;
+    }
+    loadStats();
+  });
+</script>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

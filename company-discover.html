@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Zoek stagiairs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background: #f4f3ef; }
+
+    .topbar {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      padding: 0 32px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar .logo span { color: #FF7E42; }
+    .topbar .nav { display: flex; gap: 24px; }
+    .topbar .nav a {
+      color: rgba(255,255,255,.7); text-decoration: none;
+      font-size: .95rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; }
+    .topbar .role-badge {
+      background: rgba(255,255,255,.15);
+      color: rgba(255,255,255,.9);
+      font-size: .78rem; font-weight: 500;
+      padding: 4px 12px; border-radius: 20px;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 2rem; font-weight: 700; color: #0d1520; margin-bottom: 6px;
+    }
+    .page-sub { color: #6b7280; font-size: 1rem; margin-bottom: 28px; }
+
+    .filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      align-items: center; margin-bottom: 28px;
+    }
+    .search-bar {
+      flex: 1; min-width: 240px; padding: 11px 18px;
+      border: 1.5px solid #e2e8f0; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .95rem;
+      outline: none; background: #fff; transition: border-color .15s;
+    }
+    .search-bar:focus { border-color: #1a7a48; }
+    .filters select {
+      padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem;
+      background: #fff; cursor: pointer; outline: none; color: #374151;
+    }
+    .filters select:focus { border-color: #1a7a48; }
+    .filters button {
+      padding: 10px 24px; background: #1a7a48; color: #fff; border: none;
+      border-radius: 50px; font-family: 'Outfit', sans-serif;
+      font-size: .9rem; font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .filters button:hover { background: #0f5c36; }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .student-card {
+      background: #fff; border-radius: 16px; padding: 24px;
+      border: 1.5px solid #f0f0ee;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      transition: transform .2s, box-shadow .2s;
+      display: flex; flex-direction: column;
+    }
+    .student-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.09);
+    }
+
+    .card-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 10px; margin-bottom: 12px;
+    }
+    .avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .card-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 600; color: #0d1520; margin-bottom: 2px;
+    }
+    .card-meta { font-size: .82rem; color: #6b7280; }
+
+    .avail-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .73rem; font-weight: 600;
+      padding: 4px 10px; border-radius: 50px;
+      background: #e8f5ee; color: #1a7a48; white-space: nowrap; flex-shrink: 0;
+    }
+
+    .card-section { margin-bottom: 12px; }
+    .cs-label {
+      font-size: .7rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: #9ca3af; margin-bottom: 5px;
+    }
+    .cs-text { font-size: .88rem; color: #374151; line-height: 1.55; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      background: #f0f0ee; color: #6b7280;
+      padding: 3px 9px; border-radius: 50px; font-size: .75rem;
+    }
+    .tag.domain {
+      background: #fdf0e8; color: #FF7E42;
+    }
+
+    .onderzoek-box {
+      background: #f8fdf9; border: 1px solid #c9e8d5;
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
+    }
+    .ob-label {
+      font-size: .7rem; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: #1a7a48; margin-bottom: 5px;
+    }
+    .ob-vraag {
+      font-size: .88rem; color: #0d1520; line-height: 1.5;
+      font-style: italic;
+    }
+    .ob-meta {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+    }
+    .ob-tag {
+      font-size: .72rem; font-weight: 500;
+      padding: 3px 8px; border-radius: 20px;
+      background: #e8f5ee; color: #1a7a48;
+    }
+
+    .card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 14px; border-top: 1px solid #f0f0ee; margin-top: auto;
+    }
+    .duur-text { font-size: .82rem; color: #6b7280; }
+
+    .btn-contact {
+      background: #FF7E42; color: #fff; border: none;
+      padding: 8px 18px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-weight: 600;
+      font-size: .83rem; cursor: pointer; transition: background .15s;
+    }
+    .btn-contact:hover { background: #e05c1a; }
+
+    .state-box {
+      grid-column: 1 / -1; text-align: center;
+      padding: 60px 20px; color: #6b7280;
+      font-size: .95rem; line-height: 1.9;
+    }
+    .state-icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
+    .state-box.error { color: #b82020; }
+    .state-box code {
+      display: inline-block; background: #fdeaea; color: #b82020;
+      padding: 5px 12px; border-radius: 6px; font-size: .8rem;
+    }
+
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 12px 24px;
+      border-radius: 12px; font-size: .9rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+
+    .topbar-user {
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500;
+    }
+    .topbar-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,.2); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .btn-topbar-logout {
+      background: none; border: 1px solid rgba(255,255,255,.3);
+      color: rgba(255,255,255,.7); padding: 5px 12px; border-radius: 20px;
+      font-family: 'Outfit', sans-serif; font-size: .8rem; cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-topbar-logout:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .results-count { font-size: .85rem; color: #9ca3af; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+
+<div class="topbar">
+  <a href="index.html" class="logo">intern<span>ly</span></a>
+  <nav class="nav">
+    <a href="company-dashboard.html">Dashboard</a>
+    <a href="company-discover.html" class="active">Stagiairs zoeken</a>
+  </nav>
+  <div class="lang-switcher">
+    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+  </div>
+  <div id="topbarAuth" style="display:flex;align-items:center;gap:10px">
+    <span class="role-badge">🏢 Bedrijf</span>
+    <a href="auth.html" style="color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;font-weight:500;">Inloggen</a>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Zoek een stagiair</h1>
+  <p class="page-sub">Studenten die zichzelf hebben aangemeld — inclusief hun opdracht en onderzoeksvraag</p>
+
+  <div class="filters">
+    <input type="text" id="searchInput" class="search-bar"
+      placeholder="Zoek op naam, skill, opleiding of onderzoeksvraag…"
+      oninput="filterCards()">
+
+    <select id="domeinFilter" onchange="filterCards()">
+      <option value="">Alle domeinen</option>
+      <option>Marketing & Communicatie</option>
+      <option>Software & Development</option>
+      <option>Data & Analytics</option>
+      <option>Design & UX</option>
+      <option>Finance & Economie</option>
+      <option>Duurzaamheid & ESG</option>
+      <option>HR & Organisatie</option>
+      <option>Zorg & Welzijn</option>
+      <option>Techniek & Engineering</option>
+    </select>
+
+    <select id="duurFilter" onchange="filterCards()">
+      <option value="">Alle duren</option>
+      <option value="4 maanden">4 maanden</option>
+      <option value="5 maanden">5 maanden</option>
+      <option value="6 maanden">6 maanden</option>
+    </select>
+
+    <select id="methodeFilter" onchange="filterCards()">
+      <option value="">Alle methoden</option>
+      <option>Kwalitatief</option>
+      <option>Kwantitatief</option>
+      <option>Mixed methods</option>
+      <option>Ontwerpgericht</option>
+    </select>
+
+    <button onclick="filterCards()">Filter toepassen</button>
+  </div>
+
+  <div class="results-count" id="resultsCount"></div>
+  <div id="studentsContainer" class="cards-container"></div>
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function initials(naam) {
+  return naam.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function formatDate(d) {
+  if (!d) return 'Flexibel';
+  return new Date(d).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderCard(s) {
+  const skills  = Array.isArray(s.skills) ? s.skills : [];
+  const eNaam   = escapeHtml(s.naam            || '');
+  const eOpl    = escapeHtml(s.opleiding       || '');
+  const eSchool = escapeHtml(s.school          || '');
+  const eJaar   = escapeHtml(String(s.jaar     ?? ''));
+  const eDomein = escapeHtml(s.opdracht_domein || '');
+  const eAard   = escapeHtml(s.opdracht_aard   || '');
+  const eMeth   = escapeHtml(s.methode_type    || '');
+  const eVraag  = escapeHtml(s.onderzoeksvraag || '');
+  const eVType  = escapeHtml(s.onderzoeksvraag_type || '');
+  const eRes    = escapeHtml(s.resultaat_type  || '');
+  const eMot    = escapeHtml(s.motivatie       || '');
+  const eDuur   = escapeHtml(s.duur            || '');
+  return `
+    <div class="student-card"
+      data-naam="${eNaam.toLowerCase()}"
+      data-opleiding="${eOpl.toLowerCase()}"
+      data-skills="${escapeHtml(skills.join(' ').toLowerCase())}"
+      data-domein="${eDomein.toLowerCase()}"
+      data-duur="${eDuur}"
+      data-methode="${eMeth.toLowerCase()}"
+      data-vraag="${eVraag.toLowerCase()}"
+      data-motivatie="${eMot.toLowerCase()}">
+
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar">${escapeHtml(initials(s.naam||'?'))}</div>
+          <div>
+            <div class="card-name">${eNaam}</div>
+            <div class="card-meta">${eOpl} · ${eSchool} · Jaar ${eJaar}</div>
+          </div>
+        </div>
+        <span class="avail-badge">📅 ${formatDate(s.beschikbaar_vanaf)}</span>
+      </div>
+
+      ${s.opdracht_domein ? `
+        <div style="margin-bottom:10px">
+          <span class="tag domain">${eDomein}</span>
+          ${s.opdracht_aard ? `<span class="tag" style="background:#f0f4ff;color:#1756a8">${eAard}</span>` : ''}
+          ${s.methode_type ? `<span class="tag">${eMeth}</span>` : ''}
+        </div>` : ''}
+
+      ${s.onderzoeksvraag ? `
+        <div class="onderzoek-box">
+          <div class="ob-label">Onderzoeksvraag</div>
+          <div class="ob-vraag">"${eVraag}"</div>
+          <div class="ob-meta">
+            ${s.onderzoeksvraag_type ? `<span class="ob-tag">${eVType}</span>` : ''}
+            ${s.resultaat_type ? `<span class="ob-tag">${eRes}</span>` : ''}
+          </div>
+        </div>` : ''}
+
+      ${s.motivatie ? `
+        <div class="card-section">
+          <div class="cs-label">Motivatie</div>
+          <div class="cs-text">${eMot}</div>
+        </div>` : ''}
+
+      ${skills.length > 0 ? `
+        <div class="card-section">
+          <div class="cs-label">Skills</div>
+          <div class="tags">${skills.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>
+        </div>` : ''}
+
+      <div class="card-footer">
+        <span class="duur-text">⏱ ${eDuur || '—'}</span>
+        <button class="btn-contact" data-naam="${eNaam}">Neem contact op</button>
+      </div>
+    </div>`;
+}
+
+async function loadStudents() {
+  const container = document.getElementById('studentsContainer');
+  container.innerHTML = `<div class="state-box"><span class="state-icon">⏳</span>Studenten laden…</div>`;
+
+  const { data, error } = await db
+    .from('student_profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Fout bij laden.<br><code>${escapeHtml(error.message)}</code></div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = `
+      <div class="state-box">
+        <span class="state-icon">📭</span>
+        Nog geen studentprofielen beschikbaar.<br>
+        <small>Studenten vullen hun profiel in via <strong>student-profile.html</strong>.</small>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = data.map(renderCard).join('');
+  container.querySelectorAll('.btn-contact').forEach(btn => {
+    btn.addEventListener('click', () => contact(btn.dataset.naam));
+  });
+  document.getElementById('resultsCount').textContent = `${data.length} student${data.length !== 1 ? 'en' : ''} gevonden`;
+}
+
+function filterCards() {
+  const q       = document.getElementById('searchInput').value.toLowerCase().trim();
+  const domein  = document.getElementById('domeinFilter').value.toLowerCase();
+  const duur    = document.getElementById('duurFilter').value;
+  const methode = document.getElementById('methodeFilter').value.toLowerCase();
+
+  let visible = 0;
+  document.querySelectorAll('.student-card').forEach(card => {
+    const hit =
+      (!q       || [card.dataset.naam, card.dataset.opleiding, card.dataset.skills, card.dataset.vraag, card.dataset.motivatie].some(v => v.includes(q))) &&
+      (!domein  || card.dataset.domein.includes(domein)) &&
+      (!duur    || card.dataset.duur === duur) &&
+      (!methode || card.dataset.methode.includes(methode));
+    card.style.display = hit ? '' : 'none';
+    if (hit) visible++;
+  });
+
+  let noResult = document.getElementById('no-results');
+  if (visible === 0 && document.querySelectorAll('.student-card').length > 0) {
+    if (!noResult) {
+      noResult = document.createElement('div');
+      noResult.id = 'no-results';
+      noResult.className = 'state-box';
+      noResult.innerHTML = '<span class="state-icon">🔎</span>Geen studenten gevonden voor deze filters.';
+      document.getElementById('studentsContainer').appendChild(noResult);
+    }
+  } else if (noResult) {
+    noResult.remove();
+  }
+}
+
+function contact(naam) {
+  notify(`Contactverzoek verstuurd naar ${naam}`);
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+async function signOut() {
+  try {
+    await db.auth.signOut();
+  } catch(e) {
+    console.error('Logout error:', e);
+  } finally {
+    sessionStorage.removeItem('internly_role');
+    window.location.href = 'auth.html';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  // Rolcheck — alleen bedrijf-gebruikers mogen studentprofielen doorzoeken
+  const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const userRole = roleRow?.role;
+  if (userRole && userRole !== 'bedrijf') {
+    const routes = { student: 'discover.html', school: 'school-dashboard.html' };
+    window.location.href = routes[userRole] || 'auth.html';
+    return;
+  }
+
+  const authEl = document.getElementById('topbarAuth');
+  const email = user.email || '';
+  const name = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+  const initials2 = name.slice(0, 2).toUpperCase();
+  authEl.innerHTML = `
+    <span class="role-badge">🏢 Bedrijf</span>
+    <div class="topbar-user">
+      <div class="topbar-avatar">${escapeHtml(initials2)}</div>
+      <span>${escapeHtml(name)}</span>
+      <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
+    </div>`;
+
+  loadStudents();
+});
+</script>
+
+  <!-- Google Translate Widget -->
+  <div id="google_translate_element" style="display:none"></div>
+  <script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

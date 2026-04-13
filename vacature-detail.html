@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vacaturedetail — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root {
+      --green:      #1a7a48;
+      --green-dark: #0f5c36;
+      --green-bg:   #e8f5ee;
+      --orange:     #FF7E42;
+      --orange-dark:#e05c1a;
+      --orange-bg:  #fdf0e8;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --white:      #ffffff;
+      --border:     #f0f0ee;
+      --border2:    #e2e8f0;
+      --red:        #b82020;
+      --red-bg:     #fdeaea;
+      --amber:      #a06010;
+      --amber-bg:   #fdf3e0;
+      --r:          16px;
+      --r-sm:       8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    :focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      padding: 0 32px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .logo span { color: var(--orange); }
+    .topbar-nav { display: flex; gap: 20px; align-items: center; }
+    .topbar-nav a {
+      color: rgba(255,255,255,.75); text-decoration: none;
+      font-size: .9rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar-nav a:hover { color: #fff; }
+
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 760px; margin: 0 auto;
+      padding: 44px 24px 80px;
+    }
+
+    /* ── BACK LINK ── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--ink3); text-decoration: none; font-size: .88rem;
+      margin-bottom: 24px; transition: color .15s;
+    }
+    .back-link:hover { color: var(--ink); }
+
+    /* ── CARD ── */
+    .detail-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:520px) { .detail-card { padding: 20px 18px; } }
+
+    /* ── SECTION HEADING ── */
+    .sec-head {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .78rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: 14px;
+    }
+
+    /* ── HEADER ── */
+    .vac-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 14px; margin-bottom: 8px;
+    }
+    .vac-company {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: 2px;
+    }
+    .vac-sector { font-size: .84rem; color: var(--ink3); }
+    .vac-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.55rem; font-weight: 700; color: var(--ink);
+      line-height: 1.25; margin: 14px 0 12px;
+    }
+    .vac-desc {
+      color: var(--ink2); line-height: 1.7; font-size: .95rem;
+      margin-bottom: 20px;
+    }
+
+    /* ── META ROW ── */
+    .meta-row {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;
+    }
+    .meta-chip {
+      background: var(--bg); color: var(--ink2);
+      padding: 5px 12px; border-radius: 20px; font-size: .82rem;
+    }
+    .meta-chip.green { background: var(--green-bg); color: var(--green); font-weight: 600; }
+
+    /* ── TAGS ── */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+    .tag {
+      background: #f0f0ee; color: var(--ink3);
+      padding: 4px 10px; border-radius: 20px; font-size: .76rem;
+    }
+    .tag-posting {
+      background: var(--orange-bg); color: var(--orange);
+      font-weight: 600;
+    }
+
+    /* ── TRUST BADGE ── */
+    .trust-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .75rem; font-weight: 700; padding: 5px 12px;
+      border-radius: 50px; white-space: nowrap; flex-shrink: 0;
+    }
+    .trust-a { background: var(--green-bg); color: var(--green); }
+    .trust-b { background: var(--amber-bg); color: var(--amber); }
+    .trust-c { background: var(--red-bg);   color: var(--red); }
+
+    /* ── TRUST DETAIL ── */
+    .trust-detail {
+      display: flex; align-items: flex-start; gap: 16px; margin-top: 14px;
+    }
+    .trust-score-big {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 3rem; font-weight: 700; line-height: 1; flex-shrink: 0;
+      width: 64px; text-align: center;
+    }
+    .trust-score-big.grade-a { color: var(--green); }
+    .trust-score-big.grade-b { color: var(--amber); }
+    .trust-score-big.grade-c { color: var(--red); }
+    .trust-explain-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 5px;
+    }
+    .trust-explain-body { font-size: .88rem; color: var(--ink2); line-height: 1.65; }
+    .trust-grades {
+      display: flex; flex-direction: column; gap: 8px; margin-top: 18px;
+    }
+    .trust-grade-row {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 10px 14px; border-radius: var(--r-sm);
+      font-size: .88rem; line-height: 1.5;
+    }
+    .trust-grade-row .grade-letter {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 700; flex-shrink: 0; width: 18px;
+    }
+    .tgr-a { background: var(--green-bg); color: var(--ink); }
+    .tgr-a .grade-letter { color: var(--green); }
+    .tgr-b { background: var(--amber-bg); color: var(--ink); }
+    .tgr-b .grade-letter { color: var(--amber); }
+    .tgr-c { background: var(--red-bg);   color: var(--ink); }
+    .tgr-c .grade-letter { color: var(--red); }
+
+    /* ── TIPS ── */
+    .tips-list { list-style: none; margin-top: 6px; }
+    .tips-list li {
+      display: flex; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+      font-size: .9rem; color: var(--ink2); line-height: 1.6;
+    }
+    .tips-list li:last-child { border-bottom: none; }
+    .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── SAVE BUTTON ── */
+    .btn-save {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--ink); color: #fff; border: none;
+      padding: 14px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-save:hover { background: var(--ink2); }
+    .btn-save:disabled {
+      background: var(--green-bg); color: var(--green);
+      cursor: default;
+    }
+    .btn-row {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    }
+    .btn-back-detail {
+      background: transparent; border: 1.5px solid var(--border2);
+      color: var(--ink2); padding: 13px 24px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .92rem; font-weight: 500;
+      cursor: pointer; transition: all .12s; text-decoration: none;
+    }
+    .btn-back-detail:hover { border-color: var(--ink3); }
+
+    /* ── LOADING / ERROR ── */
+    .state-box {
+      text-align: center; padding: 64px 20px;
+      color: var(--ink3); font-size: .95rem; line-height: 2;
+    }
+    .state-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+    .state-box.error { color: var(--red); }
+
+    /* ── NOTIF ── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff; padding: 12px 24px;
+      border-radius: 12px; font-size: .9rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<div class="topbar">
+  <a href="index.html" class="logo">intern<span>ly</span></a>
+  <nav class="topbar-nav">
+    <a href="discover.html">← Vacatures</a>
+    <a href="matches.html">Matches</a>
+    <a href="mijn-sollicitaties.html">Mijn Stages</a>
+    <a href="student-profile.html">Mijn profiel</a>
+    <a href="chat.html">💬 Berichten</a>
+  </nav>
+  <div class="lang-switcher">
+    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+  </div>
+</div>
+
+<div class="container">
+  <a href="discover.html" class="back-link">← Alle vacatures</a>
+  <div id="content">
+    <div class="state-box"><span class="state-icon">⏳</span>Vacature laden…</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Sector tips ──
+const SECTOR_TIPS = {
+  'engineering': [
+    { icon: '✍️', text: 'Schrijf jezelf aan met een concreet technisch vraagstuk dat jij wilt oplossen. Wees specifiek over welke technologieën je beheerst en welke je wilt leren.' },
+    { icon: '🔩', text: 'Bedrijven in Engineering zoeken stagiairs die analytisch denken, nauwkeurig werken en zelfstandig problemen kunnen structureren. Noem voorbeelden van projecten waar je dit hebt gedaan.' },
+    { icon: '📄', text: 'Stem je motivatiebrief af op het type engineering (civiel, mechatronica, software). Verwijs naar een specifiek project of product van het bedrijf om te laten zien dat je hebt ingelezen.' },
+  ],
+  'high-tech': [
+    { icon: '✍️', text: 'Benadruk in je aanschrijving aantoonbare technische vaardigheden: programmeerervaring, hardware-kennis of R&D-ervaring. Voeg een link toe naar je GitHub of portfolio.' },
+    { icon: '🔬', text: 'High-Tech bedrijven waarderen nieuwsgierigheid en het vermogen om snel te leren. Noem een recente technologische ontwikkeling in de sector die jou heeft aangesproken.' },
+    { icon: '📄', text: 'Houd je motivatiebrief helder en direct. Focus op wat jij technisch bijdraagt aan hun product of onderzoek — niet op algemene motivatie.' },
+  ],
+  'it': [
+    { icon: '✍️', text: 'Vermeld je technische stack duidelijk en link naar relevante projecten of repositories. Specifieke ervaring weegt zwaarder dan algemene interesse.' },
+    { icon: '💻', text: 'IT-bedrijven zoeken stagiairs die zelfstandig werken, snel debuggen en gewend zijn aan agile/scrum methodes. Benoem dit als je er ervaring mee hebt.' },
+    { icon: '📄', text: 'Pas je brief aan op het type IT-bedrijf: product, consultancy of in-house. Laat zien dat je de context begrijpt waarin je gaat werken.' },
+  ],
+  'data': [
+    { icon: '✍️', text: 'Schrijf jezelf aan met een concreet data-vraagstuk: welke analyse wil je uitvoeren en welke tools gebruik je? Benoem Python, SQL, R of BI-tools die je beheerst.' },
+    { icon: '📊', text: 'Data-bedrijven zoeken studenten die kritisch denken over data-kwaliteit en conclusies kunnen vertalen naar zakelijke inzichten. Beschrijf hoe je dat aanpakt.' },
+    { icon: '📄', text: 'Voeg in je brief een kort voorbeeld toe van een dataset die je hebt geanalyseerd of een dashboard dat je hebt gebouwd. Concrete output maakt het verschil.' },
+  ],
+  'finance': [
+    { icon: '✍️', text: 'Benadruk analytische vaardigheden, Excel/Power BI-kennis en interesse in financiële markten. Vermeld relevante vakken zoals Financieel Management of Beleggingsleer.' },
+    { icon: '📈', text: 'Finance-bedrijven zoeken nauwkeurige, detailgerichte stagiairs die snel grote hoeveelheden data kunnen verwerken en duidelijk kunnen rapporteren.' },
+    { icon: '📄', text: 'Schrijf een formele, gestructureerde motivatiebrief zonder spelling- of stijlfouten. In Finance is precisie een signaal van karakter. Vermeld je GPA of relevante cijfers.' },
+  ],
+  'duurzaamheid': [
+    { icon: '✍️', text: 'Laat in je aanschrijving zien dat je oprecht gedreven bent door impact — niet alleen door het woord duurzaamheid. Benoem specifieke thema\'s: circulaire economie, CO₂-reductie, biodiversiteit.' },
+    { icon: '🌱', text: 'Duurzaamheidsbedrijven zoeken stagiairs die systemisch kunnen denken, verbanden leggen tussen beleid en praktijk, en kunnen omgaan met complexe stakeholderbelangen.' },
+    { icon: '📄', text: 'Koppel je motivatiebrief aan de duurzaamheidsdoelen van het bedrijf (SDGs, CSRD-rapportage, B Corp). Lees hun duurzaamheidsverslag en verwijs er concreet naar.' },
+  ],
+  'marketing': [
+    { icon: '✍️', text: 'Laat in je aanschrijving zien dat je zelf een sterk persoonlijk merk hebt of hebt opgebouwd. Link naar eigen content, campagnes of een portfolio.' },
+    { icon: '📣', text: 'Marketing-bedrijven zoeken stagiairs met creativiteit én analytisch inzicht. Laat zien dat je niet alleen ideeën hebt, maar ook meet of ze werken.' },
+    { icon: '📄', text: 'Schrijf je motivatiebrief met hetzelfde gevoel voor toon en doelgroep dat je in je marketingwerk toepast. Maak het memorabel zonder generiek te klinken.' },
+  ],
+  'design': [
+    { icon: '✍️', text: 'Stuur altijd een portfolio mee, zelfs als er niet om gevraagd wordt. Zorg dat het werk spreekt voordat je jezelf aanschrijft — een goede eerste indruk is hier alles.' },
+    { icon: '🎨', text: 'Design-studios zoeken stagiairs die hun creatieve keuzes kunnen uitleggen en openstaan voor feedback. Toon in je brief dat je procesgedreven werkt, niet alleen resultaatgericht.' },
+    { icon: '📄', text: 'Laat je motivatiebrief qua typografie, witruimte en opmaak zien wie je bent als designer. Sla de standaard template over en maak iets dat past bij de studio\'s identiteit.' },
+  ],
+  'hospitality': [
+    { icon: '✍️', text: 'Benadruk gastvrijheid, klantgerichtheid en flexibiliteit. Vertel in je aanschrijving over situaties waar je onder druk uitstekend hebt gepresteerd voor gasten of klanten.' },
+    { icon: '🏨', text: 'Hospitality-bedrijven zoeken stagiairs met een positieve uitstraling, teamgeest en bereidheid om onregelmatige uren te draaien. Wees hierover open en realistisch.' },
+    { icon: '📄', text: 'Schrijf een warme, persoonlijke motivatiebrief — maar houd hem professioneel. Laat zien dat je het bedrijf kent door een concrete gast- of klantervaring te noemen.' },
+  ],
+  'hr': [
+    { icon: '✍️', text: 'Schrijf jezelf aan door te laten zien dat je mensen begrijpt: empathisch, discreet en tegelijk resultaatgericht. Noem ervaringen met groepen, coaching of conflictbemiddeling.' },
+    { icon: '🤝', text: 'HR-afdelingen zoeken stagiairs die betrouwbaar zijn met vertrouwelijke informatie en snel kunnen schakelen tussen administratieve taken en mensgerichte gesprekken.' },
+    { icon: '📄', text: 'Zorg dat je brief foutloos is — in HR is je communicatie je visitekaartje. Gebruik een heldere, empathische toon en focus op wat je wilt leren over people management.' },
+  ],
+  'gezondheid': [
+    { icon: '✍️', text: 'Benadruk je interesse in het snijvlak van zorg en jouw studierichting. Wees concreet over welk type organisatie je zoekt: kliniek, GGZ, e-health, of preventie.' },
+    { icon: '🏥', text: 'Zorginstellingen zoeken stagiairs die kunnen omgaan met gevoelige situaties, protocol-gedreven werken én menselijkheid behouden. Noem ethische dilemma\'s die je hebt doorgedacht.' },
+    { icon: '📄', text: 'Schrijf een rustige, serieuze brief zonder hypes of marketingtaal. Verwijzen naar specifieke zorgvraagstukken (bijv. digitalisering van dossiers, preventie in de wijk) geeft je een voorsprong.' },
+  ],
+  'dieren': [
+    { icon: '✍️', text: 'Vertel in je aanschrijving over directe ervaring met dieren — vrijwilligerswerk, eigen huisdieren of opleiding. Passie is hier even belangrijk als kennis.' },
+    { icon: '🐾', text: 'Organisaties in de diersector zoeken stagiairs die fysiek belastbaar zijn, zorgzaam en verantwoordelijk. Ze willen zien dat je begrijpt hoe zwaar het werk soms kan zijn.' },
+    { icon: '📄', text: 'Wees authentiek in je brief en vermijd clichés als "ik hou van dieren". Vertel een specifiek verhaal over een situatie met een dier die jouw keuze voor dit vakgebied versterkte.' },
+  ],
+  'niche': [
+    { icon: '✍️', text: 'Doe diepgaand onderzoek naar het bedrijf vóór je aanschrijft. Nichebedrijven merken direct of een kandidaat het vak écht begrijpt of generiek solliciteert.' },
+    { icon: '🔍', text: 'Laat zien dat je de specifieke context van de niche begrijpt: regelgeving, doelgroep, concurrentiepositie. Dit onderscheidt jou van brede kandidaten.' },
+    { icon: '📄', text: 'Schrijf een sterk gepersonaliseerde brief. In een nichemarkting zijn relaties en geloofwaardigheid alles — laat zien dat jij de cultuur al een beetje kent.' },
+  ],
+};
+
+const DEFAULT_TIPS = [
+  { icon: '✍️', text: 'Schrijf jezelf persoonlijk en concreet aan. Vertel welk specifiek vraagstuk je wilt aanpakken en waarom dit bedrijf daarvoor de beste plek is.' },
+  { icon: '🎯', text: 'Bedrijven zoeken stagiairs die initiatief tonen, zelfstandig werken en bereid zijn om buiten hun comfortzone te treden. Onderbouw dit met voorbeelden.' },
+  { icon: '📄', text: 'Pas je motivatiebrief aan per bedrijf. Een generieke brief wordt direct herkend. Verwijs naar een concreet project, product of waarde van de organisatie.' },
+];
+
+function getTips(sector) {
+  if (!sector) return DEFAULT_TIPS;
+  const key = sector.toLowerCase().trim();
+  for (const [k, tips] of Object.entries(SECTOR_TIPS)) {
+    if (key.includes(k)) return tips;
+  }
+  return DEFAULT_TIPS;
+}
+
+function trustLabel(grade) {
+  return {
+    A: 'Betrouwbaar — reageert snel en komt afspraken na',
+    B: 'Gemiddeld — redelijke ervaringen, let op verwachtingen',
+    C: 'Let op — trage respons of negatieve ervaringen gesignaleerd',
+  }[grade] || 'Geen Trust Score beschikbaar';
+}
+
+function trustTitle(grade) {
+  return { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '—';
+}
+
+function formatDate(d) {
+  if (!d) return 'Flexibel';
+  return new Date(d).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function isSaved(id, source) {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
+  catch(e) { saved = []; }
+  return saved.some(v => v.id === id && v.source === source);
+}
+
+function saveVacature(v, source) {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
+  catch(e) { saved = []; }
+  if (saved.some(s => s.id === v.id && s.source === source)) return;
+  saved.push({
+    id:           v.id,
+    title:        v.title,
+    company_name: v.company_name,
+    sector:       v.sector,
+    trust_grade:  v.trust_grade,
+    trust_score:  v.trust_score,
+    source,
+    saved_at:     new Date().toISOString(),
+  });
+  localStorage.setItem('internly_saved_vacatures', JSON.stringify(saved));
+}
+
+function render(v, source) {
+  const tags       = Array.isArray(v.tags) ? v.tags : [];
+  const gradeClass = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[v.trust_grade] || 'trust-b';
+  const gradeSize  = { A: 'grade-a', B: 'grade-b', C: 'grade-c' }[v.trust_grade] || 'grade-b';
+  const tgrClass   = { A: 'tgr-a',   B: 'tgr-b',   C: 'tgr-c'   }[v.trust_grade] || 'tgr-b';
+  const already    = isSaved(v.id, source);
+  const tips       = getTips(v.sector);
+
+  // Escape all user-supplied values before innerHTML injection
+  const eName     = escapeHtml(v.company_name || 'Bedrijf');
+  const eSector   = escapeHtml(v.sector || '');
+  const eTitle    = escapeHtml(v.title || 'Stageplaats');
+  const eDesc     = escapeHtml(v.description || '').replace(/\n/g, '<br>');
+  const eDuration = escapeHtml(v.duration || '—');
+  const eGrade    = escapeHtml(v.trust_grade || '—');
+  const eScore    = escapeHtml(String(v.trust_score ?? '—'));
+
+  document.title = `${v.title || 'Vacature'} — Internly`;
+
+  document.getElementById('content').innerHTML = `
+
+    <!-- ── SECTIE 1: Vacature info ── -->
+    <div class="detail-card">
+      <div class="sec-head">Vacature</div>
+      <div class="vac-header">
+        <div>
+          <div class="vac-company">${eName}</div>
+          <div class="vac-sector">${eSector}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          ${source === 'internship_postings' ? '<span style="font-size:.72rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 10px;border-radius:20px">🏢 Bedrijfsposting</span>' : ''}
+          <span class="trust-badge ${gradeClass}">${eGrade} · ${eScore} <span style="opacity:.65;font-weight:400">${trustTitle(v.trust_grade)}</span></span>
+        </div>
+      </div>
+
+      <h1 class="vac-title">${eTitle}</h1>
+      <p class="vac-desc">${eDesc}</p>
+
+      <div class="meta-row">
+        <span class="meta-chip">⏱ ${eDuration}</span>
+        <span class="meta-chip">📅 ${formatDate(v.start_date)}</span>
+        ${v.guarantee ? '<span class="meta-chip green">⚡ Responsgarantie</span>' : ''}
+      </div>
+
+      ${tags.length > 0 ? `
+        <div class="tag-row">
+          ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+        </div>` : ''}
+    </div>
+
+    <!-- ── SECTIE 2: Trust Score uitleg ── -->
+    <div class="detail-card">
+      <div class="sec-head">Trust Score uitleg</div>
+      <div class="trust-detail">
+        <div class="trust-score-big ${gradeSize}">${eGrade}</div>
+        <div>
+          <div class="trust-explain-title">${trustTitle(v.trust_grade)}</div>
+          <div class="trust-explain-body">${trustLabel(v.trust_grade)}</div>
+        </div>
+      </div>
+      <div class="trust-grades">
+        <div class="trust-grade-row tgr-a">
+          <span class="grade-letter">A</span>
+          <span><strong>Betrouwbaar</strong> — reageert snel, nakomt afspraken. Aanbevolen voor plaatsing.</span>
+        </div>
+        <div class="trust-grade-row tgr-b">
+          <span class="grade-letter">B</span>
+          <span><strong>Gemiddeld</strong> — redelijke ervaringen, let op verwachtingen en maak duidelijke afspraken.</span>
+        </div>
+        <div class="trust-grade-row tgr-c">
+          <span class="grade-letter">C</span>
+          <span><strong>Let op</strong> — trage respons of negatieve ervaringen gesignaleerd. Bespreek dit met je begeleider voor je solliciteert.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTIE 3: Tips ── -->
+    <div class="detail-card">
+      <div class="sec-head">Tips voor jou${v.sector ? ' — ' + eSector : ''}</div>
+      <ul class="tips-list">
+        ${tips.map(t => `<li><span class="tip-icon">${t.icon}</span><span>${t.text}</span></li>`).join('')}
+      </ul>
+    </div>
+
+    <!-- ── SECTIE 4: Opslaan ── -->
+    <div class="detail-card">
+      <div class="sec-head">Bewaar deze vacature</div>
+      <p style="font-size:.9rem;color:var(--ink3);margin-bottom:18px;line-height:1.6">
+        Sla de vacature op in je profiel zodat je hem later rustig kunt bekijken of vergelijken.
+      </p>
+      <div class="btn-row">
+        <button class="btn-save" id="saveBtn"
+          onclick="handleSave()"
+          ${already ? 'disabled' : ''}>
+          ${already ? '✓ Opgeslagen' : '🔖 Opslaan voor later'}
+        </button>
+        <a href="discover.html" class="btn-back-detail">← Terug naar overzicht</a>
+      </div>
+    </div>
+  `;
+
+  // Sla vacaturedata op voor de save-handler
+  window.__currentVacature = v;
+  window.__currentSource   = source;
+}
+
+async function handleSave() {
+  const v      = window.__currentVacature;
+  const source = window.__currentSource;
+  if (!v) return;
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled    = true;
+  btn.textContent = 'Bezig…';
+
+  // 1. Always write to localStorage
+  saveVacature(v, source);
+
+  try {
+    const { data: { user } } = await db.auth.getUser();
+
+    if (!user) {
+      // Not logged in — saved locally only
+      btn.textContent = '✓ Opgeslagen op dit apparaat';
+      notify('✓ Opgeslagen — log in om je sollicitatie in je profiel te bewaren');
+      return;
+    }
+
+    if (source === 'internships') {
+      // 2. Check for duplicate before inserting
+      const { data: existing } = await db
+        .from('applications')
+        .select('id')
+        .eq('student_id', user.id)
+        .eq('internship_id', v.id)
+        .maybeSingle();
+
+      if (!existing) {
+        const { error: appErr } = await db
+          .from('applications')
+          .insert({
+            internship_id: v.id,
+            student_id:    user.id,
+            status:        'pending',
+          });
+
+        if (appErr && appErr.code !== '23505') {
+          // Non-fatal — still saved to localStorage
+          console.error('Application insert fout:', appErr);
+        }
+      }
+      btn.textContent = '✓ Opgeslagen in profiel';
+      notify('✓ Sollicitatie opgeslagen — bekijk je voortgang bij Mijn Stages');
+    } else {
+      // internship_postings — no FK in applications, localStorage only
+      btn.textContent = '✓ Opgeslagen';
+      notify('✓ Vacature opgeslagen');
+    }
+  } catch(e) {
+    console.error('handleSave error:', e);
+    btn.textContent = '✓ Opgeslagen';
+    notify('✓ Vacature opgeslagen');
+  }
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const id     = params.get('id');
+  const source = params.get('source');
+
+  const validSources = ['internships', 'internship_postings'];
+  if (!id || !validSources.includes(source)) {
+    document.getElementById('content').innerHTML =
+      '<div class="state-box error"><span class="state-icon">⚠️</span>Ongeldige vacature-URL. <a href="discover.html" style="color:#1a7a48">Terug naar overzicht →</a></div>';
+    return;
+  }
+
+  let query = db.from(source).select('*').eq('id', id);
+  if (source === 'internship_postings') query = query.eq('status', 'active');
+
+  const { data, error } = await query.single();
+
+  if (error || !data) {
+    document.getElementById('content').innerHTML =
+      `<div class="state-box error"><span class="state-icon">⚠️</span>Vacature niet gevonden.<br><a href="discover.html" style="color:#1a7a48">Terug naar overzicht →</a></div>`;
+    return;
+  }
+
+  render(data, source);
+});
+</script>
+
+<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
+<div id="waitlist-overlay" style="
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:24px;">
+</div>
+
+<div id="waitlist-popup" style="
+  display:none; position:fixed; z-index:9999;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#fff; border-radius:20px;
+  width:100%; max-width:440px;
+  box-shadow:0 24px 60px rgba(0,0,0,.18);
+  overflow:hidden; font-family:'Outfit',sans-serif;">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#1a7a48,#0f5c36);padding:28px 32px 24px;position:relative;">
+    <button onclick="sluitPopup()" style="
+      position:absolute;top:14px;right:16px;
+      background:rgba(255,255,255,.15);border:none;
+      color:#fff;width:28px;height:28px;border-radius:50%;
+      font-size:1rem;cursor:pointer;line-height:1;
+      display:flex;align-items:center;justify-content:center;">×</button>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
+      intern<span style="color:#FF7E42;">ly</span>
+    </div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.65);">
+      Blijf op de hoogte van de ontwikkeling
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div style="padding:28px 32px 32px;">
+    <p style="font-size:.95rem;color:#374151;line-height:1.7;margin:0 0 8px;">
+      Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
+    </p>
+    <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
+      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
+    </p>
+
+    <div id="wl-form">
+      <input type="email" id="wl-email" placeholder="jouw@email.nl" style="
+        width:100%;padding:11px 16px;
+        border:1.5px solid #e2e8f0;border-radius:10px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;
+        color:#0d1520;outline:none;box-sizing:border-box;
+        transition:border-color .15s;margin-bottom:10px;"
+        onfocus="this.style.borderColor='#1a7a48'"
+        onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')schrijfIn()">
+      <button onclick="schrijfIn()" id="wl-btn" style="
+        width:100%;padding:12px;
+        background:#FF7E42;color:#fff;border:none;
+        border-radius:50px;font-family:'Outfit',sans-serif;
+        font-size:.95rem;font-weight:700;cursor:pointer;
+        transition:background .15s;">
+        Houd me op de hoogte →
+      </button>
+    </div>
+
+    <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
+      <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
+    </div>
+
+    <div id="wl-error" style="display:none;margin-top:8px;
+      background:#fdeaea;color:#b82020;border-radius:8px;
+      padding:8px 14px;font-size:.82rem;"></div>
+
+    <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
+      Door je in te schrijven ga je akkoord met ons privacybeleid.
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+
+  if (!localStorage.getItem('internly_waitlist_seen')) {
+    setTimeout(async function() {
+      const _client = (typeof db !== 'undefined') ? db
+        : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { session } } = await _client.auth.getSession();
+      if (!session) toonPopup();
+    }, 8000);
+  }
+
+  function toonPopup() {
+    document.getElementById('waitlist-overlay').style.display = 'flex';
+    document.getElementById('waitlist-popup').style.display  = 'block';
+    localStorage.setItem('internly_waitlist_seen', '1');
+  }
+
+  window.sluitPopup = function() {
+    document.getElementById('waitlist-overlay').style.display = 'none';
+    document.getElementById('waitlist-popup').style.display  = 'none';
+  };
+
+  document.getElementById('waitlist-overlay').addEventListener('click', sluitPopup);
+
+  window.schrijfIn = async function() {
+    const email = document.getElementById('wl-email').value.trim();
+    const btn   = document.getElementById('wl-btn');
+    const err   = document.getElementById('wl-error');
+
+    err.style.display = 'none';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent   = 'Voer een geldig e-mailadres in.';
+      err.style.display = 'block';
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Bezig…';
+
+    const client = (typeof db !== 'undefined') ? db
+      : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const { error } = await client
+      .from('waitlist')
+      .insert({ email, source: window.location.pathname });
+
+    btn.disabled    = false;
+    btn.textContent = 'Houd me op de hoogte →';
+
+    if (error) {
+      if (error.code === '23505') {
+        document.getElementById('wl-form').style.display    = 'none';
+        document.getElementById('wl-success').style.display = 'block';
+      } else {
+        err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
+        err.style.display = 'block';
+      }
+      return;
+    }
+
+    document.getElementById('wl-form').style.display    = 'none';
+    document.getElementById('wl-success').style.display = 'block';
+
+    setTimeout(sluitPopup, 3000);
+  };
+})();
+</script>
+<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stagebegeleiding — Internly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:      #0d1520;
+  --ink2:     #3a4455;
+  --ink3:     #7a8799;
+  --bg:       #f4f3ef;
+  --bg2:      #eceae4;
+  --white:    #ffffff;
+  --border:   rgba(13,21,32,0.09);
+  --border2:  rgba(13,21,32,0.16);
+  --green:    #1a7a48;
+  --green-bg: #e8f5ee;
+  --green-dk: #0f4f2d;
+  --orange:   #e05c1a;
+  --orange-bg:#fdf0e8;
+  --blue:     #1756a8;
+  --blue-bg:  #e8f0fc;
+  --amber:    #a06010;
+  --amber-bg: #fdf3e0;
+  --red:      #b82020;
+  --red-bg:   #fdeaea;
+  --r:        12px;
+  --r-sm:     8px;
+  --nav-h:    60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);color:var(--ink);
+  font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  height:var(--nav-h);
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;
+}
+.topbar-logo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:1.3rem;font-weight:700;
+  color:#fff;text-decoration:none;letter-spacing:-.02em;
+}
+.topbar-logo span{color:var(--orange);}
+.topbar-nav{display:flex;align-items:center;gap:24px;}
+.topbar-nav a{
+  font-size:.88rem;font-weight:500;color:rgba(255,255,255,.6);
+  text-decoration:none;transition:color .12s;
+}
+.topbar-nav a:hover,.topbar-nav a.active{color:#fff;}
+.topbar-cta{
+  background:var(--orange);color:#fff;
+  padding:7px 18px;border-radius:50px;
+  font-size:.82rem;font-weight:600;
+  text-decoration:none;transition:background .12s;
+}
+.topbar-cta:hover{background:#c44b0f;color:#fff;}
+@media(max-width:820px){.topbar-nav a:not(.topbar-cta){display:none;}}
+
+/* HERO */
+.hero{
+  background:var(--green-dk);
+  padding:80px 1.75rem 64px;
+  position:relative;overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 60px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 60px);
+}
+.hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;}
+.hero-eyebrow{
+  font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:8px;
+}
+.hero-dot{
+  width:6px;height:6px;border-radius:50%;background:#6ee09a;
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.75);}}
+.hero h1{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:clamp(2.2rem,5vw,3.6rem);
+  font-weight:700;line-height:1.1;letter-spacing:-.03em;
+  color:#fff;max-width:640px;margin-bottom:1.1rem;
+}
+.hero h1 em{font-style:normal;color:#6ee09a;}
+.hero-sub{
+  font-size:1rem;color:rgba(255,255,255,.6);
+  line-height:1.7;max-width:500px;margin-bottom:2.5rem;
+}
+.hero-shelf{
+  display:flex;gap:1px;
+  background:rgba(255,255,255,.1);
+  border-radius:var(--r) var(--r) 0 0;
+  overflow:hidden;max-width:580px;
+}
+.shelf-tab{
+  flex:1;padding:.9rem 1.15rem;
+  border:none;text-align:left;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:500;
+  color:rgba(255,255,255,.55);background:rgba(255,255,255,.06);
+  display:flex;align-items:center;gap:.5rem;
+  transition:background .12s,color .12s;
+}
+.shelf-tab:hover{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);}
+.shelf-tab.active{background:var(--white);color:var(--ink);}
+
+/* LAYOUT */
+.container{max-width:960px;margin:0 auto;padding:0 1.75rem;}
+.panel{display:none;padding:52px 0 64px;}
+.panel.active{display:block;}
+
+/* SECTION HEADER */
+.sec-eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.5rem;}
+.sec-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.5rem,3.5vw,2rem);font-weight:700;letter-spacing:-.025em;color:var(--ink);line-height:1.15;margin-bottom:.7rem;}
+.sec-sub{font-size:.9rem;color:var(--ink2);line-height:1.7;max-width:520px;}
+.sec-head{margin-bottom:2rem;}
+
+/* GRIDS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:680px){.two-col{grid-template-columns:1fr;}.three-col{grid-template-columns:1fr 1fr;}}
+@media(max-width:440px){.three-col{grid-template-columns:1fr;}}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;}
+.clist-head{display:flex;align-items:center;gap:.8rem;padding-bottom:1rem;margin-bottom:1rem;border-bottom:1px solid var(--border);}
+.clist-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.clist-title{font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.1rem;}
+.clist-sub{font-size:.76rem;color:var(--ink3);}
+
+/* CHECKLIST */
+.check-item{display:flex;align-items:flex-start;gap:.7rem;padding:.55rem 0;border-bottom:1px solid var(--border);}
+.check-item:last-child{border-bottom:none;padding-bottom:0;}
+.check-box{
+  width:20px;height:20px;min-width:20px;border-radius:5px;
+  border:1.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;margin-top:2px;font-size:.6rem;
+  color:transparent;user-select:none;
+  transition:background .12s,border-color .12s;
+}
+.check-box.done{background:var(--green);border-color:var(--green);color:white;}
+.check-text{font-size:.86rem;color:var(--ink2);line-height:1.5;}
+.check-text strong{color:var(--ink);font-weight:600;}
+
+/* FEATURE CARDS */
+.feat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem;transition:border-color .12s,box-shadow .12s;}
+.feat-card:hover{border-color:var(--border2);box-shadow:0 3px 12px rgba(0,0,0,.05);}
+.feat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.85rem;}
+.feat-title{font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:.28rem;}
+.feat-body{font-size:.8rem;color:var(--ink2);line-height:1.6;}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;}
+.tl-step{display:grid;grid-template-columns:34px 1fr;gap:.8rem;position:relative;}
+.tl-step:not(:last-child) .tl-num::after{content:'';position:absolute;left:16px;top:34px;width:2px;height:calc(100% - 10px);background:var(--border);}
+.tl-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;flex-shrink:0;position:relative;z-index:1;background:var(--white);border:1.5px solid var(--border2);color:var(--ink2);}
+.tl-num.green{background:var(--green);border-color:var(--green);color:#fff;}
+.tl-body{padding-bottom:1.4rem;}
+.tl-title{font-family:'Bricolage Grotesque',sans-serif;font-size:.88rem;font-weight:700;color:var(--ink);margin-top:.48rem;margin-bottom:.22rem;}
+.tl-text{font-size:.81rem;color:var(--ink2);line-height:1.6;}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;font-size:.7rem;font-weight:500;padding:3px 8px;border-radius:20px;margin-top:.45rem;}
+.tag.green{background:var(--green-bg);color:var(--green);}
+.tag.orange{background:var(--orange-bg);color:var(--orange);}
+.tag.blue{background:var(--blue-bg);color:var(--blue);}
+.tag.amber{background:var(--amber-bg);color:var(--amber);}
+
+/* CALLOUTS */
+.callout{border-left:3px solid var(--blue);border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--blue-bg);padding:.95rem 1.2rem;font-size:.85rem;color:var(--ink2);line-height:1.65;}
+.callout strong{color:var(--blue);font-weight:600;}
+.callout-green{border-left:3px solid var(--green);border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--green-bg);padding:.95rem 1.2rem;font-size:.85rem;color:var(--ink2);line-height:1.65;}
+.callout-green strong{color:var(--green);font-weight:600;}
+
+/* CTA BANNER */
+.cta-banner{background:var(--green);border-radius:var(--r);padding:1.6rem 1.85rem;display:flex;align-items:center;justify-content:space-between;gap:1.25rem;flex-wrap:wrap;margin-top:2.5rem;}
+.cta-text h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:.2rem;}
+.cta-text p{font-size:.82rem;color:rgba(255,255,255,.62);line-height:1.55;}
+.btn-cta{background:#fff;color:var(--green);font-family:'Outfit',sans-serif;font-size:.86rem;font-weight:600;padding:9px 20px;border-radius:50px;border:none;cursor:pointer;text-decoration:none;transition:box-shadow .12s,transform .1s;white-space:nowrap;flex-shrink:0;}
+.btn-cta:hover{box-shadow:0 4px 12px rgba(0,0,0,.14);transform:translateY(-1px);}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:.83rem;}
+.data-table th{text-align:left;padding:.55rem .8rem;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.76rem;color:var(--ink);border-bottom:2px solid var(--border);}
+.data-table td{padding:.58rem .8rem;color:var(--ink2);border-bottom:1px solid var(--border);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table td strong{color:var(--ink);font-weight:600;}
+
+/* SCORE BARS */
+.score-bars{display:flex;flex-direction:column;gap:8px;}
+.sb-row{display:flex;align-items:center;gap:.7rem;}
+.sb-label{font-size:.79rem;color:var(--ink2);min-width:155px;flex-shrink:0;}
+.sb-track{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.sb-fill{height:100%;border-radius:3px;}
+@media(max-width:460px){.sb-label{min-width:100px;font-size:.74rem;}}
+
+/* PROGRESS ROWS */
+.progress-row{display:flex;align-items:center;gap:.7rem;padding:.65rem 0;border-bottom:1px solid var(--border);}
+.progress-row:last-child{border-bottom:none;}
+.pr-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+.pr-info{flex:1;min-width:0;}
+.pr-name{font-size:.84rem;font-weight:500;color:var(--ink);}
+.pr-company{font-size:.73rem;color:var(--ink3);}
+.pr-bar{width:66px;flex-shrink:0;}
+.pr-bar-track{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.pr-bar-fill{height:100%;border-radius:3px;}
+.pr-pct{font-size:.7rem;color:var(--ink3);margin-top:2px;text-align:right;}
+.status{display:inline-flex;font-size:.7rem;font-weight:500;padding:3px 8px;border-radius:20px;flex-shrink:0;}
+.status.green{background:var(--green-bg);color:var(--green);}
+.status.amber{background:var(--amber-bg);color:var(--amber);}
+.status.red{background:var(--red-bg);color:var(--red);}
+
+.gap{height:2rem;} .gap-sm{height:1.25rem;}
+.divider{height:1px;background:var(--border);margin:1.75rem 0;}
+
+footer{border-top:1px solid var(--border);padding:1.75rem;text-align:center;}
+footer p{font-size:.77rem;color:var(--ink3);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.hero-eyebrow{animation:fadeUp .4s ease both;}
+.hero h1{animation:fadeUp .45s .07s ease both;}
+.hero-sub{animation:fadeUp .45s .14s ease both;}
+.hero-shelf{animation:fadeUp .45s .21s ease both;}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
+  <div class="topbar-nav">
+    <a href="discover.html">Vacatures</a>
+    <a href="about.html">Over ons</a>
+    <a href="stagebegeleiding.html" class="active">Stagebegeleiding</a>
+    <a href="auth.html" class="topbar-cta">Inloggen →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="hero-dot"></span>Stagebegeleiding</div>
+    <h1>Begeleiding die de<br><em>stage laat slagen</em></h1>
+    <p class="hero-sub">Hoe bedrijven en scholen het platform gebruiken om stages goed te begeleiden — van onboarding tot eindevaluatie.</p>
+    <div class="hero-shelf" id="shelf">
+      <button class="shelf-tab active" onclick="switchPanel('bedrijven',this)">🏢 Voor bedrijven</button>
+      <button class="shelf-tab" onclick="switchPanel('scholen',this)">🎓 Voor scholen</button>
+      <button class="shelf-tab" onclick="switchPanel('wetgeving',this)">⚖️ Wetgeving &amp; CSRD</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── BEDRIJVEN ── -->
+<div class="panel active" id="panel-bedrijven">
+<div class="container">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Voor bedrijven</div>
+    <h2 class="sec-title">Van onboarding tot eindevaluatie</h2>
+    <p class="sec-sub">Een goed begeleide stage verbetert je Trust Score, trekt gemotiveerdere kandidaten aan en levert automatisch je ESG-data op.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="clist-head">
+        <div class="clist-icon" style="background:var(--green-bg)">📋</div>
+        <div><div class="clist-title">Onboarding — week 1</div><div class="clist-sub">Vink af wat je hebt geregeld</div></div>
+      </div>
+      <div class="check-item"><div class="check-box done" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Werkplek, laptop &amp; toegangspas</strong> gereed vóór dag één</div></div>
+      <div class="check-item"><div class="check-box done" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Stageovereenkomst getekend</strong> met leerdoelen, uren en vergoeding</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Inwerkprogramma</strong> klaar voor de eerste twee weken</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Eerste 1-op-1</strong> ingepland binnen 48 uur na start</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Team geïnformeerd</strong> over komst en rol van de stagiair</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Stageprofiel gekoppeld</strong> in het Internly-dashboard</div></div>
+    </div>
+
+    <div class="card">
+      <div class="clist-head">
+        <div class="clist-icon" style="background:var(--orange-bg)">🔄</div>
+        <div><div class="clist-title">Begeleidingscyclus</div><div class="clist-sub">Gedurende de hele stageperiode</div></div>
+      </div>
+      <div class="timeline">
+        <div class="tl-step">
+          <div class="tl-num green">W1</div>
+          <div class="tl-body">
+            <div class="tl-title">Startgesprek</div>
+            <div class="tl-text">Leerdoelen concretiseren, verwachtingen uitspreken, eerste opdracht toewijzen.</div>
+            <span class="tag green">Trust Score — leerdoelopvolging</span>
+          </div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-num">↻</div>
+          <div class="tl-body">
+            <div class="tl-title">Wekelijks 1-op-1 (min. 30 min.)</div>
+            <div class="tl-text">Voortgang bespreken, feedback geven, obstakels wegnemen. Internly registreert begeleidingskwaliteit.</div>
+            <span class="tag orange">Trust Score — begeleidingskwaliteit</span>
+          </div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-num">½</div>
+          <div class="tl-body">
+            <div class="tl-title">Halverwege-evaluatie</div>
+            <div class="tl-text">Formeel tussengesprek. School-begeleider ontvangt automatisch een signaal via het dashboard.</div>
+            <span class="tag blue">Schooldashboard ontvangt signaal</span>
+          </div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-num green">✓</div>
+          <div class="tl-body">
+            <div class="tl-title">Eindevaluatie</div>
+            <div class="tl-text">Student beoordeelt het bedrijf. Trust Score wordt bijgewerkt. ESG-rapport wordt automatisch gegenereerd.</div>
+            <span class="tag green">ESG-data klaar voor CSRD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="sec-head">
+    <div class="sec-eyebrow">Platform</div>
+    <h2 class="sec-title">Wat Internly voor je regelt</h2>
+  </div>
+
+  <div class="three-col" style="margin-bottom:1.4rem">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--orange-bg)">⏰</div>
+      <div class="feat-title">Responsgarantie</div>
+      <div class="feat-body">Stel een maximale reactietermijn in — 1, 2, 3 of 5 dagen. Elke overschrijding verlaagt automatisch de responssnelheid in je Trust Score.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--green-bg)">⭐</div>
+      <div class="feat-title">Trust Score</div>
+      <div class="feat-body">Je reputatie op vier dimensies: responssnelheid, leerdoelopvolging, nakomen afspraken en begeleidingskwaliteit — zichtbaar voor studenten vóór ze solliciteren.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--blue-bg)">📊</div>
+      <div class="feat-title">ESG-rapportage</div>
+      <div class="feat-body">Internly logt elk begeleidingsmoment. Na de eindevaluatie is een CSRD-rapport downloadbaar zonder handmatige invoer.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--amber-bg)">🔍</div>
+      <div class="feat-title">Gemotiveerde matches</div>
+      <div class="feat-body">Het algoritme koppelt op leerdoelen en motivatie, niet op cv-trefwoorden. Je ontvangt gerichte kandidaten in plaats van bulksollicitaties.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--green-bg)">📩</div>
+      <div class="feat-title">Aanmeldingen beheren</div>
+      <div class="feat-body">Uitnodigen of afwijzen vanuit één overzicht. Het systeem toont hoeveel dagen responsverplichting er nog over is.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--orange-bg)">🎓</div>
+      <div class="feat-title">Early talent pipeline</div>
+      <div class="feat-body">Studenten die jouw stage positief beoordelen, kennen jou al als ze de arbeidsmarkt betreden.</div>
+    </div>
+  </div>
+
+  <div class="callout-green">
+    <strong>Hoe ghosting afgestraft wordt —</strong> Als een bedrijf niet reageert binnen de ingestelde termijn, daalt de responssnelheidsscore automatisch. Studenten zien dit op het profiel vóór ze solliciteren. Een C-score leidt tot minder sollicitaties en een zichtbare waarschuwing.
+  </div>
+
+  <div class="cta-banner">
+    <div class="cta-text"><h3>Verbeter je Trust Score</h3><p>Meld je bedrijf aan en bereik studenten die al weten waarom ze bij jou willen.</p></div>
+    <a href="auth.html" class="btn-cta">Start als bedrijf →</a>
+  </div>
+</div>
+</div>
+
+
+<!-- ── SCHOLEN ── -->
+<div class="panel" id="panel-scholen">
+<div class="container">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Voor scholen &amp; begeleiders</div>
+    <h2 class="sec-title">Minder administratie, meer regie</h2>
+    <p class="sec-sub">Het schooldashboard toont per student de voortgang, signaleert problemen vroeg en genereert rapportages automatisch.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="clist-head">
+        <div class="clist-icon" style="background:var(--amber-bg)">📡</div>
+        <div><div class="clist-title">Wat het dashboard toont</div><div class="clist-sub">Real-time, voor elke begeleider</div></div>
+      </div>
+      <div class="check-item"><div class="check-box done">✓</div><div class="check-text"><strong>Voortgangspercentage</strong> per student met startdatum en stagebedrijf</div></div>
+      <div class="check-item"><div class="check-box done">✓</div><div class="check-text"><strong>Risicosignalen</strong> bij lage voortgang of gesignaleerde begeleidingsproblemen</div></div>
+      <div class="check-item"><div class="check-box done">✓</div><div class="check-text"><strong>Trust Score per bedrijf</strong> — inclusief aanbeveling voor plaatsing</div></div>
+      <div class="check-item"><div class="check-box done">✓</div><div class="check-text"><strong>Signaal bij halverwege-evaluatie</strong> — automatisch, geen handmatige herinnering</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Cohortrapportage</strong> voor ELBHO/SBB-accreditatie automatisch gegenereerd</div></div>
+      <div class="check-item"><div class="check-box" onclick="toggleCheck(this)">✓</div><div class="check-text"><strong>Matchsuggesties versturen</strong> naar studenten die nog geen plek hebben gevonden</div></div>
+    </div>
+
+    <div class="card">
+      <div class="clist-head">
+        <div class="clist-icon" style="background:var(--green-bg)">👥</div>
+        <div><div class="clist-title">Voortgang cohort</div><div class="clist-sub">Voorbeeld schooldashboard</div></div>
+      </div>
+      <div class="progress-row">
+        <div class="pr-avatar" style="background:var(--blue-bg);color:var(--blue)">LH</div>
+        <div class="pr-info"><div class="pr-name">Lena Hartman</div><div class="pr-company">NIOZ Zeewetenschappen</div></div>
+        <div class="pr-bar"><div class="pr-bar-track"><div class="pr-bar-fill" style="width:65%;background:var(--green)"></div></div><div class="pr-pct">65%</div></div>
+        <span class="status green">Actief</span>
+      </div>
+      <div class="progress-row">
+        <div class="pr-avatar" style="background:var(--green-bg);color:var(--green)">TV</div>
+        <div class="pr-info"><div class="pr-name">Tom de Vries</div><div class="pr-company">Vandaag Agency</div></div>
+        <div class="pr-bar"><div class="pr-bar-track"><div class="pr-bar-fill" style="width:40%;background:var(--amber)"></div></div><div class="pr-pct">40%</div></div>
+        <span class="status amber">Actief</span>
+      </div>
+      <div class="progress-row">
+        <div class="pr-avatar" style="background:var(--amber-bg);color:var(--amber)">SO</div>
+        <div class="pr-info"><div class="pr-name">Sara Ouali</div><div class="pr-company">Koek &amp; Ei Studio</div></div>
+        <div class="pr-bar"><div class="pr-bar-track"><div class="pr-bar-fill" style="width:20%;background:var(--red)"></div></div><div class="pr-pct">20%</div></div>
+        <span class="status red">⚠ Risico</span>
+      </div>
+      <div class="progress-row">
+        <div class="pr-avatar" style="background:var(--red-bg);color:var(--red)">JB</div>
+        <div class="pr-info"><div class="pr-name">Jules Bakker</div><div class="pr-company">Nog geen plek gevonden</div></div>
+        <div class="pr-bar"><div class="pr-bar-track"><div class="pr-bar-fill" style="width:0%"></div></div><div class="pr-pct">—</div></div>
+        <span class="status amber">Zoekend</span>
+      </div>
+      <div style="margin-top:.8rem;padding:.65rem .8rem;background:var(--red-bg);border-radius:var(--r-sm);font-size:.78rem;color:var(--red);line-height:1.5">
+        ⚠ Platform signaleert vertraagde leerdoelopvolging bij Sara — Trust Score Koek &amp; Ei Studio: 78 (B)
+      </div>
+    </div>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="sec-head">
+    <div class="sec-eyebrow">Stappenplan</div>
+    <h2 class="sec-title">Hoe een opleiding meedoet</h2>
+  </div>
+
+  <div class="card">
+    <div class="timeline">
+      <div class="tl-step">
+        <div class="tl-num green">01</div>
+        <div class="tl-body"><div class="tl-title">School aanmelden</div><div class="tl-text">Maak een schoolprofiel aan. Voeg begeleiders toe. Importeer cohortlijst via CSV of handmatig. Het basisdashboard is gratis.</div></div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-num">02</div>
+        <div class="tl-body"><div class="tl-title">Studenten uitnodigen</div><div class="tl-text">Studenten ontvangen een uitnodigingslink. Na aanmelding zijn ze direct zichtbaar in het dashboard van hun begeleider.</div></div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-num">03</div>
+        <div class="tl-body">
+          <div class="tl-title">Bedrijven screenen</div>
+          <div class="tl-text">Bekijk de Trust Score van elk leerbedrijf vóór plaatsing. Bedrijven met een C-score worden geflagd en niet aanbevolen.</div>
+          <span class="tag amber">C-score bedrijven worden gemarkeerd</span>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-num">04</div>
+        <div class="tl-body"><div class="tl-title">Stage monitoren</div><div class="tl-text">Voortgang per student in realtime. Risicosignalen verschijnen proactief bij vertraagde leerdoelopvolging of begeleidingsproblemen.</div></div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-num green">05</div>
+        <div class="tl-body">
+          <div class="tl-title">Rapportage genereren</div>
+          <div class="tl-text">Aan het einde van het stagejaar genereert Internly automatisch een cohortrapport voor ELBHO/SBB-accreditatie.</div>
+          <span class="tag green">Klaar voor accreditatie</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gap-sm"></div>
+
+  <div class="callout">
+    <strong>Objectieve stagematching —</strong> Internly koppelt op leerwensen en competenties, niet op naam of uiterlijk. Dit vermindert stagediscriminatie structureel, conform de methode die scholen verplicht zijn te hanteren bij signalen van ongelijke behandeling.
+  </div>
+
+  <div class="cta-banner">
+    <div class="cta-text"><h3>Verlaag de werkdruk van je begeleiders</h3><p>Monitor proactief, rapporteer automatisch en signaleer problemen vóórdat studenten uitvallen.</p></div>
+    <a href="auth.html" class="btn-cta">Start als school →</a>
+  </div>
+</div>
+</div>
+
+
+<!-- ── WETGEVING ── -->
+<div class="panel" id="panel-wetgeving">
+<div class="container">
+  <div class="sec-head">
+    <div class="sec-eyebrow">Wetgeving &amp; verplichtingen</div>
+    <h2 class="sec-title">Wat wettelijk verplicht is</h2>
+    <p class="sec-sub">Een overzicht van de juridische kaders voor bedrijven en scholen — van erkenning tot stagecontract en CSRD.</p>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-bottom:.6rem">Erkenning leerbedrijf</div>
+  <div class="two-col" style="margin-bottom:1.4rem">
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.8rem">
+        <div style="width:38px;height:38px;border-radius:8px;background:var(--orange-bg);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">🏅</div>
+        <div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.92rem;color:var(--ink);margin-bottom:.1rem">SBB-erkenning</div>
+          <div style="font-size:.74rem;color:var(--ink3)">Wettelijk verplicht voor mbo-stages</div>
+        </div>
+      </div>
+      <p style="font-size:.83rem;color:var(--ink2);line-height:1.65;margin-bottom:.7rem">Zonder SBB-erkenning mag een mbo-student geen stage bij het bedrijf lopen. Vereisten: een getrainde praktijkopleider en een veilige leeromgeving.</p>
+      <a href="https://www.s-bb.nl" target="_blank" rel="noopener" style="font-size:.78rem;color:var(--green);font-weight:600;text-decoration:none">→ s-bb.nl</a>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.8rem">
+        <div style="width:38px;height:38px;border-radius:8px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0">🎓</div>
+        <div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.92rem;color:var(--ink);margin-bottom:.1rem">ELBHO-erkenning</div>
+          <div style="font-size:.74rem;color:var(--ink3)">Vrijwillig, aanbevolen voor hbo/wo</div>
+        </div>
+      </div>
+      <p style="font-size:.83rem;color:var(--ink2);line-height:1.65;margin-bottom:.7rem">Vereist minimaal 5 fte op hbo/wo-niveau en een vergoeding conform richtlijnen. Verhoogt vertrouwen bij onderwijsinstellingen en werkt positief door in de Trust Score.</p>
+      <a href="https://www.elbho.nl" target="_blank" rel="noopener" style="font-size:.78rem;color:var(--blue);font-weight:600;text-decoration:none">→ elbho.nl</a>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-bottom:.6rem">Richtlijn stagevergoedingen</div>
+  <div class="card" style="overflow:auto;margin-bottom:1.4rem">
+    <table class="data-table">
+      <thead><tr><th>Niveau</th><th>Type</th><th style="text-align:right">Richtlijn/maand (40u)</th><th>Bron</th></tr></thead>
+      <tbody>
+        <tr><td>Mbo (BBL)</td><td>Werkend leren</td><td style="text-align:right">Variabel</td><td><span style="font-size:.73rem;color:var(--ink3)">CAO-afhankelijk</span></td></tr>
+        <tr><td>Hbo/Wo Bachelor</td><td>Meewerk</td><td style="text-align:right"><strong>€ 350,–</strong></td><td><span style="font-size:.73rem;color:var(--ink3)">ELBHO</span></td></tr>
+        <tr><td>Hbo/Wo Bachelor</td><td>Afstuderen</td><td style="text-align:right"><strong>€ 440,–</strong></td><td><span style="font-size:.73rem;color:var(--ink3)">ELBHO</span></td></tr>
+        <tr><td>Hbo/Wo Master</td><td>Afstuderen</td><td style="text-align:right"><strong>€ 550,–</strong></td><td><span style="font-size:.73rem;color:var(--ink3)">ELBHO</span></td></tr>
+        <tr><td>Rijksoverheid</td><td>Alle niveaus</td><td style="text-align:right"><strong style="color:var(--green)">€ 800,–</strong> <span style="font-size:.7rem;color:var(--ink3);font-weight:400">v.a. jan 2026</span></td><td><span style="font-size:.7rem;padding:2px 7px;background:var(--green-bg);color:var(--green);border-radius:20px;font-weight:500">Nieuw</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-bottom:.6rem">Stageovereenkomst — verplichte onderdelen</div>
+  <div class="three-col" style="margin-bottom:1.4rem">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--green-bg)">📝</div>
+      <div class="feat-title">Leerdoelen &amp; begeleiding</div>
+      <div class="feat-body">Leerdoelen en begeleidingsafspraken moeten expliciet zijn vastgelegd. Ontbreekt dit, dan riskeert het bedrijf een fictieve dienstbetrekking via de Arbeidsinspectie.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--blue-bg)">🛡️</div>
+      <div class="feat-title">Aansprakelijkheid</div>
+      <div class="feat-body">De werkgever is verantwoordelijk voor schade die de stagiair veroorzaakt of oploopt tijdens werktijd. Controleer of je AVB-polis dit dekt.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--orange-bg)">🔒</div>
+      <div class="feat-title">Geheimhouding &amp; auteursrecht</div>
+      <div class="feat-body">De student behoudt auteursrecht op het stageverslag. Het bedrijf kan een NDA eisen voor gevoelige informatie en bedrijfsprocessen.</div>
+    </div>
+  </div>
+
+  <div class="sec-eyebrow" style="margin-bottom:.6rem">Trust Score en wetgeving</div>
+  <div class="card" style="margin-bottom:1.4rem">
+    <div class="score-bars">
+      <div class="sb-row">
+        <div class="sb-label">Responssnelheid</div>
+        <div class="sb-track"><div class="sb-fill" style="width:100%;background:var(--green)"></div></div>
+        <div style="font-size:.76rem;color:var(--ink2);min-width:170px;padding-left:.6rem">Responsgarantie-instelling</div>
+      </div>
+      <div class="sb-row">
+        <div class="sb-label">Leerdoelopvolging</div>
+        <div class="sb-track"><div class="sb-fill" style="width:100%;background:var(--green)"></div></div>
+        <div style="font-size:.76rem;color:var(--ink2);min-width:170px;padding-left:.6rem">Stageovereenkomst leerdoelen</div>
+      </div>
+      <div class="sb-row">
+        <div class="sb-label">Nakomen afspraken</div>
+        <div class="sb-track"><div class="sb-fill" style="width:100%;background:var(--green)"></div></div>
+        <div style="font-size:.76rem;color:var(--ink2);min-width:170px;padding-left:.6rem">Contractuele verplichtingen</div>
+      </div>
+      <div class="sb-row">
+        <div class="sb-label">Begeleidingskwaliteit</div>
+        <div class="sb-track"><div class="sb-fill" style="width:100%;background:var(--green)"></div></div>
+        <div style="font-size:.76rem;color:var(--ink2);min-width:170px;padding-left:.6rem">SBB/ELBHO-standaard</div>
+      </div>
+    </div>
+    <div style="margin-top:.85rem;font-size:.8rem;color:var(--ink3);line-height:1.6">De vier Trust Score-dimensies zijn direct ontleend aan wat wet- en regelgeving als minimumstandaard stelt. Een A-score betekent dat een bedrijf structureel aan die standaarden voldoet.</div>
+  </div>
+
+  <div class="callout">
+    <strong>CSRD / ESG —</strong> Grote bedrijven zijn verplicht sociaal beleid te rapporteren via de Corporate Sustainability Reporting Directive. Internly levert traceerbare data over investering in jong talent — reactietijden, begeleiding, leerdoelopvolging — kant-en-klaar voor het ESG-verslag.
+  </div>
+
+  <div class="cta-banner">
+    <div class="cta-text"><h3>CSRD-compliant zonder extra werk</h3><p>Internly genereert je ESG-stagedata automatisch na elke afgeronde stage.</p></div>
+    <a href="auth.html" class="btn-cta">Bekijk de ESG-module →</a>
+  </div>
+</div>
+</div>
+
+<footer><p>© 2025 internly.pro — <a href="about.html" style="color:var(--ink3);text-decoration:none">Over ons</a></p></footer>
+
+<script>
+function switchPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.shelf-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const heroH = document.querySelector('.hero').offsetHeight;
+  const navH  = document.querySelector('.topbar').offsetHeight;
+  window.scrollTo({ top: heroH + navH - 1, behavior: 'smooth' });
+}
+function toggleCheck(el) {
+  const done = el.classList.toggle('done');
+  el.textContent = done ? '✓' : '';
+}
+</script>
+</body>
+</html>

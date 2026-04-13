@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Over ons</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:       #1a7a48;
+      --green-dark:  #0f5c36;
+      --green-bg:    #e8f5ee;
+      --orange:      #FF7E42;
+      --orange-dark: #e05c1a;
+      --ink:         #0d1520;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
+      --ink4:        #9ca3af;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #e8e6e0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--ink);
+      height: 60px; padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.3rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-nav { display: flex; align-items: center; gap: 28px; }
+    .topbar-nav a {
+      color: rgba(255,255,255,.6); text-decoration: none;
+      font-size: .88rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar-nav a:hover, .topbar-nav a.active { color: #fff; }
+    .topbar-cta {
+      background: var(--orange); color: #fff;
+      padding: 7px 18px; border-radius: 50px;
+      font-size: .82rem; font-weight: 600;
+      text-decoration: none; transition: background .15s;
+    }
+    .topbar-cta:hover { background: var(--orange-dark); color: #fff; }
+
+    .lang-switcher { display: flex; gap: 4px; align-items: center; }
+    .lang-btn {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.7);
+      padding: 4px 9px; border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .75rem; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .lang-btn:hover, .lang-btn.active {
+      background: rgba(255,255,255,.2);
+      color: #fff; border-color: rgba(255,255,255,.4);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      padding: 90px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(255,126,66,.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .75rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      margin-bottom: 20px;
+    }
+    .hero-label::before, .hero-label::after {
+      content: ''; width: 24px; height: 1px;
+      background: rgba(255,255,255,.3);
+    }
+    .hero h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 700; line-height: 1.1;
+      color: #fff; margin-bottom: 20px;
+      letter-spacing: -.02em;
+    }
+    .hero h1 em { font-style: italic; color: var(--orange); }
+    .hero-sub {
+      font-size: 1.1rem; color: rgba(255,255,255,.8);
+      max-width: 560px; margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding: 80px 24px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .section-sm {
+      padding: 60px 24px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .label {
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--orange); margin-bottom: 10px;
+      display: block;
+    }
+
+    .section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700; line-height: 1.15;
+      color: var(--ink); margin-bottom: 20px;
+      letter-spacing: -.02em;
+    }
+    .section-title em { font-style: italic; color: var(--green); }
+
+    .body-text {
+      font-size: 1rem; color: var(--ink2);
+      line-height: 1.8; margin-bottom: 20px;
+    }
+    .body-text strong { color: var(--ink); font-weight: 600; }
+
+    /* ── ORIGIN STORY ── */
+    .origin {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 52px;
+      position: relative;
+      overflow: hidden;
+    }
+    .origin::before {
+      content: '"';
+      position: absolute; top: -10px; left: 36px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 10rem; font-weight: 700;
+      color: var(--green-bg); line-height: 1;
+      pointer-events: none;
+    }
+    @media(max-width:600px) {
+      .origin { padding: 32px 24px; }
+      .origin::before { font-size: 6rem; }
+    }
+
+    /* ── FOUNDERS ── */
+    .founders-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 48px;
+    }
+    @media(max-width:620px) { .founders-grid { grid-template-columns: 1fr; } }
+
+    .founder-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      position: relative;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .founder-card:hover {
+      border-color: var(--green);
+      box-shadow: 0 8px 28px rgba(26,122,72,.09);
+    }
+    .founder-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; border-radius: 16px 16px 0 0;
+    }
+    .founder-card.vader::after { background: var(--green); }
+    .founder-card.dochter::after { background: var(--orange); }
+
+    .founder-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 16px;
+    }
+    .founder-card.vader .founder-avatar { background: var(--green-bg); }
+    .founder-card.dochter .founder-avatar { background: #fdf0e8; }
+
+    .founder-role {
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .founder-card.vader .founder-role { color: var(--green); }
+    .founder-card.dochter .founder-role { color: var(--orange); }
+
+    .founder-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 10px;
+    }
+    .founder-text {
+      font-size: .88rem; color: var(--ink2);
+      line-height: 1.7;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── FRUSTRATIES ── */
+    .frustrations {
+      background: var(--ink);
+      padding: 72px 24px;
+    }
+    .frustrations-inner {
+      max-width: 860px; margin: 0 auto;
+    }
+    .frustrations .label { color: rgba(255,126,66,.8); }
+    .frustrations .section-title { color: #fff; }
+    .frustrations .section-title em { color: var(--orange); }
+
+    .frustration-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 36px;
+    }
+    .frustration-item {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 22px 24px;
+      transition: background .15s;
+    }
+    .frustration-item:hover { background: rgba(255,255,255,.08); }
+    .f-icon { font-size: 1.4rem; margin-bottom: 10px; display: block; }
+    .f-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .95rem; font-weight: 600;
+      color: #fff; margin-bottom: 6px;
+    }
+    .f-text { font-size: .82rem; color: rgba(255,255,255,.5); line-height: 1.6; }
+
+    /* ── MISSIE ── */
+    .missie-block {
+      background: var(--green);
+      border-radius: 20px;
+      padding: 52px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .missie-block::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,.08) 0%, transparent 60%);
+    }
+    .missie-block .label { color: rgba(255,255,255,.6); }
+    .missie-block blockquote {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-style: italic; font-weight: 600;
+      color: #fff; line-height: 1.4;
+      max-width: 620px; margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+    .missie-block blockquote em { color: var(--orange); font-style: normal; }
+    @media(max-width:600px) { .missie-block { padding: 36px 24px; } }
+
+    /* ── VOOR WIE ── */
+    .voor-wie-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 36px;
+    }
+    @media(max-width:640px) { .voor-wie-grid { grid-template-columns: 1fr; } }
+
+    .vw-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 20px;
+      text-align: center;
+      transition: border-color .2s, transform .2s;
+    }
+    .vw-card:hover { border-color: var(--green); transform: translateY(-2px); }
+    .vw-icon { font-size: 2rem; display: block; margin-bottom: 12px; }
+    .vw-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .vw-text { font-size: .82rem; color: var(--ink3); line-height: 1.6; }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 52px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: center;
+    }
+    @media(max-width:620px) {
+      .contact-section { grid-template-columns: 1fr; padding: 32px 24px; }
+    }
+    .contact-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .contact-sub { font-size: .9rem; color: var(--ink3); line-height: 1.6; }
+    .contact-email {
+      font-size: .88rem; color: var(--green);
+      font-weight: 600; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px;
+    }
+    .contact-email:hover { color: var(--green-dark); }
+    .btn-contact {
+      display: inline-block;
+      background: var(--green); color: #fff;
+      padding: 13px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .92rem; font-weight: 600;
+      text-decoration: none; white-space: nowrap;
+      transition: background .15s, transform .15s;
+    }
+    .btn-contact:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+    /* ── BLOG CTA ── */
+    .blog-cta {
+      background: linear-gradient(135deg, #fdf0e8, #fff3ec);
+      border: 1.5px solid rgba(255,126,66,.2);
+      border-radius: 16px;
+      padding: 32px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .blog-cta-text .label { color: var(--orange); }
+    .blog-cta-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 4px;
+    }
+    .blog-cta-sub { font-size: .85rem; color: var(--ink3); }
+    .btn-blog {
+      display: inline-block;
+      background: var(--orange); color: #fff;
+      padding: 11px 24px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .88rem; font-weight: 600;
+      text-decoration: none; white-space: nowrap;
+      transition: background .15s;
+    }
+    .btn-blog:hover { background: var(--orange-dark); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 32px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .footer-logo span { color: var(--orange); }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a {
+      color: rgba(255,255,255,.45); text-decoration: none;
+      font-size: .82rem; transition: color .15s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,.8); }
+    .footer-copy { font-size: .78rem; color: rgba(255,255,255,.3); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero h1, .hero-sub, .hero-label {
+      animation: fadeUp .5s ease both;
+    }
+    .hero h1     { animation-delay: .05s; }
+    .hero-sub    { animation-delay: .12s; }
+
+    /* ── Google Translate branding suppression ── */
+    .goog-te-banner-frame { display: none !important; }
+    .skiptranslate        { display: none !important; }
+    .goog-te-gadget       { display: none !important; }
+    body                  { top: 0 !important; position: static !important; }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
+  <div class="topbar-nav">
+    <a href="discover.html">Vacatures</a>
+    <a href="about.html" class="active">Over ons</a>
+    <a href="stagebegeleiding.html">Stagebegeleiding</a>
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <a href="auth.html" class="topbar-cta">Inloggen →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Ons verhaal</div>
+  <h1>Gebouwd door mensen die<br><em>de stagemarkt van binnen kennen</em></h1>
+  <p class="hero-sub">
+    Internly is geen startup idee op een whiteboard. Het is het antwoord op jaren frustratie — van twee kanten tegelijk bekeken.
+  </p>
+</div>
+
+<!-- ORIGIN STORY -->
+<div class="section">
+  <span class="label">Het begin</span>
+  <h2 class="section-title">Een vader en dochter,<br><em>elk met hun eigen verhaal</em></h2>
+
+  <div class="origin">
+    <p class="body-text">
+      Internly is een <strong>familieproject</strong> — letterlijk. Een vader met jarenlange ervaring in het begeleiden van studenten en het werken met bedrijven, en een dochter die zelf door het stageproces heen is gegaan en van binnenuit heeft meegemaakt wat er misgaat.
+    </p>
+    <p class="body-text">
+      We hebben het allebei gezien. Studenten die weken wachten op een reactie die nooit komt. Vage onderzoeksvoorstellen die nergens op slaan. Bedrijven die een stagiair zoeken maar geen idee hebben wat ze de student kunnen bieden. Scholen die pas in actie komen als het al te laat is.
+    </p>
+    <p class="body-text" style="margin-bottom:0">
+      Uit die kennis, die frustratie — en de overtuiging dat het anders moet — is <strong>Internly</strong> ontstaan.
+    </p>
+  </div>
+
+  <div class="founders-grid">
+    <div class="founder-card vader">
+      <div class="founder-avatar">👨</div>
+      <div class="founder-role">Medeoprichter — Vaderperspectief</div>
+      <div class="founder-title">Jarenlange ervaring met de stagebegeleiding</div>
+      <p class="founder-text">
+        Heeft honderden studenten begeleid en tientallen bedrijven van binnenuit meegemaakt. Zag hoe goede studenten vastliepen op slechte communicatie, en hoe bedrijven met de beste intenties toch teleurstelden door gebrek aan structuur.
+      </p>
+    </div>
+    <div class="founder-card dochter">
+      <div class="founder-avatar">👩</div>
+      <div class="founder-role">Medeoprichter — Dochterperspectief</div>
+      <div class="founder-title">De stage-ervaring van de student zelf</div>
+      <p class="founder-text">
+        Heeft het stageproces van dichtbij meegemaakt als student. De onzekerheid, het ghosting, de vage verwachtingen. En ook: de zeldzame stage die wél klopte — en hoe groot het verschil is als je bij een bedrijf terechtkomt dat echt investeert in jou.
+      </p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- FRUSTRATIES -->
+<div class="frustrations">
+  <div class="frustrations-inner">
+    <span class="label">Waarom Internly bestaat</span>
+    <h2 class="section-title">De frustraties die we <em>zelf hebben meegemaakt</em></h2>
+
+    <div class="frustration-list">
+      <div class="frustration-item">
+        <span class="f-icon">📭</span>
+        <div class="f-title">Ghosting door bedrijven</div>
+        <p class="f-text">Studenten sturen tientallen berichten en horen niets. Weken voorbij, geen reactie, geen reden.</p>
+      </div>
+      <div class="frustration-item">
+        <span class="f-icon">📋</span>
+        <div class="f-title">Vage onderzoeksvoorstellen</div>
+        <p class="f-text">Opdrachten die nergens op slaan, zonder duidelijke leerdoelen of concrete resultaten.</p>
+      </div>
+      <div class="frustration-item">
+        <span class="f-icon">🎭</span>
+        <div class="f-title">Verwachtingen die niet kloppen</div>
+        <p class="f-text">Vacatureteksten beloven begeleiding en verantwoordelijkheid — de praktijk is koffie halen en Excel.</p>
+      </div>
+      <div class="frustration-item">
+        <span class="f-icon">🏫</span>
+        <div class="f-title">Scholen die te laat signaleren</div>
+        <p class="f-text">Begeleiders die pas ingrijpen als de student al drie weken vastloopt en de stage op springen staat.</p>
+      </div>
+      <div class="frustration-item">
+        <span class="f-icon">🔍</span>
+        <div class="f-title">Geen transparantie vooraf</div>
+        <p class="f-text">Studenten solliciteren zonder enig idee hoe betrouwbaar een bedrijf is als stagebegeleider.</p>
+      </div>
+      <div class="frustration-item">
+        <span class="f-icon">🔄</span>
+        <div class="f-title">Matching op trefwoorden</div>
+        <p class="f-text">Platforms koppelen op cv-trefwoorden, niet op motivatie, leerdoelen of werkelijke fit.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MISSIE -->
+<div class="section">
+  <div class="missie-block">
+    <span class="label">Onze missie</span>
+    <blockquote>
+      "Stages fixen door eerlijkheid te bouwen — voor studenten, bedrijven <em>&</em> scholen tegelijk."
+    </blockquote>
+  </div>
+</div>
+
+<!-- VOOR WIE -->
+<hr class="divider">
+<div class="section-sm">
+  <span class="label">Het platform</span>
+  <h2 class="section-title">Voor iedereen die een stage <em>serieus neemt</em></h2>
+  <p class="body-text">Internly is gebouwd als een driezijdig platform. Niet voor één partij, maar voor het hele ecosysteem tegelijk.</p>
+
+  <div class="voor-wie-grid">
+    <div class="vw-card">
+      <span class="vw-icon">👤</span>
+      <div class="vw-title">Studenten</div>
+      <p class="vw-text">Vind een stage bij bedrijven die je vooraf al kunt beoordelen. Geen ghosting meer, transparante Trust Scores en begeleiding die klopt.</p>
+    </div>
+    <div class="vw-card">
+      <span class="vw-icon">🏢</span>
+      <div class="vw-title">Bedrijven</div>
+      <p class="vw-text">Bouw je reputatie op als betrouwbare stagebegeleider. Vind gemotiveerde studenten die echt passen bij jouw opdracht en cultuur.</p>
+    </div>
+    <div class="vw-card">
+      <span class="vw-icon">🎓</span>
+      <div class="vw-title">Scholen</div>
+      <p class="vw-text">Monitor studenten proactief, signaleer problemen vroeg en werk samen met bedrijven op basis van harde data.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- CONTACT + BLOG -->
+<div class="section">
+
+  <!-- Contact -->
+  <div class="contact-section">
+    <div>
+      <div class="contact-title">Neem contact op</div>
+      <p class="contact-sub">
+        Vragen over het platform, interesse in samenwerking of gewoon nieuwsgierig? We horen graag van je.
+      </p>
+      <a href="mailto:hallo@internly.pro" class="contact-email">
+        ✉️ hallo@internly.pro
+      </a>
+    </div>
+    <a href="mailto:hallo@internly.pro" class="btn-contact">Stuur een bericht →</a>
+  </div>
+
+  <!-- Blog CTA -->
+  <div class="blog-cta" style="margin-top:20px">
+    <div class="blog-cta-text">
+      <span class="label">Blog</span>
+      <div class="blog-cta-title">De ins en outs van de stagemarkt</div>
+      <p class="blog-cta-sub">Laatste updates, tips voor studenten, bedrijven en scholen — en de ontwikkelingen achter Internly.</p>
+    </div>
+    <a href="https://internly.pro/blog" class="btn-blog">Lees de blog →</a>
+  </div>
+
+</div>
+
+<!-- ── BLIJF OP DE HOOGTE ──────────────────────────────────────────────────── -->
+<section style="background:#f4f3ef;padding:80px 24px;border-top:1px solid var(--border)">
+  <div style="max-width:560px;margin:0 auto;text-align:center;">
+    <p style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px;">Geen spam, beloofd</p>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.6rem,3vw,2.1rem);font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:14px;">
+      Blijf op de hoogte van Internly
+    </h2>
+    <p style="font-size:.95rem;color:var(--ink3);line-height:1.65;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;">
+      Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal één mail per maand.
+    </p>
+
+    <div id="about-wl-form" style="display:flex;gap:8px;max-width:440px;margin:0 auto 12px;flex-wrap:wrap;">
+      <input type="email" id="about-wl-email" placeholder="jouw@email.nl" style="
+        flex:1;min-width:180px;padding:12px 18px;
+        border:1.5px solid #e2e8f0;border-radius:50px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;
+        color:var(--ink);outline:none;box-sizing:border-box;
+        transition:border-color .15s;"
+        onfocus="this.style.borderColor='#1a7a48'"
+        onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')schrijfInAbout()">
+      <button onclick="schrijfInAbout()" id="about-wl-btn" style="
+        padding:12px 22px;
+        background:#FF7E42;color:#fff;border:none;border-radius:50px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;
+        cursor:pointer;white-space:nowrap;flex-shrink:0;
+        transition:background .15s;">
+        Schrijf je in →
+      </button>
+    </div>
+
+    <div id="about-wl-success" style="display:none;padding:14px 0;">
+      <span style="font-size:.95rem;font-weight:600;color:var(--green);">Je staat op de lijst! We houden je op de hoogte.</span>
+    </div>
+    <div id="about-wl-error" style="display:none;color:#b82020;font-size:.85rem;margin-top:6px;"></div>
+
+    <p style="font-size:.72rem;color:#b0b7c3;margin-top:10px;">
+      Door je in te schrijven ga je akkoord met ons privacybeleid. Altijd makkelijk uitschrijven.
+    </p>
+  </div>
+</section>
+<!-- ── EINDE BLIJF OP DE HOOGTE ───────────────────────────────────────────── -->
+
+<!-- FOOTER -->
+<footer>
+  <a href="index.html" class="footer-logo">intern<span>ly</span></a>
+  <div class="footer-links">
+    <a href="discover.html">Vacatures</a>
+    <a href="about.html">Over ons</a>
+    <a href="https://internly.pro/blog">Blog</a>
+    <a href="mailto:hallo@internly.pro">Contact</a>
+    <a href="auth.html">Inloggen</a>
+  </div>
+  <div class="footer-copy">© 2026 Internly — Alle rechten voorbehouden</div>
+</footer>
+
+
+<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
+<div id="waitlist-overlay" style="
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:24px;">
+</div>
+
+<div id="waitlist-popup" style="
+  display:none; position:fixed; z-index:9999;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#fff; border-radius:20px;
+  width:100%; max-width:440px;
+  box-shadow:0 24px 60px rgba(0,0,0,.18);
+  overflow:hidden; font-family:'Outfit',sans-serif;">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#1a7a48,#0f5c36);padding:28px 32px 24px;position:relative;">
+    <button onclick="sluitPopup()" style="
+      position:absolute;top:14px;right:16px;
+      background:rgba(255,255,255,.15);border:none;
+      color:#fff;width:28px;height:28px;border-radius:50%;
+      font-size:1rem;cursor:pointer;line-height:1;
+      display:flex;align-items:center;justify-content:center;">×</button>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
+      intern<span style="color:#FF7E42;">ly</span>
+    </div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.65);">
+      Blijf op de hoogte van de ontwikkeling
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div style="padding:28px 32px 32px;">
+    <p style="font-size:.95rem;color:#374151;line-height:1.7;margin:0 0 8px;">
+      Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
+    </p>
+    <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
+      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
+    </p>
+
+    <div id="wl-form">
+      <input type="email" id="wl-email" placeholder="jouw@email.nl" style="
+        width:100%;padding:11px 16px;
+        border:1.5px solid #e2e8f0;border-radius:10px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;
+        color:#0d1520;outline:none;box-sizing:border-box;
+        transition:border-color .15s;margin-bottom:10px;"
+        onfocus="this.style.borderColor='#1a7a48'"
+        onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')schrijfIn()">
+      <button onclick="schrijfIn()" id="wl-btn" style="
+        width:100%;padding:12px;
+        background:#FF7E42;color:#fff;border:none;
+        border-radius:50px;font-family:'Outfit',sans-serif;
+        font-size:.95rem;font-weight:700;cursor:pointer;
+        transition:background .15s;">
+        Houd me op de hoogte →
+      </button>
+    </div>
+
+    <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
+      <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
+    </div>
+
+    <div id="wl-error" style="display:none;margin-top:8px;
+      background:#fdeaea;color:#b82020;border-radius:8px;
+      padding:8px 14px;font-size:.82rem;"></div>
+
+    <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
+      Door je in te schrijven ga je akkoord met ons privacybeleid.
+    </p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+
+  if (!localStorage.getItem('internly_waitlist_seen')) {
+    setTimeout(async function() {
+      const _client = (typeof db !== 'undefined') ? db
+        : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { session } } = await _client.auth.getSession();
+      if (!session) toonPopup();
+    }, 8000);
+  }
+
+  function toonPopup() {
+    document.getElementById('waitlist-overlay').style.display = 'flex';
+    document.getElementById('waitlist-popup').style.display  = 'block';
+    localStorage.setItem('internly_waitlist_seen', '1');
+  }
+
+  window.sluitPopup = function() {
+    document.getElementById('waitlist-overlay').style.display = 'none';
+    document.getElementById('waitlist-popup').style.display  = 'none';
+  };
+
+  document.getElementById('waitlist-overlay').addEventListener('click', sluitPopup);
+
+  window.schrijfIn = async function() {
+    const email = document.getElementById('wl-email').value.trim();
+    const btn   = document.getElementById('wl-btn');
+    const err   = document.getElementById('wl-error');
+
+    err.style.display = 'none';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent   = 'Voer een geldig e-mailadres in.';
+      err.style.display = 'block';
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Bezig…';
+
+    const client = (typeof db !== 'undefined') ? db
+      : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const { error } = await client
+      .from('waitlist')
+      .insert({ email, source: window.location.pathname });
+
+    btn.disabled    = false;
+    btn.textContent = 'Houd me op de hoogte →';
+
+    if (error) {
+      if (error.code === '23505') {
+        document.getElementById('wl-form').style.display    = 'none';
+        document.getElementById('wl-success').style.display = 'block';
+      } else {
+        err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
+        err.style.display = 'block';
+      }
+      return;
+    }
+
+    document.getElementById('wl-form').style.display    = 'none';
+    document.getElementById('wl-success').style.display = 'block';
+
+    setTimeout(sluitPopup, 3000);
+  };
+})();
+</script>
+<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
+
+<script>
+// Static email signup on about page
+(function() {
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+
+  window.schrijfInAbout = async function() {
+    const email = document.getElementById('about-wl-email').value.trim();
+    const btn   = document.getElementById('about-wl-btn');
+    const err   = document.getElementById('about-wl-error');
+
+    err.style.display = 'none';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent   = 'Voer een geldig e-mailadres in.';
+      err.style.display = 'block';
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Bezig…';
+
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { error } = await client
+      .from('waitlist')
+      .insert({ email, source: window.location.pathname });
+
+    btn.disabled    = false;
+    btn.textContent = 'Schrijf je in →';
+
+    if (error && error.code !== '23505') {
+      err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
+      err.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('about-wl-form').style.display    = 'none';
+    document.getElementById('about-wl-success').style.display = 'block';
+  };
+})();
+</script>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

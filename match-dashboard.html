@@ -1,0 +1,3170 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stage Hub — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ───────────────────────────────────────────── */
+    :root {
+      --primary:     #1a7a48;
+      --dark-green:  #0f5c36;
+      --accent:      #FF7E42;
+      --accent-dark: #e05c1a;
+      --ink:         #0d1520;
+      --ink-2:       #1a2535;
+      --ink-3:       #253047;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #e5e3de;
+      --text:        #1a1a1a;
+      --muted:       #6b7280;
+      --blue:        #1756a8;
+      --blue-bg:     #eef3fb;
+      --r:           16px;
+      --sidebar-w:   220px;
+      --topbar-h:    60px;
+      --green:       #1a7a48;
+      --green-bg:    #e8f5ee;
+      --amber:       #a06010;
+      --amber-bg:    #fdf3e0;
+      --red:         #b82020;
+      --red-bg:      #fdeaea;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Role picker ─────────────────────────────────────────────── */
+    #role-picker {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      background: var(--bg);
+    }
+
+    .rp-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.03em;
+      margin-bottom: 8px;
+    }
+    .rp-logo span { color: var(--accent); }
+
+    .rp-subtitle {
+      font-size: .95rem;
+      color: var(--muted);
+      margin-bottom: 48px;
+      text-align: center;
+    }
+
+    .rp-heading {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .rp-desc {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .rp-cards {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 680px;
+    }
+
+    .rp-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px 32px;
+      cursor: pointer;
+      transition: all .18s;
+      text-align: center;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    .rp-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 20px rgba(26,122,72,.12);
+      transform: translateY(-2px);
+    }
+
+    .rp-card-icon {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+    }
+
+    .rp-card-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .rp-card-hint {
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    /* ── App shell ───────────────────────────────────────────────── */
+    #app-shell {
+      display: none;
+      min-height: 100vh;
+    }
+
+    /* Topbar */
+    #hub-topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--topbar-h);
+      background: var(--white);
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px 0 0;
+      z-index: 100;
+      gap: 16px;
+    }
+
+    #hamburger-btn {
+      display: none;
+      width: var(--sidebar-w);
+      height: var(--topbar-h);
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #hamburger-btn svg { width: 22px; height: 22px; }
+
+    .hub-topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -.02em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      width: var(--sidebar-w);
+      height: 100%;
+      padding: 0 20px;
+      background: var(--ink);
+      flex-shrink: 0;
+    }
+
+    .hub-topbar-logo span { color: var(--accent); }
+
+    .hub-topbar-stage {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hub-topbar-stage-name {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hub-topbar-stage-meta {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    .hub-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 600;
+    }
+
+    .role-badge.student { background: var(--blue-bg); color: var(--blue); }
+    .role-badge.bedrijf { background: #e8f5ee; color: var(--primary); }
+    .role-badge.school  { background: #fdf3e0; color: #a06010; }
+
+    .role-switch-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .8rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .role-switch-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Hub layout */
+    .hub-layout {
+      display: flex;
+      padding-top: var(--topbar-h);
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      position: fixed;
+      top: var(--topbar-h);
+      left: 0;
+      width: var(--sidebar-w);
+      height: calc(100vh - var(--topbar-h));
+      background: var(--ink);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      z-index: 90;
+      transition: transform .25s;
+    }
+
+    .sidebar-section-label {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      padding: 20px 20px 8px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      color: rgba(255,255,255,.65);
+      font-size: .9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 0;
+      transition: all .15s;
+      text-decoration: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+    }
+
+    .sidebar-item.active {
+      background: rgba(26,122,72,.25);
+      color: #fff;
+      border-left: 3px solid var(--primary);
+    }
+
+    .sidebar-item svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      opacity: .8;
+    }
+
+    .sidebar-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .sidebar-spacer { flex: 1; }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .sidebar-footer-user {
+      font-size: .82rem;
+      color: rgba(255,255,255,.5);
+      line-height: 1.5;
+    }
+
+    /* Main content */
+    #main-content {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      padding: 32px;
+      max-width: calc(100% - var(--sidebar-w));
+    }
+
+    /* ── Shared components ───────────────────────────────────────── */
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.02em;
+    }
+
+    .page-sub {
+      font-size: .88rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .card-sub {
+      font-size: .82rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    /* Stat cards */
+    .stat-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    .tag.green  { background: #e8f5ee; color: var(--primary); }
+    .tag.blue   { background: var(--blue-bg); color: var(--blue); }
+    .tag.orange { background: #fff3eb; color: var(--accent-dark); }
+    .tag.yellow { background: #fdf3e0; color: #a06010; }
+    .tag.neutral{ background: #f4f3ef; color: var(--muted); }
+    .tag.red    { background: #fdeaea; color: #b82020; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--dark-green); }
+
+    .btn-ghost {
+      background: none;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+    .btn-sm { padding: 6px 12px; font-size: .8rem; border-radius: 8px; }
+
+    .btn-danger {
+      background: #fdeaea;
+      color: #b82020;
+      border: 1.5px solid #fca5a5;
+    }
+
+    .btn-danger:hover { background: #fca5a5; }
+
+    /* Progress bar */
+    .progress-wrap {
+      background: #f0efeb;
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--primary), var(--dark-green));
+      transition: width .4s ease;
+    }
+
+    /* Avatar chip */
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* Trust grade */
+    .grade-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: .95rem;
+    }
+
+    .grade-badge.A { background: #e8f5ee; color: var(--primary); }
+    .grade-badge.B { background: #fdf3e0; color: #a06010; }
+    .grade-badge.C { background: #fdeaea; color: #b82020; }
+
+    /* Divider */
+    .divider { border: none; border-top: 1.5px solid var(--border); margin: 16px 0; }
+
+    /* List items */
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-item:last-child { border-bottom: none; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: .88rem;
+      font-weight: 500;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .2s;
+      pointer-events: none;
+    }
+
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Modal */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(13,21,32,.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    #modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--r);
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .9rem;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus { border-color: var(--primary); }
+
+    .form-textarea { min-height: 90px; resize: vertical; }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.3rem;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    /* Task item */
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    .task-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all .15s;
+    }
+
+    .task-checkbox.done {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .task-body { flex: 1; min-width: 0; }
+
+    .task-title {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .task-title.done-text {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .task-meta {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--muted);
+      border-radius: 6px;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn:hover { background: #f4f3ef; color: var(--text); }
+    .icon-btn.danger:hover { background: #fdeaea; color: #b82020; }
+
+    /* Filter pills */
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--muted);
+      transition: all .15s;
+    }
+
+    .pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* Deadline timeline */
+    .deadline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 12px 0;
+      position: relative;
+    }
+
+    .deadline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 44px;
+      width: 2px;
+      height: calc(100% - 12px);
+      background: var(--border);
+    }
+
+    .deadline-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: .62rem;
+      font-weight: 700;
+      line-height: 1.2;
+      text-align: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .deadline-dot.past    { background: #f0efeb; color: var(--muted); }
+    .deadline-dot.today   { background: var(--accent); color: #fff; }
+    .deadline-dot.soon    { background: #fdf3e0; color: #a06010; }
+    .deadline-dot.future  { background: var(--blue-bg); color: var(--blue); }
+
+    .deadline-body { flex: 1; padding-top: 8px; }
+    .deadline-title { font-size: .9rem; font-weight: 600; color: var(--text); }
+    .deadline-date  { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    /* Leerdoel */
+    .leerdoel-item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .leerdoel-item:last-child { border-bottom: none; }
+
+    .leerdoel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .leerdoel-name {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .leerdoel-pct {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Reflectie */
+    .reflectie-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .reflectie-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .reflectie-period {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .reflectie-date {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    .reflectie-text {
+      font-size: .88rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Score bar */
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .score-label {
+      font-size: .82rem;
+      color: var(--muted);
+      width: 120px;
+      flex-shrink: 0;
+    }
+
+    .score-bar-wrap {
+      flex: 1;
+      background: #f0efeb;
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      background: linear-gradient(90deg, var(--primary), var(--dark-green));
+    }
+
+    .score-val {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--text);
+      width: 32px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Log */
+    .log-entry {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+    }
+
+    .log-entry:last-child { border-bottom: none; }
+
+    .log-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .log-dot.green  { background: var(--primary); }
+    .log-dot.blue   { background: var(--blue); }
+    .log-dot.orange { background: var(--accent); }
+
+    .log-msg { color: var(--text); line-height: 1.5; }
+    .log-time { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+    /* Sidebar overlay (mobile) */
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 80;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 220px; }
+
+      #hamburger-btn { display: flex; width: 56px; }
+
+      .hub-topbar-logo {
+        display: none;
+      }
+
+      #sidebar {
+        transform: translateX(-100%);
+      }
+
+      #sidebar.open {
+        transform: translateX(0);
+      }
+
+      #sidebar-overlay.open { display: block; }
+
+      #main-content {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 20px 16px;
+      }
+
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+      .page-head { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .rp-cards { flex-direction: column; }
+      .rp-card { min-width: unset; }
+    }
+
+    /* ══════════════════════════════════════════════════════
+       MEETING SCHEDULER — component CSS
+       ══════════════════════════════════════════════════════ */
+
+    /* Meeting card */
+    .meeting-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .meeting-card.geaccepteerd { border-left-color: var(--green); }
+    .meeting-card.tegenbod     { border-left-color: var(--amber); }
+    .meeting-card.afgewezen    { border-left-color: var(--red); }
+    .meeting-card.geannuleerd  { border-left-color: var(--muted); opacity: .7; }
+
+    .mcard-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .mcard-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .mcard-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: .82rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .mcard-meta span { display: flex; align-items: center; gap: 4px; }
+    .mcard-note {
+      font-size: .85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin: 10px 0;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+    .mcard-confirmed {
+      background: var(--green-bg);
+      color: var(--green);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: .88rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .mcard-confirmed .mcard-contact {
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: .82rem;
+    }
+
+    /* Proposed time options */
+    .meeting-dates-label {
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
+    .meeting-time-opts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .time-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .88rem;
+      transition: all .14s;
+      user-select: none;
+    }
+    .time-opt:hover { background: var(--bg); border-color: var(--primary); }
+    .time-opt.selected { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .time-opt-radio {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all .14s;
+    }
+    .time-opt.selected .time-opt-radio {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    /* Counter proposal block */
+    .counter-block {
+      background: var(--amber-bg);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .counter-label { font-size: .78rem; font-weight: 600; color: var(--amber); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+    .counter-time  { font-size: .92rem; font-weight: 600; color: var(--ink); }
+    .counter-note  { font-size: .82rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+    /* Meeting actions row */
+    .meeting-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+    /* Inline counter form */
+    .counter-form, .confirm-dialog {
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1.5px dashed var(--border);
+    }
+    .counter-form .form-row { margin-bottom: 10px; }
+    .confirm-dialog { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .confirm-dialog span { font-size: .88rem; color: var(--ink); flex: 1; }
+
+    /* Availability grid */
+    .avail-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .avail-day { display: flex; flex-direction: column; gap: 6px; }
+    .avail-day-name {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      text-align: center;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .avail-slot {
+      border-radius: 6px;
+      padding: 6px 4px;
+      font-size: .72rem;
+      text-align: center;
+      line-height: 1.3;
+      font-weight: 500;
+    }
+    .avail-slot.beschikbaar { background: var(--green-bg); color: var(--green); }
+    .avail-slot.voorkeur    { background: var(--amber-bg); color: var(--amber); }
+    .avail-slot.bezet       { background: var(--red-bg);   color: var(--red);   opacity: .7; }
+    .avail-empty            { font-size: .72rem; color: var(--muted); text-align: center; padding: 6px 0; }
+
+    /* Avail edit rows (in modal) */
+    .avail-edit-day { margin-bottom: 16px; }
+    .avail-edit-day-label {
+      font-weight: 600;
+      font-size: .88rem;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .avail-slot-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .avail-slot-row select, .avail-slot-row input[type=time] {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .85rem;
+      color: var(--text);
+      background: var(--white);
+    }
+    .avail-slot-row select { min-width: 120px; }
+
+    /* Modal overlay + box */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 200;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px;
+      overflow-y: auto;
+    }
+    .modal-box {
+      background: var(--white);
+      border-radius: var(--r);
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.18);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .modal-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.3rem;
+      color: var(--muted);
+      line-height: 1;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .modal-close:hover { background: var(--bg); color: var(--ink); }
+    .modal-body { padding: 24px; overflow-y: auto; max-height: calc(80vh - 140px); }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1.5px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Step indicator */
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    .step-indicator .step {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      background: var(--bg);
+    }
+    .step-indicator .step.active { background: var(--primary); color: #fff; }
+    .step-indicator .sep { color: var(--border); }
+
+    /* Form elements in modal */
+    .form-row { margin-bottom: 14px; }
+    .form-label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 5px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .92rem;
+      color: var(--text);
+      background: var(--white);
+      transition: border-color .14s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .form-textarea { resize: vertical; min-height: 72px; }
+
+    /* Type radio group */
+    .type-radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .type-radio-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .88rem;
+      transition: all .14s;
+      user-select: none;
+    }
+    .type-radio-option:hover { border-color: var(--primary); }
+    .type-radio-option.selected { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+    .type-radio-option input { display: none; }
+
+    /* Step 2 two-column layout */
+    .modal-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 600px) { .modal-2col { grid-template-columns: 1fr; } }
+
+    /* Time slot rows in step 2 */
+    .time-slot-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+    .time-slot-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .time-slot-row input[type=date], .time-slot-row input[type=time] {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .85rem;
+      color: var(--text);
+      background: var(--white);
+    }
+    .time-slot-row .slot-sep { font-size: .8rem; color: var(--muted); }
+
+    /* Section headers inside tab */
+    .afspraken-section { margin-bottom: 28px; }
+    .afspraken-section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .afspraken-section-title span { font-size: .75rem; }
+
+    /* Empty state */
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: .88rem;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--r);
+    }
+
+    /* Collapsible archief */
+    .archief-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: .88rem;
+      color: var(--muted);
+      padding: 0;
+    }
+    .archief-toggle:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+
+<!-- ══ Role picker ══════════════════════════════════════════════════════════ -->
+<div id="role-picker">
+  <div class="rp-logo">Internly<span>.</span></div>
+  <div class="rp-subtitle">Stage Hub — gedeeld stagedashboard</div>
+
+  <div class="rp-heading">Bekijk als</div>
+  <div class="rp-desc">Kies je rol om het dashboard in de juiste context te zien.</div>
+
+  <div class="rp-cards">
+    <div class="rp-card" onclick="startHub('student')">
+      <div class="rp-card-icon">🎓</div>
+      <div class="rp-card-title">Student</div>
+      <div class="rp-card-hint">Lena Hartman</div>
+    </div>
+    <div class="rp-card" onclick="startHub('bedrijf')">
+      <div class="rp-card-icon">🏢</div>
+      <div class="rp-card-title">Bedrijf</div>
+      <div class="rp-card-hint">NIOZ Zeewetenschappen</div>
+    </div>
+    <div class="rp-card" onclick="startHub('school')">
+      <div class="rp-card-icon">🏫</div>
+      <div class="rp-card-title">School</div>
+      <div class="rp-card-hint">M. Jansen · HBO Communicatie</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ App shell ════════════════════════════════════════════════════════════ -->
+<div id="app-shell">
+
+  <!-- Topbar -->
+  <header id="hub-topbar">
+    <a class="hub-topbar-logo" href="#">Internly<span>.</span></a>
+
+    <button id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    <div class="hub-topbar-stage">
+      <div class="hub-topbar-stage-name">Stage Wetenschapscommunicatie</div>
+      <div class="hub-topbar-stage-meta">NIOZ Zeewetenschappen · 1 mrt – 31 aug 2026</div>
+    </div>
+
+    <div class="hub-topbar-right">
+      <span id="role-badge-display" class="role-badge"></span>
+      <button class="role-switch-btn" onclick="switchRole()">Wissel rol</button>
+    </div>
+  </header>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Layout -->
+  <div class="hub-layout">
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-section-label">Menu</div>
+      <button class="sidebar-item active" data-tab="overzicht" onclick="switchTab('overzicht')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        </svg>
+        Overzicht
+      </button>
+      <button class="sidebar-item" data-tab="planning" onclick="switchTab('planning')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        Planning
+      </button>
+      <button class="sidebar-item" data-tab="taken" onclick="switchTab('taken')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+        Taken
+        <span id="sidebar-badge-taken" class="sidebar-badge" style="display:none"></span>
+      </button>
+      <button class="sidebar-item" data-tab="voortgang" onclick="switchTab('voortgang')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Voortgang
+      </button>
+      <button class="sidebar-item" data-tab="afspraken" onclick="switchTab('afspraken')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="14" x2="8" y2="14" stroke-linecap="round" stroke-width="2.5"/>
+          <line x1="12" y1="14" x2="12" y2="14" stroke-linecap="round" stroke-width="2.5"/>
+        </svg>
+        Afspraken
+        <span id="sidebar-badge-afspraken" class="sidebar-badge" style="display:none"></span>
+      </button>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-user" id="sidebar-user-info"></div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main id="main-content">
+      <!-- Rendered by JS -->
+    </main>
+
+  </div>
+</div>
+
+<!-- ══ Modal ════════════════════════════════════════════════════════════════ -->
+<div id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="modal-box">
+    <!-- Filled by JS -->
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Meeting request modal -->
+<div id="modal-root" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeMeetingModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div id="modal-inner"></div>
+  </div>
+</div>
+
+<!-- Availability modal -->
+<div id="avail-modal-root" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAvailModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div id="avail-modal-inner"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     JavaScript
+     ══════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── Demo data ──────────────────────────────────────────────────────────── */
+
+const match = {
+  student: {
+    id: 1,
+    name: 'Lena Hartman',
+    opleiding: 'Communicatie & Multimedia Design',
+    jaar: 3,
+    avatar: 'LH',
+    color: '#1756a8',
+    bgColor: 'var(--blue-bg)',
+    leerdoelen: ['Klantgericht schrijven', 'Content strategie', 'Visual storytelling']
+  },
+  company: {
+    id: 5,
+    name: 'NIOZ Zeewetenschappen',
+    sector: 'Wetenschappelijk Onderzoek',
+    score: 96,
+    grade: 'A',
+    scores: { respons: 98, leerdoel: 95, afspraken: 96, begeleiding: 96 },
+    vacature: 'Stage Wetenschapscommunicatie',
+    duur: '6 maanden',
+    start: '1 maart 2026',
+    eind: '31 augustus 2026',
+    tags: ['Communicatie', 'Wetenschap', 'Schrijven']
+  },
+  school: {
+    name: 'M. Jansen',
+    opleiding: 'HBO Communicatie',
+    invited: true
+  }
+};
+
+let hubState = {
+  role: null,
+  currentTab: 'overzicht',
+  schoolInvited: true,
+  nextId: 20,
+
+  tasks: [
+    { id: 1, title: 'Onderzoeksvoorstel schrijven', desc: 'Schrijf een voorstel van 3-5 pagina\'s over wetenschapscommunicatie voor brede doelgroepen.', deadline: '2026-03-15', status: 'done',        assignee: 'student' },
+    { id: 2, title: 'Doelgroepanalyse uitvoeren',   desc: 'Analyseer de doelgroep voor de NIOZ nieuwsbrief en socialmediakanalen.',                    deadline: '2026-03-28', status: 'in-progress', assignee: 'student' },
+    { id: 3, title: 'Interne presentatie geven',     desc: 'Presenteer de tussentijdse bevindingen aan het communicatieteam van NIOZ.',                  deadline: '2026-04-10', status: 'todo',        assignee: 'student' },
+    { id: 4, title: 'Stagegesprek week 8 plannen',   desc: 'Plan het formele stagegesprek met de stagebegeleider en schoolmentor.',                      deadline: '2026-04-17', status: 'todo',        assignee: 'bedrijf' },
+    { id: 5, title: 'Tussentijdse beoordeling',      desc: 'Vul het beoordelingsformulier in via het schoolportaal voor de tussentijdse evaluatie.',     deadline: '2026-04-22', status: 'todo',        assignee: 'school'  }
+  ],
+
+  deadlines: [
+    { id: 'd1', title: 'Start stage',              date: '2026-03-01' },
+    { id: 'd2', title: 'Week 2 check-in',          date: '2026-03-14' },
+    { id: 'd3', title: 'Tussentijdse evaluatie',   date: '2026-04-15' },
+    { id: 'd4', title: 'Halverwege presentatie',   date: '2026-05-01' },
+    { id: 'd5', title: 'Eindpresentatie',          date: '2026-08-20' },
+    { id: 'd6', title: 'Afstudeermoment',          date: '2026-08-31' }
+  ],
+
+  leerdoelen: [
+    { id: 'l1', title: 'Klantgericht schrijven',   progress: 65, notes: 'Nieuwsbriefartikelen goed ontvangen door doelgroep. Focus op toegankelijkheid verbeteren.' },
+    { id: 'l2', title: 'Content strategie',        progress: 40, notes: 'Doelgroepanalyse loopt. Strategie nog niet volledig uitgewerkt.' },
+    { id: 'l3', title: 'Visual storytelling',      progress: 25, notes: 'Begonnen met infographic-tools. Meer oefening nodig.' }
+  ],
+
+  reflecties: [
+    {
+      id: 'r1',
+      period: 'Week 1–2 reflectie',
+      date: '2026-03-14',
+      text: 'De eerste twee weken waren een goede kennismaking met het team en de werkwijze van NIOZ. Ik voel me welkom en de begeleider neemt de tijd om dingen uit te leggen. Het schrijven voor een breed publiek is uitdagender dan verwacht — wetenschappelijke taal vereenvoudigen zonder inhoud te verliezen is een vaardigheid die ik nog moet ontwikkelen.',
+      editAllowed: true
+    },
+    {
+      id: 'r2',
+      period: 'Maand 1 evaluatie',
+      date: '2026-04-01',
+      text: 'Na een maand merk ik dat mijn schrijfstijl al merkbaar toegankelijker is geworden. Ik heb twee gepubliceerde artikelen voor de NIOZ website geschreven. Het werken met onderzoekers als bron is soms lastig qua tijdsplanning — een volgende stap is om beter te plannen en eerder interviews in te plannen.',
+      editAllowed: true
+    }
+  ],
+
+  log: [
+    { id: 'lg1', msg: 'Lena Hartman heeft taak "Onderzoeksvoorstel schrijven" afgerond.',     time: '15 mrt, 11:23', color: 'green'  },
+    { id: 'lg2', msg: 'M. Jansen (school) is uitgenodigd voor het Stage Hub dashboard.',      time: '2 mrt, 09:05',  color: 'blue'   },
+    { id: 'lg3', msg: 'Stage gestart op 1 maart 2026 — hub aangemaakt.',                      time: '1 mrt, 08:00',  color: 'orange' },
+    { id: 'lg4', msg: 'Bedrijfsbegeleider heeft deadline "Halverwege presentatie" toegevoegd.',time: '3 mrt, 14:30',  color: 'blue'   },
+    { id: 'lg5', msg: 'Reflectie "Week 1–2" ingediend door Lena Hartman.',                    time: '14 mrt, 16:00', color: 'green'  }
+  ],
+
+  nextMeetingId: 4,
+
+  meetings: [
+    {
+      id: 1, from: 'bedrijf', to: 'student', toAll: false,
+      subject: 'Startgesprek stage', type: 'video',
+      contactInfo: 'meet.google.com/nioz-lena-start',
+      proposedDates: [
+        { id: 1, date: '2026-03-10', from: '10:00', to: '11:00' },
+        { id: 2, date: '2026-03-11', from: '14:00', to: '15:00' }
+      ],
+      selectedDate: 1, status: 'geaccepteerd', counterProposal: null,
+      note: 'Kennismaking en doorloop van de stage-opdracht.',
+      createdAt: '8 mrt, 09:15', updatedAt: '8 mrt, 10:00',
+      seenBy: ['student', 'bedrijf']
+    },
+    {
+      id: 2, from: 'student', to: 'bedrijf', toAll: false,
+      subject: 'Feedback op conceptscript', type: 'call',
+      contactInfo: '+31 6 12345678',
+      proposedDates: [
+        { id: 1, date: '2026-04-23', from: '10:00', to: '10:30' },
+        { id: 2, date: '2026-04-24', from: '14:00', to: '14:30' },
+        { id: 3, date: '2026-04-25', from: '09:00', to: '09:30' }
+      ],
+      selectedDate: null, status: 'openstaand', counterProposal: null,
+      note: 'Graag jullie feedback op het eerste conceptscript voor de video-serie.',
+      createdAt: '20 apr, 11:40', updatedAt: '20 apr, 11:40',
+      seenBy: ['student']
+    },
+    {
+      id: 3, from: 'school', to: 'student', toAll: false,
+      subject: 'Halverwege-evaluatie', type: 'video',
+      contactInfo: 'teams.microsoft.com/hbo-comm/evaluatie',
+      proposedDates: [
+        { id: 1, date: '2026-05-12', from: '13:00', to: '14:00' },
+        { id: 2, date: '2026-05-13', from: '10:00', to: '11:00' }
+      ],
+      selectedDate: null, status: 'tegenbod',
+      counterProposal: {
+        date: '2026-05-14', from: '14:00', to: '15:00',
+        note: 'De eerste twee data lukken niet, kan het woensdag 14:00?'
+      },
+      note: 'Bespreking van voortgang en leerdoelen halverwege de stage.',
+      createdAt: '1 mei, 09:00', updatedAt: '1 mei, 14:00',
+      seenBy: ['school', 'student']
+    }
+  ],
+
+  availability: {
+    student: { slots: [
+      { id: 1, day: 'maandag',   from: '09:00', to: '12:00', type: 'beschikbaar' },
+      { id: 2, day: 'maandag',   from: '13:00', to: '17:00', type: 'beschikbaar' },
+      { id: 3, day: 'dinsdag',   from: '10:00', to: '16:00', type: 'voorkeur'    },
+      { id: 4, day: 'woensdag',  from: '09:00', to: '12:00', type: 'beschikbaar' },
+      { id: 5, day: 'donderdag', from: '00:00', to: '23:59', type: 'bezet'       },
+      { id: 6, day: 'vrijdag',   from: '09:00', to: '13:00', type: 'beschikbaar' }
+    ]},
+    bedrijf: { slots: [
+      { id: 1, day: 'maandag',   from: '09:00', to: '17:00', type: 'beschikbaar' },
+      { id: 2, day: 'dinsdag',   from: '09:00', to: '12:00', type: 'bezet'       },
+      { id: 3, day: 'dinsdag',   from: '14:00', to: '17:00', type: 'beschikbaar' },
+      { id: 4, day: 'woensdag',  from: '10:00', to: '16:00', type: 'voorkeur'    },
+      { id: 5, day: 'donderdag', from: '09:00', to: '17:00', type: 'beschikbaar' },
+      { id: 6, day: 'vrijdag',   from: '09:00', to: '12:00', type: 'beschikbaar' }
+    ]},
+    school: { slots: [
+      { id: 1, day: 'maandag',  from: '13:00', to: '17:00', type: 'beschikbaar' },
+      { id: 2, day: 'woensdag', from: '09:00', to: '12:00', type: 'voorkeur'    },
+      { id: 3, day: 'vrijdag',  from: '14:00', to: '16:00', type: 'beschikbaar' }
+    ]}
+  }
+};
+
+/* ── Permissions ────────────────────────────────────────────────────────── */
+
+const CAN = {
+  student: {
+    addTask: true, editTask: true, deleteTask: false, checkTask: true,
+    addDeadline: false, editDeadline: false,
+    addReflectie: true, editReflectie: true,
+    updateLeerdoel: true,
+    viewLog: true, viewScores: false
+  },
+  bedrijf: {
+    addTask: true, editTask: true, deleteTask: true, checkTask: true,
+    addDeadline: true, editDeadline: true,
+    addReflectie: false, editReflectie: false,
+    updateLeerdoel: true,
+    viewLog: true, viewScores: true
+  },
+  school: {
+    addTask: false, editTask: false, deleteTask: false, checkTask: false,
+    addDeadline: false, editDeadline: false,
+    addReflectie: false, editReflectie: false,
+    updateLeerdoel: false,
+    viewLog: true, viewScores: true
+  }
+};
+
+function can(action) {
+  return CAN[hubState.role]?.[action] ?? false;
+}
+
+function roleName() {
+  return { student: match.student.name, bedrijf: match.company.name, school: match.school.name }[hubState.role] || hubState.role;
+}
+
+/* ── Bootstrap ──────────────────────────────────────────────────────────── */
+
+function startHub(role) {
+  hubState.role = role;
+  document.getElementById('role-picker').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'block';
+  updateRoleBadge();
+  updateSidebarUser();
+  updateTakenBadge();
+  switchTab('overzicht');
+}
+
+function switchRole() {
+  document.getElementById('role-picker').style.display = 'flex';
+  document.getElementById('app-shell').style.display = 'none';
+  hubState.role = null;
+}
+
+function updateRoleBadge() {
+  const el = document.getElementById('role-badge-display');
+  const labels = { student: '🎓 Student', bedrijf: '🏢 Bedrijf', school: '🏫 School' };
+  el.textContent = labels[hubState.role] || '';
+  el.className = `role-badge ${hubState.role}`;
+}
+
+function updateSidebarUser() {
+  const el = document.getElementById('sidebar-user-info');
+  const info = {
+    student: `${match.student.name}<br>${match.student.opleiding}`,
+    bedrijf: `${match.company.name}<br>${match.company.sector}`,
+    school:  `${match.school.name}<br>${match.school.opleiding}`
+  };
+  el.innerHTML = info[hubState.role] || '';
+}
+
+function updateTakenBadge() {
+  const open = hubState.tasks.filter(t => t.status !== 'done').length;
+  const badge = document.getElementById('sidebar-badge-taken');
+  if (open > 0) {
+    badge.textContent = open;
+    badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* ── Tab routing ────────────────────────────────────────────────────────── */
+
+function switchTab(tab) {
+  hubState.currentTab = tab;
+  closeSidebar();
+
+  document.querySelectorAll('.sidebar-item[data-tab]').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+
+  const mc = document.getElementById('main-content');
+  const renderers = {
+    overzicht:  renderOverzicht,
+    planning:   renderPlanning,
+    taken:      renderTaken,
+    voortgang:  renderVoortgang,
+    afspraken:  renderAfspraken
+  };
+  mc.innerHTML = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
+  updateMeetingBadge();
+}
+
+/* ── Sidebar toggle ─────────────────────────────────────────────────────── */
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ── Overzicht tab ──────────────────────────────────────────────────────── */
+
+function renderOverzicht() {
+  const role = hubState.role;
+  const doneTasks  = hubState.tasks.filter(t => t.status === 'done').length;
+  const totalTasks = hubState.tasks.length;
+  const openTasks  = totalTasks - doneTasks;
+  const stageEnd   = new Date('2026-08-31');
+  const daysLeft   = Math.max(0, Math.round((stageEnd - new Date()) / 86400000));
+  const avgLeerdoel = Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length);
+
+  const schoolBanner = !hubState.schoolInvited ? `
+    <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:var(--r);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-weight:600;font-size:.9rem;color:#9a3412;">School nog niet uitgenodigd</div>
+        <div style="font-size:.82rem;color:#c2410c;margin-top:2px;">Nodig de schoolbegeleider uit om het dashboard te delen.</div>
+      </div>
+      ${can('addTask') ? `<button class="btn btn-sm" onclick="inviteSchool()" style="background:#ff7e42;color:#fff;border:none;">Uitnodigen</button>` : ''}
+    </div>` : '';
+
+  const leerdoelenRows = hubState.leerdoelen.map(l => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:.85rem;font-weight:500;">${escHtml(l.title)}</span>
+        <span style="font-size:.8rem;font-weight:700;color:var(--primary);">${l.progress}%</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${l.progress}%"></div></div>
+    </div>`).join('');
+
+  const recentTasks = hubState.tasks.slice(-3).reverse().map(t => {
+    const statusTag = t.status === 'done'
+      ? `<span class="tag green">Afgerond</span>`
+      : t.status === 'in-progress'
+        ? `<span class="tag yellow">Bezig</span>`
+        : `<span class="tag neutral">Open</span>`;
+    return `
+      <div class="list-item">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.88rem;font-weight:600;">${escHtml(t.title)}</div>
+          <div style="font-size:.75rem;color:var(--muted);">Deadline: ${formatDate(t.deadline)}</div>
+        </div>
+        ${statusTag}
+      </div>`;
+  }).join('');
+
+  const scoresSection = can('viewScores') ? `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Bedrijf beoordeling</div>
+          <div class="card-sub">Trustscore op basis van eerdere stages</div>
+        </div>
+        <div class="grade-badge A">${match.company.grade}</div>
+      </div>
+      <div class="score-row"><span class="score-label">Responstijd</span><div class="score-bar-wrap"><div class="score-bar-fill" style="width:${match.company.scores.respons}%"></div></div><span class="score-val">${match.company.scores.respons}</span></div>
+      <div class="score-row"><span class="score-label">Leerdoelen</span><div class="score-bar-wrap"><div class="score-bar-fill" style="width:${match.company.scores.leerdoel}%"></div></div><span class="score-val">${match.company.scores.leerdoel}</span></div>
+      <div class="score-row"><span class="score-label">Afspraken</span><div class="score-bar-wrap"><div class="score-bar-fill" style="width:${match.company.scores.afspraken}%"></div></div><span class="score-val">${match.company.scores.afspraken}</span></div>
+      <div class="score-row"><span class="score-label">Begeleiding</span><div class="score-bar-wrap"><div class="score-bar-fill" style="width:${match.company.scores.begeleiding}%"></div></div><span class="score-val">${match.company.scores.begeleiding}</span></div>
+    </div>` : '';
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Overzicht</div>
+        <div class="page-sub">Stage Wetenschapscommunicatie · ${match.company.name}</div>
+      </div>
+    </div>
+
+    ${schoolBanner}
+
+    <!-- Stats row -->
+    <div class="grid-3" style="margin-bottom:16px;">
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--primary);">${doneTasks}/${totalTasks}</div>
+        <div class="stat-label">Taken afgerond</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--blue);">${avgLeerdoel}%</div>
+        <div class="stat-label">Leerdoelen gem.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--accent);">${openTasks}</div>
+        <div class="stat-label">Open taken</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- Left column -->
+      <div>
+        <!-- Match info -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Stagegegevens</div>
+              <div class="card-sub">${match.company.duur} · ${match.company.start} – ${match.company.eind}</div>
+            </div>
+            <div class="avatar" style="background:var(--blue-bg);color:var(--blue);">${match.student.avatar}</div>
+          </div>
+          <div style="margin-bottom:10px;">
+            ${match.company.tags.map(t => `<span class="tag neutral" style="margin-right:4px;margin-bottom:4px;">${escHtml(t)}</span>`).join('')}
+          </div>
+          <div style="font-size:.82rem;color:var(--muted);">
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Student</span><strong style="color:var(--text);">${match.student.name}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Opleiding</span><strong style="color:var(--text);">${match.student.opleiding}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Bedrijf</span><strong style="color:var(--text);">${match.company.name}</strong></div>
+            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${match.school.name} · ${match.school.opleiding}</strong></div>
+          </div>
+        </div>
+
+        <!-- Leerdoelen preview -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Leerdoelen</div>
+            <button class="btn btn-ghost btn-sm" onclick="switchTab('voortgang')">Bekijk alles</button>
+          </div>
+          ${leerdoelenRows}
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div>
+        ${scoresSection}
+
+        <!-- Recent taken -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Recente taken</div>
+            <button class="btn btn-ghost btn-sm" onclick="switchTab('taken')">Alle taken</button>
+          </div>
+          ${recentTasks}
+        </div>
+
+        <!-- Activity log -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Activiteit</div>
+          </div>
+          ${hubState.log.slice(0, 4).map(l => `
+            <div class="log-entry">
+              <div class="log-dot ${l.color}"></div>
+              <div>
+                <div class="log-msg">${escHtml(l.msg)}</div>
+                <div class="log-time">${escHtml(l.time)}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── Planning tab ───────────────────────────────────────────────────────── */
+
+function renderPlanning() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const deadlinesHtml = hubState.deadlines.map((d) => {
+    const dDate = new Date(d.date); dDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.ceil((dDate - today) / 86400000);
+    const dotClass = dDate < today ? 'past'
+      : diffDays === 0 ? 'today'
+      : diffDays <= 30 ? 'soon'
+      : 'future';
+    const monthAbbr = formatDateShort(d.date);
+    const editBtn = can('editDeadline') ? `
+      <button class="icon-btn" title="Bewerken" onclick="openDeadlineModal('${d.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>` : '';
+    return `
+      <div class="deadline-item">
+        <div class="deadline-dot ${dotClass}">${monthAbbr}</div>
+        <div class="deadline-body">
+          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+            <div>
+              <div class="deadline-title">${escHtml(d.title)}</div>
+              <div class="deadline-date">${formatDate(d.date)}</div>
+            </div>
+            ${editBtn}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const addDeadlineBtn = can('addDeadline') ? `
+    <button class="btn btn-primary btn-sm" onclick="openDeadlineModal(null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Deadline toevoegen
+    </button>` : '';
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Planning</div>
+        <div class="page-sub">Tijdlijn en deadlines van de stage</div>
+      </div>
+      ${addDeadlineBtn}
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Stageperiode tijdlijn</div>
+          </div>
+          ${deadlinesHtml}
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Stage info</div>
+          </div>
+          <div style="font-size:.88rem;line-height:2;">
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Duur</span><strong>${match.company.duur}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Startdatum</span><strong>${match.company.start}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Einddatum</span><strong>${match.company.eind}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Bedrijf</span><strong>${match.company.name}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Sector</span><strong>${match.company.sector}</strong></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Volgende deadline</div>
+          </div>
+          ${(() => {
+            const now = new Date(); now.setHours(0, 0, 0, 0);
+            const next = hubState.deadlines.find(d => new Date(d.date) >= now);
+            if (!next) return '<p style="color:var(--muted);font-size:.88rem;">Geen aankomende deadlines.</p>';
+            return `
+              <div style="text-align:center;padding:8px 0;">
+                <div style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:2rem;font-weight:700;color:var(--ink);">${formatDate(next.date)}</div>
+                <div style="font-size:.9rem;color:var(--muted);margin-top:4px;">${escHtml(next.title)}</div>
+              </div>`;
+          })()}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── Taken tab ──────────────────────────────────────────────────────────── */
+
+let takenFilter = 'all';
+
+function renderTaken() {
+  const filtered = takenFilter === 'all'
+    ? hubState.tasks
+    : takenFilter === 'open'
+      ? hubState.tasks.filter(t => t.status !== 'done')
+      : takenFilter === 'done'
+        ? hubState.tasks.filter(t => t.status === 'done')
+        : hubState.tasks.filter(t => t.assignee === takenFilter);
+
+  const tasksHtml = filtered.length === 0 ? `
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      Geen taken gevonden.
+    </div>` : filtered.map(t => renderTaskItem(t)).join('');
+
+  const addBtn = can('addTask') ? `
+    <button class="btn btn-primary btn-sm" onclick="openTaakModal(null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Taak toevoegen
+    </button>` : '';
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Taken</div>
+        <div class="page-sub">${hubState.tasks.filter(t=>t.status==='done').length} van ${hubState.tasks.length} afgerond</div>
+      </div>
+      ${addBtn}
+    </div>
+
+    <div class="filter-pills">
+      <button class="pill ${takenFilter==='all'?'active':''}"     onclick="setTakenFilter('all')">Alle taken</button>
+      <button class="pill ${takenFilter==='open'?'active':''}"    onclick="setTakenFilter('open')">Open</button>
+      <button class="pill ${takenFilter==='done'?'active':''}"    onclick="setTakenFilter('done')">Afgerond</button>
+      <button class="pill ${takenFilter==='student'?'active':''}" onclick="setTakenFilter('student')">Student</button>
+      <button class="pill ${takenFilter==='bedrijf'?'active':''}" onclick="setTakenFilter('bedrijf')">Bedrijf</button>
+      <button class="pill ${takenFilter==='school'?'active':''}"  onclick="setTakenFilter('school')">School</button>
+    </div>
+
+    <div class="card">
+      ${tasksHtml}
+    </div>`;
+}
+
+function renderTaskItem(t) {
+  const isDone = t.status === 'done';
+  const statusTag = isDone
+    ? `<span class="tag green">Afgerond</span>`
+    : t.status === 'in-progress'
+      ? `<span class="tag yellow">Bezig</span>`
+      : `<span class="tag neutral">Open</span>`;
+
+  const assigneeTag = `<span class="tag ${t.assignee === 'student' ? 'blue' : t.assignee === 'bedrijf' ? 'green' : 'orange'}" style="margin-left:4px;">${t.assignee.charAt(0).toUpperCase()+t.assignee.slice(1)}</span>`;
+
+  const checkboxHtml = can('checkTask') ? `
+    <div class="task-checkbox ${isDone ? 'done' : ''}" onclick="toggleTaskDone(${t.id})" title="${isDone ? 'Markeer als open' : 'Markeer als afgerond'}">
+      ${isDone ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+    </div>` : `<div style="width:20px;"></div>`;
+
+  const editBtn = can('editTask') ? `
+    <button class="icon-btn" title="Bewerken" onclick="openTaakModal(${t.id})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>` : '';
+
+  const deleteBtn = can('deleteTask') ? `
+    <button class="icon-btn danger" title="Verwijderen" onclick="deleteTask(${t.id})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+    </button>` : '';
+
+  return `
+    <div class="task-item" id="task-${t.id}">
+      ${checkboxHtml}
+      <div class="task-body">
+        <div class="task-title ${isDone ? 'done-text' : ''}">${escHtml(t.title)}</div>
+        <div class="task-meta">
+          Deadline: ${formatDate(t.deadline)} &nbsp;${statusTag}${assigneeTag}
+        </div>
+      </div>
+      <div class="task-actions">
+        ${editBtn}
+        ${deleteBtn}
+      </div>
+    </div>`;
+}
+
+function setTakenFilter(f) {
+  takenFilter = f;
+  switchTab('taken');
+}
+
+function toggleTaskDone(id) {
+  if (!can('checkTask')) return;
+  const task = hubState.tasks.find(t => t.id === id);
+  if (!task) return;
+  task.status = task.status === 'done' ? 'todo' : 'done';
+  const logMsg = task.status === 'done'
+    ? `Taak "${task.title}" afgerond door ${roleName()}.`
+    : `Taak "${task.title}" heropend.`;
+  addLog(logMsg, 'green');
+  updateTakenBadge();
+  switchTab('taken');
+  toast(task.status === 'done' ? 'Taak afgerond!' : 'Taak heropend.');
+}
+
+function deleteTask(id) {
+  if (!can('deleteTask')) return;
+  const task = hubState.tasks.find(t => t.id === id);
+  if (!task) return;
+  if (!confirm(`Weet je zeker dat je "${task.title}" wilt verwijderen?`)) return;
+  hubState.tasks = hubState.tasks.filter(t => t.id !== id);
+  addLog(`Taak "${task.title}" verwijderd.`, 'orange');
+  updateTakenBadge();
+  switchTab('taken');
+  toast('Taak verwijderd.');
+}
+
+/* ── Voortgang tab ──────────────────────────────────────────────────────── */
+
+function renderVoortgang() {
+  const leerdoelenHtml = hubState.leerdoelen.map(l => `
+    <div class="leerdoel-item">
+      <div class="leerdoel-head">
+        <div class="leerdoel-name">${escHtml(l.title)}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="leerdoel-pct">${l.progress}%</span>
+          ${can('updateLeerdoel') ? `
+            <button class="icon-btn" onclick="openLeerdoelModal('${l.id}')" title="Voortgang bijwerken">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>` : ''}
+        </div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${l.progress}%"></div></div>
+      ${l.notes ? `<div style="font-size:.8rem;color:var(--muted);margin-top:8px;">${escHtml(l.notes)}</div>` : ''}
+    </div>`).join('');
+
+  const reflectiesHtml = hubState.reflecties.length === 0 ? `
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      Nog geen reflecties ingediend.
+    </div>` : hubState.reflecties.map(r => `
+    <div class="reflectie-card">
+      <div class="reflectie-head">
+        <div class="reflectie-period">${escHtml(r.period)}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="reflectie-date">${formatDate(r.date)}</span>
+          ${can('editReflectie') && r.editAllowed ? `
+            <button class="icon-btn" onclick="openReflectieModal('${r.id}')" title="Bewerken">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>` : ''}
+        </div>
+      </div>
+      <div class="reflectie-text">${escHtml(r.text)}</div>
+    </div>`).join('');
+
+  const addReflectieBtn = can('addReflectie') ? `
+    <button class="btn btn-primary btn-sm" onclick="openReflectieModal(null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Reflectie toevoegen
+    </button>` : '';
+
+  const schoolReadOnly = hubState.role === 'school' ? `
+    <div style="background:var(--blue-bg);border:1.5px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;color:var(--blue);">
+      Je bekijkt de voortgang als schoolbegeleider. Beoordelingen zijn alleen-lezen.
+    </div>` : '';
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Voortgang</div>
+        <div class="page-sub">Leerdoelen, reflecties en evaluaties</div>
+      </div>
+      ${addReflectieBtn}
+    </div>
+
+    ${schoolReadOnly}
+
+    <div class="grid-2">
+      <div>
+        <!-- Leerdoelen -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Leerdoelen</div>
+          </div>
+          ${leerdoelenHtml}
+        </div>
+      </div>
+
+      <div>
+        <!-- Reflecties -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-head">
+            <div class="card-title">Reflecties</div>
+          </div>
+          ${reflectiesHtml}
+        </div>
+
+        <!-- Activiteitslog -->
+        ${can('viewLog') ? `
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Activiteitenlog</div>
+          </div>
+          ${hubState.log.map(l => `
+            <div class="log-entry">
+              <div class="log-dot ${l.color}"></div>
+              <div>
+                <div class="log-msg">${escHtml(l.msg)}</div>
+                <div class="log-time">${escHtml(l.time)}</div>
+              </div>
+            </div>`).join('')}
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ── Modals ─────────────────────────────────────────────────────────────── */
+
+function openModal(html) {
+  document.getElementById('modal-box').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+/* Taak modal */
+function openTaakModal(id) {
+  const task = id ? hubState.tasks.find(t => t.id === id) : null;
+  const isNew = !task;
+
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">${isNew ? 'Taak toevoegen' : 'Taak bewerken'}</div>
+    <div class="form-group">
+      <label class="form-label">Taak omschrijving</label>
+      <input class="form-input" id="m-task-title" value="${escHtml(task?.title || '')}" placeholder="Bijv. Verslag schrijven…" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Beschrijving (optioneel)</label>
+      <textarea class="form-textarea" id="m-task-desc" placeholder="Extra context…">${escHtml(task?.desc || '')}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Deadline</label>
+      <input class="form-input" id="m-task-deadline" type="date" value="${task?.deadline || ''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Toegewezen aan</label>
+      <select class="form-select" id="m-task-assignee">
+        <option value="student" ${task?.assignee==='student'?'selected':''}>Student</option>
+        <option value="bedrijf" ${task?.assignee==='bedrijf'?'selected':''}>Bedrijf</option>
+        <option value="school"  ${task?.assignee==='school' ?'selected':''}>School</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="m-task-status">
+        <option value="todo"        ${task?.status==='todo'?       'selected':''}>Open</option>
+        <option value="in-progress" ${task?.status==='in-progress'?'selected':''}>Bezig</option>
+        <option value="done"        ${task?.status==='done'?       'selected':''}>Afgerond</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="saveTaak(${id || 'null'})">Opslaan</button>
+    </div>`);
+}
+
+function saveTaak(id) {
+  const title    = document.getElementById('m-task-title').value.trim();
+  const desc     = document.getElementById('m-task-desc').value.trim();
+  const deadline = document.getElementById('m-task-deadline').value;
+  const assignee = document.getElementById('m-task-assignee').value;
+  const status   = document.getElementById('m-task-status').value;
+
+  if (!title) { alert('Geef een taakomschrijving op.'); return; }
+
+  if (id) {
+    const task = hubState.tasks.find(t => t.id === id);
+    if (task) { task.title = title; task.desc = desc; task.deadline = deadline; task.assignee = assignee; task.status = status; }
+    addLog(`Taak "${title}" bewerkt.`, 'blue');
+    toast('Taak bijgewerkt!');
+  } else {
+    hubState.tasks.push({ id: hubState.nextId++, title, desc, deadline, assignee, status });
+    addLog(`Taak "${title}" toegevoegd door ${roleName()}.`, 'green');
+    toast('Taak toegevoegd!');
+  }
+
+  updateTakenBadge();
+  closeModal();
+  switchTab('taken');
+}
+
+/* Deadline modal */
+function openDeadlineModal(id) {
+  const d = id ? hubState.deadlines.find(x => x.id === id) : null;
+  const isNew = !d;
+
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">${isNew ? 'Deadline toevoegen' : 'Deadline bewerken'}</div>
+    <div class="form-group">
+      <label class="form-label">Omschrijving</label>
+      <input class="form-input" id="m-dl-title" value="${escHtml(d?.title || '')}" placeholder="Bijv. Eindpresentatie…" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Datum</label>
+      <input class="form-input" id="m-dl-date" type="date" value="${d?.date || ''}" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="saveDeadline('${id || ''}')">Opslaan</button>
+    </div>`);
+}
+
+function saveDeadline(id) {
+  const title = document.getElementById('m-dl-title').value.trim();
+  const date  = document.getElementById('m-dl-date').value;
+  if (!title || !date) { alert('Vul alle velden in.'); return; }
+
+  if (id) {
+    const d = hubState.deadlines.find(x => x.id === id);
+    if (d) { d.title = title; d.date = date; }
+    toast('Deadline bijgewerkt!');
+  } else {
+    const newId = 'd' + hubState.nextId++;
+    hubState.deadlines.push({ id: newId, title, date, type: 'future' });
+    hubState.deadlines.sort((a, b) => a.date.localeCompare(b.date));
+    addLog(`Deadline "${title}" toegevoegd.`, 'blue');
+    toast('Deadline toegevoegd!');
+  }
+
+  closeModal();
+  switchTab('planning');
+}
+
+/* Leerdoel modal */
+function openLeerdoelModal(id) {
+  const l = hubState.leerdoelen.find(x => x.id === id);
+  if (!l) return;
+
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">Voortgang bijwerken</div>
+    <div class="form-group">
+      <label class="form-label">Leerdoel</label>
+      <input class="form-input" value="${escHtml(l.title)}" disabled />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Voortgang: <span id="m-ld-pct-display">${l.progress}%</span></label>
+      <input type="range" id="m-ld-progress" min="0" max="100" value="${l.progress}"
+        oninput="document.getElementById('m-ld-pct-display').textContent=this.value+'%'"
+        style="width:100%;accent-color:var(--primary);height:6px;cursor:pointer;" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notitie</label>
+      <textarea class="form-textarea" id="m-ld-notes" placeholder="Beschrijf de huidige stand…">${escHtml(l.notes || '')}</textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="saveLeerdoel('${id}')">Opslaan</button>
+    </div>`);
+}
+
+function saveLeerdoel(id) {
+  const l = hubState.leerdoelen.find(x => x.id === id);
+  if (!l) return;
+  l.progress = parseInt(document.getElementById('m-ld-progress').value, 10);
+  l.notes    = document.getElementById('m-ld-notes').value.trim();
+  addLog(`Leerdoel "${l.title}" bijgewerkt naar ${l.progress}%.`, 'green');
+  toast('Leerdoel bijgewerkt!');
+  closeModal();
+  switchTab('voortgang');
+}
+
+/* Reflectie modal */
+function openReflectieModal(id) {
+  const r = id ? hubState.reflecties.find(x => x.id === id) : null;
+  const isNew = !r;
+
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">${isNew ? 'Reflectie toevoegen' : 'Reflectie bewerken'}</div>
+    <div class="form-group">
+      <label class="form-label">Periode</label>
+      <input class="form-input" id="m-r-period" value="${escHtml(r?.period || '')}" placeholder="Bijv. Week 3–4 reflectie" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Datum</label>
+      <input class="form-input" id="m-r-date" type="date" value="${r?.date || ''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reflectietekst</label>
+      <textarea class="form-textarea" id="m-r-text" style="min-height:140px;" placeholder="Beschrijf je ervaringen, leerpunten en verbeterpunten…">${escHtml(r?.text || '')}</textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="saveReflectie('${id || ''}')">Opslaan</button>
+    </div>`);
+}
+
+function saveReflectie(id) {
+  const period = document.getElementById('m-r-period').value.trim();
+  const date   = document.getElementById('m-r-date').value;
+  const text   = document.getElementById('m-r-text').value.trim();
+  if (!period || !text) { alert('Vul het periode-veld en de reflectietekst in.'); return; }
+
+  if (id) {
+    const r = hubState.reflecties.find(x => x.id === id);
+    if (r) { r.period = period; r.date = date; r.text = text; }
+    toast('Reflectie bijgewerkt!');
+  } else {
+    const newId = 'r' + hubState.nextId++;
+    hubState.reflecties.unshift({ id: newId, period, date, text, editAllowed: true });
+    addLog(`Reflectie "${period}" ingediend door ${match.student.name}.`, 'green');
+    toast('Reflectie opgeslagen!');
+  }
+
+  closeModal();
+  switchTab('voortgang');
+}
+
+/* ── Helpers ────────────────────────────────────────────────────────────── */
+
+function inviteSchool() {
+  hubState.schoolInvited = true;
+  addLog('School uitgenodigd voor het Stage Hub dashboard.', 'blue');
+  toast('Uitnodiging verstuurd aan ' + match.school.name);
+  switchTab('overzicht');
+}
+
+function addLog(msg, color) {
+  const now = new Date();
+  const time = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
+    now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  hubState.log.unshift({ id: 'lg' + hubState.nextId++, msg, time, color });
+  if (hubState.log.length > 20) hubState.log.pop();
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function formatDateShort(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  const parts = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }).split(' ');
+  return `<span>${parts[0]}</span><span>${parts[1] || ''}</span>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   AFSPRAKEN SYSTEM
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Transient state ─────────────────────────────────────────────── */
+let selectedTimeOpts = {};   // meetingId → dateId
+let newMeeting = {};         // form state across modal steps
+let modalTimeSlots = [];     // [{date,from,to}] built in step 2
+let archievedOpen = false;   // accordion state
+
+/* ── Pure helpers ─────────────────────────────────────────────────── */
+function typeIcon(type) {
+  return { call: '📞', video: '🎥', fysiek: '🏢' }[type] || '📅';
+}
+function typeName(type) {
+  return { call: 'Telefonisch gesprek', video: 'Videocall', fysiek: 'Fysiek gesprek' }[type] || type;
+}
+function statusTag(s) {
+  return {
+    openstaand:   { label: 'Openstaand',  cls: 'orange'  },
+    geaccepteerd: { label: 'Bevestigd',   cls: 'green'   },
+    tegenbod:     { label: 'Tegenbod 🟡', cls: 'yellow'  },
+    afgewezen:    { label: 'Afgewezen',   cls: 'red'     },
+    geannuleerd:  { label: 'Geannuleerd', cls: 'neutral' }
+  }[s] || { label: s, cls: 'neutral' };
+}
+function formatMeetingDate(dateStr, from, to) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  const day  = d.toLocaleDateString('nl-NL', { weekday: 'long' });
+  const date = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+  return `${day[0].toUpperCase() + day.slice(1)} ${date} · ${from}–${to}`;
+}
+function roleDisplay(role) {
+  return { student: match.student.name, bedrijf: match.company.name, school: match.school.name }[role] || role;
+}
+function roleLabel(role) {
+  return { student: 'Student', bedrijf: 'Bedrijf', school: 'School' }[role] || role;
+}
+function receiverOf(m) {
+  return m.toAll ? 'alle partijen' : roleDisplay(m.to);
+}
+
+/* ── Badge ────────────────────────────────────────────────────────── */
+function updateMeetingBadge() {
+  const role = hubState.role;
+  if (!role) return;
+  const count = hubState.meetings.filter(m => {
+    if (m.status === 'openstaand' && (m.to === role || (m.toAll && m.from !== role))) return true;
+    if (m.status === 'tegenbod'   && m.from === role)             return true;
+    return false;
+  }).length;
+  const badge = document.getElementById('sidebar-badge-afspraken');
+  if (!badge) return;
+  if (count > 0) { badge.textContent = count; badge.style.display = ''; }
+  else           { badge.style.display = 'none'; }
+}
+
+/* ── Availability grid (read-only or read-write) ─────────────────── */
+function renderAvailabilityGrid(role, readonly) {
+  const days = ['maandag','dinsdag','woensdag','donderdag','vrijdag'];
+  const slots = hubState.availability[role]?.slots || [];
+  const cols  = days.map(day => {
+    const daySlots = slots.filter(s => s.day === day);
+    if (daySlots.length === 0) {
+      return `<div class="avail-day">
+        <div class="avail-day-name">${day.slice(0,2).toUpperCase()}</div>
+        <div class="avail-empty">—</div>
+      </div>`;
+    }
+    const slotsHtml = daySlots.map(s => `
+      <div class="avail-slot ${s.type}">
+        ${s.type === 'bezet' ? 'Bezet' : `${s.from}–${s.to}`}
+      </div>`).join('');
+    return `<div class="avail-day">
+      <div class="avail-day-name">${day.slice(0,2).toUpperCase()}</div>
+      ${slotsHtml}
+    </div>`;
+  });
+  return `<div class="avail-grid">${cols.join('')}</div>`;
+}
+
+/* ── Meeting card ─────────────────────────────────────────────────── */
+function renderMeetingCard(m) {
+  const role = hubState.role;
+  const st   = statusTag(m.status);
+  const isReceiver = m.to === role || (m.toAll && m.from !== role);
+  const isSender   = m.from === role;
+
+  // Confirmed date display
+  let confirmedHtml = '';
+  if (m.status === 'geaccepteerd') {
+    let dateLabel = '—';
+    if (m.counterProposal && m.selectedDate === 'counter') {
+      dateLabel = formatMeetingDate(m.counterProposal.date, m.counterProposal.from, m.counterProposal.to);
+    } else if (m.selectedDate) {
+      const pd = m.proposedDates.find(d => d.id === m.selectedDate);
+      if (pd) dateLabel = formatMeetingDate(pd.date, pd.from, pd.to);
+    }
+    confirmedHtml = `<div class="mcard-confirmed">
+      ✓ ${escHtml(dateLabel)}
+      <div class="mcard-contact">${typeIcon(m.type)} ${escHtml(m.contactInfo)}</div>
+    </div>`;
+  }
+
+  // Proposed dates (radio-like) for pending meetings received by current role
+  let datesHtml = '';
+  if (['openstaand'].includes(m.status) && isReceiver && m.proposedDates.length > 0) {
+    const opts = m.proposedDates.map(pd => {
+      const sel = selectedTimeOpts[m.id] === pd.id;
+      return `<div class="time-opt${sel ? ' selected' : ''}" id="topt-${m.id}-${pd.id}"
+        onclick="selectTimeOpt(${m.id}, ${pd.id})">
+        <span class="time-opt-radio"></span>
+        <span>${formatMeetingDate(pd.date, pd.from, pd.to)}</span>
+      </div>`;
+    }).join('');
+    datesHtml = `<div class="meeting-dates-label">Voorgestelde tijdstippen:</div>
+      <div class="meeting-time-opts">${opts}</div>`;
+  } else if (m.status === 'openstaand' && isSender && m.proposedDates.length > 0) {
+    const opts = m.proposedDates.map(pd =>
+      `<div style="font-size:.85rem;color:var(--muted);padding:4px 0">
+        ○ ${formatMeetingDate(pd.date, pd.from, pd.to)}
+      </div>`).join('');
+    datesHtml = `<div class="meeting-dates-label">Jouw voorgestelde tijdstippen:</div>${opts}`;
+  }
+
+  // Counter proposal
+  let counterHtml = '';
+  if (m.status === 'tegenbod' && m.counterProposal) {
+    const cp    = m.counterProposal;
+    const cFrom = m.to === role ? roleDisplay(m.from) : roleDisplay(m.to);
+    counterHtml = `<div class="counter-block">
+      <div class="counter-label">Tegenbod van ${escHtml(cFrom)}:</div>
+      <div class="counter-time">${formatMeetingDate(cp.date, cp.from, cp.to)}</div>
+      ${cp.note ? `<div class="counter-note">"${escHtml(cp.note)}"</div>` : ''}
+    </div>`;
+  }
+
+  // Action buttons
+  let actionsHtml = '';
+  if (m.status === 'openstaand' && isReceiver) {
+    const sel = !!selectedTimeOpts[m.id];
+    actionsHtml = `
+      <div class="meeting-actions">
+        <button class="btn btn-primary btn-sm" id="accept-btn-${m.id}"
+          ${sel ? '' : 'disabled style="opacity:.4;cursor:not-allowed"'}
+          onclick="acceptMeeting(${m.id})">✓ Accepteren</button>
+        <button class="btn btn-ghost btn-sm" onclick="openCounterForm(${m.id})">↩ Tegenbod</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDecline(${m.id})">✕ Afwijzen</button>
+      </div>
+      <div id="counter-form-${m.id}" class="counter-form" style="display:none">
+        <div class="form-row">
+          <label class="form-label">Alternatieve datum</label>
+          <input type="date" class="form-input" id="cf-date-${m.id}">
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1"><label class="form-label">Van</label>
+            <input type="time" class="form-input" id="cf-from-${m.id}" value="10:00"></div>
+          <div style="flex:1"><label class="form-label">Tot</label>
+            <input type="time" class="form-input" id="cf-to-${m.id}" value="11:00"></div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Toelichting (optioneel)</label>
+          <textarea class="form-textarea" id="cf-note-${m.id}" rows="2"
+            placeholder="Bijv. dinsdag lukt niet, kan het woensdag?"></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="submitCounter(${m.id})">Tegenbod versturen</button>
+          <button class="btn btn-ghost btn-sm"
+            onclick="document.getElementById('counter-form-${m.id}').style.display='none'">Annuleren</button>
+        </div>
+      </div>
+      <div id="confirm-decline-${m.id}" class="confirm-dialog" style="display:none">
+        <span>Weet je zeker dat je dit verzoek <strong>afwijst</strong>?</span>
+        <button class="btn btn-danger btn-sm" onclick="declineMeeting(${m.id})">Ja, afwijzen</button>
+        <button class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('confirm-decline-${m.id}').style.display='none'">Nee, terug</button>
+      </div>`;
+
+  } else if (m.status === 'openstaand' && isSender) {
+    actionsHtml = `
+      <div class="meeting-actions">
+        <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">✕ Verzoek annuleren</button>
+      </div>
+      <div id="confirm-cancel-${m.id}" class="confirm-dialog" style="display:none">
+        <span>Weet je zeker dat je dit verzoek <strong>annuleert</strong>?</span>
+        <button class="btn btn-danger btn-sm" onclick="cancelMeeting(${m.id})">Ja, annuleren</button>
+        <button class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('confirm-cancel-${m.id}').style.display='none'">Nee, terug</button>
+      </div>`;
+
+  } else if (m.status === 'tegenbod' && isSender) {
+    actionsHtml = `
+      <div class="meeting-actions">
+        <button class="btn btn-primary btn-sm" onclick="acceptCounter(${m.id})">✓ Accepteer tegenbod</button>
+        <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">✕ Verzoek annuleren</button>
+      </div>
+      <div id="confirm-cancel-${m.id}" class="confirm-dialog" style="display:none">
+        <span>Weet je zeker dat je dit verzoek <strong>annuleert</strong>?</span>
+        <button class="btn btn-danger btn-sm" onclick="cancelMeeting(${m.id})">Ja, annuleren</button>
+        <button class="btn btn-ghost btn-sm"
+          onclick="document.getElementById('confirm-cancel-${m.id}').style.display='none'">Nee, terug</button>
+      </div>`;
+
+  } else if (m.status === 'geaccepteerd' && isSender) {
+    actionsHtml = `<div class="meeting-actions">
+      <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">✕ Annuleren</button>
+    </div>
+    <div id="confirm-cancel-${m.id}" class="confirm-dialog" style="display:none">
+      <span>Weet je zeker dat je deze afspraak <strong>annuleert</strong>?</span>
+      <button class="btn btn-danger btn-sm" onclick="cancelMeeting(${m.id})">Ja, annuleren</button>
+      <button class="btn btn-ghost btn-sm"
+        onclick="document.getElementById('confirm-cancel-${m.id}').style.display='none'">Nee, terug</button>
+    </div>`;
+  }
+
+  return `<div class="meeting-card ${m.status}" id="mcard-${m.id}">
+    <div class="mcard-head">
+      <div class="mcard-title">📅 ${escHtml(m.subject)}</div>
+      <span class="tag ${st.cls}">${st.label}</span>
+    </div>
+    <div class="mcard-meta">
+      <span>Van: ${escHtml(roleDisplay(m.from))} (${roleLabel(m.from)})</span>
+      <span>${typeIcon(m.type)} ${typeName(m.type)}</span>
+      ${m.status === 'geaccepteerd' ? '' : `<span title="contactgegevens">🔒 Zichtbaar na bevestiging</span>`}
+    </div>
+    <hr class="divider">
+    ${confirmedHtml}
+    ${datesHtml}
+    ${counterHtml}
+    ${m.note ? `<div class="mcard-note">"${escHtml(m.note)}"</div>` : ''}
+    ${actionsHtml}
+    <div style="font-size:.75rem;color:var(--muted);margin-top:10px">Aangemaakt: ${escHtml(m.createdAt)}</div>
+  </div>`;
+}
+
+/* ── Main tab renderer ────────────────────────────────────────────── */
+function renderAfspraken() {
+  const role = hubState.role;
+
+  const roleInvolved = m => m.to === role || m.from === role || (m.toAll && m.from !== role);
+
+  const accepted  = hubState.meetings.filter(m => m.status === 'geaccepteerd' && roleInvolved(m));
+  const pending   = hubState.meetings.filter(m =>
+    (m.status === 'openstaand' || m.status === 'tegenbod') && roleInvolved(m)
+  );
+  const archived  = hubState.meetings.filter(m =>
+    (m.status === 'afgewezen' || m.status === 'geannuleerd') && roleInvolved(m)
+  );
+
+  const acceptedHtml = accepted.length === 0
+    ? '<div class="empty-state">Geen aankomende bevestigde afspraken.</div>'
+    : accepted.map(m => renderMeetingCard(m)).join('');
+
+  const pendingHtml = pending.length === 0
+    ? '<div class="empty-state">Geen openstaande verzoeken.</div>'
+    : pending.map(m => renderMeetingCard(m)).join('');
+
+  const archivedHtml = archived.length === 0
+    ? '<div class="empty-state" style="font-size:.82rem">Geen afgeronde of geannuleerde afspraken.</div>'
+    : archived.map(m => renderMeetingCard(m)).join('');
+
+  const availLabel = ['Mijn beschikbaarheid', `(${roleDisplay(role)})`].join(' ');
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">📅 Afspraken</div>
+        <div class="page-sub">Verzoeken en beschikbaarheid voor deze stage</div>
+      </div>
+      <button class="btn btn-primary" onclick="openMeetingModal()">+ Nieuw verzoek</button>
+    </div>
+
+    <div class="afspraken-section">
+      <div class="afspraken-section-title">Aankomende afspraken <span class="tag green">${accepted.length}</span></div>
+      ${acceptedHtml}
+    </div>
+
+    <div class="afspraken-section">
+      <div class="afspraken-section-title">Openstaande verzoeken <span class="tag orange">${pending.length}</span></div>
+      ${pendingHtml}
+    </div>
+
+    <div class="afspraken-section">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">🗓 ${escHtml(availLabel)}</div>
+            <div class="card-sub">Jouw beschikbaarheid per dag van de week</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="openAvailModal()">⚙ Bewerken</button>
+        </div>
+        ${renderAvailabilityGrid(role, true)}
+      </div>
+    </div>
+
+    <div class="afspraken-section">
+      <button class="archief-toggle" onclick="toggleArchief()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="${archievedOpen ? '18 15 12 9 6 15' : '6 9 12 15 18 9'}"/>
+        </svg>
+        Archief (${archived.length})
+      </button>
+      ${archievedOpen ? `<div style="margin-top:12px">${archivedHtml}</div>` : ''}
+    </div>`;
+}
+
+function toggleArchief() {
+  archievedOpen = !archievedOpen;
+  switchTab('afspraken');
+}
+
+/* ── Time option selection ────────────────────────────────────────── */
+function selectTimeOpt(meetingId, dateId) {
+  selectedTimeOpts[meetingId] = dateId;
+  // Re-render the tab so the selection state and button disabled state update
+  switchTab('afspraken');
+}
+
+/* ── Accept ───────────────────────────────────────────────────────── */
+function acceptMeeting(id) {
+  const m = hubState.meetings.find(m => m.id === id);
+  if (!m) return;
+  const dateId = selectedTimeOpts[id];
+  if (!dateId) return;
+  m.status       = 'geaccepteerd';
+  m.selectedDate = dateId;
+  m.updatedAt    = nowStr();
+  const pd = m.proposedDates.find(d => d.id === dateId);
+  const dateLabel = pd ? formatMeetingDate(pd.date, pd.from, pd.to) : '';
+  addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek geaccepteerd — ${dateLabel}`, 'green');
+  toast(`✓ Afspraak bevestigd — ${dateLabel}`);
+  delete selectedTimeOpts[id];
+  switchTab('afspraken');
+}
+
+/* ── Counter ──────────────────────────────────────────────────────── */
+function openCounterForm(id) {
+  const el = document.getElementById(`counter-form-${id}`);
+  if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+function submitCounter(id) {
+  const date = document.getElementById(`cf-date-${id}`)?.value;
+  const from = document.getElementById(`cf-from-${id}`)?.value;
+  const to   = document.getElementById(`cf-to-${id}`)?.value;
+  const note = document.getElementById(`cf-note-${id}`)?.value || '';
+  if (!date || !from || !to) { alert('Vul datum en tijden in.'); return; }
+  const m = hubState.meetings.find(m => m.id === id);
+  if (!m) return;
+  m.status          = 'tegenbod';
+  m.counterProposal = { date, from, to, note };
+  m.updatedAt       = nowStr();
+  addLog(`${roleDisplay(hubState.role)} heeft een tegenbod gedaan op "${m.subject}"`, 'orange');
+  toast(`${roleDisplay(hubState.role)} stelt een andere tijd voor`);
+  switchTab('afspraken');
+}
+
+/* ── Decline ──────────────────────────────────────────────────────── */
+function confirmDecline(id) {
+  const el = document.getElementById(`confirm-decline-${id}`);
+  if (el) el.style.display = '';
+}
+
+function declineMeeting(id) {
+  const m = hubState.meetings.find(m => m.id === id);
+  if (!m) return;
+  m.status    = 'afgewezen';
+  m.updatedAt = nowStr();
+  addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek "${m.subject}" afgewezen`, 'red');
+  toast('Verzoek afgewezen');
+  switchTab('afspraken');
+}
+
+/* ── Cancel ───────────────────────────────────────────────────────── */
+function confirmCancel(id) {
+  const el = document.getElementById(`confirm-cancel-${id}`);
+  if (el) el.style.display = '';
+}
+
+function cancelMeeting(id) {
+  const m = hubState.meetings.find(m => m.id === id);
+  if (!m || m.from !== hubState.role) return;
+  m.status    = 'geannuleerd';
+  m.updatedAt = nowStr();
+  addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek "${m.subject}" geannuleerd`, 'orange');
+  toast('Verzoek geannuleerd');
+  switchTab('afspraken');
+}
+
+/* ── Accept counter proposal ──────────────────────────────────────── */
+function acceptCounter(id) {
+  const m = hubState.meetings.find(m => m.id === id);
+  if (!m || !m.counterProposal) return;
+  m.status       = 'geaccepteerd';
+  m.selectedDate = 'counter';
+  m.updatedAt    = nowStr();
+  const cp        = m.counterProposal;
+  const dateLabel = formatMeetingDate(cp.date, cp.from, cp.to);
+  addLog(`${roleDisplay(hubState.role)} heeft het tegenbod geaccepteerd — ${dateLabel}`, 'green');
+  toast(`✓ Afspraak bevestigd — ${dateLabel}`);
+  switchTab('afspraken');
+}
+
+/* ── Meeting request modal ────────────────────────────────────────── */
+function openMeetingModal() {
+  newMeeting    = { type: 'video' };
+  modalTimeSlots = [{ date: '', from: '10:00', to: '11:00' }];
+  renderModalStep1();
+  document.getElementById('modal-root').style.display = 'flex';
+}
+
+function closeMeetingModal() {
+  document.getElementById('modal-root').style.display = 'none';
+}
+
+function renderModalStep1() {
+  const role   = hubState.role;
+  const others = ['student', 'bedrijf', 'school'].filter(r => r !== role);
+  const toOpts = others.map(r =>
+    `<option value="${r}" ${newMeeting.to === r ? 'selected' : ''}>${roleDisplay(r)} (${roleLabel(r)})</option>`
+  ).join('');
+  const toAllOpt = `<option value="all" ${newMeeting.to === 'all' ? 'selected' : ''}>Alle partijen</option>`;
+
+  const typeOptions = ['call','video','fysiek'].map(t => `
+    <label class="type-radio-option${newMeeting.type === t ? ' selected' : ''}">
+      <input type="radio" name="mtype" value="${t}" ${newMeeting.type === t ? 'checked' : ''}
+        onchange="newMeeting.type='${t}'; this.closest('.modal-body').querySelector('.contact-label').textContent=contactLabel('${t}'); document.querySelectorAll('.type-radio-option').forEach(el=>el.classList.remove('selected')); this.closest('.type-radio-option').classList.add('selected')">
+      ${typeIcon(t)} ${typeName(t)}
+    </label>`).join('');
+
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">Afspraak verzoeken</div>
+      <button class="modal-close" onclick="closeMeetingModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <span class="step active">① Details</span>
+        <span class="sep">→</span>
+        <span class="step">② Tijdstip</span>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Aan</label>
+        <select class="form-select" id="m-to" onchange="newMeeting.to=this.value">
+          <option value="">— Kies ontvanger —</option>
+          ${toOpts}${toAllOpt}
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Onderwerp</label>
+        <input type="text" class="form-input" id="m-subject" maxlength="80"
+          placeholder="Bijv. Voortgangsgesprek week 4"
+          value="${escHtml(newMeeting.subject || '')}"
+          oninput="newMeeting.subject=this.value">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Type gesprek</label>
+        <div class="type-radio-group">${typeOptions}</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label contact-label">${contactLabel(newMeeting.type)}</label>
+        <input type="text" class="form-input" id="m-contact"
+          value="${escHtml(newMeeting.contactInfo || '')}"
+          oninput="newMeeting.contactInfo=this.value">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Toelichting (optioneel)</label>
+        <textarea class="form-textarea" id="m-note" rows="3"
+          oninput="newMeeting.note=this.value">${escHtml(newMeeting.note || '')}</textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeMeetingModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="nextStep()">Volgende →</button>
+    </div>`;
+}
+
+function contactLabel(type) {
+  return { call: 'Telefoonnummer', video: 'Vergaderlink (Meet / Teams / Zoom)', fysiek: 'Adres of locatie' }[type] || 'Contactgegevens';
+}
+
+function nextStep() {
+  const to      = document.getElementById('m-to')?.value;
+  const subject = document.getElementById('m-subject')?.value?.trim();
+  const contact = document.getElementById('m-contact')?.value?.trim();
+  if (!to || !subject || !contact) {
+    alert('Vul alle verplichte velden in (Aan, Onderwerp, Contactgegevens).'); return;
+  }
+  newMeeting.to          = to;
+  newMeeting.subject     = subject;
+  newMeeting.contactInfo = contact;
+  newMeeting.note        = document.getElementById('m-note')?.value || '';
+  renderModalStep2();
+}
+
+function renderModalStep2() {
+  const receiver = newMeeting.to === 'all'
+    ? 'alle partijen'
+    : roleDisplay(newMeeting.to);
+
+  const availRole = newMeeting.to === 'all' ? 'student' : newMeeting.to;
+  const availGrid = renderAvailabilityGrid(availRole, true);
+
+  const slotRows = () => modalTimeSlots.map((s, i) => `
+    <div class="time-slot-row" id="tsrow-${i}">
+      <input type="date" value="${s.date}" onchange="modalTimeSlots[${i}].date=this.value">
+      <span class="slot-sep">van</span>
+      <input type="time" value="${s.from}" onchange="modalTimeSlots[${i}].from=this.value">
+      <span class="slot-sep">tot</span>
+      <input type="time" value="${s.to}"   onchange="modalTimeSlots[${i}].to=this.value">
+      ${modalTimeSlots.length > 1
+        ? `<button class="btn btn-ghost btn-sm" onclick="removeTimeSlot(${i})" style="padding:4px 8px">✕</button>`
+        : ''}
+    </div>`).join('');
+
+  document.getElementById('modal-inner').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">Afspraak verzoeken</div>
+      <button class="modal-close" onclick="closeMeetingModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="step-indicator">
+        <span class="step">① Details</span>
+        <span class="sep">→</span>
+        <span class="step active">② Tijdstip</span>
+      </div>
+      <div class="modal-2col">
+        <div>
+          <div class="form-label" style="margin-bottom:10px">Stel tijdstippen voor (max. 3)</div>
+          <div class="time-slot-rows" id="time-slot-rows">${slotRows()}</div>
+          ${modalTimeSlots.length < 3
+            ? `<button class="btn btn-ghost btn-sm" onclick="addTimeSlot()">+ Tijdstip toevoegen</button>`
+            : ''}
+        </div>
+        <div>
+          <div class="form-label" style="margin-bottom:10px">Beschikbaarheid van ${escHtml(receiver)}</div>
+          ${availGrid}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="renderModalStep1()">← Terug</button>
+      <button class="btn btn-primary" onclick="saveMeeting()">Verzoek versturen →</button>
+    </div>`;
+}
+
+function addTimeSlot() {
+  if (modalTimeSlots.length >= 3) return;
+  modalTimeSlots.push({ date: '', from: '10:00', to: '11:00' });
+  renderModalStep2();
+}
+
+function removeTimeSlot(idx) {
+  modalTimeSlots.splice(idx, 1);
+  renderModalStep2();
+}
+
+function saveMeeting() {
+  const filled = modalTimeSlots.filter(s => s.date && s.from && s.to);
+  if (filled.length === 0) { alert('Voeg minimaal één tijdstip toe.'); return; }
+  const now = new Date();
+  const timeStr = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
+    now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  const m = {
+    id:            hubState.nextMeetingId++,
+    from:          hubState.role,
+    to:            newMeeting.to === 'all' ? '' : newMeeting.to,
+    toAll:         newMeeting.to === 'all',
+    subject:       newMeeting.subject,
+    type:          newMeeting.type,
+    contactInfo:   newMeeting.contactInfo,
+    proposedDates: filled.map((s, i) => ({ id: i + 1, date: s.date, from: s.from, to: s.to })),
+    selectedDate:  null,
+    status:        'openstaand',
+    counterProposal: null,
+    note:          newMeeting.note || '',
+    createdAt:     timeStr,
+    updatedAt:     timeStr,
+    seenBy:        [hubState.role]
+  };
+  hubState.meetings.unshift(m);
+  const receiverLabel = newMeeting.to === 'all' ? 'alle partijen' : roleDisplay(newMeeting.to);
+  addLog(`${roleDisplay(hubState.role)} heeft een ${typeName(m.type).toLowerCase()}-verzoek verstuurd aan ${receiverLabel}`, 'blue');
+  toast(`Verzoek verstuurd aan ${receiverLabel}`);
+  closeMeetingModal();
+  switchTab('afspraken');
+}
+
+/* ── Availability modal ───────────────────────────────────────────── */
+function openAvailModal() {
+  renderAvailModal();
+  document.getElementById('avail-modal-root').style.display = 'flex';
+}
+
+function closeAvailModal() {
+  document.getElementById('avail-modal-root').style.display = 'none';
+}
+
+function renderAvailModal() {
+  const role  = hubState.role;
+  const days  = ['maandag','dinsdag','woensdag','donderdag','vrijdag'];
+  const slots = hubState.availability[role]?.slots || [];
+
+  const dayRows = days.map(day => {
+    const daySlots = slots.filter(s => s.day === day);
+    const dayIdx   = days.indexOf(day);
+    const slotsHtml = daySlots.map((s, si) => `
+      <div class="avail-slot-row" id="asr-${dayIdx}-${si}">
+        <select onchange="updateAvailSlot('${day}', ${si}, 'type', this.value)">
+          <option value="beschikbaar" ${s.type==='beschikbaar'?'selected':''}>Beschikbaar</option>
+          <option value="voorkeur"    ${s.type==='voorkeur'   ?'selected':''}>Voorkeur</option>
+          <option value="bezet"       ${s.type==='bezet'      ?'selected':''}>Bezet</option>
+        </select>
+        ${s.type !== 'bezet' ? `
+          <input type="time" value="${s.from}" onchange="updateAvailSlot('${day}', ${si}, 'from', this.value)">
+          <span style="font-size:.8rem;color:var(--muted)">–</span>
+          <input type="time" value="${s.to}"   onchange="updateAvailSlot('${day}', ${si}, 'to', this.value)">
+        ` : ''}
+        <button class="btn btn-ghost btn-sm" style="padding:4px 8px"
+          onclick="removeAvailSlot('${day}', ${si})">✕</button>
+      </div>`).join('');
+
+    return `<div class="avail-edit-day">
+      <div class="avail-edit-day-label">${day[0].toUpperCase() + day.slice(1)}</div>
+      <div id="avail-slots-${dayIdx}">${slotsHtml}</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:4px"
+        onclick="addAvailSlot('${day}')">+ Blok toevoegen</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('avail-modal-inner').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">Beschikbaarheid instellen</div>
+      <button class="modal-close" onclick="closeAvailModal()">✕</button>
+    </div>
+    <div class="modal-body">${dayRows}</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAvailModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="saveAvailability()">Opslaan</button>
+    </div>`;
+}
+
+function updateAvailSlot(day, idx, field, value) {
+  const role  = hubState.role;
+  const slots = hubState.availability[role].slots;
+  const s     = slots.filter(sl => sl.day === day)[idx];
+  if (s) { s[field] = value; renderAvailModal(); }
+}
+
+function addAvailSlot(day) {
+  const role = hubState.role;
+  hubState.availability[role].slots.push({
+    id: Date.now(), day, from: '09:00', to: '17:00', type: 'beschikbaar'
+  });
+  renderAvailModal();
+}
+
+function removeAvailSlot(day, idx) {
+  const role  = hubState.role;
+  const slots = hubState.availability[role].slots;
+  const daySlots = slots.filter(s => s.day === day);
+  if (daySlots[idx]) {
+    const globalIdx = slots.indexOf(daySlots[idx]);
+    slots.splice(globalIdx, 1);
+  }
+  renderAvailModal();
+}
+
+function saveAvailability() {
+  const role  = hubState.role;
+  const slots = hubState.availability[role]?.slots || [];
+  const invalid = slots.filter(s => !s.from || !s.to || s.from >= s.to);
+  if (invalid.length > 0) {
+    alert('Controleer de tijden: elk blok moet een geldige van–tot hebben (van < tot).');
+    return;
+  }
+  addLog(`${roleDisplay(role)} heeft beschikbaarheid bijgewerkt.`, 'blue');
+  toast('Beschikbaarheid bijgewerkt');
+  closeAvailModal();
+  switchTab('afspraken');
+}
+
+/* ── Utility ──────────────────────────────────────────────────────── */
+function nowStr() {
+  const now = new Date();
+  return now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
+    now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+}
+</script>
+</body>
+</html>

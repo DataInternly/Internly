@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Schooldashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/push.js"></script>
+  <style>
+    :root {
+      --blue:       #1756a8;
+      --blue-dark:  #0f3f80;
+      --blue-bg:    #e8f0fc;
+      --orange:     #FF7E42;
+      --orange-dark:#e05c1a;
+      --orange-bg:  #fdf0e8;
+      --green:      #1a7a48;
+      --green-bg:   #e8f5ee;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --white:      #ffffff;
+      --border:     #f0f0ee;
+      --border2:    #e2e8f0;
+      --red:        #b82020;
+      --red-bg:     #fdeaea;
+      --amber:      #a06010;
+      --amber-bg:   #fdf3e0;
+      --r:          16px;
+      --r-sm:       8px;
+      --sidebar-w:  240px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--blue-dark);
+      height: 56px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-link {
+      color: rgba(255,255,255,.6); text-decoration: none;
+      font-size: .85rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar-link:hover { color: #fff; }
+    .role-pill {
+      background: rgba(255,255,255,.15);
+      color: rgba(255,255,255,.9);
+      font-size: .75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+    }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar-inner { padding: 20px 12px; }
+    .sidebar-section { margin-bottom: 24px; }
+    .sidebar-label {
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ink4); padding: 0 8px; margin-bottom: 6px; display: block;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%; padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: .88rem;
+      color: var(--ink2); text-align: left;
+      transition: background .12s, color .12s; margin-bottom: 2px;
+    }
+    .nav-btn:hover { background: var(--bg); }
+    .nav-btn.active { background: var(--blue-bg); color: var(--blue); font-weight: 600; }
+    .nav-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto; background: var(--orange); color: #fff;
+      font-size: .65rem; font-weight: 700; padding: 2px 6px; border-radius: 10px;
+    }
+
+    /* ── MAIN ── */
+    .main { flex: 1; padding: 32px 32px 80px; max-width: 900px; }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 4px;
+    }
+    .page-sub { font-size: .88rem; color: var(--ink3); margin-bottom: 24px; }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 16px 18px;
+    }
+    .stat-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink4); margin-bottom: 6px;
+    }
+    .stat-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.9rem; font-weight: 700; color: var(--ink); line-height: 1;
+    }
+    .stat-note { font-size: .75rem; color: var(--ink4); margin-top: 3px; }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* ── STUDENT ROWS ── */
+    .student-row {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 16px 18px;
+      margin-bottom: 8px; display: flex; align-items: center;
+      gap: 14px; transition: border-color .15s;
+    }
+    .student-row:hover { border-color: #bfdbfe; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--blue-bg); color: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .88rem; font-weight: 700; flex-shrink: 0;
+    }
+    .sr-info { flex: 1; min-width: 0; }
+    .sr-name { font-size: .92rem; font-weight: 600; color: var(--ink); }
+    .sr-meta { font-size: .78rem; color: var(--ink3); }
+    .sr-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    .progress-wrap { width: 80px; }
+    .progress-track { height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+    .progress-label { font-size: .68rem; color: var(--ink4); text-align: right; margin-top: 2px; }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green  { background: var(--green); }
+    .dot-amber  { background: var(--amber); }
+    .dot-red    { background: var(--red); }
+    .dot-gray   { background: var(--ink4); }
+
+    /* ── SIGNAL CARDS ── */
+    .signal-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 16px 18px; margin-bottom: 8px;
+    }
+    .signal-card.urgent {
+      border-left: 3px solid var(--red);
+      border-radius: 0 var(--r) var(--r) 0;
+    }
+    .signal-card.warn {
+      border-left: 3px solid var(--amber);
+      border-radius: 0 var(--r) var(--r) 0;
+    }
+    .signal-title { font-size: .9rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+    .signal-sub { font-size: .8rem; color: var(--ink3); line-height: 1.5; }
+    .signal-badge {
+      font-size: .7rem; font-weight: 700; padding: 3px 9px;
+      border-radius: 20px; display: inline-block; margin-bottom: 6px;
+    }
+    .sb-red    { background: var(--red-bg);   color: var(--red); }
+    .sb-amber  { background: var(--amber-bg);  color: var(--amber); }
+    .sb-blue   { background: var(--blue-bg);   color: var(--blue); }
+    .sb-green  { background: var(--green-bg);  color: var(--green); }
+
+    /* ── COMPANY CARDS ── */
+    .company-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 18px 20px; margin-bottom: 10px;
+      transition: border-color .15s;
+    }
+    .company-card:hover { border-color: #bfdbfe; }
+    .cc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .cc-name { font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 700; color: var(--ink); }
+    .cc-meta { font-size: .8rem; color: var(--ink3); margin-top: 2px; }
+    .trust-badge {
+      font-size: .72rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+    }
+    .trust-a { background: var(--green-bg); color: var(--green); }
+    .trust-b { background: var(--amber-bg); color: var(--amber); }
+    .trust-c { background: var(--red-bg);   color: var(--red); }
+
+    /* ── POSTING CARDS ── */
+    .posting-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 18px 20px; margin-bottom: 10px;
+      transition: border-color .15s;
+    }
+    .posting-card:hover { border-color: var(--blue-bg); }
+    .pc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .pc-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 700; color: var(--ink); }
+    .pc-meta { font-size: .8rem; color: var(--ink3); margin-top: 2px; }
+    .status-badge { font-size: .7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .s-active { background: var(--green-bg); color: var(--green); }
+    .s-paused { background: var(--amber-bg); color: var(--amber); }
+    .s-closed { background: #f0f0ee; color: #6b7280; }
+
+    .pc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0 8px; }
+    .tag { background: #f0f0ee; color: #6b7280; padding: 3px 9px; border-radius: 20px; font-size: .73rem; }
+    .tag-blue { background: var(--blue-bg); color: var(--blue); }
+
+    .pc-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn-xs {
+      padding: 9px 14px; border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .78rem; font-weight: 600;
+      cursor: pointer; border: 1.5px solid transparent; transition: all .12s;
+      min-height: 36px;
+    }
+    .btn-pause    { background: var(--amber-bg); color: var(--amber); border-color: rgba(160,96,16,.2); }
+    .btn-pause:hover { background: #fde8b0; }
+    .btn-activate { background: var(--green-bg); color: var(--green); border-color: rgba(26,122,72,.2); }
+    .btn-activate:hover { background: #e8f5ee; }
+    .btn-del      { background: var(--red-bg);   color: var(--red);   border-color: rgba(184,32,32,.15); }
+    .btn-del:hover { background: #fccaca; }
+
+    /* ── FORM ── */
+    .form-card, .card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 24px; margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .9rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: .84rem; font-weight: 600; color: var(--ink2); margin-bottom: 5px; }
+    .req { color: var(--orange); margin-left: 2px; }
+    .hint { font-weight: 400; color: var(--ink4); font-size: .76rem; margin-left: 6px; }
+    .field input[type="text"],
+    .field select,
+    .field textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border2); border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .9rem;
+      color: var(--ink); background: var(--white);
+      outline: none; transition: border-color .15s; box-sizing: border-box;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); }
+    .field textarea { resize: vertical; min-height: 85px; line-height: 1.55; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+
+    /* Tags */
+    .tags-box {
+      border: 1.5px solid var(--border2); border-radius: var(--r-sm);
+      padding: 7px 12px; background: var(--white);
+      display: flex; flex-wrap: wrap; gap: 5px;
+      cursor: text; min-height: 42px; align-items: center;
+      transition: border-color .15s;
+    }
+    .tags-box:focus-within { border-color: var(--blue); }
+    .tag-chip {
+      background: var(--blue-bg); color: var(--blue);
+      padding: 3px 9px; border-radius: 20px;
+      font-size: .76rem; font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .tag-chip button { background: none; border: none; color: var(--blue); cursor: pointer; font-size: .85rem; padding: 0; }
+    .tags-input {
+      border: none; outline: none; font-family: 'Outfit', sans-serif;
+      font-size: .88rem; color: var(--ink); flex: 1; min-width: 100px; background: transparent;
+    }
+    .tags-hint { font-size: .75rem; color: var(--ink4); margin-top: 4px; }
+
+    /* Radio */
+    .radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 14px; border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm); cursor: pointer;
+      transition: all .12s; background: var(--white); flex: 1; min-width: 100px;
+    }
+    .radio-opt:hover { border-color: var(--blue); background: #f0f4ff; }
+    .radio-opt.selected { border-color: var(--blue); background: #eef2ff; }
+    .radio-opt input { accent-color: var(--blue); flex-shrink: 0; }
+    .radio-label { font-size: .85rem; color: var(--ink2); font-weight: 500; }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--blue); color: #fff; border: none;
+      padding: 11px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-ghost {
+      background: transparent; border: 1.5px solid var(--border2);
+      color: var(--ink2); padding: 10px 22px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 500;
+      cursor: pointer; transition: all .12s;
+    }
+    .btn-ghost:hover { border-color: var(--ink3); }
+    .btn-blue {
+      background: var(--blue); color: #fff; border: none;
+      padding: 8px 18px; border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-blue:hover { background: var(--blue-dark); }
+
+    /* Empty */
+    .empty {
+      text-align: center; padding: 48px 20px;
+      color: var(--ink4); font-size: .88rem; line-height: 1.9;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r);
+    }
+    .empty-icon { font-size: 2.2rem; display: block; margin-bottom: 12px; }
+
+    /* Alert box */
+    .alert-box {
+      border-left: 3px solid;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      padding: 12px 16px; margin-bottom: 16px;
+      font-size: .85rem; line-height: 1.6;
+    }
+    .alert-red   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+    .alert-amber { background: var(--amber-bg);  border-color: var(--amber); color: var(--amber); }
+    .alert-blue  { background: var(--blue-bg);   border-color: var(--blue);  color: var(--blue); }
+
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── FOCUS STATES ── */
+    :focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+    .nav-btn:focus-visible { outline-offset: 0; }
+
+    /* ── SIDEBAR USER ── */
+    .sidebar-user {
+      padding: 16px 12px 12px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-user-info { min-width: 0; }
+    .sidebar-user-name {
+      font-size: .84rem; font-weight: 600; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sidebar-user-email {
+      font-size: .72rem; color: var(--ink4);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── LOGOUT ── */
+    .btn-logout {
+      display: flex; align-items: center; gap: 9px;
+      width: calc(100% - 24px); margin: 8px 12px;
+      padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: 1.5px solid var(--border2);
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: .84rem; color: var(--ink3); text-align: left;
+      transition: all .12s;
+    }
+    .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
+
+    /* ── CONFIRM MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(13,21,32,.45); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: var(--white); border-radius: var(--r);
+      padding: 28px; max-width: 380px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,.2);
+    }
+    .modal-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: 8px;
+    }
+    .modal-body { font-size: .88rem; color: var(--ink3); line-height: 1.6; margin-bottom: 22px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* Notif */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff; padding: 12px 24px;
+      border-radius: var(--r); font-size: .88rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Bevestig actie</div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" style="padding:9px 20px;font-size:.88rem" onclick="closeModal()">Annuleren</button>
+      <button class="btn-xs btn-del" id="modalConfirmBtn" style="padding:9px 16px;font-size:.88rem">Verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<!-- KOPPEL MODAL -->
+<div class="modal-overlay" id="koppelModal">
+  <div class="modal-box" style="max-width:440px">
+    <div class="modal-title">Koppel aan student</div>
+    <div class="modal-body" id="koppelModalBody">Selecteer een student om te koppelen aan dit bedrijf.</div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:.84rem;font-weight:600;color:var(--ink2);margin-bottom:5px">Student</label>
+      <select id="koppelStudentSelect"
+        style="width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.9rem;color:var(--ink);background:var(--white);outline:none">
+        <option value="">Kies een student…</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" style="padding:9px 20px;font-size:.88rem" onclick="closeKoppelModal()">Annuleren</button>
+      <button class="btn-blue" id="koppelConfirmBtn" onclick="confirmKoppel()">Koppelen →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
+  <div class="topbar-right">
+    <a href="school-dashboard.html" class="topbar-link" style="color:#fff">Dashboard</a>
+    <a href="auth.html" class="topbar-link">Inloggen</a>
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" aria-label="Meldingen">
+      <span class="bell-icon">🔔</span>
+      <span class="bell-count" id="bellCount" style="display:none">0</span>
+      <div class="notif-dropdown" id="notifDropdown" style="display:none">
+        <div class="nd-header">
+          <span class="nd-title">Meldingen</span>
+          <button class="nd-mark-all" onclick="markAllRead(event)">Alles gelezen</button>
+        </div>
+        <div class="nd-list" id="notifList">
+          <div class="nd-empty">Geen meldingen</div>
+        </div>
+      </div>
+    </div>
+    <span class="role-pill">🎓 School</span>
+  </div>
+</div>
+
+<!-- Mobile bottom tab bar -->
+<nav class="mobile-tabs" aria-label="Navigatie">
+  <button class="mt-tab active" onclick="show('dashboard')">
+    <span class="mt-icon">📊</span>
+    <span class="mt-label">Dashboard</span>
+  </button>
+  <button class="mt-tab" onclick="show('studenten')">
+    <span class="mt-icon">👥</span>
+    <span class="mt-label">Studenten</span>
+  </button>
+  <button class="mt-tab" onclick="show('bedrijven')">
+    <span class="mt-icon">🏢</span>
+    <span class="mt-label">Bedrijven</span>
+  </button>
+  <button class="mt-tab" onclick="show('oproepen')">
+    <span class="mt-icon">📢</span>
+    <span class="mt-label">Oproepen</span>
+  </button>
+  <button class="mt-tab" onclick="show('signalen')">
+    <span class="mt-icon">⚠️</span>
+    <span class="mt-label">Signalen</span>
+  </button>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">??</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="userName">Laden…</div>
+        <div class="sidebar-user-email" id="userEmail"></div>
+      </div>
+    </div>
+    <div class="sidebar-inner">
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Overzicht</span>
+        <button class="nav-btn active" id="nav-dashboard" onclick="show('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-btn" id="nav-studenten" onclick="show('studenten')">
+          <span class="nav-icon">👥</span> Studenten
+          <span class="nav-badge" id="badge-studenten" style="display:none">0</span>
+        </button>
+        <button class="nav-btn" id="nav-signalen" onclick="show('signalen')">
+          <span class="nav-icon">⚠️</span> Signalen
+          <span class="nav-badge" id="badge-signalen" style="display:none">0</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Matching</span>
+        <button class="nav-btn" id="nav-oproepen" onclick="show('oproepen')">
+          <span class="nav-icon">📢</span> Mijn oproepen
+        </button>
+        <button class="nav-btn" id="nav-new-oproep" onclick="show('new-oproep')">
+          <span class="nav-icon">➕</span> Nieuwe oproep
+        </button>
+        <button class="nav-btn" id="nav-bedrijven" onclick="show('bedrijven')">
+          <span class="nav-icon">🏢</span> Bedrijven bekijken
+        </button>
+        <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
+          <span class="nav-icon">💬</span> Berichten
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">Account</span>
+        <button class="nav-btn" id="nav-profiel" onclick="show('profiel')">
+          <span class="nav-icon">🎓</span> Schoolprofiel
+        </button>
+      </div>
+
+    </div>
+    <button class="btn-logout" onclick="signOut()">🚪 Uitloggen</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="page-title">Schooldashboard</div>
+      <p class="page-sub" id="dashboardSub">Stageoverzicht voor jouw cohort</p>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Op stage</div>
+          <div class="stat-val" id="stat-active">0</div>
+          <div class="stat-note">actief</div>
+        </div>
+        <div class="stat-card" id="stat-card-risico">
+          <div class="stat-label">Aandacht nodig</div>
+          <div class="stat-val" id="stat-risico" style="color:var(--red)">0</div>
+          <div class="stat-note">studenten</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Zoekt stage</div>
+          <div class="stat-val" id="stat-zoekend">0</div>
+          <div class="stat-note">studenten</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Actieve oproepen</div>
+          <div class="stat-val" id="stat-oproepen">0</div>
+          <div class="stat-note">geplaatst</div>
+        </div>
+      </div>
+
+      <div id="risico-alert" style="display:none">
+        <div class="alert-box alert-red">
+          <strong>⚠ Let op</strong> — Er zijn studenten die aandacht nodig hebben. Controleer het signalenoverzicht.
+          <button class="btn-xs btn-del" style="margin-left:12px;font-size:.75rem" onclick="show('signalen')">Bekijk signalen →</button>
+        </div>
+      </div>
+
+      <div class="sec-title">
+        Studentenoverzicht
+        <button class="btn-blue" onclick="show('studenten')">Alle studenten →</button>
+      </div>
+      <div id="dashboard-studenten">
+        <div class="empty"><span class="empty-icon">👥</span>Nog geen studentprofielen beschikbaar.</div>
+      </div>
+    </div>
+
+    <!-- ── STUDENTEN ── -->
+    <div class="screen" id="screen-studenten">
+      <div class="page-title">Studenten</div>
+      <p class="page-sub">Individueel stageverloop en signalen per student</p>
+      <div id="studenten-list">
+        <div class="empty"><span class="empty-icon">👥</span>Nog geen studentprofielen beschikbaar.</div>
+      </div>
+    </div>
+
+    <!-- ── SIGNALEN ── -->
+    <div class="screen" id="screen-signalen">
+      <div class="page-title">Signalen</div>
+      <p class="page-sub">Proactief gesignaleerde aandachtspunten per student</p>
+      <div id="signalen-list">
+        <div class="empty"><span class="empty-icon">✅</span>Geen actieve signalen.</div>
+      </div>
+    </div>
+
+    <!-- ── MIJN OPROEPEN ── -->
+    <div class="screen" id="screen-oproepen">
+      <div class="sec-title">
+        Mijn oproepen
+        <button class="btn-blue" onclick="show('new-oproep')">+ Nieuwe oproep</button>
+      </div>
+      <div id="oproepen-list">
+        <div class="empty"><span class="empty-icon">📢</span>Nog geen oproepen geplaatst.</div>
+      </div>
+    </div>
+
+    <!-- ── NIEUWE OPROEP ── -->
+    <div class="screen" id="screen-new-oproep">
+      <div class="page-title">Nieuwe oproep plaatsen</div>
+      <p class="page-sub">Zoek je een bedrijf, stagiair of samenwerkingspartner? Plaats hier een oproep.</p>
+
+      <div class="form-card">
+        <div class="form-section-title">School &amp; context</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Schoolnaam <span class="req">*</span></label>
+            <input type="text" id="o-school" placeholder="Bijv. HvA, Fontys, Windesheim">
+          </div>
+          <div class="field">
+            <label>Sector / opleiding <span class="req">*</span></label>
+            <input type="text" id="o-sector" placeholder="Bijv. Communicatie, IT">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="form-section-title">Oproepdetails</div>
+
+        <div class="field">
+          <label>Titel van de oproep <span class="req">*</span></label>
+          <input type="text" id="o-title" placeholder="Bijv. Zoeken stagebedrijven voor HBO-Communicatie studenten">
+        </div>
+
+        <div class="field">
+          <label>Omschrijving <span class="req">*</span></label>
+          <textarea id="o-desc" placeholder="Wat zoek je? Wat biedt de school? Hoeveel studenten? Welke leerdoelen?"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Tags <span class="hint">typ en druk Enter</span></label>
+          <div class="tags-box" id="oTagsBox" onclick="document.getElementById('oTagsInput').focus()">
+            <input type="text" id="oTagsInput" class="tags-input" placeholder="Bijv. Marketing, Design…" maxlength="30">
+          </div>
+          <div class="tags-hint">Max 8 tags — druk Enter of komma om toe te voegen.</div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="form-section-title">Bedoeld voor</div>
+
+        <div class="field">
+          <div class="radio-group">
+            <label class="radio-opt selected" id="ot-bedrijf" onclick="setOproepTarget('bedrijf')">
+              <input type="radio" name="ot" value="bedrijf" checked>
+              <div class="radio-label">🏢 Bedrijven</div>
+            </label>
+            <label class="radio-opt" id="ot-student" onclick="setOproepTarget('student')">
+              <input type="radio" name="ot" value="student">
+              <div class="radio-label">👤 Studenten</div>
+            </label>
+            <label class="radio-opt" id="ot-beide" onclick="setOproepTarget('beide')">
+              <input type="radio" name="ot" value="beide">
+              <div class="radio-label">👥 Beide</div>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn-primary" id="submitOproep" onclick="submitOproep()">Oproep plaatsen →</button>
+          <button class="btn-ghost" onclick="show('oproepen')">Annuleren</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BEDRIJVEN ── -->
+    <div class="screen" id="screen-bedrijven">
+      <div class="page-title">Bedrijven bekijken</div>
+      <p class="page-sub">Beschikbare stagebedrijven met Trust Score — van hoog naar laag gesorteerd</p>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
+        <input type="text" id="bz-search"
+          placeholder="Zoek op naam of sector…"
+          oninput="filterBedrijven()"
+          style="flex:1;min-width:160px;padding:9px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s"
+          onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border2)'">
+        <select id="bz-grade" onchange="filterBedrijven()"
+          style="padding:9px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--ink);background:var(--white);outline:none">
+          <option value="">Alle grades</option>
+          <option value="A">Grade A (Betrouwbaar)</option>
+          <option value="B">Grade B (Gemiddeld)</option>
+          <option value="C">Grade C (Let op)</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:7px;font-size:.84rem;color:var(--ink2);cursor:pointer;white-space:nowrap;user-select:none">
+          <input type="checkbox" id="bz-active-only" onchange="filterBedrijven()" style="accent-color:var(--blue);width:15px;height:15px">
+          Alleen met actieve stages
+        </label>
+      </div>
+
+      <div id="bedrijven-list">
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
+      </div>
+    </div>
+
+    <!-- ── PROFIEL ── -->
+    <div class="screen" id="screen-profiel">
+      <div class="page-title">Schoolprofiel</div>
+      <p class="page-sub">Deze informatie is zichtbaar voor bedrijven en studenten</p>
+
+      <!-- Overview -->
+      <div id="school-view-profiel" style="display:none">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="spv-naam">—</div>
+            <div style="font-size:.88rem;color:var(--ink3)" id="spv-locatie">—</div>
+          </div>
+          <button onclick="toonSchoolFormulier()" class="btn-ghost">✏️ Bewerken</button>
+        </div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px">Contactpersoon</div>
+          <div id="spv-contact" style="font-size:.9rem;color:var(--ink2)">—</div>
+        </div>
+        <div class="card">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:8px">Opleidingen</div>
+          <div id="spv-opleidingen" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div id="school-view-form">
+      <div class="form-card">
+        <div class="form-section-title">Schoolinformatie</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Schoolnaam</label>
+            <input type="text" id="p-naam" placeholder="Naam van de school">
+          </div>
+          <div class="field">
+            <label>Locatie</label>
+            <input type="text" id="p-locatie" placeholder="Bijv. Amsterdam">
+          </div>
+        </div>
+        <div class="field">
+          <label>Contactpersoon stagebegeleiding</label>
+          <input type="text" id="p-contact" placeholder="Naam contactpersoon">
+        </div>
+        <div class="field">
+          <label>Aangeboden opleidingen <span class="hint">komma-gescheiden</span></label>
+          <input type="text" id="p-opleidingen" placeholder="Bijv. Communicatie, CMD, Business">
+        </div>
+        <button class="btn-primary" id="saveProfielBtn" onclick="saveProfiel()">Profiel opslaan →</button>
+      </div>
+      </div><!-- /#school-view-form -->
+
+      <div class="form-card">
+        <div class="form-section-title">Wachtwoord</div>
+        <p style="font-size:.88rem;color:var(--ink3);margin-bottom:14px;line-height:1.6">Ontvang een e-mail met een wachtwoordherstelkoppeling. De link is 24 uur geldig.</p>
+        <button class="btn-ghost" style="font-size:.88rem" onclick="resetPassword()">📧 Stuur herstelmail</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── State ──
+const oTags = [];
+let oproepTarget      = 'bedrijf';
+let studenten         = [];
+let oproepen          = [];
+let currentUser       = null;
+let notifSubscription = null;
+
+// ── Notification system ───────────────────────────────────────────────────
+
+async function createNotification(userId, type, refId, refType, message) {
+  if (!userId) return;
+  try {
+    await db.from('notifications').insert({
+      user_id:  userId,
+      type,
+      ref_id:   refId   || null,
+      ref_type: refType || null,
+      message,
+      read:     false,
+    });
+  } catch(e) {
+    console.warn('createNotification fout (non-blocking):', e);
+  }
+}
+
+function formatRelativeTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1)  return 'Zojuist';
+  if (m < 60) return m + ' min geleden';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + ' uur geleden';
+  return Math.floor(h / 24) + 'd geleden';
+}
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  const { data } = await db
+    .from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  const items  = data || [];
+  const unread = items.filter(n => !n.read).length;
+  const countEl = document.getElementById('bellCount');
+  if (countEl) {
+    countEl.textContent = unread > 9 ? '9+' : unread;
+    countEl.style.display = unread > 0 ? 'flex' : 'none';
+  }
+
+  const listEl = document.getElementById('notifList');
+  if (!listEl) return;
+  if (items.length === 0) {
+    listEl.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
+    return;
+  }
+  listEl.innerHTML = items.map(n => `
+    <div class="nd-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+      <span class="nd-dot ${n.read ? 'read' : ''}"></span>
+      <div>
+        <div class="nd-msg">${escapeHtml(n.message)}</div>
+        <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function markAllRead(e) {
+  if (e) e.stopPropagation();
+  if (!currentUser) return;
+  await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+  loadNotifications();
+}
+
+function toggleNotifDropdown(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('notifDropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) loadNotifications();
+}
+
+async function handleNotifClick(id, refType, refId) {
+  if (id) await db.from('notifications').update({ read: true }).eq('id', id);
+  document.getElementById('notifDropdown').style.display = 'none';
+  if (refType === 'match' && refId) show('bedrijven');
+  loadNotifications();
+}
+
+function startNotifSubscription() {
+  if (!currentUser || notifSubscription) return;
+  notifSubscription = db
+    .channel('notif-school-' + currentUser.id)
+    .on('postgres_changes', {
+      event:  'INSERT',
+      schema: 'public',
+      table:  'notifications',
+      filter: 'user_id=eq.' + currentUser.id,
+    }, payload => {
+      showToast(payload.new.message);
+      loadNotifications();
+    })
+    .subscribe();
+}
+
+function showToast(message) {
+  let t = document.getElementById('notif-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'notif-toast';
+    t.style.cssText = 'position:fixed;top:66px;right:16px;background:#0d1520;color:#fff;padding:10px 16px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;line-height:1.4;font-family:Outfit,sans-serif;transition:opacity .3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = '🔔 ' + message;
+  t.style.opacity = '1';
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => { t.style.opacity = '0'; }, 4000);
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  const bell = document.getElementById('notifBell');
+  const dd   = document.getElementById('notifDropdown');
+  if (dd && dd.style.display !== 'none' && bell && !bell.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
+
+// ── Auth ──
+async function loadUser() {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+  currentUser = user;
+  const email = user.email || '';
+  const name = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+  const initials2 = name.slice(0, 2).toUpperCase();
+  document.getElementById('userAvatar').textContent = initials2;
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userEmail').textContent = email;
+
+  const loginLink = document.querySelector('.topbar-link[href="auth.html"]');
+  if (loginLink) {
+    loginLink.textContent = name;
+    loginLink.removeAttribute('href');
+    loginLink.style.cssText += ';cursor:default;color:rgba(255,255,255,.85)';
+  }
+}
+
+async function signOut() {
+  try { await db.auth.signOut(); }
+  catch(e) { console.error('Logout error:', e); }
+  finally {
+    sessionStorage.removeItem('internly_role');
+    window.location.href = 'auth.html';
+  }
+}
+
+async function resetPassword() {
+  if (!currentUser) return;
+  const { error } = await db.auth.resetPasswordForEmail(currentUser.email, {
+    redirectTo: window.location.origin + '/auth.html'
+  });
+  if (error) { notify('Fout: ' + error.message); return; }
+  notify('✓ Herstelmail verstuurd naar ' + currentUser.email);
+}
+
+// ── Confirm modal ──
+let _modalConfirmFn = null;
+function openModal(title, body, onConfirm) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  _modalConfirmFn = onConfirm;
+  document.getElementById('confirmModal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('show');
+  _modalConfirmFn = null;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+    if (_modalConfirmFn) _modalConfirmFn();
+    closeModal();
+  });
+  document.getElementById('confirmModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  document.getElementById('koppelModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeKoppelModal();
+  });
+  document.getElementById('bedrijven-list').addEventListener('click', e => {
+    const btn = e.target.closest('.koppel-btn');
+    if (!btn) return;
+    openKoppelModal(
+      btn.dataset.companyId,
+      btn.dataset.postingId,
+      btn.dataset.companyNaam
+    );
+  });
+});
+
+// ── Navigation ──
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mt-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  const nb = document.getElementById('nav-' + id);
+  if (nb) nb.classList.add('active');
+  if (id === 'bedrijven') loadBedrijven();
+  if (id === 'oproepen')  renderOproepen();
+}
+
+// ── Load student data ──
+// schoolNaamFilter is ingesteld vanuit DOMContentLoaded nadat het school-profiel geladen is.
+let _schoolNaamFilter = null;
+
+async function loadStudenten() {
+  let q = db
+    .from('student_profiles')
+    .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein')
+    .order('created_at', { ascending: false });
+
+  // Filter op eigen school als de schoolnaam bekend is
+  if (_schoolNaamFilter) q = q.eq('school', _schoolNaamFilter);
+
+  const { data, error } = await q;
+
+  if (error) {
+    console.error('Fout bij laden studenten:', error);
+    studenten = [];
+  } else {
+    studenten = (data || []).map(s => ({
+      naam:      s.naam || 'Onbekende student',
+      opleiding: [s.opleiding, s.school].filter(Boolean).join(' — ') || '—',
+      jaar:      s.jaar || '—',
+      status:    'zoekend',
+      progress:  0,
+      bedrijf:   null,
+    }));
+  }
+
+  document.getElementById('stat-active').textContent  = 0;
+  document.getElementById('stat-risico').textContent  = 0;
+  document.getElementById('stat-zoekend').textContent = studenten.length;
+
+  const badge = document.getElementById('badge-studenten');
+  if (studenten.length > 0) { badge.textContent = studenten.length; badge.style.display = 'inline'; }
+
+  renderStudentenRows('dashboard-studenten', studenten.slice(0, 4));
+  renderStudentenRows('studenten-list', studenten);
+  renderSignalen();
+}
+
+function initials(naam) {
+  return naam.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+}
+
+function progressColor(p) {
+  return p > 60 ? 'var(--green)' : p > 30 ? 'var(--amber)' : 'var(--red)';
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderStudentenRows(cid, data) {
+  const el = document.getElementById(cid);
+  if (!data || data.length === 0) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">👥</span>Geen studenten.</div>`;
+    return;
+  }
+  el.innerHTML = data.map(s => {
+    const eNaam    = escapeHtml(s.naam);
+    const eBedrijf = escapeHtml(s.bedrijf || '');
+    const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
+    return `
+    <div class="student-row">
+      <div class="avatar">${escapeHtml(initials(s.naam))}</div>
+      <div class="sr-info">
+        <div class="sr-name">${eNaam}</div>
+        <div class="sr-meta">${escapeHtml(s.opleiding)} · Jaar ${escapeHtml(String(s.jaar ?? ''))}${eBedrijf ? ' — ' + eBedrijf : ''}</div>
+      </div>
+      <div class="sr-right">
+        ${s.status !== 'zoekend' ? `
+          <div class="progress-wrap">
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${progress}%;background:${progressColor(progress)}"></div>
+            </div>
+            <div class="progress-label">${progress}%</div>
+          </div>` : ''}
+        <span class="signal-badge ${s.status === 'actief' ? 'sb-green' : s.status === 'risico' ? 'sb-red' : 'sb-amber'}">
+          ${s.status === 'actief' ? 'Actief' : s.status === 'risico' ? '⚠ Risico' : 'Zoekend'}
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSignalen() {
+  const el = document.getElementById('signalen-list');
+  const risico  = studenten.filter(s => s.status === 'risico');
+  const zoekend = studenten.filter(s => s.status === 'zoekend');
+
+  if (risico.length === 0 && zoekend.length === 0) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">✅</span>Geen actieve signalen. Alle studenten lopen op schema.</div>`;
+    return;
+  }
+
+  let html = '';
+  risico.forEach(s => {
+    html += `
+      <div class="signal-card urgent">
+        <span class="signal-badge sb-red">⚠ Urgent</span>
+        <div class="signal-title">${escapeHtml(s.naam)} — ${escapeHtml(s.bedrijf || '')}</div>
+        <div class="signal-sub">Platform signaleert vertraagde leerdoelopvolging. Voortgang: ${Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0))}%. Neem contact op met de begeleider.</div>
+      </div>`;
+  });
+  zoekend.forEach(s => {
+    html += `
+      <div class="signal-card warn">
+        <span class="signal-badge sb-amber">Zoekend</span>
+        <div class="signal-title">${escapeHtml(s.naam)} — Nog geen stage</div>
+        <div class="signal-sub">Student heeft nog geen stageplaats gevonden. Overweeg matchsuggesties te sturen via het platform.</div>
+      </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ── Load bedrijven (with reviews) ─────────────────────────────────────────────
+let _allBedrijven = [];
+
+async function loadBedrijven() {
+  const el = document.getElementById('bedrijven-list');
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+  const [{ data: companies, error }, { data: allPostings }] = await Promise.all([
+    db.from('company_profiles')
+      .select('profile_id, bedrijfsnaam, sector, trust_score, trust_grade, beschrijving')
+      .order('trust_score', { ascending: false, nullsFirst: false }),
+    db.from('internship_postings')
+      .select('id, title, sector, status, tags, created_by'),
+  ]);
+
+  if (error) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  // Batch-fetch reviews for all company user IDs
+  const companyIds = (companies || []).map(b => b.profile_id).filter(Boolean);
+  let reviewsByCompany = {};
+  if (companyIds.length > 0) {
+    const { data: reviewRows } = await db
+      .from('reviews')
+      .select('reviewee_id, rating')
+      .in('reviewee_id', companyIds);
+    (reviewRows || []).forEach(r => {
+      if (!reviewsByCompany[r.reviewee_id]) reviewsByCompany[r.reviewee_id] = [];
+      reviewsByCompany[r.reviewee_id].push(r.rating);
+    });
+  }
+
+  const postingsByCompany = {};
+  (allPostings || []).forEach(p => {
+    if (!postingsByCompany[p.created_by]) postingsByCompany[p.created_by] = [];
+    postingsByCompany[p.created_by].push(p);
+  });
+
+  _allBedrijven = (companies || []).map(b => {
+    const postings = postingsByCompany[b.profile_id] || [];
+    const ratings  = reviewsByCompany[b.profile_id] || [];
+    const reviewAvg = ratings.length > 0
+      ? (ratings.reduce((s, r) => s + r, 0) / ratings.length)
+      : null;
+    return {
+      profile_id:   b.profile_id,
+      naam:         b.bedrijfsnaam || '—',
+      sector:       b.sector || '',
+      score:        b.trust_score ?? null,
+      grade:        b.trust_grade || '',
+      beschrijving: b.beschrijving || '',
+      postings,
+      actief:       postings.filter(p => p.status === 'active'),
+      reviewAvg,
+      reviewCount:  ratings.length,
+    };
+  });
+
+  filterBedrijven();
+}
+
+function filterBedrijven() {
+  const search     = (document.getElementById('bz-search')?.value || '').toLowerCase();
+  const grade      = document.getElementById('bz-grade')?.value || '';
+  const activeOnly = document.getElementById('bz-active-only')?.checked || false;
+
+  let filtered = _allBedrijven.filter(b => {
+    if (activeOnly && b.actief.length === 0) return false;
+    if (grade && b.grade !== grade) return false;
+    if (search && !b.naam.toLowerCase().includes(search) && !b.sector.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  renderBedrijvenList(filtered);
+}
+
+function renderBedrijvenList(bedrijven) {
+  const el = document.getElementById('bedrijven-list');
+
+  if (!bedrijven || bedrijven.length === 0) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Geen bedrijven gevonden.</div>`;
+    return;
+  }
+
+  el.innerHTML = bedrijven.map(b => {
+    const cls       = b.grade === 'A' ? 'trust-a' : b.grade === 'B' ? 'trust-b' : 'trust-c';
+    const gradeLabel = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[b.grade] || '';
+    const activeCount = b.actief.length;
+    const activeTitles = b.actief.slice(0, 3).map(p => `<span class="tag">${escapeHtml(p.title)}</span>`).join('');
+    const moreTag = b.actief.length > 3
+      ? `<span class="tag" style="color:var(--ink3)">+${b.actief.length - 3} meer</span>`
+      : '';
+
+    // Review stars
+    let reviewStarsHtml = '';
+    if (b.reviewAvg !== null && b.reviewCount > 0) {
+      const avgStr  = b.reviewAvg.toFixed(1);
+      const starsFilled = Math.round(b.reviewAvg);
+      const starsStr = [1,2,3,4,5].map(i => i <= starsFilled ? '★' : '☆').join('');
+      reviewStarsHtml = `<span class="mini-stars" style="margin-left:8px" title="${b.reviewCount} review${b.reviewCount !== 1 ? 's' : ''}">${starsStr} <span style="color:#FF7E42;font-weight:700">${avgStr}</span><span class="ms-count">(${b.reviewCount})</span></span>`;
+    }
+
+    return `
+      <div class="company-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-name">${escapeHtml(b.naam)}</div>
+            <div class="cc-meta">${escapeHtml(b.sector || '—')}${activeCount > 0 ? ` · <strong style="color:var(--green)">${activeCount} actieve stage${activeCount !== 1 ? 's' : ''}</strong>` : ' · geen actieve stages'}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            ${b.grade ? `<span class="trust-badge ${cls}">${escapeHtml(b.grade)} · ${escapeHtml(String(b.score ?? '—'))} <span style="font-weight:400;opacity:.7">${gradeLabel}</span></span>` : ''}
+            ${reviewStarsHtml}
+          </div>
+        </div>
+        ${b.grade === 'C' ? `<div class="alert-box alert-red" style="margin:8px 0 4px;font-size:.78rem;padding:8px 12px">⚠ Niet aanbevolen voor plaatsing — bespreek met student vóór akkoord.</div>` : ''}
+        ${activeTitles || moreTag ? `<div class="pc-tags" style="margin:8px 0 4px">${activeTitles}${moreTag}</div>` : ''}
+        ${activeCount > 0 ? `
+        <div style="margin-top:10px">
+          <button class="btn-xs btn-activate koppel-btn"
+            data-company-id="${escapeHtml(b.profile_id)}"
+            data-posting-id="${escapeHtml(b.actief[0]?.id || '')}"
+            data-company-naam="${escapeHtml(b.naam)}">
+            🔗 Koppel aan student
+          </button>
+        </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ── Koppel modal ──
+let _koppelCompanyId = null;
+let _koppelPostingId = null;
+
+async function openKoppelModal(companyId, postingId, companyNaam) {
+  _koppelCompanyId = companyId;
+  _koppelPostingId = postingId;
+
+  document.getElementById('koppelModalBody').textContent =
+    `Selecteer een student om te koppelen aan ${companyNaam}.`;
+
+  const sel = document.getElementById('koppelStudentSelect');
+  sel.innerHTML = '<option value="">Laden…</option>';
+
+  const { data: profs } = await db
+    .from('student_profiles')
+    .select('profile_id, naam, opleiding')
+    .not('profile_id', 'is', null)
+    .order('naam');
+
+  sel.innerHTML = '<option value="">Kies een student…</option>';
+  (profs || []).forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.profile_id;
+    opt.textContent = `${s.naam || 'Onbekend'}${s.opleiding ? ' — ' + s.opleiding : ''}`;
+    sel.appendChild(opt);
+  });
+
+  document.getElementById('koppelModal').classList.add('show');
+}
+
+function closeKoppelModal() {
+  document.getElementById('koppelModal').classList.remove('show');
+  _koppelCompanyId = null;
+  _koppelPostingId = null;
+}
+
+async function confirmKoppel() {
+  const studentId = document.getElementById('koppelStudentSelect').value;
+  if (!studentId) { notify('Selecteer eerst een student'); return; }
+  if (!_koppelCompanyId || !currentUser) { notify('Fout: ontbrekende gegevens'); return; }
+
+  const btn = document.getElementById('koppelConfirmBtn');
+  btn.disabled = true; btn.textContent = 'Koppelen…';
+
+  const { data: existing } = await db
+    .from('matches')
+    .select('id')
+    .eq('party_a', studentId)
+    .eq('party_b', _koppelCompanyId)
+    .maybeSingle();
+
+  if (existing) {
+    notify('Deze student is al gekoppeld aan dit bedrijf');
+    btn.disabled = false; btn.textContent = 'Koppelen →';
+    closeKoppelModal();
+    return;
+  }
+
+  const { data: matchRow, error } = await db.from('matches').insert({
+    party_a:      studentId,
+    party_b:      _koppelCompanyId,
+    type:         'school_referral',
+    status:       'pending',
+    initiated_by: currentUser.id,
+    match_target: 'posting',
+    posting_id:   _koppelPostingId || null,
+  }).select('id').single();
+
+  btn.disabled = false; btn.textContent = 'Koppelen →';
+
+  if (error) { notify('Fout bij koppelen: ' + error.message); return; }
+
+  // Notify student of school referral
+  const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw school';
+  createNotification(
+    studentId,
+    'school_referral',
+    matchRow?.id || null,
+    'match',
+    schoolName + ' heeft je gekoppeld aan een stagebedrijf — bekijk het in je Matches'
+  );
+
+  notify('✓ Student gekoppeld aan bedrijf!');
+  closeKoppelModal();
+}
+
+// ── Oproepen ──
+async function loadOproepen() {
+  if (!currentUser) return;
+  const { data, error } = await db
+    .from('school_postings')
+    .select('*')
+    .eq('created_by', currentUser.id)
+    .order('created_at', { ascending: false });
+  if (error) { notify('Fout bij laden oproepen: ' + error.message); return; }
+  oproepen = data || [];
+  document.getElementById('stat-oproepen').textContent = oproepen.filter(o => o.status === 'active').length;
+}
+
+function renderOproepen() {
+  const el = document.getElementById('oproepen-list');
+  if (!oproepen || oproepen.length === 0) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📢</span>Nog geen oproepen geplaatst.<br>Klik op <strong>Nieuwe oproep</strong> om te beginnen.</div>`;
+    return;
+  }
+  el.innerHTML = oproepen.map(o => {
+    const desc    = (o.description || '').substring(0, 140);
+    const hasMore = (o.description || '').length > 140;
+    return `
+    <div class="posting-card">
+      <div class="pc-head">
+        <div>
+          <div class="pc-title">${escapeHtml(o.title)}</div>
+          <div class="pc-meta">${escapeHtml(o.school_name)} · ${escapeHtml(o.sector || '—')}</div>
+        </div>
+        <span class="status-badge ${o.status === 'active' ? 's-active' : 's-closed'}">${o.status === 'active' ? '✓ Actief' : '✕ Gesloten'}</span>
+      </div>
+      <div class="pc-tags">
+        <span class="tag tag-blue">👥 ${o.match_target === 'bedrijf' ? 'Bedrijven' : o.match_target === 'student' ? 'Studenten' : 'Beide'}</span>
+        ${(o.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+      </div>
+      <div style="font-size:.85rem;color:var(--ink3);line-height:1.5">${escapeHtml(desc)}${hasMore ? '…' : ''}</div>
+      <div class="pc-actions">
+        <button class="btn-xs btn-del" onclick="delOproep('${o.id}')">✕ Verwijderen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Tags voor oproep
+document.getElementById('oTagsInput').addEventListener('keydown', function(e) {
+  if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+    e.preventDefault();
+    addOTag(this.value.trim().replace(/,/g, ''));
+    this.value = '';
+  }
+});
+function addOTag(s) {
+  if (oTags.length >= 8 || oTags.includes(s) || !s) return;
+  oTags.push(s);
+  const chip = document.createElement('div');
+  chip.className = 'tag-chip';
+  chip.appendChild(document.createTextNode(s));
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', () => removeOTag(s, closeBtn));
+  chip.appendChild(closeBtn);
+  document.getElementById('oTagsBox').insertBefore(chip, document.getElementById('oTagsInput'));
+}
+function removeOTag(s, btn) {
+  const i = oTags.indexOf(s); if (i > -1) oTags.splice(i, 1);
+  btn.closest('.tag-chip').remove();
+}
+
+function setOproepTarget(val) {
+  oproepTarget = val;
+  ['bedrijf','student','beide'].forEach(v => {
+    document.getElementById('ot-' + v).classList.toggle('selected', v === val);
+  });
+}
+
+async function submitOproep() {
+  const school = document.getElementById('o-school').value.trim();
+  const sector = document.getElementById('o-sector').value.trim();
+  const title  = document.getElementById('o-title').value.trim();
+  const desc   = document.getElementById('o-desc').value.trim();
+
+  if (!school || !sector || !title || !desc) { notify('Vul alle verplichte velden in'); return; }
+
+  const btn = document.getElementById('submitOproep');
+  btn.disabled = true; btn.textContent = 'Plaatsen…';
+
+  const { error } = await db.from('school_postings').insert({
+    created_by:   currentUser?.id || null,
+    school_name:  school,
+    sector,
+    title,
+    description:  desc,
+    tags:         [...oTags],
+    match_target: oproepTarget,
+    status:       'active',
+  });
+
+  btn.disabled = false; btn.textContent = 'Oproep plaatsen →';
+
+  if (error) { notify('Fout: ' + error.message); return; }
+
+  notify('✓ Oproep geplaatst!');
+  ['o-school','o-sector','o-title','o-desc'].forEach(id => document.getElementById(id).value = '');
+  oTags.length = 0;
+  document.getElementById('oTagsBox').querySelectorAll('.tag-chip').forEach(c => c.remove());
+  setOproepTarget('bedrijf');
+  await loadOproepen();
+  show('oproepen');
+}
+
+async function delOproep(id) {
+  openModal('Oproep verwijderen', 'Weet je zeker dat je deze oproep wilt verwijderen? Dit kan niet ongedaan worden gemaakt.', async () => {
+    const { error } = await db.from('school_postings').delete().eq('id', id);
+    if (error) { notify('Fout: ' + error.message); return; }
+    notify('✓ Oproep verwijderd');
+    await loadOproepen();
+    renderOproepen();
+  });
+}
+
+// ── School profile overview ───────────────────────────────────────────────────
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function toonSchoolOverzicht(data) {
+  setText('spv-naam',    data.schoolnaam    || '—');
+  setText('spv-locatie', data.locatie       || '—');
+  setText('spv-contact', data.contactpersoon || '—');
+  const oplEl = document.getElementById('spv-opleidingen');
+  if (oplEl) {
+    const opl = Array.isArray(data.opleidingen) ? data.opleidingen : [];
+    if (opl.length > 0) {
+      oplEl.innerHTML = opl.map(o => '<span class="tag">' + escapeHtml(o) + '</span>').join('');
+    } else {
+      oplEl.textContent = 'Nog geen opleidingen toegevoegd';
+    }
+  }
+  document.getElementById('school-view-form').style.display    = 'none';
+  document.getElementById('school-view-profiel').style.display = 'block';
+}
+
+function toonSchoolFormulier() {
+  document.getElementById('school-view-form').style.display    = 'block';
+  document.getElementById('school-view-profiel').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+async function saveProfiel() {
+  if (!currentUser) { notify('Niet ingelogd'); return; }
+  const btn = document.getElementById('saveProfielBtn');
+  btn.disabled = true; btn.textContent = 'Opslaan…';
+
+  const naam       = document.getElementById('p-naam').value.trim();
+  const locatie    = document.getElementById('p-locatie').value.trim();
+  const contact    = document.getElementById('p-contact').value.trim();
+  const opleidingen = document.getElementById('p-opleidingen').value.trim();
+
+  const { error } = await db.from('school_profiles').upsert({
+    profile_id:    currentUser.id,
+    schoolnaam:    naam || null,
+    locatie:       locatie || null,
+    contactpersoon: contact || null,
+    opleidingen:   opleidingen ? opleidingen.split(',').map(o => o.trim()).filter(Boolean) : [],
+  }, { onConflict: 'profile_id' });
+
+  btn.disabled = false; btn.textContent = 'Profiel opslaan →';
+  if (error) { notify('Fout: ' + error.message); return; }
+  notify('✓ Profiel opgeslagen');
+  toonSchoolOverzicht({
+    schoolnaam:     naam     || null,
+    locatie:        locatie  || null,
+    contactpersoon: contact  || null,
+    opleidingen:    opleidingen ? opleidingen.split(',').map(o => o.trim()).filter(Boolean) : [],
+  });
+}
+
+// ── Push prompt banner ────────────────────────────────────────────────────────
+function showPushPromptBanner() {
+  if (document.getElementById('push-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'push-banner';
+  banner.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#fff;border:1px solid var(--border2);border-radius:14px;padding:18px 20px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);font-size:.88rem;';
+  banner.innerHTML = `
+    <div style="font-weight:600;margin-bottom:6px;font-size:.95rem">Meldingen aanzetten?</div>
+    <div style="color:var(--ink3);margin-bottom:14px;line-height:1.5">Ontvang een melding zodra er een update is over een student — ook als je dit tabblad sluit.</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="acceptPush()" style="flex:1;padding:8px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem">Ja, aanzetten</button>
+      <button onclick="dismissPush()" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:none;cursor:pointer;font-size:.85rem;color:var(--ink3)">Nee, bedankt</button>
+    </div>`;
+  document.body.appendChild(banner);
+}
+
+async function acceptPush() {
+  localStorage.setItem('internly_push_asked', '1');
+  const banner = document.getElementById('push-banner');
+  if (banner) banner.remove();
+  if (currentUser) {
+    try { await registerPushNotifications(db, currentUser.id); } catch(_) {}
+  }
+}
+
+function dismissPush() {
+  localStorage.setItem('internly_push_asked', '1');
+  const banner = document.getElementById('push-banner');
+  if (banner) banner.remove();
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  // Rolcheck — alleen school-gebruikers mogen dit dashboard zien
+  const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const userRole = roleRow?.role;
+  if (userRole && userRole !== 'school') {
+    const routes = { student: 'discover.html', bedrijf: 'company-dashboard.html' };
+    window.location.href = routes[userRole] || 'auth.html';
+    return;
+  }
+
+  await loadUser();
+
+  // Laad school-profiel eerst zodat we kunnen filteren op eigen school
+  const { data: sp } = await db
+    .from('school_profiles')
+    .select('*')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+
+  if (sp?.schoolnaam) _schoolNaamFilter = sp.schoolnaam;
+
+  await loadStudenten();
+  await loadOproepen();
+
+  if (sp) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+    set('p-naam',        sp.schoolnaam);
+    set('p-locatie',     sp.locatie);
+    set('p-contact',     sp.contactpersoon);
+    set('p-opleidingen', Array.isArray(sp.opleidingen) ? sp.opleidingen.join(', ') : (sp.opleidingen || ''));
+    toonSchoolOverzicht(sp);
+  }
+
+  if (!localStorage.getItem('internly_push_asked') && 'Notification' in window) {
+    showPushPromptBanner();
+  }
+
+  await loadNotifications();
+  startNotifSubscription();
+});
+
+window.addEventListener('beforeunload', () => {
+  if (notifSubscription) notifSubscription.unsubscribe();
+});
+</script>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

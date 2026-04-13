@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Matches</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f4f3ef; -webkit-font-smoothing: antialiased; }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      padding: 0 32px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar .logo span { color: #FF7E42; }
+    .topbar .nav { display: flex; gap: 24px; }
+    .topbar .nav a {
+      color: rgba(255,255,255,.7); text-decoration: none;
+      font-size: .95rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; }
+    .topbar-user { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500; }
+    .topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.2); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+    .btn-topbar-logout { background: none; border: 1px solid rgba(255,255,255,.3); color: rgba(255,255,255,.7); padding: 5px 12px; border-radius: 20px; font-family: 'Outfit', sans-serif; font-size: .8rem; cursor: pointer; transition: all .15s; }
+    .btn-topbar-logout:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* ── Container ── */
+    .container { max-width: 560px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 2rem; font-weight: 700; color: #0d1520; margin-bottom: 6px;
+    }
+    .page-sub { color: #6b7280; font-size: 1rem; margin-bottom: 24px; }
+
+    /* ── Toggle filter ── */
+    .filter-toggle {
+      background: #fff; border: 1.5px solid #f0f0ee;
+      border-radius: 16px; padding: 14px 18px; margin-bottom: 28px;
+    }
+    .toggle-row {
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; user-select: none;
+    }
+    .toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: relative; width: 44px; height: 24px;
+      background: #e2e8f0; border-radius: 12px;
+      transition: background .2s; flex-shrink: 0;
+    }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; background: #fff;
+      border-radius: 50%; transition: transform .2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle-input:checked + .toggle-track { background: #1a7a48; }
+    .toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
+    .toggle-label { font-size: .92rem; font-weight: 600; color: #374151; }
+    .toggle-sub { font-size: .8rem; color: #9ca3af; margin-top: 6px; padding-left: 56px; }
+
+    /* ── Trust badge ── */
+    .trust-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .73rem; font-weight: 700; padding: 4px 10px;
+      border-radius: 50px; white-space: nowrap; flex-shrink: 0;
+    }
+    .trust-a { background: #e8f5ee; color: #1a7a48; }
+    .trust-b { background: #fdf3e0; color: #a06010; }
+    .trust-c { background: #fdeaea; color: #b82020; }
+
+    /* ── Swipe area ── */
+    .swipe-area {
+      position: relative; height: 440px;
+      margin-bottom: 20px; touch-action: none;
+    }
+    @media (max-width: 480px) {
+      .swipe-area { height: 400px; }
+      .swipe-card { height: 400px !important; }
+      .card-visual { height: 160px !important; }
+    }
+
+    .swipe-card {
+      position: absolute; width: 100%; height: 440px;
+      background: #fff; border-radius: 20px;
+      border: 1.5px solid #f0f0ee;
+      box-shadow: 0 4px 20px rgba(0,0,0,.07);
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+      cursor: grab; user-select: none;
+      display: flex; flex-direction: column;
+    }
+    .swipe-card:active { cursor: grabbing; }
+    .swipe-card.is-match { border-color: #c9e8d5; box-shadow: 0 4px 20px rgba(26,122,72,.08); }
+
+    .card-visual {
+      height: 190px;
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 72px; color: rgba(255,255,255,.2);
+      flex-shrink: 0; position: relative;
+    }
+
+    .pool-badge {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(244,243,239,.95); color: #6b7280;
+      font-size: .7rem; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px;
+      font-family: 'Outfit', sans-serif;
+      backdrop-filter: blur(4px);
+    }
+
+    .card-body { padding: 20px 24px 22px; flex: 1; display: flex; flex-direction: column; }
+    .card-top-row {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 10px; margin-bottom: 4px;
+    }
+    .card-company { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 600; color: #0d1520; }
+    .card-role { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 600; color: #0d1520; margin: 8px 0 12px; }
+    .card-desc { color: #374151; font-size: .9rem; line-height: 1.55; flex: 1; }
+
+    /* ── Action buttons ── */
+    .actions { display: flex; justify-content: center; gap: 12px; }
+
+    .btn-pass {
+      padding: 13px 32px; background: #fff; color: #374151;
+      border: 1.5px solid #e2e8f0; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: border-color .15s, color .15s, background .15s;
+    }
+    .btn-pass:hover { border-color: #b82020; color: #b82020; background: #fdeaea; }
+
+    .btn-like {
+      padding: 13px 32px; background: #FF7E42; color: #fff;
+      border: none; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
+      cursor: pointer; box-shadow: 0 4px 14px rgba(255,126,66,.35);
+      transition: background .15s, transform .1s, box-shadow .15s;
+    }
+    .btn-like:hover { background: #e05c1a; box-shadow: 0 6px 18px rgba(255,126,66,.45); }
+    .btn-like:active { transform: scale(.97); }
+
+    /* ── Empty states ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: #6b7280; font-size: .95rem;
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+    .btn-enable-pool {
+      display: inline-block; margin-top: 16px;
+      background: #1a7a48; color: #fff; border: none;
+      padding: 11px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-enable-pool:hover { background: #0f5c36; }
+
+    /* ── Notif (toast) ── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 12px 24px;
+      border-radius: 12px; font-size: .9rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* Bell border on green topbar */
+    .topbar .bell-count { border-color: #1a7a48; }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<div class="topbar">
+  <a href="index.html" class="logo">intern<span>ly</span></a>
+  <nav class="nav">
+    <a href="discover.html">Ontdek</a>
+    <a href="matches.html" class="active">Matches</a>
+    <a href="mijn-sollicitaties.html">Mijn Stages</a>
+    <a href="chat.html">💬 Berichten</a>
+  </nav>
+  <div class="lang-switcher">
+    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+  </div>
+  <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" aria-label="Meldingen">
+    <span class="bell-icon">🔔</span>
+    <span class="bell-count" id="bellCount" style="display:none">0</span>
+    <div class="notif-dropdown" id="notifDropdown" style="display:none">
+      <div class="nd-header">
+        <span class="nd-title">Meldingen</span>
+        <button class="nd-mark-all" onclick="markAllRead(event)">Alles gelezen</button>
+      </div>
+      <div class="nd-list" id="notifList">
+        <div class="nd-empty">Geen meldingen</div>
+      </div>
+    </div>
+  </div>
+  <div id="topbarAuth">
+    <a href="auth.html" style="color:rgba(255,255,255,.7);font-size:.9rem;font-weight:500;transition:color .15s;text-decoration:none;">👤 Inloggen</a>
+  </div>
+</div>
+
+<!-- Mobile bottom tab bar -->
+<nav class="mobile-tabs" aria-label="Navigatie">
+  <button class="mt-tab" onclick="window.location.href='discover.html'">
+    <span class="mt-icon">🔍</span>
+    <span class="mt-label">Ontdek</span>
+  </button>
+  <button class="mt-tab active" onclick="window.location.href='matches.html'">
+    <span class="mt-icon">❤️</span>
+    <span class="mt-label">Matches</span>
+  </button>
+  <button class="mt-tab" onclick="window.location.href='mijn-sollicitaties.html'">
+    <span class="mt-icon">📋</span>
+    <span class="mt-label">Stages</span>
+  </button>
+  <button class="mt-tab" onclick="window.location.href='student-profile.html'">
+    <span class="mt-icon">👤</span>
+    <span class="mt-label">Profiel</span>
+  </button>
+</nav>
+
+<div class="container">
+  <h1>Mijn Matches</h1>
+  <p class="page-sub">Bedrijven die ook interesse in jou hebben</p>
+
+  <!-- Toggle filter -->
+  <div class="filter-toggle">
+    <label class="toggle-row" for="poolToggle">
+      <input type="checkbox" class="toggle-input" id="poolToggle" onchange="onToggleChange()">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      <span class="toggle-label">Toon vacatures in matchpool</span>
+    </label>
+    <div class="toggle-sub">Zet dit uit om alleen je echte matches te zien</div>
+  </div>
+
+  <div class="swipe-area" id="swipe-container"></div>
+
+  <div class="actions">
+    <button class="btn-pass" onclick="skipCard()">Passen</button>
+    <button class="btn-like" onclick="likeCard()">Like ❤️</button>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let allCards          = [];
+  let currentIndex      = 0;
+  let currentUser       = null;
+  let notifSubscription = null;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Notification system
+  // ─────────────────────────────────────────────────────────────────────────
+
+  async function createNotification(userId, type, refId, refType, message) {
+    if (!userId) return;
+    try {
+      await db.from('notifications').insert({
+        user_id:  userId,
+        type,
+        ref_id:   refId   || null,
+        ref_type: refType || null,
+        message,
+        read:     false,
+      });
+    } catch(e) {
+      console.warn('createNotification fout (non-blocking):', e);
+    }
+  }
+
+  function formatRelativeTime(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1)  return 'Zojuist';
+    if (m < 60) return m + ' min geleden';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + ' uur geleden';
+    return Math.floor(h / 24) + 'd geleden';
+  }
+
+  async function loadNotifications() {
+    if (!currentUser) return;
+    const { data } = await db
+      .from('notifications')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    const items = data || [];
+    const unread = items.filter(n => !n.read).length;
+    const countEl = document.getElementById('bellCount');
+    if (countEl) {
+      countEl.textContent = unread > 9 ? '9+' : unread;
+      countEl.style.display = unread > 0 ? 'flex' : 'none';
+    }
+
+    const listEl = document.getElementById('notifList');
+    if (!listEl) return;
+    if (items.length === 0) {
+      listEl.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(n => `
+      <div class="nd-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+        <span class="nd-dot ${n.read ? 'read' : ''}"></span>
+        <div>
+          <div class="nd-msg">${escapeHtml(n.message)}</div>
+          <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  async function markAllRead(e) {
+    if (e) e.stopPropagation();
+    if (!currentUser) return;
+    await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+    loadNotifications();
+  }
+
+  function toggleNotifDropdown(e) {
+    if (e) e.stopPropagation();
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    const isOpen = dd.style.display !== 'none';
+    dd.style.display = isOpen ? 'none' : 'flex';
+    if (!isOpen) loadNotifications();
+  }
+
+  async function handleNotifClick(id, refType, refId) {
+    if (id) {
+      await db.from('notifications').update({ read: true }).eq('id', id);
+    }
+    document.getElementById('notifDropdown').style.display = 'none';
+    if (refType === 'match' && refId) {
+      window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
+    } else if (refType === 'conversation' && refId) {
+      // refId is conv id — navigate to match
+    }
+    loadNotifications();
+  }
+
+  function startNotifSubscription() {
+    if (!currentUser || notifSubscription) return;
+    notifSubscription = db
+      .channel('notif-matches-' + currentUser.id)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: 'user_id=eq.' + currentUser.id,
+      }, payload => {
+        showToast(payload.new.message);
+        loadNotifications();
+      })
+      .subscribe();
+  }
+
+  function showToast(message) {
+    let t = document.getElementById('notif-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'notif-toast';
+      t.style.cssText = 'position:fixed;top:70px;right:16px;background:#0d1520;color:#fff;padding:10px 16px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;line-height:1.4;font-family:Outfit,sans-serif';
+      document.body.appendChild(t);
+    }
+    t.textContent = '🔔 ' + message;
+    t.style.opacity = '1';
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => { t.style.opacity = '0'; }, 4000);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Toggle helpers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function getToggleState() {
+    const stored = localStorage.getItem('internly_show_vacatures');
+    return stored === null ? true : stored === 'true';
+  }
+
+  function setToggleUI(val) {
+    document.getElementById('poolToggle').checked = val;
+  }
+
+  function onToggleChange() {
+    const checked = document.getElementById('poolToggle').checked;
+    localStorage.setItem('internly_show_vacatures', String(checked));
+    loadMatches();
+  }
+
+  function enablePool() {
+    localStorage.setItem('internly_show_vacatures', 'true');
+    setToggleUI(true);
+    loadMatches();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Trust badge
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function trustBadge(grade, score) {
+    const cls   = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[grade] || 'trust-b';
+    const label = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '';
+    return `<span class="trust-badge ${cls}">${escapeHtml(grade ?? '—')} · ${escapeHtml(String(score ?? '—'))} <span style="opacity:.65;font-weight:400">${label}</span></span>`;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // localStorage — save liked vacature
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function saveVacatureToLocal(card) {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
+    catch(e) { saved = []; }
+    if (saved.some(s => s.id === card.id && s.source === card.source)) return;
+    saved.push({
+      id:           card.id,
+      title:        card.title,
+      company_name: card.name,
+      sector:       card.sector || '',
+      trust_grade:  card.grade,
+      trust_score:  card.trust,
+      source:       card.source || 'internships',
+      saved_at:     new Date().toISOString(),
+    });
+    localStorage.setItem('internly_saved_vacatures', JSON.stringify(saved));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Card rendering
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function createCard(card, stackIndex) {
+    const el = document.createElement('div');
+    el.className = 'swipe-card' + (card.type === 'match' ? ' is-match' : '');
+    el.style.zIndex = 10 - stackIndex;
+
+    const poolBadge = card.type === 'vacature'
+      ? '<span class="pool-badge">📋 Uit matchpool</span>'
+      : '';
+
+    el.innerHTML = `
+      <div class="card-visual">
+        ${card.emoji || '🏢'}
+        ${poolBadge}
+      </div>
+      <div class="card-body">
+        <div class="card-top-row">
+          <span class="card-company">${escapeHtml(card.name)}</span>
+          ${trustBadge(card.grade, card.trust)}
+        </div>
+        <div class="card-role">${escapeHtml(card.title)}</div>
+        <p class="card-desc">${escapeHtml(card.description || '')}</p>
+      </div>
+    `;
+
+    let startX = 0;
+
+    el.addEventListener('mousedown', e => {
+      startX = e.clientX;
+      el.style.transition = 'none';
+    });
+    el.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      el.style.transition = 'none';
+    }, { passive: true });
+
+    el.addEventListener('mousemove', e => {
+      if (!startX) return;
+      const diff = e.clientX - startX;
+      el.style.transform = `translateX(${diff}px) rotate(${diff / 22}deg)`;
+    });
+    el.addEventListener('touchmove', e => {
+      if (!startX) return;
+      const diff = e.touches[0].clientX - startX;
+      el.style.transform = `translateX(${diff}px) rotate(${diff / 22}deg)`;
+    }, { passive: true });
+
+    const endSwipe = clientX => {
+      if (!startX) return;
+      const diff = clientX - startX;
+      el.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+      if (Math.abs(diff) > 120) {
+        diff > 0 ? likeCard() : skipCard();
+      } else {
+        el.style.transform = 'translateX(0) rotate(0)';
+      }
+      startX = 0;
+    };
+
+    el.addEventListener('mouseup',   e => endSwipe(e.clientX));
+    el.addEventListener('touchend',  e => endSwipe(e.changedTouches[0].clientX));
+
+    return el;
+  }
+
+  function loadCards() {
+    const container  = document.getElementById('swipe-container');
+    const showPool   = getToggleState();
+    container.innerHTML = '';
+
+    const remaining = allCards.slice(currentIndex);
+
+    if (remaining.length === 0) {
+      if (!showPool) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">💫</span>
+            Nog geen matches.<br>
+            <small>Zet de matchpool aan om alvast vacatures te bekijken.</small>
+            <button class="btn-enable-pool" onclick="enablePool()">Matchpool aanzetten</button>
+          </div>`;
+      } else {
+        container.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">📭</span>
+            Geen vacatures beschikbaar.<br>
+            <small>Kom later terug.</small>
+          </div>`;
+      }
+      return;
+    }
+
+    remaining.forEach((card, i) => {
+      container.appendChild(createCard(card, i));
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Swipe actions
+  // ─────────────────────────────────────────────────────────────────────────
+
+  async function likeCard() {
+    const card = allCards[currentIndex];
+    if (!card) return;
+
+    if (card.type === 'match') {
+      if (card.matchId && currentUser) {
+        // Fetch full match to determine other party
+        const { data: matchRow } = await db
+          .from('matches')
+          .select('party_a, party_b')
+          .eq('id', card.matchId)
+          .maybeSingle();
+
+        await db.from('matches').update({ status: 'accepted' }).eq('id', card.matchId);
+
+        // Maak conversation aan (of hergebruik bestaande)
+        let { data: conv } = await db.from('conversations')
+          .select('id')
+          .eq('match_id', card.matchId)
+          .maybeSingle();
+        if (!conv) {
+          const { data: newConv } = await db.from('conversations')
+            .insert({ match_id: card.matchId })
+            .select('id')
+            .single();
+          conv = newConv;
+        }
+
+        // Notify the other party
+        if (matchRow) {
+          const otherPartyId = matchRow.party_a === currentUser.id ? matchRow.party_b : matchRow.party_a;
+          const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Iemand';
+          createNotification(
+            otherPartyId,
+            'new_match',
+            card.matchId,
+            'match',
+            myName + ' wil graag kennismaken voor een stage'
+          );
+        }
+
+        advanceCard();
+        window.location.href = 'chat.html?match=' + encodeURIComponent(card.matchId);
+        return;
+      }
+      notify('🎉 Match bevestigd!');
+    } else {
+      // Pool vacature
+      if (currentUser && card.source === 'internship_postings') {
+        try {
+          const { data: posting } = await db
+            .from('internship_postings')
+            .select('created_by')
+            .eq('id', card.id)
+            .single();
+          if (posting?.created_by) {
+            const { data: match } = await db.from('matches').insert({
+              party_a:      currentUser.id,
+              party_b:      posting.created_by,
+              type:         'student_to_company',
+              status:       'accepted',
+              initiated_by: currentUser.id,
+              match_target: 'posting',
+              posting_id:   card.id,
+            }).select('id').single();
+            if (match) {
+              await db.from('conversations').insert({ match_id: match.id }).select('id').single();
+              // Notify company of new match
+              const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een student';
+              createNotification(
+                posting.created_by,
+                'new_match',
+                match.id,
+                'match',
+                myName + ' heeft interesse in jouw vacature: ' + (card.title || 'Stageplek')
+              );
+              saveVacatureToLocal(card);
+              notify('🎉 Match aangemaakt! Bekijk bij Matches om te chatten.');
+              advanceCard();
+              return;
+            }
+          }
+        } catch(e) { console.error('Match aanmaken fout:', e); }
+      }
+      saveVacatureToLocal(card);
+      notify('🔖 Opgeslagen bij Mijn Stages!');
+    }
+
+    advanceCard();
+  }
+
+  async function skipCard() {
+    const card = allCards[currentIndex];
+    if (!card) return;
+
+    if (card.type === 'match' && card.matchId && currentUser) {
+      await db.from('matches').update({ status: 'rejected' }).eq('id', card.matchId);
+    }
+    notify('Gepast');
+    advanceCard();
+  }
+
+  function advanceCard() {
+    currentIndex++;
+    if (currentIndex >= allCards.length) {
+      currentIndex = 0;
+      notify('Dat was de laatste kaart — kom later terug!');
+    }
+    loadCards();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Data loading
+  // ─────────────────────────────────────────────────────────────────────────
+
+  async function loadMatches() {
+    const container = document.getElementById('swipe-container');
+    container.innerHTML = `<div class="empty-state"><span class="empty-icon">⏳</span>Laden…</div>`;
+
+    const showPool = getToggleState();
+    allCards       = [];
+    currentIndex   = 0;
+
+    // 1. Real matches (requires auth)
+    if (currentUser) {
+      const { data: matchRows } = await db
+        .from('matches')
+        .select('*, internship_postings(title, company_name, trust_score, trust_grade)')
+        .or(`party_a.eq.${currentUser.id},party_b.eq.${currentUser.id}`)
+        .in('status', ['pending', 'active']);
+
+      if (matchRows && matchRows.length > 0) {
+        allCards.push(...matchRows.map(m => {
+          const p = m.internship_postings || {};
+          return {
+            id:          m.id,
+            type:        'match',
+            matchId:     m.id,
+            source:      null,
+            name:        p.company_name || 'Bedrijf',
+            title:       p.title        || 'Stageplek',
+            trust:       p.trust_score  || 70,
+            grade:       p.trust_grade  || 'B',
+            description: 'Dit bedrijf heeft interesse in jouw profiel.',
+            emoji:       '🏢',
+            sector:      '',
+          };
+        }));
+      }
+    }
+
+    // 2. Matchpool vacatures (when toggle is on)
+    if (showPool) {
+      const [
+        { data: internships },
+        { data: postings },
+      ] = await Promise.all([
+        db.from('internships')
+          .select('id, company_name, sector, title, description, trust_score, trust_grade')
+          .order('trust_score', { ascending: false })
+          .limit(20),
+        db.from('internship_postings')
+          .select('id, company_name, sector, title, description, trust_score, trust_grade')
+          .eq('status', 'active')
+          .order('trust_score', { ascending: false })
+          .limit(20),
+      ]);
+
+      const toCard = (v, source) => ({
+        id:          v.id,
+        type:        'vacature',
+        matchId:     null,
+        source,
+        name:        v.company_name || 'Bedrijf',
+        title:       v.title        || 'Stageplek',
+        trust:       v.trust_score  || 70,
+        grade:       v.trust_grade  || 'B',
+        description: (v.description || '').length > 150
+                       ? v.description.slice(0, 150) + '…'
+                       : (v.description || ''),
+        emoji:       '🏢',
+        sector:      v.sector || '',
+      });
+
+      allCards.push(
+        ...(internships || []).map(v => toCard(v, 'internships')),
+        ...(postings    || []).map(v => toCard(v, 'internship_postings')),
+      );
+    }
+
+    loadCards();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Helpers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  function notify(msg) {
+    const el = document.getElementById('notif');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  async function signOut() {
+    try {
+      await db.auth.signOut();
+    } catch(e) {
+      console.error('Logout error:', e);
+    } finally {
+      sessionStorage.removeItem('internly_role');
+      window.location.href = 'auth.html';
+    }
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', e => {
+    const bell = document.getElementById('notifBell');
+    const dd   = document.getElementById('notifDropdown');
+    if (dd && dd.style.display !== 'none' && bell && !bell.contains(e.target)) {
+      dd.style.display = 'none';
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Init
+  // ─────────────────────────────────────────────────────────────────────────
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    setToggleUI(getToggleState());
+
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { window.location.href = 'auth.html'; return; }
+    currentUser = user;
+
+    const authEl = document.getElementById('topbarAuth');
+    if (user) {
+      const name     = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+      const initials = name.slice(0, 2).toUpperCase();
+      authEl.innerHTML = `
+        <div class="topbar-user">
+          <div class="topbar-avatar">${escapeHtml(initials)}</div>
+          <span>${escapeHtml(name)}</span>
+          <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
+        </div>`;
+    }
+
+    await loadMatches();
+    await loadNotifications();
+    startNotifSubscription();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    if (notifSubscription) notifSubscription.unsubscribe();
+  });
+</script>
+
+  <!-- Google Translate Widget -->
+  <div id="google_translate_element" style="display:none"></div>
+  <script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

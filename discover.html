@@ -3,15 +3,1118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Discover - Internly</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Internly — Ontdek Stages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6ozhZf1wVjSq6aBMhOmW1u3nfr1UsGMc&libraries=places" defer></script>
+  <script src="js/reistijd.js" defer></script>
+  <style>
+    .topbar {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      padding: 0 32px; height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar .logo span { color: #FF7E42; }
+    .topbar .nav { display: flex; gap: 24px; }
+    .topbar .nav a {
+      color: rgba(255,255,255,.7); text-decoration: none;
+      font-size: .95rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; }
+    .topbar .user { color: rgba(255,255,255,.8); font-size: .9rem; }
+
+    /* Bell border override for green topbar */
+    .topbar .bell-count { border-color: #1a7a48; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 2rem; font-weight: 700; color: #0d1520; margin-bottom: 6px;
+    }
+    .page-sub { color: #6b7280; font-size: 1rem; margin-bottom: 28px; }
+
+    .filters {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      align-items: center; margin-bottom: 28px;
+    }
+    .search-bar {
+      flex: 1; min-width: 240px; padding: 11px 18px;
+      border: 1.5px solid #e2e8f0; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .95rem;
+      outline: none; background: #fff; transition: border-color .15s;
+    }
+    .search-bar:focus { border-color: #1a7a48; }
+    .filters select {
+      padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem;
+      background: #fff; cursor: pointer; outline: none; color: #374151;
+    }
+    .filters select:focus { border-color: #1a7a48; }
+    .filters button {
+      padding: 10px 24px; background: #1a7a48; color: #fff; border: none;
+      border-radius: 50px; font-family: 'Outfit', sans-serif;
+      font-size: .9rem; font-weight: 600; cursor: pointer; transition: background .15s;
+    }
+    .filters button:hover { background: #0f5c36; }
+
+    .results-count {
+      font-size: .85rem; color: #9ca3af; margin-bottom: 16px;
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .stage-card {
+      background: #fff; border-radius: 16px; padding: 24px;
+      border: 1.5px solid #f0f0ee;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      transition: transform .2s, box-shadow .2s;
+      display: flex; flex-direction: column;
+    }
+    .stage-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.09); }
+
+    .company-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 10px; margin-bottom: 6px;
+    }
+    .company-header h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 600; color: #0d1520; margin: 0;
+    }
+    .company-sector {
+      font-size: .75rem; color: #9ca3af; margin-bottom: 4px;
+    }
+
+    .trust-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .73rem; font-weight: 700; padding: 4px 10px;
+      border-radius: 50px; white-space: nowrap; flex-shrink: 0;
+    }
+    .trust-a { background: #e8f5ee; color: #1a7a48; }
+    .trust-b { background: #fdf3e0; color: #a06010; }
+    .trust-c { background: #fdeaea; color: #b82020; }
+
+    .stage-card h4 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 600; color: #0d1520; margin: 10px 0 10px;
+    }
+    .description {
+      color: #374151; line-height: 1.55; font-size: .9rem;
+      margin-bottom: 14px; flex: 1;
+    }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      color: #6b7280; font-size: .82rem; margin-bottom: 12px;
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .tag {
+      background: #f0f0ee; color: #6b7280;
+      padding: 4px 10px; border-radius: 50px; font-size: .76rem;
+    }
+
+    .card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 14px; border-top: 1px solid #f0f0ee; margin-top: auto;
+    }
+    .guarantee { font-size: .82rem; font-weight: 500; }
+    .guarantee.yes { color: #1a7a48; }
+    .guarantee.no  { color: #9ca3af; }
+
+    .apply-btn {
+      background: #FF7E42; color: #fff; border: none;
+      padding: 9px 20px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-weight: 600;
+      font-size: .85rem; cursor: pointer; transition: background .15s, transform .1s;
+      text-decoration: none; display: inline-block;
+    }
+    .apply-btn:hover { background: #e05c1a; }
+    .apply-btn:active { transform: scale(.97); }
+
+    .state-box {
+      grid-column: 1 / -1; text-align: center;
+      padding: 60px 20px; color: #6b7280;
+      font-size: .95rem; line-height: 1.9;
+    }
+    .state-icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
+    .state-box.error { color: #b82020; }
+    .state-box code {
+      display: inline-block; background: #fdeaea; color: #b82020;
+      padding: 5px 12px; border-radius: 6px; font-size: .8rem;
+    }
+
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 12px 24px;
+      border-radius: 12px; font-size: .9rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+
+    .topbar-user {
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500;
+    }
+    .topbar-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,.2); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .btn-topbar-logout {
+      background: none; border: 1px solid rgba(255,255,255,.3);
+      color: rgba(255,255,255,.7); padding: 5px 12px; border-radius: 20px;
+      font-family: 'Outfit', sans-serif; font-size: .8rem; cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-topbar-logout:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+    /* Reistijd filter */
+    .reistijd-filter {
+      margin-bottom: 20px;
+    }
+    .rf-toggle {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 50px;
+      border: 1.5px solid #e2e8f0; background: #fff;
+      font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 500;
+      color: #374151; cursor: pointer; transition: all .15s;
+    }
+    .rf-toggle:hover { border-color: #1a7a48; color: #1a7a48; }
+    .rf-toggle.active { border-color: #1a7a48; background: #e8f5ee; color: #1a7a48; }
+    .rf-toggle .rf-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #e2e8f0; transition: background .15s;
+    }
+    .rf-toggle.active .rf-dot { background: #1a7a48; }
+
+    .rf-panel {
+      display: none; margin-top: 12px;
+      background: #fff; border: 1.5px solid #e2e8f0;
+      border-radius: 14px; padding: 18px 20px;
+    }
+    .rf-panel.open { display: block; }
+
+    .rf-row {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    }
+    .rf-label {
+      font-size: .83rem; font-weight: 600; color: #374151; white-space: nowrap;
+    }
+    .rf-postcode {
+      width: 120px; padding: 8px 14px;
+      border: 1.5px solid #e2e8f0; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem;
+      outline: none; transition: border-color .15s; text-transform: uppercase;
+    }
+    .rf-postcode:focus { border-color: #1a7a48; }
+    .rf-postcode.invalid { border-color: #b82020; }
+
+    .rf-slider-wrap {
+      display: flex; align-items: center; gap: 10px; flex: 1; min-width: 180px;
+    }
+    .rf-slider {
+      flex: 1; accent-color: #1a7a48;
+      height: 4px; cursor: pointer;
+    }
+    .rf-slider-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .95rem; font-weight: 700; color: #1a7a48;
+      min-width: 60px; white-space: nowrap;
+    }
+
+    .rf-hint {
+      margin-top: 10px; font-size: .78rem; color: #9ca3af; line-height: 1.5;
+    }
+
+    /* OV badges on cards */
+    .reistijd-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .75rem; font-weight: 600; padding: 3px 9px;
+      border-radius: 50px; white-space: nowrap;
+    }
+    .rb-ok  { background: #e8f5ee; color: #1a7a48; }
+    .rb-ver { background: #fdeaea; color: #b82020; }
+    .rb-onb { background: #f0f0ee; color: #9ca3af; }
+    .rb-lad { background: #f0f0ee; color: #9ca3af; animation: rb-pulse .9s infinite alternate; }
+    @keyframes rb-pulse { from { opacity: .5 } to { opacity: 1 } }
+
+    /* Trust tooltip */
+    .trust-info { position: relative; display: inline-block; }
+    .trust-info-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: rgba(0,0,0,.08); color: #6b7280;
+      font-size: .65rem; font-weight: 700; cursor: help;
+      margin-left: 4px; vertical-align: middle;
+    }
+    .trust-info-text {
+      display: none; position: absolute; bottom: 120%; left: 50%;
+      transform: translateX(-50%); width: 200px; padding: 8px 12px;
+      background: #0d1520; color: #fff; font-size: .75rem; line-height: 1.5;
+      border-radius: 8px; z-index: 100; pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    }
+    .trust-info:hover .trust-info-text { display: block; }
+  </style>
 </head>
 <body>
-  <h1 style="text-align:center; margin-top:80px;">Discover Pagina</h1>
-  <p style="text-align:center;">Hier komen de stage vacatures met swipe-functionaliteit.</p>
-  <p style="text-align:center; margin-top:40px;">
-    <a href="index.html" style="color:#e05c1a;">← Terug naar rol kiezen</a>
-  </p>
+<div class="notif" id="notif"></div>
+
+<div class="topbar">
+  <a href="index.html" class="logo">intern<span>ly</span></a>
+  <nav class="nav">
+    <a href="discover.html" class="active">Vacatures</a>
+    <a href="about.html">Over ons</a>
+    <a href="matches.html">Matches</a>
+    <a href="mijn-sollicitaties.html">Mijn Stages</a>
+    <a href="student-profile.html">Mijn profiel</a>
+    <a href="chat.html">💬 Berichten</a>
+  </nav>
+  <div class="lang-switcher">
+    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+  </div>
+
+  <!-- Notification bell -->
+  <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" style="display:none" role="button" aria-label="Meldingen" tabindex="0">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <span class="bell-count" id="bellCount" style="display:none">0</span>
+    <!-- Notification dropdown -->
+    <div class="notif-dropdown" id="notifDropdown" style="display:none" onclick="event.stopPropagation()">
+      <div class="nd-header">
+        <span>Meldingen</span>
+        <button class="nd-mark-all" onclick="markAllRead()">Alles gelezen</button>
+      </div>
+      <div class="nd-list" id="ndList">
+        <div class="nd-empty">Geen meldingen</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="topbarAuth">
+    <a href="auth.html" style="color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;font-weight:500;">Inloggen</a>
+  </div>
+</div>
+
+<!-- Mobile bottom tab bar -->
+<nav class="mobile-tabs">
+  <a href="discover.html" class="mt-tab active">
+    <span class="mt-icon">🔍</span>
+    <span class="mt-label">Ontdek</span>
+  </a>
+  <a href="matches.html" class="mt-tab">
+    <span class="mt-icon">💫</span>
+    <span class="mt-label">Matches</span>
+  </a>
+  <a href="mijn-sollicitaties.html" class="mt-tab">
+    <span class="mt-icon">📋</span>
+    <span class="mt-label">Stages</span>
+  </a>
+  <a href="student-profile.html" class="mt-tab">
+    <span class="mt-icon">👤</span>
+    <span class="mt-label">Profiel</span>
+  </a>
+</nav>
+
+<div class="container">
+  <h1>Ontdek stageopdrachten</h1>
+  <p class="page-sub">Vacatures samengesteld uit openbare bronnen — beoordeeld op betrouwbaarheid via Trust Score</p>
+
+  <!-- Profile-missing banner — shown only when logged-in student has no profile yet -->
+  <div id="noprofileBanner" style="display:none;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:14px 18px;margin-bottom:20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <span style="font-size:.9rem;color:#92400e">Je hebt nog geen profiel aangemaakt — bedrijven kunnen je dan niet vinden.</span>
+    <a href="student-profile.html" style="background:#FF7E42;color:#fff;padding:8px 20px;border-radius:50px;font-size:.85rem;font-weight:600;text-decoration:none;white-space:nowrap">Maak je profiel aan →</a>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="searchInput" class="search-bar"
+      placeholder="Zoek op titel, bedrijf, sector of skill…"
+      oninput="filterCards()">
+
+    <select id="sectorFilter" onchange="filterCards()">
+      <option value="">Alle sectoren</option>
+      <option value="engineering">Engineering</option>
+      <option value="high-tech">High-Tech</option>
+      <option value="it">IT</option>
+      <option value="data">Data</option>
+      <option value="finance">Finance</option>
+      <option value="duurzaamheid">Duurzaamheid</option>
+      <option value="marketing">Marketing</option>
+      <option value="design">Design</option>
+      <option value="hospitality">Hospitality</option>
+      <option value="hr">HR</option>
+      <option value="gezondheid">Gezondheid</option>
+      <option value="dieren">Dieren</option>
+      <option value="niche">Niche</option>
+    </select>
+
+    <select id="durationFilter" onchange="filterCards()">
+      <option value="">Alle duren</option>
+      <option value="4 maanden">4 maanden</option>
+      <option value="5 maanden">5 maanden</option>
+      <option value="6 maanden">6 maanden</option>
+    </select>
+
+    <select id="trustFilter" onchange="filterCards()">
+      <option value="">Alle Trust Scores</option>
+      <option value="a">A — Betrouwbaar</option>
+      <option value="b">B — Gemiddeld</option>
+      <option value="c">C — Let op</option>
+    </select>
+
+    <button onclick="filterCards()">Filter toepassen</button>
+  </div>
+
+  <!-- Reistijd filter -->
+  <div class="reistijd-filter">
+    <button class="rf-toggle" id="rfToggle" onclick="toggleReistijd()" type="button">
+      <span class="rf-dot"></span>
+      🚌 Filter op reistijd (OV)
+    </button>
+    <div class="rf-panel" id="rfPanel">
+      <div class="rf-row">
+        <span class="rf-label">Jouw postcode:</span>
+        <input type="text" id="rfPostcode" class="rf-postcode"
+          placeholder="1234AB" maxlength="7"
+          oninput="onPostcodeInput()" aria-label="Jouw postcode">
+        <span class="rf-label" style="margin-left:6px">Max. reistijd:</span>
+        <div class="rf-slider-wrap">
+          <input type="range" id="rfSlider" class="rf-slider"
+            min="30" max="120" step="5" value="60"
+            oninput="onSliderChange()" aria-label="Maximale reistijd in minuten">
+          <span class="rf-slider-val" id="rfSliderVal">60 min</span>
+        </div>
+      </div>
+      <div class="rf-hint" id="rfHint">Vul je postcode in (bijv. 1234AB) om vacatures te filteren op OV-reistijd.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div class="results-count" id="resultsCount"></div>
+    <div class="trust-info">
+      <span style="font-size:.8rem;color:#9ca3af">ℹ Trust Score</span>
+      <div class="trust-info-text">De Trust Score beoordeelt de betrouwbaarheid van het stagebedrijf op basis van openbare data. A = hoog vertrouwen, B = gemiddeld, C = wees voorzichtig.</div>
+    </div>
+  </div>
+  <div id="internshipsContainer" class="cards-container"></div>
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── State ──────────────────────────────────────────────────────────────────
+let currentUser        = null;
+let notifSubscription  = null;
+// reviewsByCompany: { companyUserId: { avg: float, count: int } }
+let reviewsByCompany   = {};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function trustBadge(grade, score) {
+  if (!grade) return '';
+  const cls   = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[grade] || 'trust-a';
+  const label = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '';
+  return `<span class="trust-badge ${cls}">${escapeHtml(grade)} · ${escapeHtml(String(score ?? '—'))} <span style="opacity:.65;font-weight:400">${label}</span></span>`;
+}
+
+function renderCard(row) {
+  const tags     = Array.isArray(row.tags) ? row.tags : [];
+  const start    = row.start_date
+    ? new Date(row.start_date).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })
+    : 'Flexibel';
+  const eTitle   = escapeHtml(row.title        || '');
+  const eCompany = escapeHtml(row.company_name || '');
+  const eSector  = escapeHtml(row.sector       || '');
+  const eDur     = escapeHtml(row.duration     || '');
+  const eDesc    = escapeHtml(row.description  || '');
+  const ePostcode = escapeHtml(row.postcode || '');
+
+  // Review stars for bedrijfs-postings
+  let reviewStarsHtml = '';
+  if (row._isPosting && row._companyUserId && reviewsByCompany[row._companyUserId]) {
+    const { avg, count } = reviewsByCompany[row._companyUserId];
+    const starsFilled = Math.round(avg);
+    const avgStr      = avg.toFixed(1);
+    const starsStr    = [1,2,3,4,5].map(i => i <= starsFilled ? '★' : '☆').join('');
+    reviewStarsHtml = `<span class="mini-stars">${starsStr} ${avgStr} <span class="ms-count">(${count})</span></span>`;
+  }
+
+  return `
+    <div class="stage-card"
+      data-id="${row.id}"
+      data-title="${eTitle.toLowerCase()}"
+      data-company="${eCompany.toLowerCase()}"
+      data-sector="${eSector.toLowerCase()}"
+      data-duration="${eDur}"
+      data-trust="${escapeHtml((row.trust_grade || '').toLowerCase())}"
+      data-tags="${escapeHtml(tags.join(' ').toLowerCase())}"
+      data-desc="${eDesc.toLowerCase()}"
+      data-postcode="${ePostcode}"
+      data-reistijd="">
+
+      <div class="company-header">
+        <div>
+          <h3>${eCompany || 'Bedrijf'}</h3>
+          <div class="company-sector">${eSector}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+          ${row._isPosting ? '<span style="font-size:.7rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 8px;border-radius:20px;white-space:nowrap">🏢 Bedrijfsposting</span>' : ''}
+          ${trustBadge(row.trust_grade, row.trust_score)}
+        </div>
+      </div>
+
+      <h4>${eTitle || 'Stageplaats'}</h4>
+      <p class="description">${eDesc}</p>
+
+      <div class="meta">
+        <span>⏱ ${eDur || '—'}</span>
+        <span>📅 ${start}</span>
+        <span class="reistijd-badge rb-onb" style="display:none" data-badge></span>
+      </div>
+
+      <div class="tags">
+        ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+      </div>
+
+      <div class="card-footer">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="guarantee ${row.guarantee ? 'yes' : 'no'}">
+            ${row.guarantee ? '⚡ Responsgarantie' : 'Geen garantie'}
+          </span>
+          ${reviewStarsHtml}
+        </div>
+        <a class="apply-btn"
+          href="vacature-detail.html?id=${row.id}&source=${row._isPosting ? 'internship_postings' : 'internships'}">
+          Lees meer →
+        </a>
+      </div>
+    </div>`;
+}
+
+async function loadInternships() {
+  const container = document.getElementById('internshipsContainer');
+  container.innerHTML = `<div class="state-box"><span class="state-icon">⏳</span>Vacatures laden…</div>`;
+
+  const [
+    { data: internships, error: err1 },
+    { data: postings,    error: err2 },
+  ] = await Promise.all([
+    db.from('internships')
+      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode')
+      .order('trust_score', { ascending: false }),
+    db.from('internship_postings')
+      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode, created_by')
+      .eq('status', 'active')
+      .order('trust_score', { ascending: false }),
+  ]);
+
+  if (err1 || err2) {
+    const msg = (err1 || err2).message;
+    console.error(err1 || err2);
+    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Fout bij laden.<br><code>${escapeHtml(msg)}</code></div>`;
+    return;
+  }
+
+  // Batch-fetch reviews for all posting company IDs
+  const companyUserIds = [...new Set((postings || []).map(p => p.created_by).filter(Boolean))];
+  if (companyUserIds.length > 0) {
+    const { data: reviewRows } = await db
+      .from('reviews')
+      .select('reviewee_id, rating')
+      .in('reviewee_id', companyUserIds);
+
+    // Build lookup map
+    reviewsByCompany = {};
+    (reviewRows || []).forEach(r => {
+      if (!reviewsByCompany[r.reviewee_id]) {
+        reviewsByCompany[r.reviewee_id] = { sum: 0, count: 0 };
+      }
+      reviewsByCompany[r.reviewee_id].sum   += r.rating;
+      reviewsByCompany[r.reviewee_id].count += 1;
+    });
+    // Convert sum→avg
+    Object.keys(reviewsByCompany).forEach(id => {
+      const d = reviewsByCompany[id];
+      reviewsByCompany[id] = { avg: d.sum / d.count, count: d.count };
+    });
+  }
+
+  const combined = [
+    ...(internships || []),
+    ...(postings || []).map(p => ({ ...p, _isPosting: true, _companyUserId: p.created_by })),
+  ].sort((a, b) => (b.trust_score || 0) - (a.trust_score || 0));
+
+  if (combined.length === 0) {
+    container.innerHTML = `<div class="state-box"><span class="state-icon">📭</span>Nog geen vacatures beschikbaar.</div>`;
+    return;
+  }
+
+  container.innerHTML = combined.map(renderCard).join('');
+  updateCount(combined.length);
+}
+
+// ── Reistijd filter state ──────────────────────────────────────────────────
+let reistijdActief   = false;
+let studentPostcode  = localStorage.getItem('internly_student_postcode') || '';
+let maxReistijd      = 60;
+const reistijdCache  = new Map();   // key: "VAN|NAAR" → { minuten, status }
+
+function toggleReistijd() {
+  reistijdActief = !reistijdActief;
+  const toggle = document.getElementById('rfToggle');
+  const panel  = document.getElementById('rfPanel');
+  toggle.classList.toggle('active', reistijdActief);
+  panel.classList.toggle('open', reistijdActief);
+
+  if (reistijdActief) {
+    // pre-fill saved postcode
+    const inp = document.getElementById('rfPostcode');
+    if (studentPostcode && !inp.value) {
+      inp.value = studentPostcode;
+      inp.classList.remove('invalid');
+    }
+    onSliderChange();
+    if (studentPostcode && REISTIJD.valideer(studentPostcode)) {
+      updateReistijdBadges();
+    }
+  } else {
+    // hide all badges and show all cards
+    document.querySelectorAll('.stage-card').forEach(card => {
+      card.style.display = '';
+      const badge = card.querySelector('[data-badge]');
+      if (badge) badge.style.display = 'none';
+    });
+    filterCards();
+  }
+}
+
+function onPostcodeInput() {
+  const inp = document.getElementById('rfPostcode');
+  const val = inp.value.trim();
+  if (!val) {
+    inp.classList.remove('invalid');
+    document.getElementById('rfHint').textContent = 'Vul je postcode in (bijv. 1234AB) om vacatures te filteren op OV-reistijd.';
+    return;
+  }
+  if (!REISTIJD.valideer(val)) {
+    inp.classList.add('invalid');
+    document.getElementById('rfHint').textContent = 'Voer een geldige Nederlandse postcode in (bijv. 1234AB).';
+    return;
+  }
+  inp.classList.remove('invalid');
+  studentPostcode = REISTIJD.normaliseer(val);
+  reistijdCache.clear();
+  updateReistijdBadges();
+}
+
+function onSliderChange() {
+  maxReistijd = parseInt(document.getElementById('rfSlider').value, 10);
+  document.getElementById('rfSliderVal').textContent = maxReistijd + ' min';
+  if (reistijdActief && studentPostcode && REISTIJD.valideer(studentPostcode)) {
+    filterOpReistijd();
+  }
+}
+
+async function updateReistijdBadges() {
+  if (!studentPostcode || !REISTIJD.valideer(studentPostcode)) return;
+  document.getElementById('rfHint').textContent = 'Reistijden berekenen…';
+
+  const cards = Array.from(document.querySelectorAll('.stage-card'));
+  const promises = cards.map(async card => {
+    const bedrijfPostcode = card.dataset.postcode;
+    const badge = card.querySelector('[data-badge]');
+    if (!badge) return;
+
+    if (!bedrijfPostcode) {
+      setBadge(badge, null, 'onbekend');
+      card.dataset.reistijd = '';
+      return;
+    }
+
+    const cacheKey = studentPostcode + '|' + bedrijfPostcode;
+    let result = reistijdCache.get(cacheKey);
+    if (!result) {
+      setBadge(badge, null, 'laden');
+      result = await REISTIJD.berekenOV(studentPostcode, bedrijfPostcode);
+      reistijdCache.set(cacheKey, result);
+    }
+
+    card.dataset.reistijd = result.minuten !== null ? String(result.minuten) : '';
+    setBadge(badge, result.minuten, result.status);
+  });
+
+  await Promise.all(promises);
+  document.getElementById('rfHint').textContent =
+    'Toont OV-reistijd van ' + studentPostcode + ' naar het stagebedrijf.';
+  filterOpReistijd();
+}
+
+function setBadge(badge, minuten, status) {
+  badge.style.display = 'inline-flex';
+  badge.className = 'reistijd-badge';
+  if (status === 'laden') {
+    badge.classList.add('rb-lad');
+    badge.textContent = '🚌 …';
+  } else if (status === 'onbekend' || status === 'fout' || minuten === null) {
+    badge.classList.add('rb-onb');
+    badge.textContent = '🚌 —';
+  } else if (minuten <= maxReistijd) {
+    badge.classList.add('rb-ok');
+    badge.textContent = '🚌 ' + minuten + ' min';
+  } else {
+    badge.classList.add('rb-ver');
+    badge.textContent = '🚌 ' + minuten + ' min';
+  }
+}
+
+function filterOpReistijd() {
+  // re-run setBadge colours after maxReistijd changes
+  document.querySelectorAll('.stage-card').forEach(card => {
+    const badge   = card.querySelector('[data-badge]');
+    const minuten = card.dataset.reistijd ? parseInt(card.dataset.reistijd, 10) : null;
+    const postcode = card.dataset.postcode;
+
+    if (badge && badge.style.display !== 'none') {
+      const status = (postcode && minuten !== null) ? 'ok' : 'onbekend';
+      setBadge(badge, minuten, status);
+    }
+  });
+  filterCards();
+}
+// ── End reistijd ───────────────────────────────────────────────────────────
+
+function filterCards() {
+  const q        = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sector   = document.getElementById('sectorFilter').value.toLowerCase();
+  const duration = document.getElementById('durationFilter').value;
+  const trust    = document.getElementById('trustFilter').value.toLowerCase();
+
+  let visible = 0;
+  document.querySelectorAll('.stage-card').forEach(card => {
+    const baseHit =
+      (!q        || [card.dataset.title, card.dataset.company, card.dataset.desc, card.dataset.tags, card.dataset.sector].some(v => v.includes(q))) &&
+      (!sector   || card.dataset.sector.includes(sector)) &&
+      (!duration || card.dataset.duration === duration) &&
+      (!trust    || card.dataset.trust === trust);
+
+    let reistijdHit = true;
+    if (reistijdActief && studentPostcode && REISTIJD.valideer(studentPostcode)) {
+      const minuten = card.dataset.reistijd ? parseInt(card.dataset.reistijd, 10) : null;
+      // Cards with unknown reistijd are shown when filter is active (benefit of the doubt)
+      reistijdHit = (minuten === null) || (minuten <= maxReistijd);
+    }
+
+    const hit = baseHit && reistijdHit;
+    card.style.display = hit ? '' : 'none';
+    if (hit) visible++;
+  });
+
+  updateCount(visible);
+
+  let nr = document.getElementById('no-results');
+  if (visible === 0 && document.querySelectorAll('.stage-card').length > 0) {
+    if (!nr) {
+      nr = document.createElement('div');
+      nr.id = 'no-results'; nr.className = 'state-box';
+      nr.innerHTML = '<span class="state-icon">🔎</span>Geen vacatures gevonden voor deze filters.';
+      document.getElementById('internshipsContainer').appendChild(nr);
+    }
+  } else if (nr) nr.remove();
+}
+
+function updateCount(n) {
+  document.getElementById('resultsCount').textContent = `${n} vacature${n !== 1 ? 's' : ''} gevonden`;
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+async function signOut() {
+  if (notifSubscription) {
+    try { await db.removeChannel(notifSubscription); } catch(e) {}
+    notifSubscription = null;
+  }
+  try {
+    await db.auth.signOut();
+  } catch(e) {
+    console.error('Logout error:', e);
+  } finally {
+    sessionStorage.removeItem('internly_role');
+    window.location.href = 'auth.html';
+  }
+}
+
+// ── Notification system ────────────────────────────────────────────────────
+async function createNotification(userId, type, refId, refType, message) {
+  if (!userId) return;
+  try {
+    await db.from('notifications').insert({
+      user_id: userId, type, ref_id: refId || null,
+      ref_type: refType || null, message
+    });
+  } catch(e) {
+    console.warn('createNotification failed (non-blocking):', e);
+  }
+}
+
+function formatRelativeTime(isoString) {
+  const diff = Date.now() - new Date(isoString).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'zojuist';
+  if (mins < 60) return `${mins} min geleden`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return `${hrs} uur geleden`;
+  return `${Math.floor(hrs / 24)} dagen geleden`;
+}
+
+async function loadNotifications() {
+  if (!currentUser) return;
+  const { data } = await db
+    .from('notifications')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  const unread = (data || []).filter(n => !n.read).length;
+  const countEl = document.getElementById('bellCount');
+  if (unread > 0) {
+    countEl.textContent = unread > 9 ? '9+' : String(unread);
+    countEl.style.display = 'flex';
+  } else {
+    countEl.style.display = 'none';
+  }
+
+  const list = document.getElementById('ndList');
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(n => `
+    <div class="nd-item${n.read ? '' : ' unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+      ${!n.read ? '<span class="nd-dot"></span>' : ''}
+      <div class="nd-body">
+        <div class="nd-msg">${escapeHtml(n.message || '')}</div>
+        <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function markAllRead() {
+  if (!currentUser) return;
+  await db.from('notifications')
+    .update({ read: true })
+    .eq('user_id', currentUser.id)
+    .eq('read', false);
+  loadNotifications();
+}
+
+function toggleNotifDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('notifDropdown');
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) loadNotifications();
+}
+
+function handleNotifClick(notifId, refType, refId) {
+  // Mark single notification read
+  db.from('notifications').update({ read: true }).eq('id', notifId).then(() => {
+    loadNotifications();
+  });
+  // Navigate
+  if (refType === 'match')        window.location.href = 'matches.html';
+  else if (refType === 'conversation') window.location.href = 'chat.html?conversation=' + refId;
+  else                             document.getElementById('notifDropdown').style.display = 'none';
+}
+
+function startNotifSubscription() {
+  if (!currentUser) return;
+  notifSubscription = db
+    .channel('notif-discover-' + currentUser.id)
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'notifications',
+      filter: 'user_id=eq.' + currentUser.id
+    }, () => {
+      loadNotifications();
+      showToast();
+    })
+    .subscribe();
+}
+
+function showToast() {
+  notify('Je hebt een nieuwe melding');
+}
+// ── End notification system ────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { user } } = await db.auth.getUser();
+  const authEl = document.getElementById('topbarAuth');
+  if (user) {
+    currentUser = user;
+    const email    = user.email || '';
+    const name     = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+    const initials = name.slice(0, 2).toUpperCase();
+    authEl.innerHTML = `
+      <div class="topbar-user">
+        <div class="topbar-avatar">${escapeHtml(initials)}</div>
+        <span>${escapeHtml(name)}</span>
+        <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
+      </div>`;
+
+    // Show notification bell
+    document.getElementById('notifBell').style.display = 'flex';
+    loadNotifications();
+    startNotifSubscription();
+
+    // Show banner if student has no profile yet
+    const role = sessionStorage.getItem('internly_role') || '';
+    if (role !== 'company' && role !== 'school') {
+      const { data: sp } = await db
+        .from('student_profiles')
+        .select('profile_id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+      if (!sp) {
+        const banner = document.getElementById('noprofileBanner');
+        if (banner) banner.style.display = 'flex';
+      }
+    }
+  }
+
+  loadInternships();
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    const bell = document.getElementById('notifBell');
+    if (bell && !bell.contains(e.target)) {
+      const dd = document.getElementById('notifDropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  });
+});
+
+window.addEventListener('beforeunload', async () => {
+  if (notifSubscription) {
+    try { await db.removeChannel(notifSubscription); } catch(e) {}
+  }
+});
+</script>
+
+<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
+<div id="waitlist-overlay" style="
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:24px;">
+</div>
+
+<div id="waitlist-popup" style="
+  display:none; position:fixed; z-index:9999;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#fff; border-radius:20px;
+  width:100%; max-width:440px;
+  box-shadow:0 24px 60px rgba(0,0,0,.18);
+  overflow:hidden; font-family:'Outfit',sans-serif;">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#1a7a48,#0f5c36);padding:28px 32px 24px;position:relative;">
+    <button onclick="sluitPopup()" style="
+      position:absolute;top:14px;right:16px;
+      background:rgba(255,255,255,.15);border:none;
+      color:#fff;width:28px;height:28px;border-radius:50%;
+      font-size:1rem;cursor:pointer;line-height:1;
+      display:flex;align-items:center;justify-content:center;">×</button>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
+      intern<span style="color:#FF7E42;">ly</span>
+    </div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.65);">
+      Blijf op de hoogte van de ontwikkeling
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div style="padding:28px 32px 32px;">
+    <p style="font-size:.95rem;color:#374151;line-height:1.7;margin:0 0 8px;">
+      Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
+    </p>
+    <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
+      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
+    </p>
+
+    <div id="wl-form">
+      <input type="email" id="wl-email" placeholder="jouw@email.nl" style="
+        width:100%;padding:11px 16px;
+        border:1.5px solid #e2e8f0;border-radius:10px;
+        font-family:'Outfit',sans-serif;font-size:.95rem;
+        color:#0d1520;outline:none;box-sizing:border-box;
+        transition:border-color .15s;margin-bottom:10px;"
+        onfocus="this.style.borderColor='#1a7a48'"
+        onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')schrijfIn()">
+      <button onclick="schrijfIn()" id="wl-btn" style="
+        width:100%;padding:12px;
+        background:#FF7E42;color:#fff;border:none;
+        border-radius:50px;font-family:'Outfit',sans-serif;
+        font-size:.95rem;font-weight:700;cursor:pointer;
+        transition:background .15s;">
+        Houd me op de hoogte →
+      </button>
+    </div>
+
+    <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
+      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
+      <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
+    </div>
+
+    <div id="wl-error" style="display:none;margin-top:8px;
+      background:#fdeaea;color:#b82020;border-radius:8px;
+      padding:8px 14px;font-size:.82rem;"></div>
+
+    <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
+      Door je in te schrijven ga je akkoord met ons privacybeleid.
+    </p>
+  </div>
+</div>
+
+<script>
+(function() {
+  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+
+  if (!localStorage.getItem('internly_waitlist_seen')) {
+    setTimeout(async function() {
+      const _client = (typeof db !== 'undefined') ? db
+        : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { session } } = await _client.auth.getSession();
+      if (!session) toonPopup();
+    }, 8000);
+  }
+
+  function toonPopup() {
+    document.getElementById('waitlist-overlay').style.display = 'flex';
+    document.getElementById('waitlist-popup').style.display  = 'block';
+    localStorage.setItem('internly_waitlist_seen', '1');
+  }
+
+  window.sluitPopup = function() {
+    document.getElementById('waitlist-overlay').style.display = 'none';
+    document.getElementById('waitlist-popup').style.display  = 'none';
+  };
+
+  document.getElementById('waitlist-overlay').addEventListener('click', sluitPopup);
+
+  window.schrijfIn = async function() {
+    const email = document.getElementById('wl-email').value.trim();
+    const btn   = document.getElementById('wl-btn');
+    const err   = document.getElementById('wl-error');
+
+    err.style.display = 'none';
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      err.textContent   = 'Voer een geldig e-mailadres in.';
+      err.style.display = 'block';
+      return;
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Bezig…';
+
+    const client = (typeof db !== 'undefined') ? db
+      : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const { error } = await client
+      .from('waitlist')
+      .insert({ email, source: window.location.pathname });
+
+    btn.disabled    = false;
+    btn.textContent = 'Houd me op de hoogte →';
+
+    if (error) {
+      if (error.code === '23505') {
+        document.getElementById('wl-form').style.display    = 'none';
+        document.getElementById('wl-success').style.display = 'block';
+      } else {
+        err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
+        err.style.display = 'block';
+      }
+      return;
+    }
+
+    document.getElementById('wl-form').style.display    = 'none';
+    document.getElementById('wl-success').style.display = 'block';
+
+    setTimeout(sluitPopup, 3000);
+  };
+})();
+</script>
+<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Internly — Bouwfase"
+AuthUserFile /domains/internly.pro/public_html/.htpasswd
+Require valid-user

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internly — Inloggen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/push.js"></script>
+  <style>
+    :root {
+      --green:      #1a7a48;
+      --green-dark: #0f5c36;
+      --green-bg:   #e8f5ee;
+      --blue:       #1756a8;
+      --blue-bg:    #e8f0fc;
+      --orange:     #FF7E42;
+      --orange-dark:#e05c1a;
+      --amber:      #a06010;
+      --amber-bg:   #fdf3e0;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --white:      #ffffff;
+      --border:     #e2e8f0;
+      --red:        #b82020;
+      --red-bg:     #fdeaea;
+      --r:          14px;
+      --r-sm:       8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── CARD ── */
+    .auth-card {
+      background: var(--white);
+      border-radius: 20px;
+      width: 100%; max-width: 440px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.18);
+      overflow: hidden;
+    }
+
+    /* ── HEADER ── */
+    .card-header {
+      background: var(--ink);
+      padding: 28px 32px 24px;
+      text-align: center;
+    }
+    .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.8rem; font-weight: 700; color: #fff;
+      letter-spacing: -.03em; margin-bottom: 4px;
+    }
+    .logo span { color: var(--orange); }
+    .logo-sub { font-size: .82rem; color: rgba(255,255,255,.45); }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: #f4f3ef;
+    }
+    .tab {
+      flex: 1; padding: 13px;
+      text-align: center; cursor: pointer;
+      font-size: .88rem; font-weight: 600;
+      color: var(--ink3);
+      border-bottom: 2px solid transparent;
+      transition: all .15s;
+    }
+    .tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+      background: var(--white);
+    }
+
+    /* ── BODY ── */
+    .card-body { padding: 28px 32px 32px; }
+
+    /* ── ROLE PICKER ── */
+    .role-title {
+      font-size: .78rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink4); margin-bottom: 10px;
+    }
+    .role-cards {
+      display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;
+    }
+    .role-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: var(--r-sm); cursor: pointer;
+      transition: all .15s; background: var(--white);
+    }
+    .role-card:hover { border-color: var(--green); background: #f8fdf9; }
+    .role-card.selected { border-color: var(--green); background: var(--green-bg); }
+    .role-card.selected.blue-role { border-color: var(--blue); background: var(--blue-bg); }
+    .role-card.selected.amber-role { border-color: var(--amber); background: var(--amber-bg); }
+    .role-icon-wrap {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg); display: flex; align-items: center;
+      justify-content: center; font-size: 1rem; flex-shrink: 0;
+    }
+    .role-name { font-size: .9rem; font-weight: 600; color: var(--ink); }
+    .role-desc { font-size: .75rem; color: var(--ink3); }
+    .role-check {
+      margin-left: auto; width: 18px; height: 18px;
+      border-radius: 50%; border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; flex-shrink: 0; transition: all .15s;
+    }
+    .role-card.selected .role-check {
+      background: var(--green); border-color: var(--green); color: #fff;
+    }
+    .role-card.selected.blue-role .role-check { background: var(--blue); border-color: var(--blue); }
+    .role-card.selected.amber-role .role-check { background: var(--amber); border-color: var(--amber); }
+
+    /* ── FORM ── */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block; font-size: .82rem; font-weight: 600;
+      color: var(--ink2); margin-bottom: 5px;
+    }
+    .field input {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .92rem;
+      color: var(--ink); background: var(--white);
+      outline: none; transition: border-color .15s; box-sizing: border-box;
+    }
+    .field input:focus { border-color: var(--green); }
+
+    /* ── SUBMIT ── */
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: var(--green); color: #fff; border: none;
+      border-radius: 50px; font-family: 'Outfit', sans-serif;
+      font-size: .95rem; font-weight: 700; cursor: pointer;
+      transition: background .15s; margin-top: 4px;
+    }
+    .btn-submit:hover { background: var(--green-dark); }
+    .btn-submit:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── ERROR ── */
+    .error-box {
+      background: var(--red-bg); color: var(--red);
+      border: 1px solid rgba(184,32,32,.2); border-radius: var(--r-sm);
+      padding: 10px 14px; font-size: .82rem;
+      margin-bottom: 14px; display: none; line-height: 1.5;
+    }
+    .error-box.show { display: block; }
+
+    /* ── SUCCESS ── */
+    .success-box {
+      background: var(--green-bg); color: var(--green);
+      border: 1px solid rgba(26,122,72,.2); border-radius: var(--r-sm);
+      padding: 10px 14px; font-size: .82rem;
+      margin-bottom: 14px; display: none; line-height: 1.5;
+    }
+    .success-box.show { display: block; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 18px 0; font-size: .78rem; color: var(--ink4);
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── FOOTER ── */
+    .card-footer {
+      padding: 16px 32px;
+      background: #f4f3ef;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: .78rem; color: var(--ink4);
+    }
+    .card-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+
+    /* ── LOADING ── */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .6s linear infinite; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="auth-card">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <div class="lang-switcher">
+        <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+        <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+        <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+        <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+      </div>
+    </div>
+    <div class="logo">intern<span>ly</span></div>
+    <div class="logo-sub">Stage platform voor studenten, bedrijven en scholen</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" id="tab-login" onclick="switchTab('login')">Inloggen</div>
+    <div class="tab" id="tab-register" onclick="switchTab('register')">Registreren</div>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+
+    <!-- Error / success -->
+    <div class="error-box" id="errorBox"></div>
+    <div class="success-box" id="successBox"></div>
+
+    <!-- Rol kiezen -->
+    <div class="role-title">Kies je rol</div>
+    <div class="role-cards">
+      <div class="role-card" id="rc-student" onclick="selectRole('student')">
+        <div class="role-icon-wrap">👤</div>
+        <div>
+          <div class="role-name">Student</div>
+          <div class="role-desc">Zoek stages, maak profiel aan</div>
+        </div>
+        <div class="role-check" id="check-student"></div>
+      </div>
+      <div class="role-card blue-role" id="rc-bedrijf" onclick="selectRole('bedrijf')">
+        <div class="role-icon-wrap">🏢</div>
+        <div>
+          <div class="role-name">Bedrijf</div>
+          <div class="role-desc">Zoek stagiairs, beheer vacatures</div>
+        </div>
+        <div class="role-check" id="check-bedrijf"></div>
+      </div>
+      <div class="role-card amber-role" id="rc-school" onclick="selectRole('school')">
+        <div class="role-icon-wrap">🎓</div>
+        <div>
+          <div class="role-name">School</div>
+          <div class="role-desc">Monitor studenten, plaats oproepen</div>
+        </div>
+        <div class="role-check" id="check-school"></div>
+      </div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="field">
+        <label>E-mailadres</label>
+        <input type="email" id="login-email" placeholder="jouw@email.nl" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Wachtwoord</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-submit" id="loginBtn" onclick="doLogin()">
+        Inloggen →
+      </button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none">
+      <div class="field">
+        <label>Naam</label>
+        <input type="text" id="reg-naam" placeholder="Jouw naam">
+      </div>
+      <div class="field">
+        <label>E-mailadres</label>
+        <input type="email" id="reg-email" placeholder="jouw@email.nl" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Wachtwoord</label>
+        <input type="password" id="reg-pass" placeholder="Min. 6 tekens" autocomplete="new-password">
+      </div>
+      <button class="btn-submit" id="registerBtn" onclick="doRegister()">
+        Account aanmaken →
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="card-footer">
+    <a href="index.html">← Terug naar homepagina</a>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Routing per rol ──
+const ROUTES = {
+  student: 'discover.html',
+  bedrijf: 'company-dashboard.html',
+  school:  'school-dashboard.html',
+};
+
+// ── State ──
+let selectedRole = null;
+let activeTab    = 'login';
+
+// ── Tab switch ──
+function switchTab(tab) {
+  activeTab = tab;
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  clearMessages();
+}
+
+// ── Role select ──
+function selectRole(role) {
+  selectedRole = role;
+
+  // Reset alle kaarten
+  ['student','bedrijf','school'].forEach(r => {
+    const card  = document.getElementById('rc-' + r);
+    const check = document.getElementById('check-' + r);
+    card.classList.remove('selected');
+    check.textContent = '';
+  });
+
+  // Activeer gekozen kaart
+  document.getElementById('rc-' + role).classList.add('selected');
+  document.getElementById('check-' + role).textContent = '✓';
+
+  clearMessages();
+}
+
+// ── Login ──
+async function doLogin() {
+  if (!selectedRole) { showError('Kies eerst een rol.'); return; }
+
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+
+  if (!email || !pass) { showError('Vul e-mailadres en wachtwoord in.'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Inloggen…';
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+
+  btn.disabled = false;
+  btn.textContent = 'Inloggen →';
+
+  if (error) {
+    showError('Inloggen mislukt: ' + error.message);
+    return;
+  }
+
+  // Haal rol op uit profiles tabel
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .single();
+
+  // Gebruik opgeslagen rol of geselecteerde rol
+  const role = profile?.role || selectedRole;
+  sessionStorage.setItem('internly_role', role);
+
+  showSuccess('Inloggen gelukt! Je wordt doorgestuurd…');
+
+  // Push registration — fire-and-forget, never blocks redirect
+  // Show browser native dialog only on first login (student role).
+  // Company/school see a soft banner on their dashboard instead.
+  setTimeout(() => { window.location.href = ROUTES[role] || 'discover.html'; }, 1000);
+
+  // Push registration — fire-and-forget, AFTER redirect is scheduled
+  if (role === 'student' && !localStorage.getItem('internly_push_asked')) {
+    localStorage.setItem('internly_push_asked', '1');
+    registerPushNotifications(db, data.user.id).catch(() => {});
+  }
+}
+
+// ── Register ──
+async function doRegister() {
+  if (!selectedRole) { showError('Kies eerst een rol.'); return; }
+
+  const naam  = document.getElementById('reg-naam').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+
+  if (!naam || !email || !pass) { showError('Vul alle velden in.'); return; }
+  if (pass.length < 6) { showError('Wachtwoord moet minimaal 6 tekens zijn.'); return; }
+
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Account aanmaken…';
+
+  // 1. Registreer in Supabase Auth
+  const { data, error } = await db.auth.signUp({
+    email,
+    password: pass,
+    options: { data: { role: selectedRole, naam } }
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Account aanmaken →';
+
+  if (error) {
+    showError('Registreren mislukt: ' + error.message);
+    return;
+  }
+
+  // 2. Maak profiel aan in profiles tabel
+  if (data.user) {
+    const { error: profileError } = await db.from('profiles').insert({
+      id:    data.user.id,
+      role:  selectedRole,
+      naam:  naam,
+      email: email,
+    });
+    if (profileError && profileError.code !== '23505') {
+      // 23505 = profiel bestaat al (bijv. herregistratie) — stilzwijgend doorgaan
+      console.warn('[auth] Profile insert fout:', profileError.message);
+    }
+  }
+
+  showSuccess('Account aangemaakt! Controleer je e-mail en klik op de bevestigingslink om in te loggen.');
+}
+
+// ── Helpers ──
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('show');
+  document.getElementById('successBox').classList.remove('show');
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('successBox');
+  el.textContent = msg;
+  el.classList.add('show');
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+function clearMessages() {
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('successBox').classList.remove('show');
+}
+
+// ── Check of al ingelogd + pre-select rol via URL param ──
+window.addEventListener('DOMContentLoaded', async () => {
+  // Al ingelogd? Direct doorsturen.
+  const { data: { user } } = await db.auth.getUser();
+  if (user) {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    const role = profile?.role || sessionStorage.getItem('internly_role');
+    if (role && ROUTES[role]) window.location.href = ROUTES[role];
+    return;
+  }
+
+  // Lees ?role= param van index.html
+  const param = new URLSearchParams(window.location.search).get('role');
+  if (param && ROUTES[param]) selectRole(param);
+});
+</script>
+
+<!-- Google Translate Widget (no buttons on this page — language preference persists via cookie) -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  var select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  var saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
