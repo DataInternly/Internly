@@ -2141,7 +2141,7 @@ let hubState = {
 const CAN = {
   student: {
     addTask: true, editTask: true, deleteTask: false, checkTask: true,
-    addDeadline: false, editDeadline: false,
+    addDeadline: true, editDeadline: false,
     addReflectie: true, editReflectie: true,
     updateLeerdoel: true, editStageplan: true,
     inviteSchool: true,
@@ -2558,6 +2558,14 @@ function renderOverzicht() {
 
     ${schoolBanner}
 
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('planning')">📅 Planning</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">🗓 Kalender</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken')">💬 Afspraken</button>
+      ${can('addTask') ? `<button class="btn btn-primary btn-sm" onclick="switchTab('taken');setTimeout(()=>openTaakModal(null),50)">+ Taak</button>` : ''}
+      ${can('addDeadline') ? `<button class="btn btn-primary btn-sm" onclick="switchTab('planning');setTimeout(()=>openDeadlineModal(null),50)">+ Deadline</button>` : ''}
+    </div>
+
     <!-- Stats row -->
     <div class="grid-3" style="margin-bottom:16px;">
       <div class="stat-card">
@@ -2696,7 +2704,10 @@ function renderPlanning() {
         <div class="page-title">Planning</div>
         <div class="page-sub">Tijdlijn en deadlines van de stage</div>
       </div>
-      ${addDeadlineBtn}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${addDeadlineBtn}
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">🗓 Kalender</button>
+      </div>
     </div>
 
     <div class="grid-2">
@@ -3766,6 +3777,10 @@ function renderKalender() {
       <div>
         <div class="page-title">Kalender</div>
         <div class="page-sub">Deadlines en afspraken in één overzicht</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${can('addDeadline') ? `<button class="btn btn-primary btn-sm" onclick="openDeadlineModal(null)">+ Deadline</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken');setTimeout(()=>openMeetingModal(),50)">+ Afspraak</button>
       </div>
     </div>
 

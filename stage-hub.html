@@ -810,7 +810,7 @@ function renderTaken(filter) {
   return `${renderHubHeader()}${renderTabBar('taken')}
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem">
     <div><div class="page-title">Taken</div><div class="page-sub">Gedeelde takenlijst voor alle partijen</div></div>
-    <button class="btn btn-primary" onclick="openModal('modal-task')">+ Taak toevoegen</button>
+    ${hub.role !== 'school' ? `<button class="btn btn-primary" onclick="openModal('modal-task')">+ Taak toevoegen</button>` : ''}
   </div>
   <div class="filter-chips">
     ${filters.map(f => `
