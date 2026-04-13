@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6ozhZf1wVjSq6aBMhOmW1u3nfr1UsGMc&libraries=places" defer></script>
   <script src="js/reistijd.js" defer></script>
+  <script src="js/push.js"></script>
   <style>
     .topbar {
       background: linear-gradient(135deg, #1a7a48, #0f5c36);
@@ -830,13 +831,20 @@ async function loadNotifications() {
   }
 
   list.innerHTML = data.map(n => `
-    <div class="nd-item${n.read ? '' : ' unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+    <div class="nd-item${n.read ? '' : ' unread'}"
+         data-nid="${escapeHtml(n.id || '')}"
+         data-ref-type="${escapeHtml(n.ref_type || '')}"
+         data-ref-id="${escapeHtml(n.ref_id || '')}">
       ${!n.read ? '<span class="nd-dot"></span>' : ''}
       <div class="nd-body">
         <div class="nd-msg">${escapeHtml(n.message || '')}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
+  list.querySelectorAll('.nd-item').forEach(el => {
+    el.addEventListener('click', () =>
+      handleNotifClick(el.dataset.nid, el.dataset.refType, el.dataset.refId));
+  });
 }
 
 async function markAllRead() {
@@ -906,8 +914,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadNotifications();
     startNotifSubscription();
 
-    // Show banner if student has no profile yet
+    // Push registration for students — safe here, no impending redirect
     const role = sessionStorage.getItem('internly_role') || '';
+    if (role === 'student' || role === '') {
+      registerPushNotifications(db, user.id).catch(() => {});
+    }
+
+    // Show banner if student has no profile yet
     if (role !== 'company' && role !== 'school') {
       const { data: sp } = await db
         .from('student_profiles')

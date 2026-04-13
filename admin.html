@@ -566,11 +566,15 @@
                 <td>${escapeHtml(r.rol || '—')}</td>
                 <td style="color:var(--ink3);font-size:.82rem">${r.created_at ? new Date(r.created_at).toLocaleDateString('nl-NL') : '?'}</td>
                 <td>
-                  <button class="btn-sm btn-green" onclick="copyEmail('${escapeHtml(r.email)}')" title="Email kopiëren">📋</button>
+                  <button class="btn-sm btn-green copy-email-btn" data-email="${escapeHtml(r.email)}" title="Email kopiëren">📋</button>
                 </td>
               </tr>`).join('')}
           </tbody>
         </table>`;
+
+      el.querySelectorAll('.copy-email-btn').forEach(btn => {
+        btn.addEventListener('click', () => copyEmail(btn.dataset.email));
+      });
 
     } catch(e) {
       console.error('loadWaitlist fout:', e);

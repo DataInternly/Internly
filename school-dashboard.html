@@ -888,13 +888,20 @@ async function loadNotifications() {
     return;
   }
   listEl.innerHTML = items.map(n => `
-    <div class="nd-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+    <div class="nd-item ${n.read ? '' : 'unread'}"
+         data-nid="${escapeHtml(n.id || '')}"
+         data-ref-type="${escapeHtml(n.ref_type || '')}"
+         data-ref-id="${escapeHtml(n.ref_id || '')}">
       <span class="nd-dot ${n.read ? 'read' : ''}"></span>
       <div>
         <div class="nd-msg">${escapeHtml(n.message)}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
+  listEl.querySelectorAll('.nd-item').forEach(el => {
+    el.addEventListener('click', () =>
+      handleNotifClick(el.dataset.nid, el.dataset.refType, el.dataset.refId));
+  });
 }
 
 async function markAllRead(e) {
@@ -1069,13 +1076,22 @@ function show(id) {
 let _schoolNaamFilter = null;
 
 async function loadStudenten() {
+  // Safety: never load all students when school filter is unknown.
+  // _schoolNaamFilter is set from the school_profiles row in DOMContentLoaded.
+  if (!_schoolNaamFilter) {
+    const msg = '<div class="empty-state"><span class="icon">🏫</span>Vul eerst je schoolnaam in bij Profiel om studenten te zien.</div>';
+    const el  = document.getElementById('studenten-list');
+    const el2 = document.getElementById('dashboard-studenten');
+    if (el)  el.innerHTML  = msg;
+    if (el2) el2.innerHTML = msg;
+    return;
+  }
+
   let q = db
     .from('student_profiles')
     .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
+    .eq('school', _schoolNaamFilter)
     .order('created_at', { ascending: false });
-
-  // Filter op eigen school als de schoolnaam bekend is
-  if (_schoolNaamFilter) q = q.eq('school', _schoolNaamFilter);
 
   const { data, error } = await q;
 

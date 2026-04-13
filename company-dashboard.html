@@ -490,6 +490,23 @@
   </div>
 </div>
 
+<!-- FLAG REVIEW MODAL -->
+<div class="modal-overlay" id="flagModal" style="display:none">
+  <div class="modal-box" role="dialog" aria-modal="true" style="max-width:420px">
+    <div class="modal-title">⚑ Beoordeling melden</div>
+    <div class="modal-body">
+      <p style="font-size:.88rem;color:var(--ink2);margin-bottom:12px">Geef een korte reden voor de melding. Het Internly-team beoordeelt deze binnen 48 uur.</p>
+      <textarea id="flagReasonInput" rows="3" placeholder="Bijv. ongepaste inhoud, nep-review…"
+        style="width:100%;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:.88rem;resize:vertical;outline:none;"></textarea>
+      <div id="flagReasonErr" style="display:none;color:var(--red);font-size:.8rem;margin-top:4px">Vul een reden in.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeFlagModal()">Annuleren</button>
+      <button class="btn-xs btn-del" id="flagModalSubmit" onclick="submitFlagReview()" style="padding:9px 18px;font-size:.88rem;background:var(--orange);border-color:var(--orange);">Melden</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOPBAR -->
 <div class="topbar">
   <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
@@ -958,13 +975,20 @@ async function loadNotifications() {
     return;
   }
   listEl.innerHTML = items.map(n => `
-    <div class="nd-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+    <div class="nd-item ${n.read ? '' : 'unread'}"
+         data-nid="${escapeHtml(n.id || '')}"
+         data-ref-type="${escapeHtml(n.ref_type || '')}"
+         data-ref-id="${escapeHtml(n.ref_id || '')}">
       <span class="nd-dot ${n.read ? 'read' : ''}"></span>
       <div>
         <div class="nd-msg">${escapeHtml(n.message)}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
+  listEl.querySelectorAll('.nd-item').forEach(el => {
+    el.addEventListener('click', () =>
+      handleNotifClick(el.dataset.nid, el.dataset.refType, el.dataset.refId));
+  });
 }
 
 async function markAllRead(e) {
@@ -1104,8 +1128,11 @@ document.getElementById('modal-confirm').addEventListener('click', () => {
 document.getElementById('confirmModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeModal();
 });
+document.getElementById('flagModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeFlagModal();
+});
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeFlagModal(); }
 });
 
 // ── Navigation ──
@@ -1862,15 +1889,41 @@ async function saveProfile() {
 }
 
 // ── Flag review ──────────────────────────────────────────────────────────────
-async function flagReview(reviewId) {
-  const reason = prompt('Reden voor melding (verplicht):');
-  if (!reason || !reason.trim()) return;
+let _flagReviewId = null;
+
+function flagReview(reviewId) {
+  _flagReviewId = reviewId;
+  const ta  = document.getElementById('flagReasonInput');
+  const err = document.getElementById('flagReasonErr');
+  const btn = document.getElementById('flagModalSubmit');
+  if (ta)  ta.value = '';
+  if (err) err.style.display = 'none';
+  if (btn) { btn.disabled = false; btn.textContent = 'Melden'; }
+  document.getElementById('flagModal').style.display = 'flex';
+  setTimeout(() => ta?.focus(), 80);
+}
+
+function closeFlagModal() {
+  document.getElementById('flagModal').style.display = 'none';
+  _flagReviewId = null;
+}
+
+async function submitFlagReview() {
+  const reason = (document.getElementById('flagReasonInput')?.value || '').trim();
+  const err    = document.getElementById('flagReasonErr');
+  const btn    = document.getElementById('flagModalSubmit');
+  if (!reason) { if (err) err.style.display = 'block'; return; }
+  if (err) err.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = 'Melden…'; }
+
   const { error } = await db.from('reviews').update({
-    flagged:    true,
-    flag_reason: reason.trim(),
-    flagged_by: currentUser.id,
-    flagged_at: new Date().toISOString()
-  }).eq('id', reviewId);
+    flagged:     true,
+    flag_reason: reason,
+    flagged_by:  currentUser.id,
+    flagged_at:  new Date().toISOString()
+  }).eq('id', _flagReviewId);
+
+  closeFlagModal();
   if (error) { notify('Fout: ' + error.message); return; }
   notify('Beoordeling gemeld — wordt beoordeeld door het Internly team');
   loadReviews();

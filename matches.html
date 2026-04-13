@@ -332,13 +332,20 @@
       return;
     }
     listEl.innerHTML = items.map(n => `
-      <div class="nd-item ${n.read ? '' : 'unread'}" onclick="handleNotifClick('${n.id}','${n.ref_type || ''}','${n.ref_id || ''}')">
+      <div class="nd-item ${n.read ? '' : 'unread'}"
+           data-nid="${escapeHtml(n.id || '')}"
+           data-ref-type="${escapeHtml(n.ref_type || '')}"
+           data-ref-id="${escapeHtml(n.ref_id || '')}">
         <span class="nd-dot ${n.read ? 'read' : ''}"></span>
         <div>
           <div class="nd-msg">${escapeHtml(n.message)}</div>
           <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
         </div>
       </div>`).join('');
+    listEl.querySelectorAll('.nd-item').forEach(el => {
+      el.addEventListener('click', () =>
+        handleNotifClick(el.dataset.nid, el.dataset.refType, el.dataset.refId));
+    });
   }
 
   async function markAllRead(e) {

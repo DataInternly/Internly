@@ -932,11 +932,14 @@ function laadOpgeslagenVacatures() {
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
           <a href="vacature-detail.html?id=${encodeURIComponent(v.id)}&source=${encodeURIComponent(v.source || 'internships')}"
             style="background:#1a7a48;color:#fff;text-decoration:none;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600">Bekijk</a>
-          <button onclick="verwijderOpgeslagen('${escapeHtml(String(v.id))}')"
+          <button class="del-saved-btn" data-id="${escapeHtml(String(v.id))}"
             style="background:#fdeaea;color:#b82020;border:none;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer">✕</button>
         </div>
       </div>
     </div>`).join('');
+  container.querySelectorAll('.del-saved-btn').forEach(btn => {
+    btn.addEventListener('click', () => verwijderOpgeslagen(btn.dataset.id));
+  });
 }
 
 function verwijderOpgeslagen(id) {
@@ -1202,7 +1205,7 @@ function renderSaved() {
         </div>
         <span class="trust-badge-sm ${cls}">${escapeHtml(v.trust_grade || '—')} · ${escapeHtml(String(v.trust_score ?? '—'))}</span>
         <div class="saved-card-actions">
-          <a class="btn-saved-view" href="vacature-detail.html?id=${v.id}&source=${v.source}">Bekijk</a>
+          <a class="btn-saved-view" href="vacature-detail.html?id=${encodeURIComponent(v.id)}&source=${encodeURIComponent(v.source || 'internships')}">Bekijk</a>
           <button class="btn-saved-del" onclick="removeSaved(${i})">Verwijder</button>
         </div>
       </div>`;

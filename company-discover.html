@@ -368,7 +368,7 @@ async function loadStudents() {
 
   const { data, error } = await db
     .from('student_profiles')
-    .select('*')
+    .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, opdracht_aard, methode_type, onderzoeksvraag, onderzoeksvraag_type, resultaat_type, motivatie, duur, skills')
     .order('created_at', { ascending: false });
 
   if (error) {

@@ -370,12 +370,15 @@
             const eligibleDate = new Date(new Date(created).getTime() + NINETY_DAYS_MS)
               .toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
             const starsHtml = [1,2,3,4,5].map(i =>
-              `<span class="star" id="star-${appId}-${i}" onclick="setReviewStar('${appId}', ${i})">☆</span>`
+              `<span class="star review-star" id="star-${appId}-${i}" data-app="${escapeHtml(appId)}" data-val="${i}">☆</span>`
             ).join('');
             reviewSection = `
               <div id="review-btn-container-${appId}" style="margin-top:8px">
-                <button class="review-pending-badge"
-                  onclick="openReviewForm('${appId}', '${escapeHtml(matchId)}', '${escapeHtml(revieweeId)}', '${escapeHtml(company)}')">
+                <button class="review-pending-badge review-open-btn"
+                  data-app="${escapeHtml(appId)}"
+                  data-match="${escapeHtml(matchId)}"
+                  data-reviewee="${escapeHtml(revieweeId)}"
+                  data-company="${escapeHtml(company)}">
                   ★ Laat een review achter
                 </button>
               </div>
@@ -385,11 +388,14 @@
                 <textarea id="review-body-${appId}" placeholder="Vertel anderen over je ervaring (optioneel)" maxlength="500" rows="3"></textarea>
                 <div class="review-error" id="review-err-${appId}"></div>
                 <div class="review-form-actions">
-                  <button class="btn-review-submit" id="review-btn-${appId}"
-                    onclick="submitReview('${appId}', '${escapeHtml(matchId)}', '${escapeHtml(revieweeId)}', '${escapeHtml(company)}')">
+                  <button class="btn-review-submit review-submit-btn" id="review-btn-${appId}"
+                    data-app="${escapeHtml(appId)}"
+                    data-match="${escapeHtml(matchId)}"
+                    data-reviewee="${escapeHtml(revieweeId)}"
+                    data-company="${escapeHtml(company)}">
                     Review plaatsen
                   </button>
-                  <button class="btn-review-cancel" onclick="closeReviewForm('${appId}')">Annuleren</button>
+                  <button class="btn-review-cancel review-cancel-btn" data-app="${escapeHtml(appId)}">Annuleren</button>
                 </div>
               </div>`;
           } else if (!eligible && revieweeId) {
@@ -422,6 +428,23 @@
             ${reviewSection}
           </div>`;
       }).join('');
+
+      // Wire review buttons + stars via delegation (avoids inline onclick with user strings)
+      container.querySelectorAll('.review-star').forEach(span => {
+        span.addEventListener('click', () =>
+          setReviewStar(span.dataset.app, Number(span.dataset.val)));
+      });
+      container.querySelectorAll('.review-open-btn').forEach(btn => {
+        btn.addEventListener('click', () =>
+          openReviewForm(btn.dataset.app, btn.dataset.match, btn.dataset.reviewee, btn.dataset.company));
+      });
+      container.querySelectorAll('.review-submit-btn').forEach(btn => {
+        btn.addEventListener('click', () =>
+          submitReview(btn.dataset.app, btn.dataset.match, btn.dataset.reviewee, btn.dataset.company));
+      });
+      container.querySelectorAll('.review-cancel-btn').forEach(btn => {
+        btn.addEventListener('click', () => closeReviewForm(btn.dataset.app));
+      });
     }
 
     // ── Load applications ─────────────────────────────────────────────────
@@ -517,13 +540,19 @@
       }
       list.innerHTML = data.map(n => `
         <div class="nd-item ${n.read ? '' : 'unread'}"
-          onclick="handleNotifClick('${escapeHtml(n.id)}','${escapeHtml(n.ref_type||'')}','${escapeHtml(n.ref_id||'')}')">
+          data-nid="${escapeHtml(n.id || '')}"
+          data-ref-type="${escapeHtml(n.ref_type || '')}"
+          data-ref-id="${escapeHtml(n.ref_id || '')}">
           <div class="nd-dot ${n.read ? 'read' : ''}"></div>
           <div>
             <div class="nd-msg">${escapeHtml(n.message)}</div>
             <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
           </div>
         </div>`).join('');
+      list.querySelectorAll('.nd-item').forEach(el => {
+        el.addEventListener('click', () =>
+          handleNotifClick(el.dataset.nid, el.dataset.refType, el.dataset.refId));
+      });
     }
 
     function formatRelativeTime(iso) {

@@ -411,9 +411,9 @@ async function doLogin() {
   // Company/school see a soft banner on their dashboard instead.
   setTimeout(() => { window.location.href = ROUTES[role] || 'discover.html'; }, 1000);
 
-  // Push registration — fire-and-forget, AFTER redirect is scheduled
-  if (role === 'student' && !localStorage.getItem('internly_push_asked')) {
-    localStorage.setItem('internly_push_asked', '1');
+  // Push registration — only if permission already granted (no dialog → no race with redirect).
+  // First-time permission request is handled by discover.html where there's no redirect pressure.
+  if (role === 'student' && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
     registerPushNotifications(db, data.user.id).catch(() => {});
   }
 }

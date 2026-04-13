@@ -546,6 +546,21 @@
     const main = document.getElementById('messagesArea');
     if (main) main.innerHTML = '<div class="chat-empty"><span class="icon">⏳</span>Gesprekken laden…</div>';
 
+    // Step 1: fetch only match IDs for this user — DB-level filter so we never
+    // receive other users' conversations even if RLS on conversations is absent.
+    const { data: userMatches, error: matchErr } = await db
+      .from('matches')
+      .select('id')
+      .or(`party_a.eq.${userId},party_b.eq.${userId}`);
+
+    if (matchErr || !userMatches || userMatches.length === 0) {
+      showEmptyState();
+      return;
+    }
+
+    const matchIds = userMatches.map(m => m.id);
+
+    // Step 2: fetch conversations scoped to those match IDs
     const { data, error } = await db
       .from('conversations')
       .select(`
@@ -557,6 +572,7 @@
           internship_postings ( title, company_name )
         )
       `)
+      .in('match_id', matchIds)
       .order('created_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
@@ -564,17 +580,7 @@
       return;
     }
 
-    const mine = data.filter(c =>
-      c.matches &&
-      (c.matches.party_a === userId || c.matches.party_b === userId)
-    );
-
-    if (mine.length === 0) {
-      showEmptyState();
-      return;
-    }
-
-    renderConversationList(mine, userId);
+    renderConversationList(data, userId);
   }
 
   function showEmptyState() {
@@ -664,7 +670,7 @@
               color:${unread ? '#1a7a48' : '#6b7280'};
               flex-shrink:0;
             ">
-              ${(profile?.naam || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2)}
+              ${escapeHtml((profile?.naam || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2))}
             </div>
             <div style="flex:1; min-width:0;">
               <div style="

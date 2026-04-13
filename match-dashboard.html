@@ -2859,11 +2859,27 @@ async function toggleTaskDone(id) {
   toast(task.status === 'done' ? 'Taak afgerond!' : 'Taak heropend.');
 }
 
+let _pendingDeleteTaskId = null;
+let _pendingDeleteTimer  = null;
+
 async function deleteTask(id) {
   if (!can('deleteTask')) return;
   const task = hubState.tasks.find(t => t.id === id);
   if (!task) return;
-  if (!confirm(`Weet je zeker dat je "${task.title}" wilt verwijderen?`)) return;
+
+  // Two-tap confirmation: first tap arms, second tap within 3s confirms
+  if (_pendingDeleteTaskId !== id) {
+    _pendingDeleteTaskId = id;
+    clearTimeout(_pendingDeleteTimer);
+    _pendingDeleteTimer = setTimeout(() => { _pendingDeleteTaskId = null; }, 3000);
+    toast(`Nogmaals tikken om "${escHtml(task.title)}" te verwijderen.`, 'error');
+    return;
+  }
+
+  // Second tap — confirmed
+  clearTimeout(_pendingDeleteTimer);
+  _pendingDeleteTaskId = null;
+
   hubState.tasks = hubState.tasks.filter(t => t.id !== id);
   if (MATCH_ID && task._dbId) {
     await db.from('stage_tasks').delete().eq('id', task._dbId);

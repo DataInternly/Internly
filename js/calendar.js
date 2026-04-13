@@ -22,6 +22,7 @@ const InternlyCalendar = (() => {
 
   // ── helpers ──────────────────────────────────────────────────────────────────
   const k = (d,h) => `${d}_${h}`;
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
   function notify(msg, ok = true) {
     let n = document.getElementById('cal-notif');
@@ -217,11 +218,11 @@ const InternlyCalendar = (() => {
     otherSlots.forEach(s => { (byDay[s.day_of_week]||(byDay[s.day_of_week]=[])).push(s); });
 
     const previewHTML = otherSlots.length
-      ? `<div class="avail-prev"><div class="avail-prev-title">Beschikbaarheid van ${otherName}</div>
+      ? `<div class="avail-prev"><div class="avail-prev-title">Beschikbaarheid van ${esc(otherName)}</div>
           <div class="avail-slots">${Object.entries(byDay).flatMap(([d,ss])=>
             ss.map(s=>`<span class="avail-slot ${s.status}">${DAYS[d]} ${s.hour_start}:00</span>`)
           ).join('')}</div></div>`
-      : `<div class="avail-prev" style="font-size:.78rem;color:#7a8799">${otherName} heeft nog geen beschikbaarheid ingesteld.</div>`;
+      : `<div class="avail-prev" style="font-size:.78rem;color:#7a8799">${esc(otherName)} heeft nog geen beschikbaarheid ingesteld.</div>`;
 
     const old = document.getElementById('mtg-modal-bg');
     if (old) old.remove();
@@ -233,7 +234,7 @@ const InternlyCalendar = (() => {
     wrap.innerHTML = `
       <div class="mtg-box">
         <div class="mtg-head">
-          <div class="mtg-title">📅 Afspraak plannen met ${otherName}</div>
+          <div class="mtg-title">📅 Afspraak plannen met ${esc(otherName)}</div>
           <button class="mtg-close" onclick="InternlyCalendar._close()">✕</button>
         </div>
         ${previewHTML}
@@ -272,13 +273,20 @@ const InternlyCalendar = (() => {
           <textarea class="mf-ta" id="mf-note" placeholder="Wat wil je bespreken?"></textarea>
         </div>
         <button class="mtg-submit" id="mf-submit"
-          onclick="InternlyCalendar._submit('${otherUserId}','${otherEmail}','${otherName}')">
+          data-uid="${esc(otherUserId)}"
+          data-email="${esc(otherEmail)}"
+          data-name="${esc(otherName)}">
           Afspraak versturen →
         </button>
       </div>`;
 
     document.body.appendChild(wrap);
     wrap.addEventListener('click', e => { if(e.target===wrap) closeModal(); });
+    const submitBtn = document.getElementById('mf-submit');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', () =>
+        submitMeeting(submitBtn.dataset.uid, submitBtn.dataset.email, submitBtn.dataset.name));
+    }
   }
 
   function closeModal() {
