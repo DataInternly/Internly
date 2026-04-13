@@ -208,8 +208,9 @@
   let convId         = null;
   let matchId        = null;
   let realtimeSub    = null;
-  let otherPartyId   = null;  // used for notification trigger
-  let otherPartyName = 'Gesprekspartner';
+  let otherPartyId    = null;  // used for notification trigger
+  let otherPartyName  = 'Gesprekspartner';
+  let otherPartyEmail = '';
 
   // ── Notification helper ───────────────────────────────────────────────────
 
@@ -389,7 +390,8 @@
         .eq('id', otherPartyId)
         .maybeSingle();
       if (profile) {
-        otherPartyName = profile.naam || profile.name || profile.email?.split('@')[0] || 'Gesprekspartner';
+        otherPartyName  = profile.naam || profile.name || profile.email?.split('@')[0] || 'Gesprekspartner';
+        otherPartyEmail = profile.email || '';
       }
     }
 
@@ -419,6 +421,9 @@
     await loadMessages();
     subscribeRealtime();
     markMessagesRead();
+    if (otherPartyId) {
+      InternlyCalendar.renderChatButton(otherPartyId, otherPartyEmail, otherPartyName, 'sendBtn', db, currentUser.id);
+    }
   }
 
   async function loadMessages() {
@@ -734,5 +739,6 @@ window.addEventListener('load', function() {
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/calendar.js"></script>
 </body>
 </html>

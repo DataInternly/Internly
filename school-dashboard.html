@@ -796,6 +796,14 @@
         <p style="font-size:.88rem;color:var(--ink3);margin-bottom:14px;line-height:1.6">Ontvang een e-mail met een wachtwoordherstelkoppeling. De link is 24 uur geldig.</p>
         <button class="btn-ghost" style="font-size:.88rem" onclick="resetPassword()">📧 Stuur herstelmail</button>
       </div>
+
+      <div class="form-card" style="margin-top:16px">
+        <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:600;color:#0d1520;margin:0 0 .5rem">📅 Mijn beschikbaarheid</h3>
+        <p style="font-size:.88rem;color:#6b7280;margin-bottom:1rem;line-height:1.6">
+          Studenten en bedrijven zien dit wanneer ze een gesprek met jou willen plannen.
+        </p>
+        <div id="ical-container"></div>
+      </div>
     </div>
 
   </main>
@@ -1613,6 +1621,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await loadNotifications();
   startNotifSubscription();
+
+  InternlyCalendar.render('ical-container', db, user.id);
 });
 
 window.addEventListener('beforeunload', () => {
@@ -1655,5 +1665,6 @@ window.addEventListener('load', function() {
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/calendar.js"></script>
 </body>
 </html>

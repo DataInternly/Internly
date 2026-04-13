@@ -867,6 +867,14 @@
           <button class="btn-ghost" style="font-size:.82rem;padding:7px 16px" onclick="resetPassword()">Resetlink versturen</button>
         </div>
       </div>
+
+      <div class="form-card" style="margin-top:16px">
+        <div class="form-section-title" style="margin-bottom:.5rem">📅 Beschikbaarheid</div>
+        <p style="font-size:.9rem;color:#6b7280;margin-bottom:1rem;line-height:1.6">
+          Geef aan wanneer je beschikbaar bent voor gesprekken met studenten en scholen.
+        </p>
+        <div id="ical-container"></div>
+      </div>
     </div>
 
   </main>
@@ -1916,6 +1924,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await loadNotifications();
   startNotifSubscription();
+
+  InternlyCalendar.render('ical-container', db, user.id);
 });
 
 async function loadUnreadBadge(userId) {
@@ -1993,5 +2003,6 @@ window.addEventListener('load', function() {
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/calendar.js"></script>
 </body>
 </html>

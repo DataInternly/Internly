@@ -644,6 +644,14 @@
     </div>
   </div>
 
+  <!-- Beschikbaarheid -->
+  <div class="form-section" id="section-availability" style="display:block">
+    <div class="section-label">Jouw planning</div>
+    <div class="section-title">Beschikbaarheid</div>
+    <p class="section-sub">Geef aan wanneer je beschikbaar bent voor gesprekken of afspraken. Bedrijven en scholen kunnen dit zien bij het plannen van een meeting.</p>
+    <div id="ical-container"></div>
+  </div>
+
   <!-- Success -->
   <div class="success-screen" id="successScreen">
     <div class="success-icon">🎉</div>
@@ -1155,6 +1163,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     updateUIForCreateMode();
   }
+
+  InternlyCalendar.render('ical-container', db, user.id);
 });
 
 function escapeHtml(s) {
@@ -1392,5 +1402,6 @@ window.addEventListener('load', function() {
 });
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/calendar.js"></script>
 </body>
 </html>
