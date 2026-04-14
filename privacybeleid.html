@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacyverklaring — Internly</title>
+<meta name="description" content="Hoe Internly omgaat met je persoonsgegevens. Kort, duidelijk en volledig.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS — exact Internly palet ─── */
+:root{
+  --green:    #1a7a48;
+  --green-mid:#22a85e;
+  --green-bg: #e8f5ee;
+  --deep:     #0b2416;
+  --dark:     #0d1a10;
+  --accent:   #e05c1a;
+  --accent-bg:#fdf0e8;
+  --ink:      #0d1a10;
+  --ink2:     #2e4038;
+  --ink3:     #6b8070;
+  --bg:       #f4f3ef;
+  --bg2:      #eceae4;
+  --white:    #fff;
+  --bd:       rgba(13,26,16,.09);
+  --bd2:      rgba(13,26,16,.16);
+  --r:        10px;
+  --rsm:      7px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Outfit',sans-serif;
+  font-size:15px;line-height:1.75;
+  background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ─── HEADER ─── */
+.header{
+  background:var(--dark);padding:13px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  position:sticky;top:0;z-index:100;
+}
+.logo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:1.15rem;font-weight:800;letter-spacing:-.03em;
+  color:#fff;text-decoration:none;
+}
+.logo-ly{color:var(--accent);}
+.back{
+  font-size:.78rem;color:rgba(255,255,255,.45);
+  text-decoration:none;display:flex;align-items:center;gap:5px;
+  transition:color .12s;
+}
+.back:hover{color:#fff;}
+
+/* ─── HERO ─── */
+.hero{
+  background:linear-gradient(148deg,#1e8a52 0%,#1a7a48 50%,#145e38 100%);
+  padding:44px 40px 36px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 70% at 50% 40%,transparent 45%,rgba(0,0,0,.14) 100%);
+  pointer-events:none;
+}
+.hero-inner{position:relative;z-index:1;max-width:640px;}
+.hero-eyebrow{
+  font-size:.67rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.48);margin-bottom:8px;
+}
+.hero-title{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:clamp(1.75rem,4vw,2.5rem);
+  font-weight:800;letter-spacing:-.03em;
+  color:#fff;line-height:1.1;margin-bottom:10px;
+}
+.hero-sub{
+  font-size:.88rem;color:rgba(255,255,255,.6);
+  line-height:1.7;max-width:480px;margin-bottom:20px;
+}
+.hero-badges{display:flex;flex-wrap:wrap;gap:7px;}
+.badge{
+  font-size:.7rem;font-weight:600;
+  padding:4px 11px;border-radius:20px;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.badge-groen{background:rgba(34,168,94,.25);color:#6ee7a0;}
+.badge-grijs{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
+
+/* ─── DIVIDER ─── */
+.divider{
+  height:4px;
+  background:linear-gradient(90deg,var(--green-mid),var(--accent));
+  box-shadow:0 0 16px rgba(224,92,26,.28),0 0 5px rgba(34,168,94,.18);
+}
+
+/* ─── LAYOUT ─── */
+.main{max-width:700px;margin:0 auto;padding:56px 40px 88px;}
+
+/* ─── SECTIES ─── */
+.sectie{margin-bottom:56px;}
+.sectie:last-child{margin-bottom:0;}
+.sectie-kop{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:1.08rem;font-weight:800;letter-spacing:-.02em;
+  color:var(--ink);margin-bottom:16px;
+  padding-bottom:10px;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;gap:10px;
+  scroll-margin-top:64px;
+}
+.kop-nr{
+  font-size:.65rem;font-weight:700;
+  min-width:20px;height:20px;border-radius:50%;
+  background:var(--green);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+/* ─── TEKST ─── */
+p{font-size:.9rem;color:var(--ink2);margin-bottom:12px;line-height:1.82;}
+p:last-child{margin-bottom:0;}
+ul,ol{padding-left:18px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;}
+li{font-size:.88rem;color:var(--ink2);line-height:1.72;}
+a{color:var(--green);}
+a:hover{color:var(--accent);}
+strong{font-weight:600;color:var(--ink);}
+.art{font-size:.71rem;color:var(--ink3);font-style:italic;margin-left:3px;}
+
+/* ─── CONTACTBLOK ─── */
+.contactblok{
+  background:var(--green-bg);
+  border:1px solid rgba(26,122,72,.2);
+  border-left:3px solid var(--green);
+  border-radius:0 var(--r) var(--r) 0;
+  padding:16px 20px;margin:12px 0;
+}
+.contactblok-label{
+  font-size:.67rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--green);margin-bottom:6px;
+}
+.contactblok p{font-size:.86rem;color:var(--ink2);margin-bottom:4px;}
+
+/* ─── CATEGORIE-KAARTEN ─── */
+.cat-grid{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
+.cat{
+  background:var(--white);border:1px solid var(--bd);
+  border-radius:var(--r);overflow:hidden;
+}
+.cat-kop{
+  background:var(--bg2);padding:11px 18px;
+  display:flex;align-items:center;gap:9px;
+  border-bottom:1px solid var(--bd);
+}
+.cat-ico{font-size:.95rem;}
+.cat-naam{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:.85rem;font-weight:700;color:var(--ink);
+}
+.cat-basis{
+  font-size:.72rem;color:var(--ink3);
+  background:var(--bg);padding:2px 8px;border-radius:20px;
+  margin-left:auto;white-space:nowrap;
+}
+.cat-body{padding:14px 18px;}
+.cat-body p{font-size:.86rem;color:var(--ink2);margin-bottom:0;line-height:1.72;}
+
+/* ─── BEWAARTABEL ─── */
+.bewaar-tabel{
+  width:100%;border-collapse:collapse;margin:16px 0;
+  background:var(--white);border:1px solid var(--bd);
+  border-radius:var(--r);overflow:hidden;font-size:.83rem;
+}
+.bewaar-tabel th{
+  background:var(--bg2);text-align:left;padding:8px 13px;
+  font-weight:600;color:var(--ink2);border-bottom:1px solid var(--bd);
+  font-size:.73rem;text-transform:uppercase;letter-spacing:.04em;
+}
+.bewaar-tabel td{
+  padding:11px 14px;border-bottom:1px solid var(--bd);
+  color:var(--ink2);vertical-align:middle;line-height:1.65;
+}
+.bewaar-tabel tr:last-child td{border-bottom:none;}
+
+/* ─── DERDEN ─── */
+.derden-lijst{display:flex;flex-direction:column;gap:9px;margin:16px 0;}
+.derde{
+  background:var(--white);border:1px solid var(--bd);border-radius:var(--r);
+  padding:14px 18px;display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:start;
+}
+.derde-naam{font-size:.86rem;font-weight:600;color:var(--ink);}
+.derde-land{font-size:.73rem;color:var(--ink3);}
+.derde-info{font-size:.84rem;color:var(--ink2);line-height:1.7;}
+
+/* ─── RECHTEN ─── */
+.rechten{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:16px 0;}
+.recht{
+  background:var(--white);border:1px solid var(--bd);border-radius:var(--r);
+  padding:14px 16px;transition:border-color .12s,transform .1s;
+}
+.recht:hover{border-color:var(--green);transform:translateY(-1px);}
+.recht-naam{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:.83rem;font-weight:700;color:var(--ink);margin-bottom:5px;
+}
+.recht-desc{font-size:.79rem;color:var(--ink3);line-height:1.6;}
+
+/* ─── INFO-BLOK ─── */
+.info{
+  background:var(--accent-bg);
+  border:1px solid rgba(224,92,26,.15);
+  border-radius:var(--r);padding:14px 18px;margin:16px 0;
+  font-size:.85rem;color:var(--ink2);line-height:1.7;
+}
+.info strong{color:var(--ink);}
+
+/* ─── FOOTER ─── */
+.footer{
+  background:var(--dark);padding:16px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.footer-logo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:.9rem;font-weight:700;color:rgba(255,255,255,.55);
+}
+.footer-logo span{color:var(--accent);}
+.footer-links{display:flex;gap:14px;list-style:none;}
+.footer-links a{font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;}
+.footer-links a:hover{color:rgba(255,255,255,.7);}
+.footer-disc{font-size:.67rem;color:rgba(255,255,255,.2);}
+
+/* ─── PRINT ─── */
+@media print{
+  .header,.footer,.divider{display:none;}
+  .main{padding:0;max-width:100%;}
+  body{font-size:12px;background:#fff;color:#000;}
+  .contactblok,.cat,.derde,.recht{border:1px solid #ccc !important;background:#fff !important;}
+  a::after{content:" (" attr(href) ")";font-size:.8em;color:#555;}
+  .sectie{break-inside:avoid;}
+}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:600px){
+  .header,.hero,.main,.footer{padding-left:16px;padding-right:16px;}
+  .main{padding-top:32px;padding-bottom:52px;}
+  .rechten{grid-template-columns:1fr;}
+  .derde{grid-template-columns:1fr;gap:4px;}
+  .hero-badges{flex-direction:column;gap:5px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="logo" href="index.html">intern<span class="logo-ly">ly</span></a>
+  <a class="back" href="index.html" onclick="if(document.referrer)event.preventDefault(),history.back()">← Terug</a>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Jouw privacy</div>
+    <h1 class="hero-title">Privacyverklaring</h1>
+    <p class="hero-sub">We verwerken zo min mogelijk gegevens en zijn daar transparant over. Studenten betalen nooit mee — ook niet indirect via hun data.</p>
+    <div class="hero-badges">
+      <span class="badge badge-groen">✓ AVG-compliant</span>
+      <span class="badge badge-grijs">Versie 1.0 · april 2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- DIVIDER -->
+<div class="divider"></div>
+
+<main class="main">
+
+  <!-- 1. WIE -->
+  <section class="sectie" id="wie">
+    <h2 class="sectie-kop"><span class="kop-nr">1</span>Wie is verantwoordelijk?</h2>
+    <div class="contactblok">
+      <div class="contactblok-label">Verwerkingsverantwoordelijke</div>
+      <p><strong>Sasubo Holding B.V.</strong></p>
+      <p>KVK: 80201822</p>
+      <p>E-mail: <a href="mailto:data@internly.pro">data@internly.pro</a></p>
+      <p>Website: <a href="https://internly.pro">internly.pro</a></p>
+    </div>
+  </section>
+
+  <!-- 2. WELKE GEGEVENS -->
+  <section class="sectie" id="gegevens">
+    <h2 class="sectie-kop"><span class="kop-nr">2</span>Welke gegevens en waarvoor?</h2>
+    <p>We verwerken alleen wat nodig is. Hieronder staat per situatie precies welke gegevens dat zijn, waarvoor we ze gebruiken en op welke wettelijke grondslag.</p>
+
+    <div class="cat-grid">
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">📧</span>
+          <span class="cat-naam">Wachtlijst en nieuwsbrief</span>
+          <span class="cat-basis">Jij geeft toestemming</span>
+        </div>
+        <div class="cat-body">
+          <p>Je e-mailadres — om je op de hoogte te houden van de ontwikkeling van het platform. Je geeft hiervoor zelf toestemming en je kunt je altijd uitschrijven via de afmeldlink in elke mail of via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">👤</span>
+          <span class="cat-naam">Account aanmaken (alle gebruikers)</span>
+          <span class="cat-basis">Nodig voor het platform</span>
+        </div>
+        <div class="cat-body">
+          <p>Naam, e-mailadres en wachtwoord. Nodig om je account aan te maken en veilig te houden.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">🎓</span>
+          <span class="cat-naam">Studentprofiel</span>
+          <span class="cat-basis">Nodig voor het platform</span>
+        </div>
+        <div class="cat-body">
+          <p>Opleiding, studieniveau, regio, leerdoelen en motivatie. Hiermee koppelen we je aan stages die écht bij je passen.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">🏢</span>
+          <span class="cat-naam">Bedrijfsprofiel</span>
+          <span class="cat-basis">Nodig voor het platform</span>
+        </div>
+        <div class="cat-body">
+          <p>Bedrijfsnaam, sector, vestigingsplaats en vacaturegegevens, zodat studenten kunnen zien wat er bij jullie te leren is. Reactietijden op sollicitaties en beoordelingen van studenten gebruiken we voor de Trust Score. Zie sectie 3.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">🏫</span>
+          <span class="cat-naam">Schoolprofiel en begeleidersdashboard</span>
+          <span class="cat-basis">Nodig voor het platform</span>
+        </div>
+        <div class="cat-body">
+          <p>Naam begeleider, schoolnaam en voortgangsgegevens van begeleide studenten. Hiermee kunnen begeleiders het stageproces volgen en vroeg signaleren waar het mis dreigt te gaan.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">💬</span>
+          <span class="cat-naam">Berichten en afspraken</span>
+          <span class="cat-basis">Nodig voor het platform</span>
+        </div>
+        <div class="cat-body">
+          <p>Chatberichten en geplande meetings. Wij lezen die niet mee. Ze zijn er uitsluitend voor de communicatie tussen de gebruikers onderling.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">🛡️</span>
+          <span class="cat-naam">Beveiliging</span>
+          <span class="cat-basis">Grondslag: gerechtvaardigd belang</span>
+        </div>
+        <div class="cat-body">
+          <p>Je IP-adres, maximaal 90 dagen. Uitsluitend om misbruik te detecteren en het platform veilig te houden.</p>
+        </div>
+      </div>
+
+      <div class="cat">
+        <div class="cat-kop">
+          <span class="cat-ico">🧾</span>
+          <span class="cat-naam">Betalingen</span>
+          <span class="cat-basis">Grondslag: wettelijke verplichting</span>
+        </div>
+        <div class="cat-body">
+          <p>Factuurgegevens van betalende gebruikers. We bewaren die zeven jaar, zoals de belastingdienst verplicht. Studenten vallen hier nooit onder.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>Je gegevens worden nooit verkocht.</strong> Studenten betalen ook niet indirect mee via hun data. We tonen geen advertenties van derden en doen niet aan commerciële profilering.
+    </div>
+  </section>
+
+  <!-- 3. ALGORITME -->
+  <section class="sectie" id="algoritme">
+    <h2 class="sectie-kop"><span class="kop-nr">3</span>Geautomatiseerde besluitvorming</h2>
+    <p><strong>Matching.</strong> Ons algoritme vergelijkt je studentprofiel met stageplekken op basis van niveau, regio en leerdoelen. Het resultaat zijn suggesties. Jij beslist altijd zelf — er zijn geen rechtsgevolgen verbonden aan wat het algoritme voorstelt. <span class="art">(art. 22 AVG)</span></p>
+    <p><strong>Trust Score.</strong> Voor bedrijven berekenen we automatisch een betrouwbaarheidsscore, gebaseerd op meetbaar gedrag: hoe snel reageert een bedrijf op sollicitaties, en wat zeggen studenten die er stage hebben gelopen? Een lage score kan de zichtbaarheid van een bedrijf in zoekresultaten verlagen. Studenten hebben hier geen last van — de score gaat over bedrijven, niet over hen. Bedrijven die het niet eens zijn met hun score kunnen contact opnemen via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
+  </section>
+
+  <!-- 4. BEWAARTERMIJNEN -->
+  <section class="sectie" id="bewaartermijnen">
+    <h2 class="sectie-kop"><span class="kop-nr">4</span>Hoe lang bewaren we je gegevens?</h2>
+    <p>We houden gegevens niet langer bij dan nodig. Zodra er geen reden meer is, wissen we ze.</p>
+    <table class="bewaar-tabel">
+      <thead><tr><th>Categorie</th><th>Termijn</th></tr></thead>
+      <tbody>
+        <tr><td>Accountgegevens (actief account)</td><td>Zolang het account bestaat</td></tr>
+        <tr><td>Accountgegevens na verwijdering</td><td>30 dagen, daarna volledig gewist</td></tr>
+        <tr><td>Chatberichten</td><td>2 jaar na afsluiting van de match</td></tr>
+        <tr><td>Trust Score-data en beoordelingen</td><td>3 jaar</td></tr>
+        <tr><td>Betalings- en factuurgegevens</td><td>7 jaar <span class="art">(fiscale bewaarplicht)</span></td></tr>
+        <tr><td>Nieuwsbrief e-mailadressen</td><td>Tot uitschrijving</td></tr>
+        <tr><td>IP-adressen in logs</td><td>Maximaal 90 dagen</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 5. DERDEN -->
+  <section class="sectie" id="derden">
+    <h2 class="sectie-kop"><span class="kop-nr">5</span>Wie ontvangt je gegevens?</h2>
+    <p>We delen gegevens alleen met de partijen die we nodig hebben om het platform te laten werken. Meer niet. Met elk van hen is een verwerkersovereenkomst gesloten. <span class="art">(art. 28 AVG)</span></p>
+    <div class="derden-lijst">
+      <div class="derde">
+        <div>
+          <div class="derde-naam">Supabase Inc.</div>
+          <div class="derde-land">VS · EU-dataopslag</div>
+        </div>
+        <div class="derde-info">Database, authenticatie en berichtopslag. Je data staat op servers in Frankfurt (EU). Doorgifte naar de VS is gewaarborgd via Standard Contractual Clauses.</div>
+      </div>
+      <div class="derde">
+        <div>
+          <div class="derde-naam">Mollie B.V.</div>
+          <div class="derde-land">Nederland</div>
+        </div>
+        <div class="derde-info">Betalingsverwerking voor betalende gebruikers. Mollie is gereguleerd door De Nederlandsche Bank.</div>
+      </div>
+      <div class="derde">
+        <div>
+          <div class="derde-naam">Google LLC</div>
+          <div class="derde-land">VS</div>
+        </div>
+        <div class="derde-info">Google Fonts (lettertypen) en Google Translate (vertaalfunctie). Bij gebruik wordt je IP-adres doorgegeven aan Google. Doorgifte is gewaarborgd via Standard Contractual Clauses.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. RECHTEN -->
+  <section class="sectie" id="rechten">
+    <h2 class="sectie-kop"><span class="kop-nr">6</span>Jouw rechten</h2>
+    <p>Je kunt onderstaande rechten altijd uitoefenen. Stuur een mail naar <a href="mailto:data@internly.pro">data@internly.pro</a>. We vragen om een bevestiging via je geregistreerde e-mailadres — zodat we zeker weten dat we met de juiste persoon spreken. We reageren binnen één maand. Altijd gratis.</p>
+    <div class="rechten">
+      <div class="recht">
+        <div class="recht-naam">Inzage</div>
+        <div class="recht-desc">Opvragen welke gegevens we van je verwerken en waarom. <span class="art">Art. 15</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Correctie</div>
+        <div class="recht-desc">Onjuiste gegevens laten aanpassen. Veel gegevens kun je zelf aanpassen in je profiel. <span class="art">Art. 16</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Verwijdering</div>
+        <div class="recht-desc">Je gegevens laten wissen — tenzij we ze wettelijk moeten bewaren, zoals facturen. <span class="art">Art. 17</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Beperking</div>
+        <div class="recht-desc">Verwerking tijdelijk laten beperken terwijl een bezwaar loopt. <span class="art">Art. 18</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Dataportabiliteit</div>
+        <div class="recht-desc">Je gegevens in een gangbaar formaat ontvangen om ze ergens anders te gebruiken. <span class="art">Art. 20</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Bezwaar</div>
+        <div class="recht-desc">Bezwaar maken tegen verwerking op basis van ons gerechtvaardigd belang, zoals beveiliging. <span class="art">Art. 21</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Toestemming intrekken</div>
+        <div class="recht-desc">Gegeven toestemming — zoals voor de nieuwsbrief — altijd intrekken. Niet met terugwerkende kracht. <span class="art">Art. 7 lid 3</span></div>
+      </div>
+      <div class="recht">
+        <div class="recht-naam">Klacht indienen</div>
+        <div class="recht-desc">Een klacht indienen bij de <a href="https://www.autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">Autoriteit Persoonsgegevens</a>. <span class="art">Art. 77</span></div>
+      </div>
+    </div>
+    <p><strong>Moet je je gegevens verstrekken?</strong> Om het platform te gebruiken heb je een account nodig, en daarvoor heb je minimaal een naam en e-mailadres nodig. Zonder dat werkt het niet. De nieuwsbrief en wachtlijst zijn volledig vrijwillig.</p>
+  </section>
+
+  <!-- 7. COOKIES -->
+  <section class="sectie" id="cookies">
+    <h2 class="sectie-kop"><span class="kop-nr">7</span>Cookies en browseropslag</h2>
+    <p>We gebruiken geen tracking-cookies, geen advertentiecookies en geen Google Analytics. Wat we wél in je browser opslaan:</p>
+    <ul>
+      <li><strong>Sessie-token</strong> — houdt je ingelogd. Noodzakelijk voor de werking van het platform.</li>
+      <li><strong>Geselecteerd niveau en rol</strong> — zodat je keuze onthouden wordt tijdens je bezoek. Wordt niet naar onze servers gestuurd.</li>
+      <li><strong>Google Translate</strong> — plaatst cookies als je de vertaalfunctie activeert. Je kiest zelf of je die functie gebruikt.</li>
+    </ul>
+  </section>
+
+  <!-- 8. BEVEILIGING -->
+  <section class="sectie" id="beveiliging">
+    <h2 class="sectie-kop"><span class="kop-nr">8</span>Beveiliging</h2>
+    <p>We treffen passende technische en organisatorische maatregelen om je gegevens te beveiligen. <span class="art">(art. 32 AVG)</span></p>
+    <p>Bij een datalek dat risico voor je oplevert melden we dit binnen 72 uur bij de Autoriteit Persoonsgegevens. Als het lek ook persoonlijk risico voor jou oplevert, informeren we je direct per e-mail.</p>
+    <p>Beveiligingsprobleem gevonden? Mail naar <a href="mailto:data@internly.pro">data@internly.pro</a>. We gaan verantwoord melden altijd constructief te lijf en handelen in overleg.</p>
+  </section>
+
+  <!-- 9. WIJZIGINGEN -->
+  <section class="sectie" id="wijzigingen">
+    <h2 class="sectie-kop"><span class="kop-nr">9</span>Wijzigingen</h2>
+    <p>Het platform groeit en deze verklaring groeit mee. De actuele versie staat altijd op <a href="https://internly.pro/privacybeleid.html">internly.pro/privacybeleid.html</a>. Als er iets wezenlijks verandert, laten we je dat per e-mail weten.</p>
+    <p>Versie 1.0 — april 2026.</p>
+  </section>
+
+  <!-- 10. CONTACT -->
+  <section class="sectie" id="contact">
+    <h2 class="sectie-kop"><span class="kop-nr">10</span>Contact</h2>
+    <div class="contactblok">
+      <div class="contactblok-label">Vragen of verzoeken</div>
+      <p><strong>Sasubo Holding B.V.</strong></p>
+      <p><a href="mailto:data@internly.pro">data@internly.pro</a></p>
+      <p>Reactie binnen 5 werkdagen — wettelijk verplicht binnen 1 maand.</p>
+      <p style="margin-top:8px">Kom je er niet uit? Je kunt ook een klacht indienen bij de <a href="https://www.autoriteitpersoonsgegevens.nl/klacht-indienen" target="_blank" rel="noopener">Autoriteit Persoonsgegevens</a>.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">intern<span>ly</span></div>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">Over ons</a></li>
+    <li><a href="privacybeleid.html" aria-current="page">Privacyverklaring</a></li>
+  </ul>
+  <div class="footer-disc">Internly.pro is onderdeel van Sasubo Holding B.V. · Privacyverklaring v1.0 · April 2026</div>
+  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+</footer>
+
+</body>
+</html>

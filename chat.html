@@ -173,8 +173,14 @@
     <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
     <div class="topbar-match-sub" id="topbarMatchSub"></div>
   </div>
-  <a id="stage-hub-topbar-link" href="#" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
-  <div class="lang-switcher" style="margin-left:auto;flex-shrink:0">
+  <a id="stage-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
+  <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:5px 4px;">Privacy</a>
+  <button onclick="db.auth.signOut().then(()=>window.location.href='index.html')" style="
+    flex-shrink:0;background:none;border:none;
+    color:rgba(255,255,255,.45);font-size:.75rem;font-family:'Outfit',sans-serif;
+    cursor:pointer;padding:5px 8px;border-radius:6px;
+    transition:color .15s;" title="Uitloggen">↪ Uit</button>
+  <div class="lang-switcher" style="margin-left:0;flex-shrink:0">
     <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
     <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
     <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
@@ -196,7 +202,7 @@
     <span class="mt-icon">📋</span>
     <span class="mt-label">Stages</span>
   </a>
-  <a href="match-dashboard.html" class="mt-tab">
+  <a id="mt-hub-link" href="match-dashboard.html" class="mt-tab">
     <span class="mt-icon">📊</span>
     <span class="mt-label">Hub</span>
   </a>
@@ -410,11 +416,15 @@
     document.getElementById('topbarMatchName').textContent = posting.title || 'Chat';
     document.getElementById('topbarMatchSub').textContent  = posting.company_name || '';
 
-    // Stage Hub shortcut
+    // Stage Hub shortcut (topbar pill + bottom-nav tab)
     const stageHubLink = document.getElementById('stage-hub-topbar-link');
     if (stageHubLink && mId) {
       stageHubLink.href = 'match-dashboard.html?match=' + encodeURIComponent(mId);
       stageHubLink.style.display = 'inline-block';
+    }
+    const mtHubLink = document.getElementById('mt-hub-link');
+    if (mtHubLink && mId) {
+      mtHubLink.href = 'match-dashboard.html?match=' + encodeURIComponent(mId);
     }
 
     // Resolve other party
@@ -472,6 +482,8 @@
 
     if (error) {
       console.error('Berichten laden fout:', error);
+      const area = document.getElementById('messagesArea');
+      if (area) area.innerHTML = `<div class="chat-empty"><span class="icon">⚠️</span>Berichten konden niet worden geladen. Probeer de pagina te verversen.</div>`;
       return;
     }
     const annotated = (messages || []).map(m => ({
@@ -653,7 +665,7 @@
         .from('profiles')
         .select('naam, role')
         .eq('id', otherPartyId)
-        .single();
+        .maybeSingle();
 
       const { data: lastMsg } = await db
         .from('messages')
@@ -661,7 +673,7 @@
         .eq('conversation_id', conv.id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       const unread = lastMsg && !lastMsg.read && lastMsg.sender_id !== userId ? 1 : 0;
 
@@ -719,6 +731,94 @@
     `;
   }
 
+  // ── Buddy pair chat ───────────────────────────────────────────────────────
+  // Vereist SQL-migratie: ALTER TABLE conversations ADD COLUMN IF NOT EXISTS
+  //   buddy_pair_id UUID REFERENCES buddy_pairs(id);
+  // Totdat die kolom bestaat valt de INSERT terug op match_id = null.
+
+  async function loadBuddyConversation(pairId) {
+    // 1. Haal buddy_pair op + profilenamen
+    const { data: pair, error: pErr } = await db
+      .from('buddy_pairs')
+      .select(`
+        id, type, status,
+        req:profiles!buddy_pairs_requester_id_fkey(id, naam),
+        rec:profiles!buddy_pairs_receiver_id_fkey(id, naam)
+      `)
+      .eq('id', pairId)
+      .maybeSingle();
+
+    if (pErr || !pair) {
+      document.getElementById('messagesArea').innerHTML =
+        '<div class="chat-empty"><span class="icon">🔒</span>Buddy-koppeling niet gevonden.</div>';
+      return;
+    }
+
+    // 2. Toegangscheck — alleen de twee betrokkenen
+    const uid = currentUser.id;
+    if (pair.req?.id !== uid && pair.rec?.id !== uid) {
+      document.getElementById('messagesArea').innerHTML =
+        '<div class="chat-empty"><span class="icon">🔒</span>Je hebt geen toegang tot dit gesprek.</div>';
+      return;
+    }
+
+    // 3. Andere partij
+    const isRequester = pair.req?.id === uid;
+    const other = isRequester ? pair.rec : pair.req;
+    otherPartyId   = other?.id || null;
+    otherPartyName = other?.naam || 'Buddy';
+    otherPartyEmail = null;
+
+    // 4. Topbar invullen
+    document.getElementById('topbarMatchName').textContent = otherPartyName;
+    document.getElementById('topbarMatchSub').textContent  = 'Buddy-chat · ' + (pair.type || 'gepensioneerd');
+    // Stage Hub-pil verbergen — niet van toepassing bij buddy-chat
+    const stageHubLink = document.getElementById('stage-hub-topbar-link');
+    if (stageHubLink) stageHubLink.style.display = 'none';
+
+    // 5. Conversation ophalen of aanmaken (buddy_pair_id kolom)
+    let conv = null;
+    const { data: existing } = await db
+      .from('conversations')
+      .select('id')
+      .eq('buddy_pair_id', pairId)
+      .maybeSingle();
+
+    if (existing) {
+      conv = existing;
+    } else {
+      // Kolom bestaat nog niet of conversation bestaat nog niet — aanmaken
+      const { data: newConv, error: cErr } = await db
+        .from('conversations')
+        .insert({ buddy_pair_id: pairId })
+        .select('id')
+        .single();
+      if (cErr) {
+        // Fallback: kolom bestaat nog niet → sla op als match_id-loze conversatie
+        console.warn('[chat] buddy_pair_id kolom ontbreekt:', cErr.message);
+        const { data: fb } = await db
+          .from('conversations')
+          .insert({ match_id: null })
+          .select('id')
+          .single();
+        conv = fb;
+      } else {
+        conv = newConv;
+      }
+    }
+
+    if (!conv) {
+      document.getElementById('messagesArea').innerHTML =
+        '<div class="chat-empty"><span class="icon">⚠️</span>Gesprek kon niet worden geladen.</div>';
+      return;
+    }
+
+    convId = conv.id;
+    await loadMessages();
+    subscribeRealtime();
+    markMessagesRead();
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', async () => {
@@ -728,8 +828,11 @@
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
+    const buddyPairId = params.get('buddy_pair_id');
 
-    if (matchId) {
+    if (buddyPairId) {
+      await loadBuddyConversation(buddyPairId);
+    } else if (matchId) {
       await loadConversation(matchId);
     } else {
       // List view — hide the input bar, update topbar title

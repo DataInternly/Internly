@@ -8,7 +8,7 @@
   <meta name="description" content="Internly verbindt studenten, scholen en bedrijven op een eerlijke en transparante stagemarkt.">
   <title>Internly — Stages fixen door eerlijkheid te bouwen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,7 +24,7 @@
     }
 
     .hero {
-      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      background: linear-gradient(148deg, #1e8a52 0%, #1a7a48 42%, #145e38 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -33,104 +33,112 @@
       text-align: center;
       padding: 80px 24px;
       color: #fff;
+      position: relative;
+      overflow: hidden;
     }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(
+        ellipse 85% 75% at 50% 38%,
+        transparent 40%,
+        rgba(0,0,0,.18) 100%
+      );
+      pointer-events: none;
+    }
+    .hero > * { position: relative; z-index: 1; }
 
     .logo {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 3.5rem;
       font-weight: 700;
       letter-spacing: -.03em;
-      margin-bottom: 20px;
+      margin-bottom: 4px;
+      animation: lp-breathe 4s ease-in-out infinite;
     }
     .logo span { color: #FF7E42; }
+    @keyframes lp-breathe {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.008); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .logo { animation: none; }
+    }
+    .lp-logo-desc {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: .76rem; font-weight: 400;
+      color: rgba(255,255,255,.62);
+      letter-spacing: .06em;
+      margin-bottom: 28px;
+    }
 
-    .tagline {
+    .lp-tagline {
       font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 600;
-      line-height: 1.15;
-      max-width: 680px;
-      margin: 0 auto 24px;
+      font-size: clamp(1rem, 2.2vw, 1.15rem);
+      font-weight: 600; font-style: italic;
+      color: rgba(255,255,255,.62);
+      letter-spacing: -.01em;
+      margin-bottom: 20px;
     }
-    .tagline em { font-style: italic; color: #FF7E42; }
+    .lp-tagline em { color: #e05c1a; font-style: italic; }
 
-    .subtitle {
-      font-size: 1.1rem;
-      max-width: 560px;
-      margin: 0 auto 52px;
-      opacity: .9;
-      line-height: 1.6;
-    }
-
-    /* ── Role picker ── */
-    .role-picker {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-      max-width: 380px;
+    /* ── Niveau pills ── */
+    .lp-niveau {
+      display: flex; gap: 6px; justify-content: center;
+      flex-wrap: wrap; width: 100%; max-width: 420px;
       margin: 0 auto 16px;
     }
-
-    .role-card {
-      background: rgba(255,255,255,.1);
-      border: 1.5px solid rgba(255,255,255,.2);
-      border-radius: 14px;
-      padding: 16px 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-align: left;
-      transition: background .15s, border-color .15s, transform .12s;
-    }
-    .role-card:hover {
-      background: rgba(255,255,255,.18);
-      border-color: rgba(255,255,255,.4);
-      transform: translateY(-1px);
-    }
-    .role-card.active {
-      background: rgba(255,255,255,.2);
-      border-color: #FF7E42;
-      box-shadow: 0 0 0 3px rgba(255,126,66,.3);
-    }
-
-    .role-icon {
-      width: 46px; height: 46px; border-radius: 50%;
-      background: rgba(255,255,255,.15);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; flex-shrink: 0;
-    }
-    .role-name {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 2px;
-    }
-    .role-desc { font-size: .82rem; color: rgba(255,255,255,.65); }
-
-    /* ── Verken knop ── */
-    .btn-verken {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      max-width: 380px;
-      margin: 0 auto 20px;
-      padding: 12px 24px;
-      background: rgba(255,255,255,.08);
-      border: 1.5px solid rgba(255,255,255,.25);
-      border-radius: 50px;
-      color: rgba(255,255,255,.85);
+    .lp-np {
       font-family: 'Outfit', sans-serif;
-      font-size: .95rem;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: background .15s, border-color .15s;
+      font-size: .83rem; font-weight: 600;
+      padding: 7px 16px; border-radius: 20px;
+      border: 1.5px solid rgba(255,255,255,.2);
+      background: transparent; color: rgba(255,255,255,.55);
+      cursor: pointer; transition: all .15s;
     }
-    .btn-verken:hover {
-      background: rgba(255,255,255,.15);
-      border-color: rgba(255,255,255,.45);
+    .lp-np:hover { background: rgba(255,255,255,.1); color: rgba(255,255,255,.9); }
+    .lp-np.lp-np-on { background: #fff; color: #0d1a10; border-color: #fff; font-weight: 700; }
+
+    /* ── Rol-beschrijvingspaneel ── */
+    .lp-role-desc {
+      width: 100%; max-width: 420px; margin: 0 auto 14px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-left: 3px solid rgba(255,255,255,.2);
+      border-radius: 0 8px 8px 0;
+      padding: 9px 14px;
+      font-size: .84rem; color: rgba(255,255,255,.78);
+      line-height: 1.6; text-align: center;
+      transition: opacity .15s ease, border-left-color .2s ease;
+    }
+    .lp-role-desc.rc-student { border-left-color: #7cb8ff; }
+    .lp-role-desc.rc-bedrijf { border-left-color: #6ee7a0; }
+    .lp-role-desc.rc-school  { border-left-color: #fcd56a; }
+    .lp-micro {
+      font-size: .74rem; color: rgba(255,255,255,.48);
+      margin-bottom: 10px; text-align: center;
+    }
+    .btn-enter {
+      display: block; width: 100%; max-width: 420px;
+      margin: 0 auto 16px; text-align: center;
+      background: #FF7E42; color: #fff; border: none;
+      padding: 13px 44px; border-radius: 40px;
+      font-family: 'Outfit', sans-serif; font-size: .93rem; font-weight: 600;
+      cursor: pointer;
+      transition: background .12s, transform .12s;
+    }
+    .btn-enter:hover { background: #e05c1a; transform: translateY(-1px); }
+    .lp-link-explore {
+      font-size: .8rem; color: rgba(255,255,255,.55);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-bottom: 12px; transition: color .12s;
+    }
+    .lp-link-explore:hover { color: rgba(255,255,255,.85); }
+    .lp-exp-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #e05c1a; flex-shrink: 0;
     }
 
     /* ── Simulator CTA ── */
@@ -148,33 +156,14 @@
       box-shadow: 0 14px 36px rgba(255,126,66,.5);
     }
 
-    /* ── CTA knop ── */
-    .btn-demo {
-      background: #FF7E42;
-      color: #fff;
-      padding: 16px 52px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      font-family: 'Outfit', sans-serif;
-      box-shadow: 0 10px 30px rgba(255,126,66,.4);
-      transition: background .15s, transform .2s, box-shadow .2s;
+    /* ── Nieuwsbrief eyebrow ── */
+    .lp-nl-eyebrow {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #fdf0e8; color: #e05c1a;
+      border: 1px solid rgba(224,92,26,.2);
+      font-size: .68rem; font-weight: 600; letter-spacing: .06em;
+      padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
     }
-    .btn-demo:hover {
-      background: #e05c1a;
-      transform: translateY(-3px);
-      box-shadow: 0 14px 36px rgba(255,126,66,.5);
-    }
-    .btn-demo:disabled {
-      opacity: .4;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .footer-text { margin-top: 48px; font-size: .9rem; opacity: .65; }
 
     /* ── Beta banner ── */
     .beta-banner {
@@ -217,13 +206,131 @@
       transition: color .15s;
     }
     .beta-close:hover { color: rgba(255,255,255,.8); }
+
+    /* ── Step 3 — hook h1 ── */
+    .hero-h1 { font-family:'Bricolage Grotesque',sans-serif; letter-spacing:-.04em; margin-bottom:18px; text-align:center; }
+    .h-intro { font-size:clamp(1.5rem,3.8vw,2.8rem); font-weight:800; color:#fff; display:block; line-height:1.1; margin-bottom:6px; }
+    .h-end   { font-size:clamp(1.9rem,4.8vw,3.6rem); font-weight:800; color:#fff; display:block; line-height:1.1; margin-top:10px; }
+    .struck  { display:inline-block; position:relative; color:rgba(255,255,255,.85); font-weight:400; font-size:clamp(3.8rem,11vw,9rem); line-height:.9; transition:color .55s .12s ease; }
+    .struck.go { color:rgba(255,255,255,.18); }
+    @keyframes lp-strike { from{width:0;opacity:0;} to{width:calc(100% + 10px);opacity:1;} }
+    .struck::after { content:''; position:absolute; left:-5px; right:unset; top:50%; height:7px; background:#e05c1a; border-radius:2px; transform:translateY(-50%) rotate(-.3deg); z-index:2; width:0; opacity:0; }
+    .struck.go::after { animation:lp-strike .65s .15s cubic-bezier(.16,1,.3,1) forwards; }
+    @media(prefers-reduced-motion:reduce) { .struck { color:rgba(255,255,255,.28) !important; } .struck::after { width:calc(100% + 10px) !important; opacity:1 !important; } }
+
+    /* ── Step 6 — role tiles ── */
+    .role-tiles { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; width:100%; max-width:560px; margin:0 auto 10px; }
+    @media(max-width:520px) { .role-tiles { grid-template-columns:repeat(3,1fr); max-width:100%; } }
+    @media(max-width:360px) { .role-tiles { grid-template-columns:repeat(2,1fr); } }
+    .rt { background:rgba(255,255,255,.09); border:1.5px solid rgba(255,255,255,.14); border-radius:12px; padding:16px 10px 13px; cursor:pointer; text-align:center; position:relative; overflow:hidden; transition:background .15s,border-color .15s; }
+    @keyframes lp-topbar { from{width:0;opacity:0;} to{width:100%;opacity:1;} }
+    .rt::after { content:''; position:absolute; top:0; left:0; height:3px; background:var(--rc-c,rgba(255,255,255,.5)); width:0; opacity:0; }
+    .rt.on::after { animation:lp-topbar .4s .05s ease forwards; }
+    .rt:hover { background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.24); }
+    .rt.on { border-color:rgba(255,255,255,.26); }
+    .rt-s { --rc-c:#7cb8ff; } .rt-b { --rc-c:#6ee7a0; } .rt-sc { --rc-c:#fcd56a; }
+    .rt-bbl  { --rc-c:#5dcaa5; } .rt-buddy { --rc-c:#fac775; }
+    .rt.on.rt-bbl   { background:rgba(93,202,165,.15); } .rt.on.rt-buddy { background:rgba(250,199,117,.13); }
+    .rt.on.rt-bbl   .rt-name { color:#5dcaa5; } .rt.on.rt-buddy .rt-name { color:#fac775; }
+    .lp-role-desc.rc-bbl   { border-left-color:#5dcaa5; } .lp-role-desc.rc-buddy { border-left-color:#fac775; }
+    .rt.on.rt-s { background:rgba(124,184,255,.15); }
+    .rt.on.rt-b { background:rgba(110,231,160,.13); }
+    .rt.on.rt-sc { background:rgba(252,213,106,.13); }
+    .rt.on.rt-s .rt-name { color:#7cb8ff; }
+    .rt.on.rt-b .rt-name { color:#6ee7a0; }
+    .rt.on.rt-sc .rt-name { color:#fcd56a; }
+    .rt:focus-visible { outline: 2px solid rgba(255,255,255,.75); outline-offset: 3px; border-radius: 12px; }
+    @keyframes lp-pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
+    .rt.pulse { animation:lp-pulse .28s ease; }
+    .rt-ico { font-size:0; margin-bottom:8px; line-height:1; }
+    .rt-ico-wrap { font-size:1.35rem; line-height:1; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.18); }
+    .rt-name { font-family:'Bricolage Grotesque',sans-serif; font-size:.88rem; font-weight:700; color:#fff; margin-bottom:6px; transition:color .15s; }
+    .rt-bdg { font-size:.65rem; font-weight:600; padding:2px 8px; border-radius:20px; display:inline-block; }
+    .bd-g { background:rgba(110,231,160,.18); color:#6ee7a0; }
+    .bd-a { background:rgba(252,213,106,.15); color:#fcd56a; }
+    .bd-b { background:rgba(124,184,255,.15); color:#7cb8ff; }
+
+    /* ── Step 8 — divider, stats, quotes, how, ESG, prev ── */
+    .lp-divider { height:4px; background:linear-gradient(90deg,#22a85e,#e05c1a); box-shadow:0 0 18px rgba(224,92,26,.32),0 0 6px rgba(34,168,94,.2); }
+    .lp-stats { background:#0b2416; padding:24px 40px; display:grid; grid-template-columns:1fr 1px 1fr 1px 1fr; align-items:center; }
+    .lp-sd { background:rgba(255,255,255,.07); height:34px; }
+    .lp-ss { padding:0 22px; }
+    .lp-sn { font-family:'Bricolage Grotesque',sans-serif; font-size:1.9rem; font-weight:800; color:#22a85e; line-height:1; margin-bottom:3px; display:flex; align-items:baseline; gap:4px; }
+    .sl-slash { color:#e05c1a; font-size:1.2rem; }
+    .lp-sl { font-size:.8rem; color:rgba(255,255,255,.42); line-height:1.45; }
+    .lp-si { font-size:.64rem; color:rgba(255,255,255,.2); font-style:italic; margin-top:1px; }
+    .lp-quotes { background:#f4f3ef; border-top:1px solid rgba(13,26,16,.09); border-bottom:1px solid rgba(13,26,16,.09); display:grid; grid-template-columns:repeat(3,1fr); }
+    .lp-q { padding:22px 24px; border-right:1px solid rgba(13,26,16,.09); border-left:3px solid #1a7a48; margin-left:-1px; transition:border-left-color .15s; }
+    .lp-q:hover { border-left-color:#e05c1a; }
+    .lp-q:last-child { border-right:none; }
+    .lp-qt { font-size:.83rem; color:#2e4038; line-height:1.65; font-style:italic; margin-bottom:8px; }
+    .lp-qs { font-family:'DM Mono',monospace; font-size:.62rem; color:#6b8070; letter-spacing:.04em; }
+    .lp-how { padding:52px 40px; background:#f4f3ef; }
+    .lp-hi { max-width:840px; margin:0 auto; }
+    .lp-lbl { font-size:.67rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#6b8070; margin-bottom:.55rem; display:flex; align-items:center; gap:.5rem; }
+    .lp-lbl::after { content:''; flex:1; height:1px; background:rgba(13,26,16,.09); }
+    .lp-sh { font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:800; color:#0d1a10; letter-spacing:-.03em; line-height:1.15; margin-bottom:.2rem; }
+    .lp-sp { font-size:.83rem; color:#6b8070; margin-bottom:26px; line-height:1.6; }
+    .lp-hg { display:grid; grid-template-columns:1fr 26px 1fr 26px 1fr; gap:0; align-items:start; }
+    .lp-hc { display:flex; align-items:flex-start; justify-content:center; padding-top:24px; }
+    .lp-ha { width:16px; height:16px; border-top:2.5px solid #22a85e; border-right:2.5px solid #22a85e; transform:rotate(45deg); margin-top:8px; }
+    .lp-hcard { background:#fff; border:1px solid rgba(13,26,16,.09); border-top:3px solid #1a7a48; border-radius:12px; padding:1rem 1.1rem; position:relative; overflow:hidden; transition:border-color .15s,transform .15s; }
+    .lp-hcard:hover { border-color:rgba(13,26,16,.18); transform:translateY(-2px); }
+    .lp-hn { font-family:'Bricolage Grotesque',sans-serif; font-size:2.8rem; font-weight:800; color:rgba(26,122,72,.22); line-height:1; position:absolute; right:10px; top:4px; letter-spacing:-.04em; }
+    .lp-hh { font-family:'Bricolage Grotesque',sans-serif; font-size:.87rem; font-weight:700; color:#0d1a10; margin-bottom:4px; position:relative; z-index:1; }
+    .lp-hp { font-size:.82rem; color:#6b8070; line-height:1.65; position:relative; z-index:1; margin-bottom:8px; }
+    .lp-tg { display:inline-block; font-size:.68rem; font-weight:600; padding:3px 8px; border-radius:20px; background:#e8f5ee; color:#1a7a48; }
+    .lp-ta { display:inline-block; font-size:.68rem; font-weight:600; padding:3px 8px; border-radius:20px; background:#fdf3e0; color:#a06010; }
+    .lp-esg { background:#e8f5ee; border-top:1px solid rgba(26,122,72,.14); border-bottom:1px solid rgba(26,122,72,.14); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+    .lp-esg-l { display:flex; align-items:center; gap:11px; }
+    .lp-esg-ico { width:36px; height:36px; border-radius:50%; background:rgba(26,122,72,.12); color:#1a7a48; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+    .lp-esg-h { font-family:'Bricolage Grotesque',sans-serif; font-size:.87rem; font-weight:700; color:#1a7a48; margin-bottom:2px; }
+    .lp-esg-p { font-size:.79rem; color:#2e4038; line-height:1.5; max-width:450px; }
+    .btn-esg { font-family:'Outfit',sans-serif; font-size:.77rem; font-weight:600; padding:8px 14px; border-radius:8px; background:#1a7a48; color:#fff; border:none; cursor:pointer; transition:background .12s; white-space:nowrap; }
+    .btn-esg:hover { background:#0b2416; }
+    .lp-prev { background:#fdf0e8; border-bottom:1px solid rgba(224,92,26,.11); padding:10px 40px; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .lp-prev-lbl { font-size:.75rem; color:#e05c1a; font-weight:500; }
+    .lp-prev-links a { font-size:.75rem; color:#e05c1a; text-decoration:none; font-weight:500; opacity:.7; }
+    .lp-prev-links a + a { margin-left:11px; }
+    .lp-prev-links a:hover { opacity:1; }
+    .lp-rev { opacity:0; transform:translateY(13px); transition:opacity .4s ease,transform .4s ease; }
+    .lp-rev.lp-rev-on { opacity:1; transform:translateY(0); }
+    .lp-d1 { transition-delay:.07s; }
+    .lp-d2 { transition-delay:.14s; }
+
+    @media(max-width:680px) {
+      .hero { padding:48px 16px 40px; }
+      .lp-stats { grid-template-columns:1fr; padding:18px 16px; gap:16px; }
+      .lp-sd { display:none; }
+      .lp-ss { padding:0; }
+      .lp-sn { justify-content:flex-start; }
+      .lp-quotes { grid-template-columns:1fr; }
+      .lp-q { border-right:none; border-bottom:1px solid rgba(13,26,16,.09); }
+      .lp-q:last-child { border-bottom:none; }
+      .lp-hg { grid-template-columns:1fr; }
+      .lp-hc { display:none; }
+      .lp-how { padding:36px 16px; }
+      .lp-esg { padding:14px 16px; flex-direction:column; align-items:flex-start; }
+      .lp-prev { padding:10px 16px; }
+      .role-tiles { max-width:100%; }
+    }
+    @media(max-width:480px) {
+      /* Prevent "0 reacties." from overflowing narrow viewports */
+      .struck { font-size: clamp(2.6rem, 13vw, 5rem); }
+    }
+    @media(max-width:420px) {
+      /* Newsletter form: stack input + button vertically on very small screens */
+      #hero-wl-form { flex-direction: column; }
+      #hero-wl-form input[type="email"],
+      #hero-wl-btn { width: 100%; box-sizing: border-box; }
+    }
   </style>
 </head>
 <body>
 
 <div class="beta-banner" id="betaBanner">
   <span class="beta-pill">Beta</span>
-  <span>Dit platform is momenteel in testfase — functionaliteiten worden actief ontwikkeld. Klik gerust rond!</span>
+  <span>Je gebruikt een vroege versie van Internly. Sommige functies zijn nog in ontwikkeling.</span>
   <div class="lang-switcher" style="margin-left:auto;margin-right:36px">
     <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
     <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
@@ -233,57 +340,205 @@
   <button class="beta-close" onclick="document.getElementById('betaBanner').style.display='none'" aria-label="Sluiten">×</button>
 </div>
 
-<div class="hero hero-stagger">
-  <div class="logo">intern<span>ly</span></div>
+<div class="hero hero-stagger" id="hero">
+  <div class="logo">intern<span style="color:#e05c1a">ly</span></div>
+  <span class="lp-logo-desc">het stageplatform</span>
 
-  <h1 class="tagline">Stages fixen door<br><em>eerlijkheid te bouwen</em></h1>
+  <h1 class="hero-h1" aria-label="40 mails. 0 reacties. Dat kan anders.">
+    <span class="h-intro">40 mails.</span>
+    <span class="struck" id="lp-struck" aria-hidden="true">0&nbsp;reacties.</span>
+    <span class="h-end">Dat kan anders<span style="color:#e05c1a">.</span></span>
+  </h1>
 
-  <p class="subtitle">
-    Een datagedreven platform met verwachtingsmanagement, Trust Scores en wederzijdse verantwoordelijkheid — voor studenten, bedrijven én scholen.
-  </p>
+  <div class="lp-tagline">Weet vooraf hoe betrouwbaar een bedrijf is. Geen ghosting, geen vage beloftes — gewoon stages die kloppen.</div>
 
-  <!-- Role picker -->
-  <div class="role-picker">
-    <div class="role-card" id="rc-student" onclick="selectRole('student')">
-      <div class="role-icon">👤</div>
-      <div>
-        <div class="role-name">Student</div>
-        <div class="role-desc">Zoek een stage op basis van ambitie &amp; leerdoelen</div>
-      </div>
+  <!-- Niveau pills -->
+  <div class="lp-niveau">
+    <button class="lp-np" onclick="lpSetNiveau(this,'bbl')">BBL</button>
+    <button class="lp-np lp-np-on" onclick="lpSetNiveau(this,'mbo')">MBO</button>
+    <button class="lp-np" onclick="lpSetNiveau(this,'hbo')">HBO</button>
+    <button class="lp-np" onclick="lpSetNiveau(this,'wo')">WO</button>
+  </div>
+
+  <!-- Role tiles — 5 tiles (student · BBL · bedrijf · school · buddy) -->
+  <div class="role-tiles">
+    <div class="rt rt-s on" data-role="student" onclick="pickRole(this,'student')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'student');}" tabindex="0" role="button" aria-pressed="true">
+      <div class="rt-ico"><span class="rt-ico-wrap">👤</span></div>
+      <div class="rt-name">Student</div>
+      <span class="rt-bdg bd-g">Gratis</span>
     </div>
-    <div class="role-card" id="rc-bedrijf" onclick="selectRole('bedrijf')">
-      <div class="role-icon">🏢</div>
-      <div>
-        <div class="role-name">Bedrijf</div>
-        <div class="role-desc">Vind gemotiveerde stagiairs, bouw je reputatie op</div>
-      </div>
+    <div class="rt rt-b" data-role="bedrijf" onclick="pickRole(this,'bedrijf')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'bedrijf');}" tabindex="0" role="button" aria-pressed="false">
+      <div class="rt-ico"><span class="rt-ico-wrap">🏢</span></div>
+      <div class="rt-name">Bedrijf</div>
+      <span class="rt-bdg bd-a">Abonnement</span>
     </div>
-    <div class="role-card" id="rc-school" onclick="selectRole('school')">
-      <div class="role-icon">🎓</div>
-      <div>
-        <div class="role-name">School</div>
-        <div class="role-desc">Volg studenten, beoordeel bedrijven en stuur het proces</div>
-      </div>
+    <div class="rt rt-sc" data-role="school" onclick="pickRole(this,'school')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'school');}" tabindex="0" role="button" aria-pressed="false">
+      <div class="rt-ico"><span class="rt-ico-wrap">🎓</span></div>
+      <div class="rt-name">School</div>
+      <span class="rt-bdg bd-b">Freemium</span>
+    </div>
+    <div class="rt rt-bbl" data-role="bbl" onclick="pickRole(this,'bbl')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'bbl');}" tabindex="0" role="button" aria-pressed="false">
+      <div class="rt-ico"><span class="rt-ico-wrap">🏗</span></div>
+      <div class="rt-name">BBL</div>
+      <span class="rt-bdg bd-g">Gratis</span>
+    </div>
+    <div class="rt rt-buddy" data-role="buddy" onclick="pickRole(this,'buddy')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'buddy');}" tabindex="0" role="button" aria-pressed="false">
+      <div class="rt-ico"><span class="rt-ico-wrap">🤝</span></div>
+      <div class="rt-name">Buddy</div>
+      <span class="rt-bdg" style="background:rgba(250,199,117,.2);color:#fac775;">Vrijwillig</span>
     </div>
   </div>
 
-  <!-- Verken knop -->
-  <a href="discover.html" class="btn-verken">
-    🔍 Verken beschikbare stageopdrachten
-  </a>
+  <!-- Beschrijvingspaneel -->
+  <div class="lp-role-desc rc-student" id="lp-role-desc">
+    Ik wil een stage vinden die écht bij mij past — op basis van mijn leerdoelen en ambities.
+  </div>
 
-  <button class="btn-demo" id="enterBtn" onclick="enterApp()" disabled>
-    Ga verder →
+  <!-- Microcopy -->
+  <div class="lp-micro" id="lp-micro">
+    ✓ Gratis voor studenten &nbsp;·&nbsp; Geen account vereist &nbsp;·&nbsp; Nu zoeken
+  </div>
+
+  <!-- CTA — vervangt de oude btn-demo + btn-verken -->
+  <button class="btn-enter" id="lp-enter-btn" onclick="lpGoToRole()">
+    Zoek MBO-stage als Student →
   </button>
 
-  <p class="footer-text">Gratis voor studenten · ESG-rapportage voor bedrijven · <a href="school-dashboard.html" style="color:inherit;text-decoration:underline;opacity:.8;">Schooldashboard</a> · <a href="about.html" style="color:inherit;text-decoration:underline;opacity:.8;">Over ons</a></p>
+  <a class="lp-link-explore" id="lp-explore-link" href="discover.html">
+    <span class="lp-exp-dot"></span>
+    <span id="lp-explore-text">Verken beschikbare stageopdrachten</span>
+  </a>
 
-  <p style="margin-top:16px;font-size:.85rem;opacity:.6">
-    Al eerder gesolliciteerd?
-    <a href="mijn-sollicitaties.html" style="color:#FF7E42;font-weight:600;text-decoration:none;">Bekijk je sollicitaties →</a>
-    &nbsp;·&nbsp;
-    <a href="matches.html" style="color:#FF7E42;font-weight:600;text-decoration:none;">Mijn matches →</a>
-  </p>
+  <!-- Verborgen enterBtn bewaren zodat enterApp() niet crasht -->
+  <button id="enterBtn" onclick="enterApp()" style="display:none" aria-hidden="true"></button>
+
+  <div style="font-size:.7rem;color:rgba(255,255,255,.34);display:flex;flex-wrap:wrap;justify-content:center;gap:2px 10px;margin-top:6px;">
+    <span>ESG-rapportage voor bedrijven</span><span style="color:rgba(255,255,255,.18)">·</span>
+    <a href="school-dashboard.html" style="color:rgba(255,255,255,.44);text-decoration:none;">Schooldashboard</a><span style="color:rgba(255,255,255,.18)">·</span>
+    <a href="about.html" style="color:rgba(255,255,255,.44);text-decoration:none;">Over ons</a><span style="color:rgba(255,255,255,.18)">·</span>
+    <a href="privacybeleid.html" style="color:rgba(255,255,255,.44);text-decoration:none;">Privacybeleid</a>
+  </div>
+</div>
+
+<!-- ── DIVIDER ─────────────────────────────────────────────────────────────── -->
+<div class="lp-divider"></div>
+
+<!-- ── STAT STRIP ─────────────────────────────────────────────────────────── -->
+<div class="lp-stats">
+  <div class="lp-ss">
+    <div class="lp-sn">1 op 10</div>
+    <div class="lp-sl">MBO-studenten ervaart discriminatie bij stage</div>
+    <div class="lp-si">Bron: CBS, december 2025</div>
+  </div>
+  <div class="lp-sd"></div>
+  <div class="lp-ss">
+    <div class="lp-sn">77%</div>
+    <div class="lp-sl">van de sollicitanten wordt geghost door werkgevers</div>
+    <div class="lp-si">indicatief — op basis van marktonderzoek</div>
+  </div>
+  <div class="lp-sd"></div>
+  <div class="lp-ss">
+    <div class="lp-sn">40 <span class="sl-slash">/</span> 0</div>
+    <div class="lp-sl">mails verstuurd / reacties ontvangen</div>
+    <div class="lp-si">gemiddeld beeld — JOB MBO Onderzoek</div>
+  </div>
+</div>
+
+<!-- ── QUOTES ─────────────────────────────────────────────────────────────── -->
+<div class="lp-quotes" role="region" aria-label="Ervaringen van studenten">
+  <blockquote class="lp-q lp-rev">
+    <p class="lp-qt">"Op meerdere brieven kreeg ik nooit reactie. Je weet gewoon niet waar je aan toe bent."</p>
+    <cite class="lp-qs">— HBO-student · Vox Magazine 2024</cite>
+  </blockquote>
+  <blockquote class="lp-q lp-rev lp-d1">
+    <p class="lp-qt">"40 emails gestuurd. 2 uitnodigingen. De rest: radiostilte."</p>
+    <cite class="lp-qs">— MBO-student · JOB MBO Onderzoek 2025</cite>
+  </blockquote>
+  <blockquote class="lp-q lp-rev lp-d2">
+    <p class="lp-qt">"In spanning wacht je af. Uiteindelijk neem je maar aan dat je het niet geworden bent."</p>
+    <cite class="lp-qs">— HBO Communicatie · Saxion Hogeschool, april 2024</cite>
+  </blockquote>
+</div>
+
+<!-- ── HOW IT WORKS ──────────────────────────────────────────────────────── -->
+<section class="lp-how">
+  <div class="lp-hi">
+    <div class="lp-lbl">Hoe het werkt</div>
+    <div class="lp-sh">Bedrijven die niet reageren, vallen af.</div>
+    <div class="lp-sp">Niet met tips — met een mechanisme dat ghosting automatisch bestraft.</div>
+    <div class="lp-hg">
+      <div class="lp-hcard lp-rev">
+        <div class="lp-hn">01</div>
+        <div class="lp-hh">Jij solliciteert</div>
+        <div class="lp-hp">Zoek op niveau (BBL/MBO/HBO/WO), regio of sector. Zie de publieke Trust Score van elk bedrijf vóórdat je solliciteert.</div>
+        <span class="lp-tg">Gratis voor studenten</span>
+      </div>
+      <div class="lp-hc"><div class="lp-ha"></div></div>
+      <div class="lp-hcard lp-rev lp-d1">
+        <div class="lp-hn">02</div>
+        <div class="lp-hh">Zij reageren — altijd.</div>
+        <div class="lp-hp">Bedrijven hebben een responsverplichting. Geen reactie = automatische daling in de Trust Score. Geen uitzonderingen.</div>
+        <span class="lp-tg">⚡ Responsgarantie</span>
+      </div>
+      <div class="lp-hc"><div class="lp-ha"></div></div>
+      <div class="lp-hcard lp-rev lp-d2">
+        <div class="lp-hn">03</div>
+        <div class="lp-hh">De markt corrigeert</div>
+        <div class="lp-hp">Slechte bedrijven worden zichtbaar. Goede bedrijven bouwen reputatie. De cyclus verandert.</div>
+        <span class="lp-ta">⭐ Trust Score</span>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(13,26,16,.08);">
+      <div class="lp-lbl" style="margin-bottom:8px;">BBL-traject — anders dan een gewone stage</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+
+        <div class="lp-hcard lp-rev" style="border-top-color:#5dcaa5;">
+          <div class="lp-hn" style="color:rgba(93,202,165,.22);">01</div>
+          <div class="lp-hh">Je werkt al</div>
+          <div class="lp-hp">Je hebt een contract bij je leerbedrijf. Je zoekt geen stage — je beheert je traject.</div>
+          <span class="lp-tg" style="background:rgba(93,202,165,.15);color:#0f6e56;">BBL</span>
+        </div>
+
+        <div class="lp-hcard lp-rev lp-d1" style="border-top-color:#5dcaa5;">
+          <div class="lp-hn" style="color:rgba(93,202,165,.22);">02</div>
+          <div class="lp-hh">Jouw rechten</div>
+          <div class="lp-hp">Je leerbedrijf moet 90 dagen vóór het einde beslissen over verlenging. Internly houdt die deadline bij.</div>
+          <span class="lp-tg" style="background:rgba(93,202,165,.15);color:#0f6e56;">Wettelijk recht</span>
+        </div>
+
+        <div class="lp-hcard lp-rev lp-d2" style="border-top-color:#5dcaa5;">
+          <div class="lp-hn" style="color:rgba(93,202,165,.22);">03</div>
+          <div class="lp-hh">Jouw beoordeling</div>
+          <div class="lp-hp">Je beoordeling van je leerbedrijf blijft anoniem tot na je contract. Zodat jij eerlijk kunt zijn.</div>
+          <span class="lp-tg" style="background:rgba(93,202,165,.15);color:#0f6e56;">Privé &amp; beschermd</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── ESG BAND ──────────────────────────────────────────────────────────── -->
+<div class="lp-esg lp-rev">
+  <div class="lp-esg-l">
+    <div class="lp-esg-ico">📊</div>
+    <div>
+      <div class="lp-esg-h">Voor bedrijven: ESG-data kant-en-klaar</div>
+      <div class="lp-esg-p">Grote bedrijven zijn verplicht sociaal beleid te rapporteren (CSRD). Internly levert harde data over investering in jong talent, direct bruikbaar voor uw ESG-verslag.</div>
+    </div>
+  </div>
+  <button class="btn-esg" onclick="window.location.href='company-dashboard.html'">Voor bedrijven →</button>
+</div>
+
+<!-- ── PREV USER ─────────────────────────────────────────────────────────── -->
+<div class="lp-prev">
+  <span class="lp-prev-lbl">Al eerder gesolliciteerd?</span>
+  <div class="lp-prev-links">
+    <a href="mijn-sollicitaties.html">Bekijk je sollicitaties →</a>
+    <a href="matches.html">Mijn matches →</a>
+  </div>
 </div>
 
 <!-- ── STAGE SIMULATOR ────────────────────────────────────────────────────── -->
@@ -375,6 +630,10 @@
       color:rgba(255,255,255,.3);">
       Gratis · Speelt in je browser · ~10 minuten
     </p>
+    <p class="sim-followup" style="margin-top:20px;font-family:'Outfit',sans-serif;font-size:.85rem;
+      color:rgba(255,255,255,.55);max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6;">
+      Na de simulator zie je meteen wat Internly voor jou kan betekenen — als student, bedrijf of school.
+    </p>
 
   </div>
 </section>
@@ -383,9 +642,10 @@
 <!-- ── BLIJF OP DE HOOGTE ──────────────────────────────────────────────────── -->
 <section class="anim-card" style="background:#f4f3ef;padding:80px 24px;">
   <div style="max-width:560px;margin:0 auto;text-align:center;">
+    <div class="lp-nl-eyebrow">🚀 123 Go — vroege toegang voor stagebegeleiders</div>
     <p style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1a7a48;margin-bottom:14px;">Geen spam, beloofd</p>
     <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.6rem,3vw,2.1rem);font-weight:700;color:#0d1520;line-height:1.2;margin-bottom:14px;">
-      Blijf op de hoogte van Internly
+      Wil je weten wanneer Internly live gaat?
     </h2>
     <p style="font-size:.95rem;color:#6b7280;line-height:1.65;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;">
       Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal één mail per maand.
@@ -418,7 +678,7 @@
     <div id="hero-wl-error" style="display:none;color:#b82020;font-size:.85rem;margin-top:6px;"></div>
 
     <p style="font-size:.72rem;color:#b0b7c3;margin-top:10px;">
-      Door je in te schrijven ga je akkoord met ons privacybeleid. Altijd makkelijk uitschrijven.
+      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html" style="color:#b0b7c3;text-decoration:underline;">privacybeleid</a>. Altijd makkelijk uitschrijven.
     </p>
   </div>
 </section>
@@ -429,9 +689,65 @@ let selectedRole = null;
 
 function selectRole(role) {
   selectedRole = role;
-  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
-  document.getElementById('rc-' + role).classList.add('active');
-  document.getElementById('enterBtn').disabled = false;
+  /* legacy role-cards removed — kept for any external callers */
+}
+
+const _roleDesc = {
+  student: 'Ik wil een stage vinden die écht bij mij past — op basis van mijn leerdoelen en ambities.',
+  bedrijf: 'Ik wil gemotiveerde stagiairs vinden en laten zien dat mijn bedrijf investeert in jongeren.',
+  school:  'Ik wil mijn studenten volgen en vroeg signaleren als een stage niet goed gaat.',
+  bbl:     'Ik werk én leer bij hetzelfde bedrijf — Internly helpt mij mijn traject beheren en mijn rechten kennen.',
+  buddy:   'Ik wil mijn ervaring delen met een student of BBL-deelnemer als vrijwillige buddy.'
+};
+
+const _roleMicro = {
+  student: '✓ Gratis voor studenten \u00a0·\u00a0 Geen account vereist \u00a0·\u00a0 Nu zoeken',
+  bedrijf: '✓ Abonnement \u00a0·\u00a0 Publiceer opdrachten \u00a0·\u00a0 Vind stagiairs',
+  school:  '✓ Freemium \u00a0·\u00a0 Monitor studenten \u00a0·\u00a0 Direct inzicht',
+  bbl:     '✓ Gratis voor BBL-studenten \u00a0·\u00a0 Beheer je traject \u00a0·\u00a0 Ken je rechten',
+  buddy:   '✓ Volledig vrijwillig \u00a0·\u00a0 Jij bepaalt je beschikbaarheid \u00a0·\u00a0 Anoniem tot jij bevestigt'
+};
+
+const _roleExplore = {
+  student: { text: 'Verken beschikbare stageopdrachten', href: 'discover.html' },
+  bedrijf: { text: 'Verken beschikbare studenten',       href: 'company-discover.html' },
+  school:  { text: 'Verken beschikbare stageopdrachten', href: 'discover.html' },
+  bbl:     { text: 'Meer over het BBL-traject op Internly', href: 'auth.html?role=bbl' },
+  buddy:   { text: 'Meer over de buddy-rol',              href: 'auth.html?role=gepensioneerd' }
+};
+
+function pickRole(el, role) {
+  document.querySelectorAll('.rt').forEach(function(t) {
+    t.classList.remove('on');
+    t.setAttribute('aria-pressed','false');
+  });
+  el.classList.add('on');
+  el.classList.add('pulse');
+  el.setAttribute('aria-pressed','true');
+  el.addEventListener('animationend', function() { el.classList.remove('pulse'); }, { once: true });
+
+  selectedRole = role;
+  if (typeof lpSetRole === 'function') lpSetRole(role);
+
+  var micro = document.getElementById('lp-micro');
+  if (micro) micro.textContent = _roleMicro[role] || '';
+
+  var exploreLink = document.getElementById('lp-explore-link');
+  var exploreText = document.getElementById('lp-explore-text');
+  if (exploreLink && exploreText && _roleExplore[role]) {
+    exploreLink.href = _roleExplore[role].href;
+    exploreText.textContent = _roleExplore[role].text;
+  }
+
+  var desc = document.getElementById('lp-role-desc');
+  if (desc) {
+    desc.style.opacity = '0';
+    setTimeout(function() {
+      desc.innerHTML = _roleDesc[role] || '';
+      desc.className = 'lp-role-desc rc-' + role;
+      desc.style.opacity = '1';
+    }, 150);
+  }
 }
 
 function enterApp() {
@@ -550,7 +866,7 @@ async function schrijfInHero() {
       padding:8px 14px;font-size:.82rem;"></div>
 
     <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
-      Door je in te schrijven ga je akkoord met ons privacybeleid.
+      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html" style="color:#9ca3af;text-decoration:underline;">privacybeleid</a>.
     </p>
   </div>
 </div>
@@ -683,5 +999,145 @@ window.addEventListener('load', function() {
   document.querySelectorAll('.anim-card').forEach(el => obs.observe(el));
 })();
 </script>
+<script>
+/* lp-landing.js — Step 10 */
+(function () {
+  'use strict';
+
+  /* ── state ── */
+  var lp = { role: 'student', niveau: 'mbo' };
+
+  /* ── niveau pills ── */
+  window.lpSetNiveau = function (btn, niveau) {
+    lp.niveau = niveau;
+    document.querySelectorAll('.lp-np').forEach(function (b) { b.classList.remove('lp-np-on'); });
+    btn.classList.add('lp-np-on');
+    if (niveau === 'bbl') {
+      var bblTile = document.querySelector('.rt[data-role="bbl"]');
+      if (bblTile) pickRole(bblTile, 'bbl');
+    }
+    lpUpdateBtn();
+  };
+
+  /* ── role tiles (fallback — primary path goes through pickRole) ── */
+  window.lpPickTile = function (role) {
+    lp.role = role;
+    document.querySelectorAll('.rt').forEach(function (t) { t.classList.remove('on'); });
+    var active = document.querySelector('.rt[data-role="' + role + '"]');
+    if (active) active.classList.add('on');
+
+    /* update description */
+    var descs = {
+      student: 'Ik wil een stage vinden die écht bij mij past — op basis van mijn leerdoelen en ambities.',
+      bedrijf: 'Ik wil gemotiveerde stagiairs vinden en laten zien dat mijn bedrijf investeert in jongeren.',
+      school:  'Ik wil mijn studenten volgen en vroeg signaleren als een stage niet goed gaat.',
+      bbl:     'Ik werk én leer bij hetzelfde bedrijf — Internly helpt mij mijn traject beheren en mijn rechten kennen.',
+      buddy:   'Ik wil mijn ervaring delen met een student of BBL-deelnemer als vrijwillige buddy.'
+    };
+    var descEl = document.getElementById('lp-role-desc');
+    if (descEl) descEl.innerHTML = descs[role] || '';
+
+    /* swap rc- class */
+    if (descEl) {
+      descEl.className = descEl.className.replace(/rc-\w+/g, '');
+      descEl.classList.add('rc-' + role);
+    }
+
+    /* also call existing selectRole if tiles are used alongside legacy picker */
+    if (typeof selectRole === 'function') selectRole(role);
+    lpUpdateBtn();
+  };
+
+  /* ── update CTA button label ── */
+  window.lpUpdateBtn = function () {
+    var btn = document.getElementById('lp-enter-btn');
+    if (!btn) return;
+
+    var niveauLabel = { bbl: 'BBL', mbo: 'MBO', hbo: 'HBO', wo: 'WO' }[lp.niveau] || lp.niveau.toUpperCase();
+    var roleLabel   = { student: 'Student', bedrijf: 'Bedrijf', school: 'School', bbl: 'BBL-student', buddy: 'Buddy' }[lp.role] || lp.role;
+
+    if (lp.role === 'bbl') {
+      btn.textContent = 'Maak BBL-profiel aan \u2192';
+    } else if (lp.role === 'buddy') {
+      btn.textContent = 'Word gepensioneerde buddy \u2192';
+    } else if (lp.role === 'student') {
+      btn.textContent = 'Zoek ' + niveauLabel + '-stage als ' + roleLabel + ' \u2192';
+    } else if (lp.role === 'bedrijf') {
+      btn.textContent = 'Vind een ' + niveauLabel + '-stagiair \u2192';
+    } else {
+      btn.textContent = 'Beheer stages als ' + roleLabel + ' \u2192';
+    }
+  };
+
+  /* ── CTA navigate ── */
+  window.lpGoToRole = function () {
+    var role = lp.role;
+    if      (role === 'student')  { window.location.href = 'discover.html?niveau=' + lp.niveau; }
+    else if (role === 'bbl')      { window.location.href = 'auth.html?role=bbl'; }
+    else if (role === 'bedrijf')  { window.location.href = 'auth.html?role=bedrijf'; }
+    else if (role === 'school')   { window.location.href = 'auth.html?role=school'; }
+    else if (role === 'buddy')    { window.location.href = 'auth.html?role=gepensioneerd'; }
+  };
+
+  /* ── expose lpSetRole so pickRole() can sync lp state ── */
+  window.lpSetRole = function (role) { lp.role = role; lpUpdateBtn(); };
+
+  /* ── strikethrough animation — observe #hero, add .go to .struck ── */
+  var struckEl = document.getElementById('lp-struck') || document.querySelector('.struck');
+  var heroEl   = document.getElementById('hero');
+  if (struckEl && heroEl && 'IntersectionObserver' in window) {
+    var strikeObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          setTimeout(function () { struckEl.classList.add('go'); }, 1000);
+          strikeObs.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    strikeObs.observe(heroEl);
+  }
+
+  /* ── scroll-reveal for .lp-rev elements ── */
+  var revEls = document.querySelectorAll('.lp-rev');
+  if (revEls.length && 'IntersectionObserver' in window) {
+    var revObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('lp-rev-on');
+          revObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revEls.forEach(function (el) { revObs.observe(el); });
+  }
+
+  /* ── newsletter extra validation (Step 9 eyebrow) ── */
+  var nlForm = document.querySelector('.newsletter-form, form[id*="nl"], form[id*="newsletter"]');
+  if (nlForm) {
+    nlForm.addEventListener('submit', function (e) {
+      var emailInput = nlForm.querySelector('input[type="email"]');
+      if (emailInput && !emailInput.value.trim()) {
+        e.preventDefault();
+        emailInput.focus();
+      }
+    });
+  }
+
+  /* init */
+  lpUpdateBtn();
+})();
+</script>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────────────── -->
+<footer style="background:#0d1a10;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,.06);">
+  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.45);">intern<span style="color:#e05c1a;">ly</span></div>
+  <ul style="display:flex;gap:14px;list-style:none;margin:0;padding:0;">
+    <li><a href="about.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Over ons</a></li>
+    <li><a href="privacybeleid.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Privacybeleid</a></li>
+    <li><a href="mailto:hallo@internly.pro" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Contact</a></li>
+  </ul>
+  <div style="font-size:.65rem;color:rgba(255,255,255,.18);">© 2026 Sasubo Holding B.V.</div>
+  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+</footer>
 </body>
 </html>

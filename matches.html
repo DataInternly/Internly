@@ -217,6 +217,7 @@
       </div>
     </div>
   </div>
+  <a href="privacybeleid.html" style="font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;flex-shrink:0;padding:5px 4px;">Privacy</a>
   <div id="topbarAuth">
     <a href="auth.html" style="color:rgba(255,255,255,.7);font-size:.9rem;font-weight:500;transition:color .15s;text-decoration:none;">👤 Inloggen</a>
   </div>
@@ -351,7 +352,8 @@
   async function markAllRead(e) {
     if (e) e.stopPropagation();
     if (!currentUser) return;
-    await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+    const { error } = await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+    if (error) console.warn('[markAllRead] failed:', error.message);
     loadNotifications();
   }
 
@@ -636,7 +638,7 @@
             .from('internship_postings')
             .select('created_by')
             .eq('id', card.id)
-            .single();
+            .maybeSingle();
           if (posting?.created_by) {
             const { data: match } = await db.from('matches').insert({
               party_a:      currentUser.id,
@@ -783,7 +785,7 @@
     const el = document.getElementById('notif');
     el.textContent = msg;
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2800);
+    setTimeout(() => el.classList.remove('show'), 3200);
   }
 
   async function signOut() {

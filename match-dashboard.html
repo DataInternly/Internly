@@ -1843,7 +1843,7 @@
 
   <!-- Topbar -->
   <header id="hub-topbar">
-    <a class="hub-topbar-logo" href="#">Internly<span>.</span></a>
+    <a class="hub-topbar-logo" href="index.html">Internly<span>.</span></a>
 
     <button id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -1939,6 +1939,15 @@
 
       <div class="sidebar-footer">
         <div class="sidebar-footer-user" id="sidebar-user-info"></div>
+        <a href="privacybeleid.html" style="display:block;margin-top:8px;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:4px 0;">Privacybeleid</a>
+        <button onclick="db.auth.signOut().then(()=>window.location.href='index.html')" style="
+          margin-top:8px;width:100%;padding:8px 12px;
+          background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+          border-radius:8px;color:rgba(255,255,255,.5);
+          font-family:'Outfit',sans-serif;font-size:.78rem;
+          cursor:pointer;text-align:left;transition:background .15s,color .15s;">
+          ↪ Uitloggen
+        </button>
       </div>
     </nav>
 
@@ -3158,11 +3167,12 @@ async function saveTaak(id) {
   if (id) {
     const task = hubState.tasks.find(t => t.id === id);
     if (task) {
+      const prev = { title: task.title, desc: task.desc, deadline: task.deadline, assignee: task.assignee, status: task.status, priority: task.priority };
       task.title = title; task.desc = desc; task.deadline = deadline;
       task.assignee = assignee; task.status = status; task.priority = priority;
       if (MATCH_ID && task._dbId) {
         const { error } = await db.from('stage_tasks').update({ title, desc, deadline, assignee, status, priority }).eq('id', task._dbId);
-        if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
+        if (error) { Object.assign(task, prev); toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     addLog(`Taak "${title}" bewerkt.`, 'blue');
@@ -3218,10 +3228,11 @@ async function saveDeadline(id) {
   if (id) {
     const d = hubState.deadlines.find(x => x.id === id);
     if (d) {
+      const prev = { title: d.title, date: d.date };
       d.title = title; d.date = date;
       if (MATCH_ID && d._dbId) {
         const { error } = await db.from('stage_deadlines').update({ title, date }).eq('id', d._dbId);
-        if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
+        if (error) { Object.assign(d, prev); toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     toast('Deadline bijgewerkt!');
@@ -3883,7 +3894,7 @@ function openKalPopup(dateStr, e) {
   const popup = document.getElementById('kal-popup');
   if (!popup) return;
   popup.innerHTML = `
-    <button class="kal-popup-close" onclick="document.getElementById('kal-popup').style.display='none'">×</button>
+    <button class="kal-popup-close" onclick="document.getElementById('kal-popup').style.display='none'" aria-label="Sluiten">×</button>
     <div class="kal-popup-title">${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</div>
     ${items}`;
   popup.style.display = 'block';

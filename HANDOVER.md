@@ -1,41 +1,22 @@
 # Internly — Developer Handover Report
 **Last updated:** 2026-04-14  
-**Sessions covered:** 2026-04-12 (Tasks 1–4), 2026-04-13/14 (Security audit, Stage Hub polish, Navigation audit, Info icons)
+**Sessions covered:** 2026-04-12 (Tasks 1–4), 2026-04-13/14 (Security audit, Stage Hub polish, Navigation audit, Info icons), 2026-04-14 (Landing page redesign)
 
 ---
 
-## Deploy checklist — what still needs external action
+## Deploy checklist — all done ✅
 
-### Supabase SQL Editor (run once)
-```sql
--- 1. Push subscriptions table
-CREATE TABLE push_subscriptions (
-  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  endpoint   text NOT NULL UNIQUE,
-  p256dh     text NOT NULL,
-  auth_key   text NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "user manages own subscriptions"
-  ON push_subscriptions FOR ALL USING (auth.uid() = user_id);
+| Item | Status |
+|------|--------|
+| `push_subscriptions` SQL | ✅ done |
+| `reviews` moderation SQL | ✅ done |
+| Edge Function `send-push-notification` | ✅ deployed |
+| VAPID env vars set | ✅ done |
+| FileZilla upload | ✅ done |
 
--- 2. Reviews moderation columns
-ALTER TABLE reviews
-  ADD COLUMN IF NOT EXISTS flagged     bool        NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS flag_reason text,
-  ADD COLUMN IF NOT EXISTS flagged_by  uuid        REFERENCES profiles(id),
-  ADD COLUMN IF NOT EXISTS flagged_at  timestamptz;
-CREATE INDEX IF NOT EXISTS reviews_flagged_idx ON reviews(flagged) WHERE flagged = true;
+### FileZilla — reference upload list (for future sessions)
 ```
-
-### Supabase Edge Functions
-Deploy `supabase/functions/send-push-notification/index.ts` — see full code in the Task 1 section below.  
-Set environment variables: `VAPID_PUBLIC_KEY` (copy from `js/push.js` line 11), `VAPID_PRIVATE_KEY`.
-
-### FileZilla — full upload list
-```
+index.html
 sw.js
 js/push.js
 js/info.js
@@ -205,11 +186,54 @@ Click-to-reveal popovers. No hover-only — mobile-safe. Closes on outside click
 
 ---
 
+---
+
+## Session 2026-04-14 — Landing page redesign
+
+### Landing page ✅ code complete
+
+**File:** `index.html`
+
+Implemented a 10-step redesign spec using `internly-demo-v10.html` as visual reference. All existing Supabase integrations (`schrijfInHero`, `schrijfIn`, `enterApp`, waitlist popup) preserved intact.
+
+**What changed:**
+
+| Step | Change |
+|------|--------|
+| 1 | Hero gradient depth + radial vignette `::before` |
+| 2 | Logo breathe animation (`lp-breathe`, 4s, `prefers-reduced-motion` safe) |
+| 3 | Hook h1 — "40 mails. / 0 reacties. / Dat kan anders." with strikethrough animation (`lp-strike`) |
+| 4 | Tagline subline — `lp-tagline` italic below the hook |
+| 5 | Niveau pills (BBL / MBO / HBO / WO) — `lp-np` / `lp-np-on` classes |
+| 6 | 3-column role tiles — `rt` / `rt-s` / `rt-b` / `rt-sc` replacing old vertical role-card list |
+| 7 | Role description panel + microcopy + full-width CTA button (`btn-enter`) + explore text link |
+| 8 | Post-hero sections: divider → stat strip (CBS data) → 3 quotes → how-it-works (3 cards) → ESG band → prev-user strip |
+| 9 | Newsletter eyebrow badge (`lp-nl-eyebrow`) |
+| 10 | Landing JS IIFE — `lpSetNiveau`, `pickRole`, `lpGoToRole`, `lpSetRole`, `lpUpdateBtn`, struck IntersectionObserver, scroll-reveal for `.lp-rev` elements |
+
+**Architecture decisions:**
+- All new CSS uses `lp-` prefix to avoid conflicts with app CSS in `css/style.css`
+- `pickRole(el, role)` is the primary tile handler; `lpPickTile` is a fallback; `lpSetRole` bridges them to sync `lp.role` state
+- Struck animation fires at t=1000ms (after heroIn completes at t=700ms) to avoid overlap
+- `DM Mono` added to Google Fonts link for quote citations
+
+**Bugs fixed during debug passes:**
+- DM Mono not in Google Fonts link
+- `.btn-enter` was `inline-flex` → `display:block; width:100%; max-width:420px`
+- Role tiles missing `data-role` attributes
+- Struck animation timing conflict with heroIn animation
+- 7 orphaned CSS classes from old landing page removed
+- Hero mobile padding (`padding:80px 24px`) → `48px 16px 40px` at ≤680px
+- `.struck` clamp minimum too large for 375px phones → `clamp(2.6rem,13vw,5rem)` at ≤480px
+- Pulse animation used `box-shadow` (clipped by `overflow:hidden`) → switched to `transform:scale(1.04)`
+
+---
+
 ## Known limitations
 
 | # | Limitation |
 |---|---|
-| 1 | Push requires Edge Function + pg_net trigger. Trigger is live; Edge Function is not yet deployed. |
+| 1 | ~~Push requires Edge Function + pg_net trigger~~ — both live as of 2026-04-14. Web Push fully operational. |
 | 2 | `admin.html` auth guard is client-side email check only. Not linked in nav — direct URL access only. |
 | 3 | Trust Score `sessionStorage` throttle — one tab session. Acceptable trade-off. |
 | 4 | `admin.html` queries `.from('waitlist')` — update if table is named differently. |

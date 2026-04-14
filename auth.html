@@ -127,6 +127,15 @@
     }
     .role-card.selected.blue-role .role-check { background: var(--blue); border-color: var(--blue); }
     .role-card.selected.amber-role .role-check { background: var(--amber); border-color: var(--amber); }
+    .role-card.selected.buddy-role { border-color: #6d28d9; background: #f5f3ff; }
+    .role-card.selected.buddy-role .role-check { background: #6d28d9; border-color: #6d28d9; }
+    .bbl-role { border-left: 3px solid rgba(93,202,165,.5); }
+    .role-card.selected.bbl-role { border-color: #0f6e56; background: #edfaf5; }
+    .role-card.selected.bbl-role .role-check { background: #0f6e56; border-color: #0f6e56; }
+
+    /* Buddy extra velden in registratieformulier */
+    .buddy-extra { display: none; margin-top: 4px; }
+    .buddy-extra.show { display: block; }
 
     /* ── FORM ── */
     .field { margin-bottom: 14px; }
@@ -237,7 +246,7 @@
       </div>
     </div>
     <div class="logo">intern<span>ly</span></div>
-    <div class="logo-sub">Stage platform voor studenten, bedrijven en scholen</div>
+    <div class="logo-sub" id="logoSub">Welkom terug.</div>
   </div>
 
   <!-- Tabs -->
@@ -260,15 +269,23 @@
         <div class="role-icon-wrap">👤</div>
         <div>
           <div class="role-name">Student</div>
-          <div class="role-desc">Zoek stages, maak profiel aan</div>
+          <div class="role-desc">Ik zoek een stage</div>
         </div>
         <div class="role-check" id="check-student"></div>
+      </div>
+      <div class="role-card bbl-role" id="rc-bbl" onclick="selectRole('bbl')">
+        <div class="role-icon-wrap">🏗</div>
+        <div>
+          <div class="role-name">Student — BBL</div>
+          <div class="role-desc">Ik werk én leer bij hetzelfde leerbedrijf.</div>
+        </div>
+        <div class="role-check" id="check-bbl"></div>
       </div>
       <div class="role-card blue-role" id="rc-bedrijf" onclick="selectRole('bedrijf')">
         <div class="role-icon-wrap">🏢</div>
         <div>
           <div class="role-name">Bedrijf</div>
-          <div class="role-desc">Zoek stagiairs, beheer vacatures</div>
+          <div class="role-desc">Ik zoek een stagiair</div>
         </div>
         <div class="role-check" id="check-bedrijf"></div>
       </div>
@@ -276,9 +293,17 @@
         <div class="role-icon-wrap">🎓</div>
         <div>
           <div class="role-name">School</div>
-          <div class="role-desc">Monitor studenten, plaats oproepen</div>
+          <div class="role-desc">Ik begeleid studenten</div>
         </div>
         <div class="role-check" id="check-school"></div>
+      </div>
+      <div class="role-card buddy-role" id="rc-gepensioneerd" onclick="selectRole('gepensioneerd')">
+        <div class="role-icon-wrap">🤝</div>
+        <div>
+          <div class="role-name">Gepensioneerde buddy</div>
+          <div class="role-desc">Geef je kennis door aan een student</div>
+        </div>
+        <div class="role-check" id="check-gepensioneerd"></div>
       </div>
     </div>
 
@@ -311,6 +336,69 @@
         <label>Wachtwoord</label>
         <input type="password" id="reg-pass" placeholder="Min. 6 tekens" autocomplete="new-password">
       </div>
+
+      <!-- Extra velden voor gepensioneerde buddy (verborgen tenzij die rol geselecteerd) -->
+      <div class="buddy-extra" id="buddyExtraFields">
+        <div class="field">
+          <label>Sector <span style="color:#6d28d9;margin-left:2px">*</span></label>
+          <select id="reg-sector">
+            <option value="">Kies je sector</option>
+            <option value="IT">IT &amp; Software</option>
+            <option value="Marketing">Marketing &amp; Communicatie</option>
+            <option value="Finance">Finance &amp; Economie</option>
+            <option value="HR">HR &amp; Organisatie</option>
+            <option value="Duurzaamheid">Duurzaamheid &amp; ESG</option>
+            <option value="Gezondheid">Zorg &amp; Welzijn</option>
+            <option value="Engineering">Techniek &amp; Engineering</option>
+            <option value="Design">Design &amp; UX</option>
+            <option value="Niche">Niche / Overig</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Expertisegebieden</label>
+          <input type="text" id="reg-expertise" placeholder="Bijv. leiderschap, agile, strategie (komma-gescheiden)">
+        </div>
+        <div class="field">
+          <label>Korte bio <span style="font-weight:400;color:#9ca3af;font-size:.78rem">optioneel</span></label>
+          <input type="text" id="reg-bio" placeholder="Bijv. 30 jaar in de IT, nu klaar om te delen">
+        </div>
+        <p style="font-size:.74rem;color:#6b7280;line-height:1.5;margin-bottom:10px;padding:8px 10px;background:#f5f3ff;border-radius:8px;border-left:3px solid #6d28d9;">
+          Je profiel wordt alleen getoond aan studenten die actief een buddy zoeken. Deelname is altijd vrijwillig en anoniem tot jij bevestigt.
+        </p>
+      </div>
+
+      <div id="bbl-consent-block" style="display:none;
+        background:rgba(93,202,165,.1);
+        border:1px solid rgba(93,202,165,.25);
+        border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;">
+        <p style="font-size:.78rem;font-weight:600;
+          color:#0f6e56;margin-bottom:.5rem;">
+          Wat ziet jouw leerbedrijf op Internly?
+        </p>
+        <div style="font-size:.75rem;color:#2e5c4a;line-height:1.6;">
+          ✓ Je voortgang op leerdoelen<br>
+          ✓ Geplande afspraken en evaluaties<br>
+          ✗ <strong>Jouw beoordeling van hen — die blijft anoniem</strong><br>
+          ✗ Berichten met je buddy
+        </div>
+      </div>
+      <label class="consent-label" style="
+        display:flex;align-items:flex-start;gap:.6rem;
+        font-size:.82rem;color:var(--ink2);line-height:1.5;
+        margin-bottom:1rem;cursor:pointer;
+      ">
+        <input type="checkbox" id="consentCheck" required style="
+          margin-top:2px;flex-shrink:0;
+          accent-color:var(--green);
+          width:15px;height:15px;cursor:pointer;
+        ">
+        <span>Ik heb het
+          <a href="privacybeleid.html" target="_blank"
+             style="color:var(--green);text-decoration:none;">privacybeleid</a>
+          gelezen en ga akkoord met de verwerking van mijn gegevens door
+          Sasubo Holding B.V.
+        </span>
+      </label>
       <button class="btn-submit" id="registerBtn" onclick="doRegister()">
         Account aanmaken →
       </button>
@@ -332,14 +420,16 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Routing per rol ──
 const ROUTES = {
-  student: 'discover.html',
-  bedrijf: 'company-dashboard.html',
-  school:  'school-dashboard.html',
+  student:       'discover.html',
+  bedrijf:       'company-dashboard.html',
+  school:        'school-dashboard.html',
+  gepensioneerd: 'buddy-dashboard.html',
 };
 
 // ── State ──
 let selectedRole = null;
 let activeTab    = 'login';
+let isBBL        = false;
 
 // ── Tab switch ──
 function switchTab(tab) {
@@ -348,24 +438,52 @@ function switchTab(tab) {
   document.getElementById('tab-register').classList.toggle('active', tab === 'register');
   document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
   document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  const logoSub = document.getElementById('logoSub');
+  if (logoSub) logoSub.textContent = tab === 'login' ? 'Welkom terug.' : 'Goed dat je er bent.';
+  // Toon/verberg buddy-extra velden op basis van tab + geselecteerde rol
+  const buddyExtra = document.getElementById('buddyExtraFields');
+  if (buddyExtra) {
+    buddyExtra.classList.toggle('show', tab === 'register' && selectedRole === 'gepensioneerd');
+  }
   clearMessages();
 }
 
 // ── Role select ──
 function selectRole(role) {
-  selectedRole = role;
+  // BBL is een student met bbl_mode=true — niet een aparte DB-rol
+  if (role === 'bbl') {
+    selectedRole = 'student';
+    isBBL = true;
+  } else {
+    selectedRole = role;
+    isBBL = false;
+  }
 
   // Reset alle kaarten
-  ['student','bedrijf','school'].forEach(r => {
+  ['student','bbl','bedrijf','school','gepensioneerd'].forEach(r => {
     const card  = document.getElementById('rc-' + r);
     const check = document.getElementById('check-' + r);
-    card.classList.remove('selected');
-    check.textContent = '';
+    if (card)  card.classList.remove('selected');
+    if (check) check.textContent = '';
   });
 
   // Activeer gekozen kaart
-  document.getElementById('rc-' + role).classList.add('selected');
-  document.getElementById('check-' + role).textContent = '✓';
+  const activeCard  = document.getElementById('rc-' + role);
+  const activeCheck = document.getElementById('check-' + role);
+  if (activeCard)  activeCard.classList.add('selected');
+  if (activeCheck) activeCheck.textContent = '✓';
+
+  // BBL-toestemmingsblok tonen/verbergen
+  const bblBlock = document.getElementById('bbl-consent-block');
+  if (bblBlock) {
+    bblBlock.style.display = (role === 'bbl') ? 'block' : 'none';
+  }
+
+  // Buddy-extra velden tonen/verbergen op registratie-tab
+  const buddyExtra = document.getElementById('buddyExtraFields');
+  if (buddyExtra) {
+    buddyExtra.classList.toggle('show', role === 'gepensioneerd' && activeTab === 'register');
+  }
 
   clearMessages();
 }
@@ -398,7 +516,7 @@ async function doLogin() {
     .from('profiles')
     .select('role')
     .eq('id', data.user.id)
-    .single();
+    .maybeSingle();
 
   // Gebruik opgeslagen rol of geselecteerde rol
   const role = profile?.role || selectedRole;
@@ -406,10 +524,21 @@ async function doLogin() {
 
   showSuccess('Inloggen gelukt! Je wordt doorgestuurd…');
 
+  // BBL check: student met bbl_mode → bbl-hub.html
+  let redirectUrl = ROUTES[role] || 'discover.html';
+  if (role === 'student') {
+    const { data: sp } = await db
+      .from('student_profiles')
+      .select('bbl_mode')
+      .eq('profile_id', data.user.id)
+      .maybeSingle();
+    if (sp?.bbl_mode) redirectUrl = 'bbl-dashboard.html';
+  }
+
   // Push registration — fire-and-forget, never blocks redirect
   // Show browser native dialog only on first login (student role).
   // Company/school see a soft banner on their dashboard instead.
-  setTimeout(() => { window.location.href = ROUTES[role] || 'discover.html'; }, 1000);
+  setTimeout(() => { window.location.href = redirectUrl; }, 1000);
 
   // Push registration — only if permission already granted (no dialog → no race with redirect).
   // First-time permission request is handled by discover.html where there's no redirect pressure.
@@ -420,6 +549,11 @@ async function doLogin() {
 
 // ── Register ──
 async function doRegister() {
+  const consent = document.getElementById('consentCheck');
+  if (consent && !consent.checked) {
+    showError('Vink het privacybeleid-akkoord aan om door te gaan.');
+    return;
+  }
   if (!selectedRole) { showError('Kies eerst een rol.'); return; }
 
   const naam  = document.getElementById('reg-naam').value.trim();
@@ -428,6 +562,10 @@ async function doRegister() {
 
   if (!naam || !email || !pass) { showError('Vul alle velden in.'); return; }
   if (pass.length < 6) { showError('Wachtwoord moet minimaal 6 tekens zijn.'); return; }
+  if (selectedRole === 'gepensioneerd') {
+    const sector = document.getElementById('reg-sector')?.value;
+    if (!sector) { showError('Kies je sector — studenten zoeken op dit gebied.'); return; }
+  }
 
   const btn = document.getElementById('registerBtn');
   btn.disabled = true;
@@ -459,6 +597,32 @@ async function doRegister() {
     if (profileError && profileError.code !== '23505') {
       // 23505 = profiel bestaat al (bijv. herregistratie) — stilzwijgend doorgaan
       console.warn('[auth] Profile insert fout:', profileError.message);
+    }
+
+    // 3. BBL-student: zet bbl_mode=true op student_profiles
+    // Gebruik upsert — bij registratie bestaat de rij nog niet, UPDATE zou 0 rijen raken.
+    if (isBBL) {
+      await db.from('student_profiles')
+        .upsert({ profile_id: data.user.id, bbl_mode: true }, { onConflict: 'profile_id' });
+    }
+
+    // 4. Gepensioneerde buddy: schrijf naar waitlist zodat studenten je kunnen vinden
+    if (selectedRole === 'gepensioneerd') {
+      const sector    = document.getElementById('reg-sector')?.value || '';
+      const expertRaw = document.getElementById('reg-expertise')?.value.trim() || '';
+      const bio       = document.getElementById('reg-bio')?.value.trim() || '';
+      const expertise = expertRaw ? expertRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      const { error: wErr } = await db.from('waitlist').insert({
+        naam,
+        email,
+        type:           'buddy_gepensioneerd', // base type column (original waitlist schema)
+        buddy_type:     'gepensioneerd',        // extended BBL-migration column
+        sector:         sector || null,
+        expertise_tags: expertise.length ? expertise : null,
+        // bio is not a waitlist column — stored in profiles via user_metadata
+      });
+      if (wErr) console.warn('[auth] Waitlist insert fout (non-blocking):', wErr.message);
     }
   }
 
@@ -504,15 +668,33 @@ window.addEventListener('DOMContentLoaded', async () => {
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     const role = profile?.role || sessionStorage.getItem('internly_role');
-    if (role && ROUTES[role]) window.location.href = ROUTES[role];
+    if (role && ROUTES[role]) {
+      let dest = ROUTES[role];
+      if (role === 'student') {
+        const { data: sp } = await db
+          .from('student_profiles')
+          .select('bbl_mode')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+        if (sp?.bbl_mode) dest = 'bbl-dashboard.html';
+      }
+      window.location.href = dest;
+    }
     return;
   }
 
   // Lees ?role= param van index.html
-  const param = new URLSearchParams(window.location.search).get('role');
-  if (param && ROUTES[param]) selectRole(param);
+  const urlRole = new URLSearchParams(window.location.search).get('role');
+  if (urlRole) {
+    const mapping = { student: 'student', bbl: 'bbl', bedrijf: 'bedrijf', school: 'school', gepensioneerd: 'gepensioneerd' };
+    const mapped = mapping[urlRole];
+    if (mapped) {
+      const card = document.getElementById('rc-' + mapped);
+      if (card) card.click();
+    }
+  }
 });
 </script>
 

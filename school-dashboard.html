@@ -581,6 +581,7 @@
       </div>
 
     </div>
+    <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <button class="btn-logout" onclick="signOut()">🚪 Uitloggen</button>
   </aside>
 
@@ -907,7 +908,8 @@ async function loadNotifications() {
 async function markAllRead(e) {
   if (e) e.stopPropagation();
   if (!currentUser) return;
-  await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+  const { error } = await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+  if (error) console.warn('[markAllRead] failed:', error.message);
   loadNotifications();
 }
 
@@ -1408,6 +1410,7 @@ let _koppelCompanyId = null;
 let _koppelPostingId = null;
 
 async function openKoppelModal(companyId, postingId, companyNaam) {
+  if (!_schoolNaamFilter) { notify('Vul eerst je schoolnaam in bij Profiel'); return; }
   _koppelCompanyId = companyId;
   _koppelPostingId = postingId;
 
@@ -1421,6 +1424,7 @@ async function openKoppelModal(companyId, postingId, companyNaam) {
     .from('student_profiles')
     .select('profile_id, naam, opleiding')
     .not('profile_id', 'is', null)
+    .eq('school', _schoolNaamFilter)
     .order('naam');
 
   sel.innerHTML = '<option value="">Kies een student…</option>';
@@ -1447,6 +1451,20 @@ async function confirmKoppel() {
 
   const btn = document.getElementById('koppelConfirmBtn');
   btn.disabled = true; btn.textContent = 'Koppelen…';
+
+  // Verify student belongs to this school before creating match
+  const { data: studentCheck } = await db
+    .from('student_profiles')
+    .select('profile_id')
+    .eq('profile_id', studentId)
+    .eq('school', _schoolNaamFilter)
+    .maybeSingle();
+  if (!studentCheck) {
+    notify('Deze student behoort niet tot jouw school');
+    btn.disabled = false; btn.textContent = 'Koppelen →';
+    closeKoppelModal();
+    return;
+  }
 
   const { data: existing } = await db
     .from('matches')
@@ -1714,7 +1732,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'school') {
-    const routes = { student: 'discover.html', bedrijf: 'company-dashboard.html' };
+    const routes = { student: 'discover.html', bedrijf: 'company-dashboard.html', gepensioneerd: 'buddy-dashboard.html' };
     window.location.href = routes[userRole] || 'auth.html';
     return;
   }

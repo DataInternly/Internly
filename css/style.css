@@ -141,6 +141,14 @@ body {
   opacity: .8;
 }
 
+.footer-tagline {
+  font-size: .72rem;
+  color: rgba(255,255,255,.28);
+  font-family: 'Outfit', sans-serif;
+  margin: 6px 0 0;
+  letter-spacing: .01em;
+}
+
 /* ── Discover pagina ──────────────────────────────────────────────────────── */
 
 .page-head  { margin-bottom: 2rem; }

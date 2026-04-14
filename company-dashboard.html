@@ -623,6 +623,7 @@
 
     </div>
 
+    <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <button class="btn-logout" onclick="signOut()" title="Uitloggen">
       <span class="nav-icon">🚪</span> Uitloggen
     </button>
@@ -994,7 +995,8 @@ async function loadNotifications() {
 async function markAllRead(e) {
   if (e) e.stopPropagation();
   if (!currentUser) return;
-  await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+  const { error } = await db.from('notifications').update({ read: true }).eq('user_id', currentUser.id).eq('read', false);
+  if (error) console.warn('[markAllRead] failed:', error.message);
   loadNotifications();
 }
 
@@ -1343,7 +1345,7 @@ async function acceptMatch(matchId, studentId) {
   if (error) { notify('Fout: ' + error.message); return; }
 
   // Create conversation
-  let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).maybeSingle();
+  let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).limit(1).maybeSingle();
   if (!conv) {
     const { data: newConv, error: convErr } = await db.from('conversations').insert({ match_id: matchId }).select('id').single();
     if (convErr) { notify('Match geaccepteerd maar chat aanmaken mislukt: ' + convErr.message); }
@@ -1974,7 +1976,7 @@ function dismissPush() {
 function notify(msg) {
   const el = document.getElementById('notif');
   el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1985,7 +1987,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'bedrijf') {
-    const routes = { student: 'discover.html', school: 'school-dashboard.html' };
+    const routes = { student: 'discover.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html' };
     window.location.href = routes[userRole] || 'auth.html';
     return;
   }

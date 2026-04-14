@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<!--
+  BUDDY DASHBOARD — Internly
+  ─────────────────────────────────────────────────────────────────────────────
+  Dashboard voor gepensioneerde buddy-gebruikers.
+  Auth check: profiles.role = 'gepensioneerd'
+  Toont: actieve koppelingen, berichten per koppeling, beschikbaarheid,
+         eigen profiel, privacyinstellingen, pauzeknop.
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6d28d9">
+  <title>Buddy Dashboard — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f3ef;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: linear-gradient(135deg, #6d28d9, #4c1d95);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: #FF7E42; }
+    .topbar-tag {
+      font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 20px;
+      background: rgba(255,255,255,.15); color: rgba(255,255,255,.9); flex-shrink: 0;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .topbar-user  { font-size: .82rem; color: rgba(255,255,255,.65); }
+    .topbar-signout {
+      background: none; border: none; color: rgba(255,255,255,.45);
+      font-size: .75rem; font-family: 'Outfit', sans-serif;
+      cursor: pointer; padding: 5px; border-radius: 6px; transition: color .15s;
+    }
+    .topbar-signout:hover { color: rgba(255,255,255,.8); }
+    .topbar-privacy { font-size: .72rem; color: rgba(255,255,255,.3); text-decoration: none; padding: 5px 4px; transition: color .15s; }
+    .topbar-privacy:hover { color: rgba(255,255,255,.6); }
+
+    /* ── Shell ── */
+    .shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+
+    /* ── Welcome ── */
+    .welcome-head { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 600; color: #0d1520; margin-bottom: 4px; }
+    .welcome-sub  { font-size: .88rem; color: #6b7280; margin-bottom: 20px; }
+
+    /* ── Pauze-banner ── */
+    .pause-banner {
+      display: none; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-radius: 10px; margin-bottom: 14px;
+      background: #fdf3e3; border: 1px solid rgba(160,96,10,.28);
+      font-size: 12px; color: #5a3500; gap: 10px;
+    }
+    .pause-banner.show { display: flex; }
+
+    /* ── Card ── */
+    .card {
+      background: #fff; border: 1px solid rgba(15,17,23,.09);
+      border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .07em; color: #9ca3af; margin-bottom: 12px;
+    }
+
+    /* ── Koppeling (pair) card ── */
+    .pair-card {
+      border: 1px solid rgba(15,17,23,.09); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 8px; background: #fff;
+    }
+    .pair-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .pair-av {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; background: #ede9fe; color: #6d28d9;
+    }
+    .pair-name  { font-size: 13px; font-weight: 500; color: #0d1520; }
+    .pair-meta  { font-size: 11px; color: #9ca3af; }
+    .pair-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* ── Btn styles ── */
+    .btn-sm {
+      font-size: 11px; padding: 5px 12px; border-radius: 20px;
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      border: 1px solid; transition: opacity .1s;
+    }
+    .btn-sm:hover { opacity: .82; }
+    .btn-primary { background: #6d28d9; color: #fff; border-color: #6d28d9; }
+    .btn-ghost-sm{ background: transparent; color: #4b5563; border-color: rgba(15,17,23,.15); }
+    .btn-danger  { background: #fdecea; color: #b82020; border-color: rgba(184,41,26,.2); }
+
+    /* ── Toggle switch ── */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; }
+    .toggle-lbl { font-size: .88rem; color: #0d1520; }
+    .toggle-sub { font-size: .75rem; color: #9ca3af; margin-top: 2px; }
+    .toggle-sw {
+      width: 42px; height: 24px; border-radius: 12px;
+      background: #e2e8f0; position: relative;
+      cursor: pointer; border: none; transition: background .2s; flex-shrink: 0;
+    }
+    .toggle-sw.on { background: #6d28d9; }
+    .toggle-sw::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.18);
+    }
+    .toggle-sw.on::after { left: 21px; }
+
+    /* ── Profile form ── */
+    .profile-field { margin-bottom: 12px; }
+    .profile-field label { display: block; font-size: .8rem; font-weight: 600; color: #374151; margin-bottom: 5px; }
+    .profile-field input,
+    .profile-field select,
+    .profile-field textarea {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid #e2e8f0; border-radius: 8px;
+      font-family: 'Outfit', sans-serif; font-size: .88rem; color: #0d1520;
+      background: #fff; outline: none; transition: border-color .15s; box-sizing: border-box;
+    }
+    .profile-field input:focus,
+    .profile-field select:focus,
+    .profile-field textarea:focus { border-color: #6d28d9; }
+    .profile-field textarea { resize: vertical; min-height: 72px; }
+    .profile-save-btn {
+      background: #6d28d9; color: #fff; border: none;
+      padding: 9px 22px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .88rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .profile-save-btn:hover { background: #4c1d95; }
+    .profile-save-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 20px; font-size: .88rem; color: #9ca3af; }
+    .empty a { color: #6d28d9; font-weight: 600; text-decoration: none; }
+
+    /* ── Availability grid ── */
+    .avail-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .avail-day {
+      padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      border: 1.5px solid rgba(15,17,23,.12); cursor: pointer;
+      transition: all .1s; background: #fff; color: #4b5563;
+    }
+    .avail-day.selected { background: #ede9fe; color: #6d28d9; border-color: rgba(109,40,217,.4); }
+    .avail-note { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+
+    /* ── Notif toast ── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 10px 22px;
+      border-radius: 12px; font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.22); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Pending requests ── */
+    .req-card {
+      border: 1px solid rgba(109,40,217,.2); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 8px; background: #faf8ff;
+    }
+    .req-who   { font-size: .88rem; font-weight: 500; color: #0d1520; margin-bottom: 4px; }
+    .req-msg   { font-size: .78rem; color: #6b7280; margin-bottom: 8px; font-style: italic; }
+    .req-btns  { display: flex; gap: 6px; }
+
+    @media (max-width: 480px) {
+      .shell { padding: 14px 12px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <a href="buddy-dashboard.html" class="topbar-logo">intern<span>ly</span></a>
+  <span class="topbar-tag">Buddy-dashboard</span>
+  <div class="topbar-right">
+    <span class="topbar-user" id="topbarUser"></span>
+    <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
+    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
+  </div>
+</div>
+
+<div class="shell">
+
+  <div class="welcome-head" id="welcomeMsg">Welkom</div>
+  <div class="welcome-sub">Jouw overzicht als buddy-vrijwilliger bij Internly.</div>
+
+  <!-- Pauze-banner (zichtbaar als paused = true) -->
+  <div class="pause-banner" id="pauseBanner">
+    <span>⏸ Je matching staat op pauze — nieuwe studenten kunnen je nu niet vinden.</span>
+    <button class="btn-sm btn-primary" onclick="togglePause()">Hervatten</button>
+  </div>
+
+  <!-- ── Openstaande verzoeken ── -->
+  <div class="card" id="requestsCard" style="display:none;">
+    <div class="card-label">Openstaande verzoeken</div>
+    <div id="requestsList"></div>
+  </div>
+
+  <!-- ── Actieve koppelingen ── -->
+  <div class="card">
+    <div class="card-label">Actieve koppelingen</div>
+    <div id="pairsList">
+      <div class="empty">Laden…</div>
+    </div>
+  </div>
+
+  <!-- ── Beschikbaarheid ── -->
+  <div class="card">
+    <div class="card-label">Beschikbaarheid</div>
+    <div class="avail-grid" id="availGrid"></div>
+    <div class="avail-note">Klik op de dagen waarop je beschikbaar bent voor een gesprek. Niet bindend.</div>
+  </div>
+
+  <!-- ── Mijn profiel ── -->
+  <div class="card">
+    <div class="card-label">Mijn profiel</div>
+    <div class="profile-field">
+      <label>Naam</label>
+      <input type="text" id="pf-naam" placeholder="Jouw naam">
+    </div>
+    <div class="profile-field">
+      <label>Sector</label>
+      <select id="pf-sector">
+        <option value="">Kies je sector</option>
+        <option value="IT">IT &amp; Software</option>
+        <option value="Marketing">Marketing &amp; Communicatie</option>
+        <option value="Finance">Finance &amp; Economie</option>
+        <option value="HR">HR &amp; Organisatie</option>
+        <option value="Duurzaamheid">Duurzaamheid &amp; ESG</option>
+        <option value="Gezondheid">Zorg &amp; Welzijn</option>
+        <option value="Engineering">Techniek &amp; Engineering</option>
+        <option value="Design">Design &amp; UX</option>
+        <option value="Niche">Niche / Overig</option>
+      </select>
+    </div>
+    <div class="profile-field">
+      <label>Expertisegebieden <span style="font-weight:400;color:#9ca3af;font-size:.76rem">komma-gescheiden</span></label>
+      <input type="text" id="pf-expertise" placeholder="Bijv. leiderschap, agile, strategie">
+    </div>
+    <div class="profile-field">
+      <label>Korte bio</label>
+      <textarea id="pf-bio" placeholder="Vertel iets over jezelf en wat studenten van jou kunnen leren."></textarea>
+    </div>
+    <button class="profile-save-btn" id="saveProfileBtn" onclick="saveProfile()">Profiel opslaan</button>
+  </div>
+
+  <!-- ── Privacy & instellingen ── -->
+  <div class="card">
+    <div class="card-label">Privacy &amp; instellingen</div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-lbl">Anoniem tot koppeling bevestigd</div>
+        <div class="toggle-sub">Studenten zien alleen je sector en expertise, niet je naam</div>
+      </div>
+      <button class="toggle-sw" id="anonToggle" onclick="toggleAnon()" aria-pressed="false"></button>
+    </div>
+
+    <div style="height:1px;background:rgba(15,17,23,.07);margin:6px 0;"></div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-lbl">Matching tijdelijk pauzeren</div>
+        <div class="toggle-sub">Nieuwe studenten kunnen je niet meer vinden, actieve koppelingen blijven actief</div>
+      </div>
+      <button class="toggle-sw" id="pauseToggle" onclick="togglePause()" aria-pressed="false"></button>
+    </div>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── State ──────────────────────────────────────────────────────────────────
+let currentUser    = null;
+let waitlistRow    = null;  // this buddy's waitlist entry
+let activePairs    = [];
+let pendingReqs    = [];
+let _selectedDays  = new Set();
+const DAYS = ['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+async function signOut() {
+  await db.auth.signOut();
+  window.location.href = 'auth.html';
+}
+
+// ── Availability grid ──────────────────────────────────────────────────────
+
+function renderAvailGrid() {
+  const grid = document.getElementById('availGrid');
+  grid.innerHTML = DAYS.map(d => `
+    <button class="avail-day${_selectedDays.has(d) ? ' selected' : ''}" onclick="toggleDay('${d}')">${d}</button>
+  `).join('');
+}
+
+function toggleDay(day) {
+  if (_selectedDays.has(day)) _selectedDays.delete(day);
+  else _selectedDays.add(day);
+  renderAvailGrid();
+  saveAvailability();
+}
+
+async function saveAvailability() {
+  const days = [..._selectedDays];
+  // Lokale write voor snelheid
+  localStorage.setItem('buddy_avail_' + (currentUser?.id || ''), JSON.stringify(days));
+  // DB write naar waitlist.available_days
+  if (waitlistRow?.id) {
+    const { error } = await db
+      .from('waitlist')
+      .update({ available_days: days })
+      .eq('id', waitlistRow.id);
+    if (error) console.warn('[buddy-dash] available_days write fout:', error.message);
+  }
+}
+
+async function loadAvailability() {
+  // DB leidend
+  if (waitlistRow?.id) {
+    try {
+      const { data: wl } = await db
+        .from('waitlist')
+        .select('available_days')
+        .eq('id', waitlistRow.id)
+        .maybeSingle();
+      if (wl?.available_days?.length) {
+        _selectedDays = new Set(wl.available_days);
+        renderAvailGrid();
+        return;
+      }
+    } catch(e) {}
+  }
+  // Lokale fallback
+  try {
+    const saved = JSON.parse(localStorage.getItem('buddy_avail_' + (currentUser?.id || '')) || '[]');
+    _selectedDays = new Set(saved);
+  } catch(e) { _selectedDays = new Set(); }
+  renderAvailGrid();
+}
+
+// ── Pairs (active couplings) ───────────────────────────────────────────────
+
+async function loadPairs() {
+  const uid = currentUser.id;
+  const { data, error } = await db
+    .from('buddy_pairs')
+    .select(`
+      id, type, status, created_at, reveal_after,
+      req:profiles!buddy_pairs_requester_id_fkey(id, naam),
+      rec:profiles!buddy_pairs_receiver_id_fkey(id, naam)
+    `)
+    .or(`requester_id.eq.${uid},receiver_id.eq.${uid}`)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[buddy-dash] loadPairs error:', error.message);
+    return;
+  }
+
+  activePairs = (data || []).map(row => {
+    const other = row.req?.id === uid ? row.rec : row.req;
+    const isAnon = row.reveal_after && new Date(row.reveal_after) > new Date();
+    return { id: row.id, type: row.type, name: isAnon ? 'Anonieme student' : (other?.naam || 'Student'), reveal_after: row.reveal_after };
+  });
+
+  renderPairs();
+}
+
+function renderPairs() {
+  const container = document.getElementById('pairsList');
+  if (!activePairs.length) {
+    container.innerHTML = '<div class="empty">Nog geen actieve koppelingen. Zodra een student je aanvraagt en je accepteert, verschijnt de koppeling hier.</div>';
+    return;
+  }
+  container.innerHTML = activePairs.map(p => {
+    const pairId = String(p.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
+    const init   = p.name === 'Anonieme student' ? '?' : escapeHtml(p.name[0].toUpperCase());
+    return `
+      <div class="pair-card">
+        <div class="pair-header">
+          <div class="pair-av">${init}</div>
+          <div>
+            <div class="pair-name">${escapeHtml(p.name)}</div>
+            <div class="pair-meta">Buddy-koppeling · ${escapeHtml(p.type)}</div>
+          </div>
+        </div>
+        <div class="pair-actions">
+          ${p.name !== 'Anonieme student' ? `<button class="btn-sm btn-primary" onclick="openChat('${pairId}')">Stuur bericht</button>` : ''}
+          <button class="btn-sm btn-danger" onclick="endPair('${pairId}')">Beëindigen</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openChat(pairId) {
+  // TODO (fase 2): chat.html moet ook buddy_pair_id ondersteunen
+  window.location.href = `chat.html?buddy_pair_id=${encodeURIComponent(pairId)}`;
+}
+
+async function endPair(pairId) {
+  // Inline bevestiging — geen native confirm() dialog
+  const btn = document.querySelector(`.pair-card [onclick="endPair('${pairId}')"]`);
+  if (btn) {
+    if (btn.dataset.confirming !== 'true') {
+      btn.dataset.confirming = 'true';
+      btn.textContent = 'Nogmaals klikken om te bevestigen';
+      setTimeout(() => { btn.dataset.confirming = ''; btn.textContent = 'Beëindigen'; }, 4000);
+      return;
+    }
+    btn.dataset.confirming = '';
+  }
+  const uid = currentUser.id;
+  const { error } = await db
+    .from('buddy_pairs')
+    .update({ status: 'ended', ended_at: new Date().toISOString() })
+    .eq('id', pairId)
+    .or(`requester_id.eq.${uid},receiver_id.eq.${uid}`);
+  if (error) { notify('Beëindigen mislukt — probeer opnieuw.'); return; }
+  activePairs = activePairs.filter(p => String(p.id) !== pairId);
+  renderPairs();
+  notify('Koppeling beëindigd.');
+}
+
+// ── Pending requests ───────────────────────────────────────────────────────
+
+async function loadPendingRequests() {
+  const { data, error } = await db
+    .from('buddy_requests')
+    .select(`
+      id, type, message, created_at,
+      sender:profiles!buddy_requests_requester_id_fkey(id, naam)
+    `)
+    .eq('receiver_id', currentUser.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) { console.error('[buddy-dash] loadPendingRequests error:', error.message); return; }
+
+  pendingReqs = data || [];
+  renderRequests();
+}
+
+function renderRequests() {
+  const card = document.getElementById('requestsCard');
+  const list = document.getElementById('requestsList');
+  if (!pendingReqs.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  list.innerHTML = pendingReqs.map(r => {
+    const reqId = String(r.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
+    const name  = escapeHtml(r.sender?.naam || 'Student');
+    return `
+      <div class="req-card">
+        <div class="req-who">${name} vraagt een buddy-koppeling aan</div>
+        ${r.message ? `<div class="req-msg">&ldquo;${escapeHtml(r.message)}&rdquo;</div>` : ''}
+        <div class="req-btns">
+          <button class="btn-sm btn-primary" onclick="acceptRequest('${reqId}')">Accepteren</button>
+          <button class="btn-sm btn-ghost-sm" onclick="declineRequest('${reqId}')">Afwijzen</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function acceptRequest(reqId) {
+  // 1. Update request status
+  const { data: req, error: rErr } = await db
+    .from('buddy_requests')
+    .select('requester_id, receiver_id, type')
+    .eq('id', reqId)
+    .eq('receiver_id', currentUser.id)
+    .maybeSingle();
+
+  if (rErr || !req) { notify('Verzoek niet gevonden.'); return; }
+
+  const { error: updErr } = await db.from('buddy_requests').update({ status: 'accepted' }).eq('id', reqId);
+  if (updErr) { notify('Accepteren mislukt — probeer opnieuw.'); return; }
+
+  // 2. Create pair
+  const { data: pair, error: pErr } = await db
+    .from('buddy_pairs')
+    .insert({ requester_id: req.requester_id, receiver_id: req.receiver_id, type: req.type, status: 'active', reveal_after: null })
+    .select('id').single();
+  if (pErr) {
+    // Roll back
+    await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId);
+    notify('Koppeling aanmaken mislukt — probeer opnieuw.'); return;
+  }
+
+  // 3. Notify student
+  await db.from('notifications').insert({
+    user_id: req.requester_id, type: 'buddy_accepted',
+    ref_id: pair.id, ref_type: 'buddy',
+    message: 'Je buddyverzoek is geaccepteerd — je buddy staat klaar!', read: false,
+  }).catch(() => {});
+
+  notify('Koppeling geaccepteerd!');
+  await loadPendingRequests();
+  await loadPairs();
+}
+
+async function declineRequest(reqId) {
+  const { error } = await db
+    .from('buddy_requests')
+    .update({ status: 'declined' })
+    .eq('id', reqId)
+    .eq('receiver_id', currentUser.id);
+  if (error) { notify('Afwijzen mislukt.'); return; }
+  pendingReqs = pendingReqs.filter(r => String(r.id) !== reqId);
+  renderRequests();
+}
+
+// ── Profile save ───────────────────────────────────────────────────────────
+
+async function saveProfile() {
+  const btn   = document.getElementById('saveProfileBtn');
+  btn.disabled = true;
+  btn.textContent = 'Opslaan…';
+
+  const naam      = document.getElementById('pf-naam').value.trim();
+  const sector    = document.getElementById('pf-sector').value;
+  const expertRaw = document.getElementById('pf-expertise').value.trim();
+  const bio       = document.getElementById('pf-bio').value.trim();
+  const expertise = expertRaw ? expertRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  // Update profiles table (naam)
+  const { error: pErr } = await db.from('profiles').update({ naam }).eq('id', currentUser.id);
+  if (pErr) console.warn('[buddy-dash] profile update fout:', pErr.message);
+
+  // Update waitlist entry (sector, expertise_tags)
+  if (waitlistRow?.id) {
+    const { error: wErr } = await db.from('waitlist')
+      .update({ naam, sector: sector || null, expertise_tags: expertise.length ? expertise : null })
+      .eq('id', waitlistRow.id);
+    if (wErr) console.warn('[buddy-dash] waitlist update fout:', wErr.message);
+  }
+
+  // Bio is stored in user metadata (no waitlist column)
+  if (bio) {
+    await db.auth.updateUser({ data: { bio } }).catch(() => {});
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Profiel opslaan';
+  notify('Profiel bijgewerkt!');
+}
+
+// ── Anon + Pause toggles ───────────────────────────────────────────────────
+
+function _setToggle(id, on) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.classList.toggle('on', on);
+  btn.setAttribute('aria-pressed', String(on));
+}
+
+async function _loadPrefs() {
+  // DB leidend — waitlist.anonymous en waitlist.paused
+  let anon = true;   // standaard anoniem
+  let paused = false;
+  if (waitlistRow?.id) {
+    try {
+      const { data: wl } = await db
+        .from('waitlist')
+        .select('anonymous, paused')
+        .eq('id', waitlistRow.id)
+        .maybeSingle();
+      if (wl) {
+        anon   = wl.anonymous !== false; // null → default true
+        paused = !!wl.paused;
+      }
+    } catch(e) {}
+  }
+  // Lokale fallback als waitlist nog niet bestaat
+  const uid = currentUser?.id || '';
+  if (!waitlistRow) {
+    anon   = localStorage.getItem('buddy_anon_'   + uid) !== 'false';
+    paused = localStorage.getItem('buddy_paused_' + uid) === 'true';
+  }
+  _setToggle('anonToggle', anon);
+  _setToggle('pauseToggle', paused);
+  const banner = document.getElementById('pauseBanner');
+  if (banner) banner.classList.toggle('show', paused);
+}
+
+async function toggleAnon() {
+  const uid = currentUser?.id || '';
+  const cur = document.getElementById('anonToggle')?.classList.contains('on') ?? true;
+  const next = !cur;
+  _setToggle('anonToggle', next);
+  localStorage.setItem('buddy_anon_' + uid, String(next));
+  if (waitlistRow?.id) {
+    const { error } = await db.from('waitlist').update({ anonymous: next }).eq('id', waitlistRow.id);
+    if (error) console.warn('[buddy-dash] anonymous write fout:', error.message);
+  }
+  notify(next ? 'Naam is nu verborgen voor nieuwe studenten.' : 'Naam is zichtbaar voor studenten.');
+}
+
+async function togglePause() {
+  const uid = currentUser?.id || '';
+  const cur = document.getElementById('pauseToggle')?.classList.contains('on') ?? false;
+  const paused = !cur;
+  _setToggle('pauseToggle', paused);
+  localStorage.setItem('buddy_paused_' + uid, String(paused));
+  const banner = document.getElementById('pauseBanner');
+  if (banner) banner.classList.toggle('show', paused);
+  if (waitlistRow?.id) {
+    const { error } = await db.from('waitlist').update({ paused }).eq('id', waitlistRow.id);
+    if (error) console.warn('[buddy-dash] paused write fout:', error.message);
+  }
+  notify(paused ? 'Matching gepauzeerd — je bent nu onzichtbaar voor nieuwe studenten.' : 'Matching hervat!');
+}
+
+// ── Realtime ───────────────────────────────────────────────────────────────
+
+function subscribeRealtime() {
+  const uid = currentUser.id;
+  db.channel('buddy-dash-' + uid)
+    .on('postgres_changes', {
+      event: 'INSERT', schema: 'public', table: 'buddy_requests',
+      filter: `receiver_id=eq.${uid}`,
+    }, async () => {
+      await loadPendingRequests();
+      notify('Nieuw buddyverzoek ontvangen!');
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'buddy_pairs',
+      filter: `requester_id=eq.${uid}`,
+    }, () => loadPairs())
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'buddy_pairs',
+      filter: `receiver_id=eq.${uid}`,
+    }, () => loadPairs())
+    .subscribe();
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. Auth guard
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+  currentUser = user;
+
+  // 2. Role check — alleen gepensioneerde buddies mogen dit dashboard zien
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role, naam')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile || profile.role !== 'gepensioneerd') {
+    // Verkeerde rol — doorsturen naar juiste dashboard
+    const redirect = { student: 'discover.html', bedrijf: 'company-dashboard.html', school: 'school-dashboard.html' };
+    window.location.href = redirect[profile?.role] || 'auth.html';
+    return;
+  }
+
+  // 3. Welkomstgroet
+  const naam = profile.naam || user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || 'Buddy';
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
+  document.getElementById('welcomeMsg').textContent = `${greeting}, ${naam}`;
+  document.getElementById('topbarUser').textContent = naam;
+
+  // 4. Waitlist profiel ophalen (voor sector/expertise)
+  const { data: wl } = await db
+    .from('waitlist')
+    .select('id, naam, sector, expertise_tags, available_days, anonymous, paused')
+    .eq('email', user.email)
+    .limit(1)
+    .maybeSingle();
+  waitlistRow = wl;
+
+  // 5. Profiel-form voorinvullen
+  document.getElementById('pf-naam').value = naam;
+  if (wl?.sector) {
+    const sel = document.getElementById('pf-sector');
+    if (sel) sel.value = wl.sector;
+  }
+  if (wl?.expertise_tags?.length) {
+    document.getElementById('pf-expertise').value = wl.expertise_tags.join(', ');
+  }
+  const bio = user.user_metadata?.bio || '';
+  if (bio) document.getElementById('pf-bio').value = bio;
+
+  // 6. Pairs + requests laden
+  await Promise.all([loadPairs(), loadPendingRequests()]);
+
+  // 7. Beschikbaarheid
+  await loadAvailability();
+
+  // 8. Prefs (anoniem, pauze)
+  await _loadPrefs();
+
+  // 9. Realtime
+  subscribeRealtime();
+});
+</script>
+
+</body>
+</html>

@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/buddy.js"></script>
   <style>
     body { background: #f4f3ef; }
 
@@ -190,6 +191,50 @@
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+
+    /* ── Buddy opt-in toggle ── */
+    .buddy-toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .toggle-sw {
+      width: 42px; height: 24px; border-radius: 12px;
+      background: #e2e8f0; position: relative;
+      cursor: pointer; border: none; transition: background .2s; flex-shrink: 0;
+    }
+    .toggle-sw.on { background: #1a7a48; }
+    .toggle-sw::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; transition: left .2s; box-shadow: 0 1px 3px rgba(0,0,0,.18);
+    }
+    .toggle-sw.on::after { left: 21px; }
+
+    /* Buddy card (pairs list) */
+    .bdy-pair {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid rgba(15,17,23,.07);
+    }
+    .bdy-pair:last-child { border-bottom: none; }
+    .bdy-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #e8f5ee; color: #1a7a48;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex-shrink: 0;
+    }
+    .bdy-name  { font-size: .88rem; font-weight: 500; color: #0d1520; }
+    .bdy-label { font-size: .75rem; color: #9ca3af; }
+
+    /* Request widget */
+    .bdy-widget {
+      background: #f4f3ef; border-radius: 10px; padding: 12px 14px; margin-top: 10px;
+    }
+    .bdy-widget p { font-size: .82rem; color: #4b5563; margin-bottom: 8px; line-height: 1.5; }
+    .bdy-req-btn {
+      background: #1a7a48; color: #fff; border: none;
+      padding: 8px 18px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .bdy-req-btn:hover { background: #0f5c36; }
+    .bdy-req-btn:disabled { opacity: .45; cursor: not-allowed; }
 
     /* ── Profile overview view ── */
     .card {
@@ -376,6 +421,13 @@
       </div>
     </div>
 
+    <div class="sec-label" id="buddySectionLabel" style="display:none;">Buddy-netwerk</div>
+    <div class="card" id="buddyProfileCard" style="margin-bottom:16px;display:none;">
+      <div id="buddyProfileContent">
+        <div style="font-size:.82rem;color:#9ca3af;">Laden…</div>
+      </div>
+    </div>
+
     <div class="sec-label">Opgeslagen vacatures</div>
     <div id="pv-saved-vacatures"></div>
   </div>
@@ -435,9 +487,39 @@
         </select>
       </div>
     </div>
-    <div class="field">
+    <div class="field bol-only">
       <label>Beschikbaar vanaf <span class="req">*</span></label>
       <input type="date" id="beschikbaar_vanaf">
+    </div>
+
+    <div class="bbl-only" style="display:none;">
+      <div class="field">
+        <label>Vaste schooldag</label>
+        <select id="schooldag">
+          <option value="">Kies je vaste schooldag</option>
+          <option value="maandag">Maandag</option>
+          <option value="dinsdag">Dinsdag</option>
+          <option value="woensdag">Woensdag</option>
+          <option value="donderdag">Donderdag</option>
+          <option value="vrijdag">Vrijdag</option>
+        </select>
+        <small style="color:#9ca3af;font-size:.75rem;margin-top:4px;display:block;">Wordt automatisch geblokkeerd in je kalender.</small>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Start contract bij leerbedrijf</label>
+          <input type="date" id="contract_start">
+        </div>
+        <div class="field">
+          <label>Einde contract</label>
+          <input type="date" id="contract_end">
+        </div>
+      </div>
+      <small style="color:#9ca3af;font-size:.75rem;margin-bottom:14px;display:block;">Internly berekent automatisch wanneer je leerbedrijf een beslissing moet nemen.</small>
+      <div class="field">
+        <label>Naam praktijkbegeleider (werkvloer)</label>
+        <input type="text" id="pb_naam" placeholder="Wie begeleidt jou op het werk?">
+      </div>
     </div>
     <div class="field">
       <label>Jouw postcode <span class="hint">voor reistijdfilter</span></label>
@@ -1009,6 +1091,22 @@ function populateForm(data) {
     if (el) el.value = data.beschikbaar_vanaf;
   }
 
+  // BBL-only fields
+  if (data.schooldag) {
+    const el = document.getElementById('schooldag');
+    if (el) el.value = data.schooldag;
+  }
+  ['contract_start','contract_end'].forEach(id => {
+    if (data[id]) {
+      const el = document.getElementById(id);
+      if (el) el.value = data[id];
+    }
+  });
+  if (data.pb_naam) {
+    const el = document.getElementById('pb_naam');
+    if (el) el.value = data.pb_naam;
+  }
+
   // Motivatie textarea + char count
   if (data.motivatie) {
     const el = document.getElementById('motivatie');
@@ -1069,6 +1167,13 @@ async function submitProfile() {
     methode_type:              fd.methode_type || null,
     methode_beschrijving:      document.getElementById('methode_beschrijving').value.trim() || null,
   };
+
+  // BBL-specifieke velden (schooldag opgeslagen op student_profiles)
+  if (document.body.classList.contains('bbl-mode')) {
+    payload.bbl_mode = true;
+    const schooldag = document.getElementById('schooldag')?.value || null;
+    if (schooldag) payload.schooldag = schooldag;
+  }
 
   const { error } = await db.from('student_profiles').upsert(payload, { onConflict: 'profile_id' });
 
@@ -1158,10 +1263,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     .eq('profile_id', user.id)
     .maybeSingle();
 
+  const isBBLProfile = existing?.bbl_mode === true;
+  if (isBBLProfile) {
+    document.body.classList.add('bbl-mode');
+    document.querySelectorAll('.bbl-only').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.bol-only').forEach(el => el.style.display = 'none');
+    const wizTitle = document.querySelector('.page-title');
+    if (wizTitle && wizTitle.textContent === 'Maak je profiel aan') {
+      wizTitle.textContent = 'Jouw BBL-profiel aanmaken';
+    }
+  }
+
   if (existing) {
     isEditMode = true;
     populateForm(existing);   // pre-fill hidden form for when user clicks Bewerken
     toonOverzicht(existing);  // show the overview
+    _initBuddyProfileSection(user, existing); // non-blocking — buddy section
   } else {
     // Pre-fill postcode from localStorage on fresh form only
     const savedPc = localStorage.getItem('internly_student_postcode');
@@ -1177,6 +1294,113 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 function escapeHtml(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── Buddy profile section ────────────────────────────────────────────────────
+let _buddyProfileSp = null;
+
+async function _initBuddyProfileSection(user, sp) {
+  _buddyProfileSp = sp;
+  const card  = document.getElementById('buddyProfileCard');
+  const label = document.getElementById('buddySectionLabel');
+  if (!card) return;
+
+  try {
+    const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+    await buddyInit(user.id, 'student', db, naam);
+  } catch(e) {
+    console.warn('[student-profile] buddy init fout:', e);
+  }
+
+  if (label) label.style.display = '';
+  card.style.display = 'block';
+  _renderBuddyProfile();
+  BuddyModule.onUpdate = _renderBuddyProfile;
+}
+
+function _renderBuddyProfile() {
+  const content = document.getElementById('buddyProfileContent');
+  if (!content) return;
+  const sp = _buddyProfileSp;
+
+  // Opt-in toggle — gelezen uit student_profiles.buddy_opt_in (DB)
+  // Lokale fallback voor snelheid totdat DB-row geladen is
+  const key   = 'internly_buddy_optin_' + (currentUser?.id || '');
+  const optIn = sp?.buddy_opt_in ?? (localStorage.getItem(key) === 'true');
+
+  let html = `
+    <div class="buddy-toggle-row">
+      <div>
+        <div style="font-size:.88rem;font-weight:600;color:#0d1520;">Deelnemen aan buddy-netwerk</div>
+        <div style="font-size:.76rem;color:#6b7280;margin-top:2px;">Ontvang begeleiding van een ervaren gepensioneerde professional</div>
+      </div>
+      <button class="toggle-sw${optIn ? ' on' : ''}" onclick="_toggleBuddyOptIn()"
+        title="${optIn ? 'Uitschakelen' : 'Inschakelen'}" aria-pressed="${optIn}"></button>
+    </div>`;
+
+  if (optIn) {
+    const pairs = BuddyModule.activePairs;
+
+    if (pairs.length > 0) {
+      html += '<div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:8px;">Actieve koppelingen</div>';
+      html += pairs.map(p => {
+        const isAnon = p.buddy_name === 'Anonieme buddy';
+        const init   = isAnon ? '?' : escapeHtml((p.buddy_name || '?')[0].toUpperCase());
+        const label  = ({ peer:'Medestudent', insider:'Bedrijfsbuddy', gepensioneerd:'Gepensioneerde buddy', mentor:'Sectormentor', school:'Schoolbuddy' })[p.type] || p.type;
+        return `
+          <div class="bdy-pair">
+            <div class="bdy-av">${init}</div>
+            <div style="flex:1;min-width:0">
+              <div class="bdy-name">${escapeHtml(p.buddy_name)}</div>
+              <div class="bdy-label">${escapeHtml(label)}</div>
+            </div>
+            ${!isAnon ? `<button class="btn-ghost" style="font-size:.78rem;padding:6px 12px;" onclick="buddyOpenChat('${String(p.id||'').replace(/[^a-zA-Z0-9\-]/g,'')}')">Stuur bericht</button>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    // Show request button if no gepensioneerd pair yet
+    const hasGep = pairs.some(p => p.type === 'gepensioneerd');
+    if (!hasGep) {
+      const context  = JSON.stringify({ sector: sp?.sector || sp?.opdracht_domein || '' });
+      const safeCtx  = escapeHtml(context);
+      html += `
+        <div class="bdy-widget" data-type="gepensioneerd" data-context="${safeCtx}">
+          <p>Koppel je aan een gepensioneerde professional die zijn kennis wil doorgeven. Volledig vrijwillig — jij hebt altijd het laatste woord.</p>
+          <button class="bdy-req-btn" onclick="buddyHandleRequestFromWidget(this)">
+            Vraag een buddy aan
+          </button>
+        </div>`;
+    }
+  }
+
+  content.innerHTML = html;
+}
+
+async function _toggleBuddyOptIn() {
+  const sp      = _buddyProfileSp;
+  const current = sp?.buddy_opt_in ?? (localStorage.getItem('internly_buddy_optin_' + (currentUser?.id || '')) === 'true');
+  const next    = !current;
+
+  // Optimistische lokale update
+  if (_buddyProfileSp) _buddyProfileSp.buddy_opt_in = next;
+  localStorage.setItem('internly_buddy_optin_' + (currentUser?.id || ''), String(next));
+  _renderBuddyProfile();
+
+  // DB write
+  if (currentUser?.id) {
+    const { error } = await db
+      .from('student_profiles')
+      .update({ buddy_opt_in: next })
+      .eq('profile_id', currentUser.id);
+    if (error) {
+      console.warn('[student-profile] buddy_opt_in write fout:', error.message);
+      // Terugdraaien bij fout
+      if (_buddyProfileSp) _buddyProfileSp.buddy_opt_in = current;
+      localStorage.setItem('internly_buddy_optin_' + (currentUser?.id || ''), String(current));
+      _renderBuddyProfile();
+    }
+  }
 }
 
 // ── Opgeslagen vacatures ──
@@ -1297,7 +1521,7 @@ function removeSaved(index) {
       padding:8px 14px;font-size:.82rem;"></div>
 
     <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
-      Door je in te schrijven ga je akkoord met ons privacybeleid.
+      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html" style="color:inherit;text-decoration:underline;">privacybeleid</a>.
     </p>
   </div>
 </div>

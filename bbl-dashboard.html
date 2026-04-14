@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<!--
+  BBL DASHBOARD — Internly
+  ─────────────────────────────────────────────────────────────────────────────
+  Overzichtspagina voor BBL-deelnemers. Laadt na login als bbl_mode = true.
+  Navigeert door naar bbl-hub.html voor chat/kalender/evaluatie/verlenging.
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
+  <title>BBL Dashboard — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f3ef;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none; flex-shrink: 0;
+    }
+    .topbar-logo span { color: #FF7E42; }
+    .topbar-bbl-tag {
+      font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 20px;
+      background: rgba(255,255,255,.15); color: rgba(255,255,255,.9);
+      flex-shrink: 0;
+    }
+    .topbar-bbl-nav { display: flex; gap: 16px; margin: 0 auto; }
+    .topbar-bbl-nav a {
+      color: rgba(255,255,255,.55); text-decoration: none;
+      font-size: .82rem; font-weight: 500; transition: color .15s;
+      padding: 4px 0; border-bottom: 2px solid transparent;
+    }
+    .topbar-bbl-nav a:hover { color: rgba(255,255,255,.85); }
+    .topbar-bbl-nav a.active { color: #fff; border-bottom-color: rgba(255,255,255,.5); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .topbar-user { font-size: .82rem; color: rgba(255,255,255,.65); }
+    .topbar-signout {
+      background: none; border: none; color: rgba(255,255,255,.45);
+      font-size: .75rem; font-family: 'Outfit', sans-serif;
+      cursor: pointer; padding: 5px; border-radius: 6px; transition: color .15s;
+    }
+    .topbar-signout:hover { color: rgba(255,255,255,.8); }
+    .topbar-privacy { font-size: .72rem; color: rgba(255,255,255,.3); text-decoration: none; padding: 5px 4px; transition: color .15s; }
+    .topbar-privacy:hover { color: rgba(255,255,255,.6); }
+
+    /* ── Page shell ── */
+    .dash-shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
+
+    /* ── Welkom header ── */
+    .dash-welcome {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.3rem; font-weight: 600; color: #0d1520;
+      margin-bottom: 4px;
+    }
+    .dash-sub { font-size: .88rem; color: #6b7280; margin-bottom: 18px; }
+
+    /* ── Contract strip ── */
+    .contract-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap;
+      padding: 9px 14px; border-radius: 10px;
+      margin-bottom: 16px; font-size: 12px; border: 1px solid;
+    }
+    .contract-strip.cs-ok     { background: #eaf5ed; color: #0f3d22; border-color: rgba(26,122,74,.28); }
+    .contract-strip.cs-warn   { background: #fdf3e3; color: #5a3500; border-color: rgba(160,96,10,.28); }
+    .contract-strip.cs-danger { background: #fdecea; color: #6b1510; border-color: rgba(184,41,26,.25); }
+    .cs-left  { display: flex; align-items: center; gap: 8px; }
+    .cs-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .cs-ok   .cs-dot { background: #1a7a48; }
+    .cs-warn .cs-dot { background: #a0600a; }
+    .cs-danger .cs-dot { background: #b8291a; }
+    .cs-action {
+      font-size: 11px; padding: 4px 10px; border-radius: 20px;
+      border: 1px solid rgba(0,0,0,.12); background: rgba(0,0,0,.06);
+      color: inherit; cursor: pointer; font-family: 'Outfit', sans-serif;
+      white-space: nowrap; flex-shrink: 0; text-decoration: none;
+    }
+    .cs-action:hover { background: rgba(0,0,0,.12); }
+
+    /* ── Card grid ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 520px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .dash-card {
+      background: #fff; border: 1px solid rgba(15,17,23,.09);
+      border-radius: 14px; padding: 16px 18px;
+    }
+    .dash-card.full { grid-column: 1 / -1; }
+
+    /* ── Card header ── */
+    .dc-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .07em; color: #9ca3af; margin-bottom: 12px;
+    }
+
+    /* ── Person row ── */
+    .person { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .person:last-child { margin-bottom: 0; }
+    .av {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex-shrink: 0;
+    }
+    .av-blue  { background: #e8f0fb; color: #1a4f8a; }
+    .av-amber { background: #fdf3e3; color: #a0600a; }
+    .av-green { background: #eaf5ed; color: #1a7a48; }
+    .av-gray  { background: #e8e6e0; color: #6b7280; }
+    .p-name { font-size: 13px; font-weight: 500; color: #0d1520; }
+    .p-role { font-size: 11px; color: #9ca3af; }
+
+    /* ── Stat grid (contract info) ── */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-item { }
+    .stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; margin-bottom: 3px; }
+    .stat-val { font-size: 14px; font-weight: 500; color: #0d1520; }
+
+    /* ── Meeting list ── */
+    .meeting-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 0; border-bottom: 1px solid rgba(15,17,23,.07);
+      font-size: 12px;
+    }
+    .meeting-row:last-child { border-bottom: none; }
+    .meet-date-box {
+      min-width: 36px; text-align: center;
+      background: #f4f3ef; border-radius: 8px;
+      padding: 4px 6px; flex-shrink: 0;
+    }
+    .meet-day  { font-size: 16px; font-weight: 600; color: #0d1520; line-height: 1; }
+    .meet-mon  { font-size: 9px; text-transform: uppercase; color: #9ca3af; }
+    .meet-info { flex: 1; min-width: 0; }
+    .meet-title { font-size: 12px; font-weight: 500; color: #0d1520; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .meet-sub   { font-size: 11px; color: #9ca3af; }
+    .meet-badge {
+      font-size: 10px; padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .mb-eval  { background: #e8f0fb; color: #1a4f8a; }
+    .mb-vpg   { background: #eaf5ed; color: #1a7a48; }
+    .mb-drie  { background: #fdf3e3; color: #a0600a; }
+    .mb-urg   { background: #fdecea; color: #b8291a; }
+
+    /* ── Leerdoel preview ── */
+    .ld-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 0; font-size: 12px; color: #4b5563;
+      border-bottom: 1px solid rgba(15,17,23,.06);
+    }
+    .ld-row:last-child { border-bottom: none; }
+    .ld-check {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1px solid rgba(15,17,23,.15); background: #f4f3ef;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .ld-check.done { background: #eaf5ed; border-color: rgba(26,122,74,.4); }
+    .ld-check.done::after { content: '✓'; font-size: 9px; color: #1a7a48; }
+
+    /* ── Quick action buttons ── */
+    .quick-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    }
+    @media (max-width: 380px) { .quick-grid { grid-template-columns: 1fr; } }
+    .qbtn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 12px;
+      border: 1px solid rgba(15,17,23,.1); background: #fff;
+      text-decoration: none; color: #0d1520;
+      transition: border-color .15s, background .15s; cursor: pointer;
+    }
+    .qbtn:hover { border-color: rgba(26,122,74,.35); background: #f8fdf9; }
+    .qbtn-icon {
+      font-size: 1.2rem; width: 34px; height: 34px;
+      border-radius: 10px; background: #f4f3ef;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .qbtn-title { font-size: 13px; font-weight: 500; }
+    .qbtn-sub   { font-size: 11px; color: #9ca3af; }
+
+    /* ── Empty & skeleton states ── */
+    .empty-block {
+      padding: 10px 0; font-size: 12px; color: #9ca3af; text-align: center;
+    }
+    .skeleton-line {
+      height: 12px; border-radius: 6px; background: linear-gradient(90deg, #f4f3ef 25%, #e8e6e0 50%, #f4f3ef 75%);
+      background-size: 200% 100%; animation: shimmer 1.4s infinite;
+      margin-bottom: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Notif toast ── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 10px 22px;
+      border-radius: 12px; font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.22); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .dash-shell { padding: 14px 12px 80px; }
+      .topbar-bbl-nav { gap: 10px; }
+    }
+    @media (max-width: 400px) {
+      .topbar-bbl-tag { display: none; }
+      .topbar-user { display: none; }
+      .topbar { padding: 0 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <a href="bbl-dashboard.html" class="topbar-logo">intern<span>ly</span></a>
+  <span class="topbar-bbl-tag">BBL-traject</span>
+  <nav class="topbar-bbl-nav">
+    <a href="bbl-dashboard.html" class="active">Dashboard</a>
+    <a href="bbl-hub.html">Hub</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="topbar-user" id="topbarUser"></span>
+    <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
+    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
+  </div>
+</div>
+
+<div class="dash-shell">
+
+  <div class="dash-welcome" id="welcomeMsg">Goedemorgen</div>
+  <div class="dash-sub" id="welcomeSub">Je BBL-traject in één overzicht.</div>
+
+  <!-- Contract strip -->
+  <div class="contract-strip cs-ok" id="contractStrip" style="display:none;">
+    <div class="cs-left">
+      <div class="cs-dot"></div>
+      <span id="contractStripText">Contract laden…</span>
+    </div>
+    <a href="bbl-hub.html" class="cs-action" onclick="sessionStorage.setItem('bblView','verlenging')">Bekijk verlenging</a>
+  </div>
+
+  <!-- Grid rij 1: Leerbedrijf + Komende afspraken -->
+  <div class="card-grid">
+
+    <!-- Mijn traject kaart -->
+    <div class="dash-card" id="trajectCard">
+      <div class="dc-label">Mijn traject</div>
+      <div class="stat-grid" id="trajectStats">
+        <div class="stat-item">
+          <div class="stat-lbl">Bedrijf</div>
+          <div class="stat-val" id="statBedrijf"><div class="skeleton-line" style="width:80%"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Uren/week</div>
+          <div class="stat-val" id="statUren"><div class="skeleton-line" style="width:40%"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Start</div>
+          <div class="stat-val" id="statStart"><div class="skeleton-line" style="width:70%"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Einde</div>
+          <div class="stat-val" id="statEinde"><div class="skeleton-line" style="width:70%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Komende afspraken -->
+    <div class="dash-card" id="meetingsCard">
+      <div class="dc-label">Komende afspraken</div>
+      <div id="meetingsList">
+        <div class="skeleton-line" style="width:90%"></div>
+        <div class="skeleton-line" style="width:75%"></div>
+        <div class="skeleton-line" style="width:60%"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Grid rij 2: Begeleiders + Leerdoelen -->
+  <div class="card-grid">
+
+    <!-- Begeleiders -->
+    <div class="dash-card" id="begeleidersCard">
+      <div class="dc-label">Mijn begeleiders</div>
+      <div id="begeleidersContent">
+        <div class="skeleton-line" style="width:85%"></div>
+        <div class="skeleton-line" style="width:65%"></div>
+      </div>
+    </div>
+
+    <!-- Leerdoelen preview -->
+    <div class="dash-card" id="leerdoelenCard">
+      <div class="dc-label">Leerdoelen</div>
+      <div id="leerdoelenContent">
+        <div class="skeleton-line" style="width:90%"></div>
+        <div class="skeleton-line" style="width:70%"></div>
+        <div class="skeleton-line" style="width:80%"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Snelle acties -->
+  <div class="dash-card full" style="margin-bottom:12px;">
+    <div class="dc-label">Snel naar</div>
+    <div class="quick-grid">
+      <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','berichten')">
+        <div class="qbtn-icon">💬</div>
+        <div><div class="qbtn-title">Berichten</div><div class="qbtn-sub">Chat met je begeleiders</div></div>
+      </a>
+      <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','kalender')">
+        <div class="qbtn-icon">📅</div>
+        <div><div class="qbtn-title">Kalender</div><div class="qbtn-sub">Plan een afspraak</div></div>
+      </a>
+      <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','evaluatie')">
+        <div class="qbtn-icon">✍️</div>
+        <div><div class="qbtn-title">Evaluatie</div><div class="qbtn-sub">Leerdoelen + handtekening</div></div>
+      </a>
+      <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','verlenging')">
+        <div class="qbtn-icon">📋</div>
+        <div><div class="qbtn-title">Verlenging</div><div class="qbtn-sub">Jouw keuze voor volgend jaar</div></div>
+      </a>
+    </div>
+  </div>
+
+</div><!-- /dash-shell -->
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatDateShort(iso) {
+  if (!iso) return { day: '?', mon: '?' };
+  const d = new Date(iso);
+  return {
+    day: d.getDate(),
+    mon: d.toLocaleDateString('nl-NL', { month: 'short' }),
+  };
+}
+
+async function signOut() {
+  await db.auth.signOut();
+  window.location.href = 'auth.html';
+}
+
+// ── Contract strip ───────────────────────────────────────────────────────────
+
+function updateContractStrip(contractEndDate) {
+  const strip = document.getElementById('contractStrip');
+  const txt   = document.getElementById('contractStripText');
+  if (!contractEndDate || !strip) return;
+  const days = Math.ceil((new Date(contractEndDate) - new Date()) / 86400000);
+  strip.style.display = '';
+  strip.className = 'contract-strip ' + (days > 60 ? 'cs-ok' : days > 30 ? 'cs-warn' : 'cs-danger');
+  if (days > 60) {
+    txt.innerHTML = `Contract loopt af over <strong>${days} dagen</strong> (${formatDate(contractEndDate)})`;
+  } else if (days > 0) {
+    txt.innerHTML = `Contract loopt af over <strong>${days} dagen</strong> — heb je al een gesprek gepland?`;
+  } else {
+    txt.innerHTML = `<strong>Contract verlopen</strong> — neem contact op met je begeleider`;
+  }
+}
+
+// ── Traject card ─────────────────────────────────────────────────────────────
+
+function renderTraject(match) {
+  const ip = match?.internship_postings;
+  document.getElementById('statBedrijf').textContent = ip?.company_name || '—';
+  document.getElementById('statUren').textContent    = ip?.hours_per_week ? ip.hours_per_week + ' uur' : '—';
+  document.getElementById('statStart').textContent   = formatDate(ip?.contract_start || match?.contract_start || null);
+  document.getElementById('statEinde').textContent   = formatDate(match?.contract_end_date || ip?.contract_end || null);
+}
+
+// ── Begeleiders ─────────────────────────────────────────────────────────────
+
+function renderBegeleiders(pb, roc) {
+  const container = document.getElementById('begeleidersContent');
+  const pbInit = escapeHtml((pb || 'PB').slice(0, 2).toUpperCase());
+  const rocInit = escapeHtml((roc || 'RB').slice(0, 2).toUpperCase());
+  container.innerHTML = `
+    <div class="person">
+      <div class="av av-blue">${pbInit}</div>
+      <div><div class="p-name">${escapeHtml(pb || 'Praktijkbegeleider')}</div><div class="p-role">Praktijkbegeleider</div></div>
+    </div>
+    <div class="person">
+      <div class="av av-amber">${rocInit}</div>
+      <div><div class="p-name">${escapeHtml(roc || 'ROC-begeleider')}</div><div class="p-role">ROC-begeleider</div></div>
+    </div>`;
+}
+
+// ── Afspraken ────────────────────────────────────────────────────────────────
+
+function renderMeetings(meetings) {
+  const container = document.getElementById('meetingsList');
+  if (!meetings || meetings.length === 0) {
+    container.innerHTML = '<div class="empty-block">Geen aankomende afspraken</div>';
+    return;
+  }
+  const badgeClass = { evaluatie:'mb-eval', voortgangsgesprek:'mb-vpg', driegesprek:'mb-drie', verlengingsgesprek:'mb-urg' };
+  const typeLabel  = { evaluatie:'Evaluatie', voortgangsgesprek:'Voortgang', driegesprek:'Driegesprek', verlengingsgesprek:'Verlenging' };
+  container.innerHTML = meetings.slice(0, 4).map(m => {
+    const { day, mon } = formatDateShort(m.proposed_date);
+    const bc = badgeClass[m.type] || 'mb-eval';
+    const tl = typeLabel[m.type] || m.type || 'Afspraak';
+    return `
+      <div class="meeting-row">
+        <div class="meet-date-box">
+          <div class="meet-day">${day}</div>
+          <div class="meet-mon">${mon}</div>
+        </div>
+        <div class="meet-info">
+          <div class="meet-title">${escapeHtml(m.subject || tl)}</div>
+          <div class="meet-sub">${escapeHtml(m.time_start || '')}${m.time_start ? ' · ' : ''}${escapeHtml(m.status || '')}</div>
+        </div>
+        <span class="meet-badge ${bc}">${tl}</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Leerdoelen ───────────────────────────────────────────────────────────────
+
+async function renderLeerdoelen(skills, userId) {
+  const container = document.getElementById('leerdoelenContent');
+  if (!skills || skills.length === 0) {
+    container.innerHTML = '<div class="empty-block">Nog geen leerdoelen — vul ze in op je profiel.</div>';
+    return;
+  }
+  // Laad voortgang uit DB (skills_progress JSONB)
+  let progress = {};
+  try {
+    const { data: sp } = await db
+      .from('student_profiles')
+      .select('skills_progress')
+      .eq('profile_id', userId)
+      .maybeSingle();
+    progress = sp?.skills_progress || {};
+  } catch(e) {}
+  // Lokale fallback
+  if (!Object.keys(progress).length) {
+    try { progress = JSON.parse(localStorage.getItem('internly_ld_' + userId) || '{}'); } catch(e) {}
+  }
+
+  container.innerHTML = skills.slice(0, 5).map(skill => {
+    const done = !!progress[skill];
+    return `
+      <div class="ld-row">
+        <div class="ld-check${done ? ' done' : ''}"></div>
+        <span>${escapeHtml(skill)}</span>
+      </div>`;
+  }).join('');
+
+  if (skills.length > 5) {
+    container.innerHTML += `<div class="empty-block" style="text-align:left;padding-top:4px;">+${skills.length - 5} meer leerdoelen in Hub</div>`;
+  }
+}
+
+// ── Welkomstgroet op basis van tijdstip ──────────────────────────────────────
+
+function setWelcome(naam) {
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
+  document.getElementById('welcomeMsg').textContent = `${greeting}, ${naam}`;
+  document.getElementById('welcomeSub').textContent = 'Je BBL-traject in één overzicht.';
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. Auth guard
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  // 2. BBL-check
+  const { data: sp, error: spErr } = await db
+    .from('student_profiles')
+    .select('profile_id, opleiding, sector, schooldag, skills, bbl_mode, school')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+
+  if (spErr) console.error('[bbl-dashboard] student_profiles fout:', spErr.message);
+
+  if (!sp?.bbl_mode) {
+    window.location.href = 'discover.html';
+    return;
+  }
+
+  // 3. Gebruikersnaam
+  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || 'Student';
+  document.getElementById('topbarUser').textContent = naam;
+  setWelcome(naam);
+
+  // 4. Actieve match ophalen
+  const { data: match, error: matchErr } = await db
+    .from('matches')
+    .select(`
+      id, party_a, party_b, status,
+      praktijkbegeleider_profile_id,
+      contract_end_date,
+      internship_postings(id, title, company_name, company_user_id, contract_start, contract_end, hours_per_week)
+    `)
+    .or(`party_a.eq.${user.id},party_b.eq.${user.id}`)
+    .eq('status', 'actief')
+    .limit(1)
+    .maybeSingle();
+
+  if (matchErr) console.error('[bbl-dashboard] match fout:', matchErr.message);
+
+  // Traject card
+  if (match) {
+    renderTraject(match);
+    const contractEnd = match.contract_end_date || match.internship_postings?.contract_end;
+    if (contractEnd) updateContractStrip(contractEnd);
+  } else {
+    document.getElementById('statBedrijf').textContent = 'Geen actieve koppeling';
+    document.getElementById('statUren').textContent    = '—';
+    document.getElementById('statStart').textContent   = '—';
+    document.getElementById('statEinde').textContent   = '—';
+  }
+
+  // 5. Praktijkbegeleider naam
+  let pbNaam = 'Praktijkbegeleider';
+  if (match?.praktijkbegeleider_profile_id) {
+    const { data: pb } = await db
+      .from('profiles')
+      .select('naam')
+      .eq('id', match.praktijkbegeleider_profile_id)
+      .maybeSingle();
+    if (pb?.naam) pbNaam = pb.naam;
+  }
+
+  // 6. ROC-begeleider: zoek schoolprofiel op basis van student_profiles.school (tekstveld)
+  let rocNaam = null;
+  if (sp?.school) {
+    // Zoek een profiel met rol 'school' waarvan de naam overeenkomt met sp.school
+    const { data: schoolProfile } = await db
+      .from('profiles')
+      .select('naam')
+      .eq('role', 'school')
+      .ilike('naam', sp.school.trim())
+      .limit(1)
+      .maybeSingle();
+    if (schoolProfile?.naam) rocNaam = schoolProfile.naam;
+  }
+
+  // 7. Begeleiders renderen
+  renderBegeleiders(pbNaam, rocNaam);
+
+  // 8. Komende afspraken (aankomende 30 dagen)
+  if (match || user) {
+    const today = new Date().toISOString().slice(0, 10);
+    const inMonth = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    const uid = user.id;
+    const { data: meetings, error: meetErr } = await db
+      .from('meetings')
+      .select('id, subject, proposed_date, time_start, type, status')
+      .or(`organizer_id.eq.${uid},attendee_id.eq.${uid}`)
+      .gte('proposed_date', today)
+      .lte('proposed_date', inMonth)
+      .not('status', 'in', '("afgewezen","geannuleerd")')
+      .order('proposed_date', { ascending: true });
+
+    if (meetErr) console.error('[bbl-dashboard] meetings fout:', meetErr.message);
+    renderMeetings(meetings || []);
+  } else {
+    renderMeetings([]);
+  }
+
+  // 9. Leerdoelen
+  await renderLeerdoelen(sp?.skills || [], user.id);
+});
+</script>
+
+</body>
+</html>

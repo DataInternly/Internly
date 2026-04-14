@@ -112,6 +112,7 @@
         <div class="nd-empty">Geen nieuwe meldingen</div>
       </div>
     </div>
+    <a href="privacybeleid.html" style="font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;flex-shrink:0;padding:5px 4px;">Privacy</a>
     <div id="topbarAuth">
       <a href="auth.html" class="nav" style="gap:0;color:rgba(255,255,255,.7);font-size:.88rem;font-weight:500;text-decoration:none;">Inloggen</a>
     </div>
@@ -569,10 +570,11 @@
 
     async function markAllRead() {
       if (!currentUserId) return;
-      await db.from('notifications')
+      const { error } = await db.from('notifications')
         .update({ read: true })
         .eq('user_id', currentUserId)
         .eq('read', false);
+      if (error) console.warn('[markAllRead] failed:', error.message);
       loadNotifications();
     }
 
@@ -611,6 +613,7 @@
           filter: 'user_id=eq.' + userId,
         }, (payload) => {
           const countEl = document.getElementById('bellCount');
+          if (!countEl) return;
           const current = parseInt(countEl.textContent) || 0;
           const next    = current + 1;
           countEl.textContent  = next > 9 ? '9+' : next;
@@ -649,7 +652,7 @@
     function notify(msg) {
       const el = document.getElementById('notif');
       el.textContent = msg; el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 3500);
+      setTimeout(() => el.classList.remove('show'), 3200);
     }
 
     async function signOut() {

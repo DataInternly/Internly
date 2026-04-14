@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<!--
+  BBL HUB — Internly
+  ─────────────────────────────────────────────────────────────────────────────
+  Vereiste SQL (nog niet uitgevoerd — voer handmatig uit in Supabase SQL editor):
+
+  -- 1. BBL-modus activeren voor test-student:
+  -- UPDATE student_profiles SET bbl_mode = true, schooldag = 'dinsdag'
+  --   WHERE profile_id = '65ed548f-a7da-4a9b-96c3-e64ccb9ca7d7';
+
+  -- 2. Vergroot de meetings-status constraint voor evaluatie-handtekeningen:
+  -- ALTER TABLE meetings DROP CONSTRAINT IF EXISTS meetings_status_check;
+  -- ALTER TABLE meetings ADD CONSTRAINT meetings_status_check
+  --   CHECK (status IN (
+  --     'openstaand','bevestigd','afgewezen','student_getekend',
+  --     'bedrijf_getekend','voltooid','geannuleerd'
+  --   ));
+
+  -- 3. Verlengingsstatus per partij (localStorage-skeleton totdat kolom bestaat):
+  -- ALTER TABLE matches ADD COLUMN IF NOT EXISTS
+  --   renewal_status JSONB DEFAULT '{}';
+  -- Structuur: { "student": "ja"|"nee"|"weet-niet"|null,
+  --              "bedrijf": "verlengd"|"gestopt"|null,
+  --              "school":  "akkoord"|null }
+
+  -- 4. buddy_queue tabel (als nog niet bestaat):
+  -- CREATE TABLE IF NOT EXISTS buddy_queue (
+  --   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  --   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  --   type TEXT NOT NULL,
+  --   context JSONB,
+  --   created_at TIMESTAMPTZ DEFAULT now(),
+  --   UNIQUE(user_id, type)
+  -- );
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
+  <title>BBL Hub — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/buddy.js"></script>
+  <style>
+    /* ── BBL Hub pagina-specifieke stijlen ────────────────────────────────── */
+    /* Basis variabelen zijn al in css/style.css. Hier ALLEEN BBL-specifiek.  */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f4f3ef;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── exact patroon als chat.html / discover.html */
+    .topbar {
+      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none; flex-shrink: 0;
+    }
+    .topbar-logo span { color: #FF7E42; }
+    .topbar-user { font-size: .82rem; color: rgba(255,255,255,.65); flex-shrink: 0; }
+    .topbar-bbl-tag {
+      font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 20px;
+      background: rgba(255,255,255,.15); color: rgba(255,255,255,.9);
+      flex-shrink: 0;
+    }
+    .topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .topbar-signout {
+      background: none; border: none; color: rgba(255,255,255,.45);
+      font-size: .75rem; font-family: 'Outfit', sans-serif;
+      cursor: pointer; padding: 5px; border-radius: 6px; transition: color .15s;
+    }
+    .topbar-signout:hover { color: rgba(255,255,255,.8); }
+    .topbar-privacy { font-size: .72rem; color: rgba(255,255,255,.3); text-decoration: none; padding: 5px 4px; transition: color .15s; }
+    .topbar-privacy:hover { color: rgba(255,255,255,.6); }
+
+    /* BBL nav (Dashboard / Hub links) */
+    .topbar-bbl-nav { display: flex; gap: 16px; margin: 0 auto; }
+    .topbar-bbl-nav a {
+      color: rgba(255,255,255,.55); text-decoration: none;
+      font-size: .82rem; font-weight: 500; transition: color .15s;
+      padding: 4px 0; border-bottom: 2px solid transparent;
+    }
+    .topbar-bbl-nav a:hover { color: rgba(255,255,255,.85); }
+    .topbar-bbl-nav a.active { color: #fff; border-bottom-color: rgba(255,255,255,.5); }
+
+    /* ── Notif toast — exact patroon chat.html ── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: #0d1520; color: #fff; padding: 10px 22px;
+      border-radius: 12px; font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.22); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s;
+      pointer-events: none; white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Page shell ── */
+    .hub-shell { max-width: 760px; margin: 0 auto; padding: 16px 16px 80px; }
+
+    /* ── Contract strip ──
+       Altijd zichtbaar direct onder topbar, in de normale flow.
+       Klasse wisselt via JS: cs-ok / cs-warn / cs-danger
+    ── */
+    .contract-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap;
+      padding: 9px 14px; border-radius: 10px;
+      margin-bottom: 10px; font-size: 12px; border: 1px solid;
+    }
+    .contract-strip.cs-ok     { background: #eaf5ed; color: #0f3d22; border-color: rgba(26,122,74,.28); }
+    .contract-strip.cs-warn   { background: #fdf3e3; color: #5a3500; border-color: rgba(160,96,10,.28); }
+    .contract-strip.cs-danger { background: #fdecea; color: #6b1510; border-color: rgba(184,41,26,.25); }
+    .cs-left  { display: flex; align-items: center; gap: 8px; }
+    .cs-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .cs-ok   .cs-dot { background: #1a7a48; }
+    .cs-warn .cs-dot { background: #a0600a; }
+    .cs-danger .cs-dot { background: #b8291a; }
+    .cs-action {
+      font-size: 11px; padding: 4px 10px; border-radius: 20px;
+      border: 1px solid rgba(0,0,0,.12); background: rgba(0,0,0,.06);
+      color: inherit; cursor: pointer; font-family: 'Outfit', sans-serif;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .cs-action:hover { background: rgba(0,0,0,.12); }
+
+    /* ── View tabs ── */
+    .view-tabs {
+      display: flex; gap: 3px;
+      background: #e8e6e0; padding: 4px;
+      border-radius: 12px; margin-bottom: 12px;
+    }
+    .vtab {
+      flex: 1; padding: 7px 4px;
+      font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 500;
+      border: none; background: transparent; color: #6b7280;
+      border-radius: 8px; cursor: pointer;
+      transition: background .12s, color .12s; text-align: center;
+      position: relative; white-space: nowrap;
+    }
+    .vtab.active { background: #fff; color: #0d1520; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .vtab .urgent-dot {
+      position: absolute; top: 4px; right: 4px;
+      width: 6px; height: 6px; border-radius: 50%; background: #b8291a;
+    }
+
+    /* ── Views ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── Shared card (overrides css/style.css .card for hub) ── */
+    .hcard {
+      background: #fff; border: 1px solid rgba(15,17,23,.09);
+      border-radius: 14px; padding: 16px 18px; margin-bottom: 10px;
+    }
+
+    /* ── Section label ── */
+    .slbl {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .07em; color: #9ca3af; margin-bottom: 9px;
+    }
+
+    /* ── Person row ── */
+    .person { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+    .av {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex-shrink: 0;
+    }
+    .av-blue  { background: #e8f0fb; color: #1a4f8a; }
+    .av-amber { background: #fdf3e3; color: #a0600a; }
+    .av-green { background: #eaf5ed; color: #1a7a48; }
+    .av-gray  { background: #e8e6e0; color: #6b7280; }
+    .p-name { font-size: 13px; font-weight: 500; color: #0d1520; }
+    .p-role { font-size: 11px; color: #9ca3af; }
+
+    /* ── Pills ── */
+    .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill {
+      font-size: 11px; padding: 5px 12px; border-radius: 20px;
+      border: 1px solid rgba(15,17,23,.12); background: transparent;
+      color: #4b5563; cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: background .1s;
+    }
+    .pill:hover { background: #f4f3ef; }
+    .pill-primary { background: #e8f0fb; color: #1a4f8a; border-color: rgba(26,79,138,.22); }
+    .pill-primary:hover { background: #d4e4f7; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: rgba(15,17,23,.08); margin: 12px 0; }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 500;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .b-ok    { background: #eaf5ed; color: #0f3d22; }
+    .b-warn  { background: #fdf3e3; color: #5a3500; }
+    .b-danger{ background: #fdecea; color: #6b1510; }
+    .b-blue  { background: #e8f0fb; color: #1a4f8a; }
+    .b-neutral{ background: #e8e6e0; color: #4b5563; }
+
+    /* ════════════════════════════════════════════════════════════
+       VIEW 1 — BERICHTEN
+    ════════════════════════════════════════════════════════════ */
+    .participants {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .participant {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: #4b5563;
+      padding: 4px 9px; background: #f4f3ef; border-radius: 20px;
+    }
+    .participant .av { width: 20px; height: 20px; font-size: 8px; }
+
+    .msg-thread {
+      min-height: 200px; max-height: 420px;
+      overflow-y: auto; display: flex; flex-direction: column;
+      gap: 8px; margin-bottom: 12px;
+      padding-right: 4px;
+    }
+    .msg-thread::-webkit-scrollbar { width: 4px; }
+    .msg-thread::-webkit-scrollbar-thumb { background: #c9e8d5; border-radius: 2px; }
+
+    /* Day separator — exact patroon chat.html */
+    .day-sep {
+      text-align: center; font-size: .72rem; color: #9ca3af;
+      margin: 4px 0; position: relative;
+    }
+    .day-sep::before, .day-sep::after {
+      content: ''; position: absolute; top: 50%;
+      width: calc(50% - 44px); height: 1px; background: #f0f0ee;
+    }
+    .day-sep::before { left: 0; }
+    .day-sep::after  { right: 0; }
+
+    .msg-row { display: flex; align-items: flex-end; gap: 7px; }
+    .msg-row.own   { justify-content: flex-end; }
+    .msg-row.other { justify-content: flex-start; }
+    .msg-avatar {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      background: #eaf5ed; color: #1a7a48;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: .65rem; font-weight: 700;
+    }
+    .msg-row.own .msg-avatar { display: none; }
+    .bubble-wrap { max-width: 74%; display: flex; flex-direction: column; }
+    .msg-row.own   .bubble-wrap { align-items: flex-end; }
+    .msg-row.other .bubble-wrap { align-items: flex-start; }
+    .bubble {
+      padding: 9px 13px; border-radius: 14px;
+      font-size: .88rem; line-height: 1.5; word-break: break-word; white-space: pre-wrap;
+    }
+    .msg-row.own   .bubble { background: #1a7a48; color: #fff; border-bottom-right-radius: 3px; }
+    .msg-row.other .bubble { background: #fff; color: #0d1520; border: 1px solid #f0f0ee; border-bottom-left-radius: 3px; }
+    .msg-time { font-size: .68rem; color: #9ca3af; margin-top: 3px; padding: 0 2px; }
+
+    /* Systeembericht */
+    .msg-system {
+      align-self: center; font-size: .72rem; color: #9ca3af;
+      padding: 3px 10px; background: #f4f3ef; border-radius: 20px;
+    }
+
+    /* Meeting-uitnodiging als berichttype */
+    .msg-invite {
+      background: #fff; border: 1px solid rgba(15,17,23,.1);
+      border-radius: 12px; padding: 11px 13px;
+      font-size: 12px; max-width: 88%; align-self: flex-start;
+    }
+    .invite-type {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .06em; padding: 2px 8px; border-radius: 20px;
+      display: inline-block; margin-bottom: 6px;
+    }
+    .invite-type.eval { background: #e8f0fb; color: #1a4f8a; }
+    .invite-type.vpg  { background: #eaf5ed; color: #1a7a48; }
+    .invite-type.drie { background: #fdf3e3; color: #a0600a; }
+    .invite-type.urg  { background: #fdecea; color: #b8291a; }
+    .invite-title { font-size: 13px; font-weight: 500; color: #0d1520; margin-bottom: 2px; }
+    .invite-sub   { font-size: 11px; color: #9ca3af; margin-bottom: 8px; }
+    .invite-btns  { display: flex; gap: 6px; }
+    .invite-btns button {
+      font-size: 11px; padding: 5px 12px; border-radius: 20px;
+      border: 1px solid; cursor: pointer; font-family: 'Outfit', sans-serif;
+    }
+    .btn-accept { background: #eaf5ed; color: #1a7a48; border-color: rgba(26,122,74,.3); }
+    .btn-decline{ background: #fdecea; color: #b8291a; border-color: rgba(184,41,26,.2); }
+
+    /* Snelacties */
+    .quick-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .qa {
+      font-size: 11px; padding: 5px 10px; border-radius: 20px;
+      border: 1px solid rgba(15,17,23,.12); background: transparent;
+      color: #4b5563; cursor: pointer; font-family: 'Outfit', sans-serif;
+    }
+    .qa:hover { background: #f4f3ef; }
+
+    .chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
+    .msg-textarea {
+      flex: 1; resize: none; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 9px 13px; font-family: 'Outfit', sans-serif;
+      font-size: 14px; color: #0d1520; line-height: 1.45;
+      max-height: 100px; overflow-y: auto; outline: none;
+      transition: border-color .15s; height: 40px;
+    }
+    .msg-textarea:focus { border-color: #1a7a48; }
+    .send-btn {
+      background: #1a7a48; color: #fff; border: none;
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; transition: background .15s;
+    }
+    .send-btn:hover { background: #0f5c36; }
+    .send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+
+    /* ════════════════════════════════════════════════════════════
+       VIEW 2 — KALENDER
+    ════════════════════════════════════════════════════════════ */
+    .cal-toolbar {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .cal-nav { display: flex; align-items: center; gap: 6px; }
+    .cal-nav button {
+      background: #f4f3ef; border: none; color: #4b5563;
+      padding: 4px 10px; border-radius: 8px; cursor: pointer;
+      font-size: .82rem; font-family: 'Outfit', sans-serif;
+    }
+    .cal-month-label { font-size: .95rem; font-weight: 600; color: #0d1520; min-width: 100px; text-align: center; }
+
+    .cal-legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .leg-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #4b5563; }
+    .leg-dot  { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 3px; margin-bottom: 12px;
+    }
+    .cal-hdr { font-size: 10px; font-weight: 500; color: #9ca3af; text-align: center; padding: 4px 0; }
+    .cal-day {
+      min-height: 50px; border-radius: 8px; padding: 4px;
+      border: 1px solid transparent; cursor: pointer;
+      transition: border-color .1s; background: #fff;
+    }
+    .cal-day:hover:not(.school-day):not(.other-month) { border-color: rgba(26,122,74,.3); }
+    .cal-day.today { border-color: #1a4f8a !important; }
+    .cal-day.school-day { background: #f1efe8; cursor: default; }
+    .cal-day.other-month { opacity: .3; pointer-events: none; }
+    .day-num { font-size: 11px; color: #6b7280; margin-bottom: 2px; }
+    .cal-day.today .day-num { font-weight: 600; color: #1a4f8a; }
+    .cal-ev {
+      font-size: 9px; padding: 1px 4px; border-radius: 3px;
+      margin-bottom: 1px; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent;
+    }
+    .cal-ev.eval   { background: #e8f0fb; color: #1a4f8a; border-color: rgba(26,79,138,.2); }
+    .cal-ev.vpg    { background: #eaf5ed; color: #1a7a48; border-color: rgba(26,122,74,.2); }
+    .cal-ev.drie   { background: #fdf3e3; color: #a0600a; border-color: rgba(160,96,10,.2); }
+    .cal-ev.urg    { background: #fdecea; color: #b8291a; border-color: rgba(184,41,26,.2); }
+    .cal-ev.school { background: #f1efe8; color: #4b5563; border-color: rgba(15,17,23,.1); }
+
+    /* Nieuwe afspraak paneel */
+    .new-meeting-panel {
+      background: #f4f3ef; border-radius: 10px;
+      padding: 14px; margin-bottom: 12px;
+    }
+    .meet-type-grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px; margin-bottom: 10px;
+    }
+    @media (max-width: 420px) { .meet-type-grid { grid-template-columns: 1fr; } }
+    .mtype-btn {
+      padding: 9px 11px; border-radius: 10px;
+      border: 1.5px solid rgba(15,17,23,.1); background: #fff;
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      text-align: left; transition: border-color .1s;
+    }
+    .mtype-btn.selected.eval { border-color: #1a4f8a; }
+    .mtype-btn.selected.vpg  { border-color: #1a7a48; }
+    .mtype-btn.selected.drie { border-color: #a0600a; }
+    .mtype-btn.selected.urg  { border-color: #b8291a; }
+    .mtype-name { font-size: 12px; font-weight: 500; color: #0d1520; margin-bottom: 2px; }
+    .mtype-note { font-size: 10px; color: #9ca3af; }
+    .mtype-verplicht {
+      font-size: 9px; padding: 1px 5px; border-radius: 20px;
+      background: #fdf3e3; color: #a0600a;
+      display: inline-block; margin-left: 4px; vertical-align: middle;
+    }
+    .meeting-form-row {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    }
+    .meeting-form-row select {
+      flex: 1; min-width: 100px; padding: 7px 10px;
+      border: 1px solid rgba(15,17,23,.12); border-radius: 8px;
+      background: #fff; font-family: 'Outfit', sans-serif;
+      font-size: 12px; color: #0d1520; outline: none;
+    }
+    .meeting-form-row select:focus { border-color: rgba(26,122,74,.4); }
+    .btn-small {
+      font-size: 12px; padding: 7px 14px; border-radius: 8px;
+      border: none; background: #1a7a48; color: #fff;
+      cursor: pointer; font-family: 'Outfit', sans-serif; white-space: nowrap;
+    }
+    .btn-small:hover { background: #0f5c36; }
+    .btn-full {
+      width: 100%; font-size: 12px; padding: 9px 16px; border-radius: 8px;
+      border: 1px solid rgba(15,17,23,.12); background: transparent;
+      color: #4b5563; cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: background .1s; margin-top: 4px;
+    }
+    .btn-full:hover { background: #f4f3ef; }
+
+    /* ════════════════════════════════════════════════════════════
+       VIEW 3 — EVALUATIE
+    ════════════════════════════════════════════════════════════ */
+    .eval-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px; margin-bottom: 12px;
+    }
+    .eval-title { font-size: 15px; font-weight: 500; color: #0d1520; margin-bottom: 3px; }
+    .eval-sub   { font-size: 12px; color: #9ca3af; }
+    .eval-section { padding: 10px 0; border-bottom: 1px solid rgba(15,17,23,.08); }
+    .eval-section:last-of-type { border-bottom: none; }
+    .eval-section-head {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 8px;
+    }
+    .eval-section-title { font-size: 13px; font-weight: 500; color: #0d1520; }
+
+    .leerdoel-row {
+      display: flex; align-items: center; gap: 9px;
+      padding: 5px 0; font-size: 12px; color: #4b5563;
+    }
+    .ld-box {
+      width: 17px; height: 17px; border-radius: 4px;
+      border: 1px solid rgba(15,17,23,.15); background: #f4f3ef;
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .1s, border-color .1s;
+    }
+    .ld-box.checked { background: #eaf5ed; border-color: rgba(26,122,74,.4); }
+    .ld-box.checked::after { content: '✓'; font-size: 10px; color: #1a7a48; font-weight: 500; }
+
+    .reflectie-textarea {
+      width: 100%; padding: 9px 12px; height: 80px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      font-family: 'Outfit', sans-serif; font-size: 12px;
+      color: #0d1520; background: #fff; resize: none;
+      transition: border-color .15s; outline: none;
+    }
+    .reflectie-textarea:focus { border-color: #1a7a48; }
+    .reflectie-textarea::placeholder { color: #9ca3af; }
+
+    .waiting-block {
+      padding: 8px 11px; background: #f4f3ef;
+      border-radius: 8px; font-size: 12px; color: #9ca3af;
+    }
+
+    .signoff-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .signoff-party {
+      flex: 1; min-width: 110px; padding: 10px 12px;
+      border: 1px solid rgba(15,17,23,.1); border-radius: 10px; text-align: center;
+    }
+    .sp-name { font-size: 12px; font-weight: 500; color: #0d1520; margin-bottom: 2px; }
+    .sp-role { font-size: 10px; color: #9ca3af; margin-bottom: 8px; }
+    .sp-signed { font-size: 11px; color: #1a7a48; font-weight: 500; }
+    .sp-wait   { font-size: 11px; color: #9ca3af; }
+    .btn-sign {
+      font-size: 11px; padding: 5px 12px; border-radius: 20px;
+      border: 1px solid rgba(26,79,138,.3); background: #e8f0fb;
+      color: #1a4f8a; cursor: pointer; font-family: 'Outfit', sans-serif;
+      width: 100%;
+    }
+    .btn-sign:hover { background: #d4e4f7; }
+
+    .archive-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 0; font-size: 12px; color: #4b5563;
+      border-bottom: 1px solid rgba(15,17,23,.07);
+    }
+    .archive-row:last-child { border-bottom: none; }
+
+    /* ════════════════════════════════════════════════════════════
+       VIEW 4 — VERLENGING
+    ════════════════════════════════════════════════════════════ */
+    .renew-metrics {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px; margin-bottom: 12px;
+    }
+    .rm-card { background: #f4f3ef; border-radius: 10px; padding: 10px 12px; }
+    .rm-lbl  { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; margin-bottom: 4px; }
+    .rm-val  { font-size: 22px; font-weight: 600; color: #0d1520; line-height: 1; }
+    .rm-sub  { font-size: 10px; color: #9ca3af; margin-top: 3px; }
+    .rm-val.urgent { color: #b8291a; }
+    .rm-val.good   { color: #1a7a48; }
+
+    .renew-party {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border: 1px solid rgba(15,17,23,.09);
+      border-radius: 10px; margin-bottom: 8px; background: #fff;
+    }
+    .rp-left { display: flex; align-items: center; gap: 9px; }
+    .rp-name { font-size: 13px; font-weight: 500; color: #0d1520; }
+    .rp-role { font-size: 11px; color: #9ca3af; }
+
+    .student-choices { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; padding-left: 43px; }
+    .choice-btn {
+      font-size: 12px; padding: 6px 14px; border-radius: 20px;
+      border: 1px solid; cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: opacity .1s;
+    }
+    .choice-btn:hover { opacity: .82; }
+    .choice-yes  { background: #eaf5ed; color: #1a7a48; border-color: rgba(26,122,74,.3); }
+    .choice-no   { background: #fdecea; color: #b8291a; border-color: rgba(184,41,26,.2); }
+    .choice-wait { background: #f4f3ef; color: #4b5563; border-color: rgba(15,17,23,.12); }
+    .choice-btn.selected { font-weight: 600; border-width: 2px; }
+
+    .legal-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 9px 11px; background: #f4f3ef;
+      border-radius: 9px; margin-bottom: 6px;
+      font-size: 12px; color: #4b5563; line-height: 1.55;
+    }
+    .btn-action-full {
+      width: 100%; font-size: 12px; font-weight: 500; padding: 10px 16px;
+      border-radius: 10px; border: 1px solid rgba(26,79,138,.3);
+      background: #e8f0fb; color: #1a4f8a; cursor: pointer;
+      font-family: 'Outfit', sans-serif; margin-top: 10px; transition: background .1s;
+    }
+    .btn-action-full:hover { background: #d4e4f7; }
+
+    /* ── Responsief ── */
+    @media (max-width: 480px) {
+      .hub-shell { padding: 10px 10px 80px; }
+      .renew-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .signoff-row { flex-direction: column; }
+      .vtab { font-size: 10px; padding: 6px 3px; }
+    }
+    @media (max-width: 400px) {
+      .topbar-bbl-tag { display: none; }
+      .topbar-user { display: none; }
+      .topbar { padding: 0 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Toast — exact patroon chat.html (id="notif" + class="show") -->
+<div class="notif" id="notif"></div>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <a href="bbl-dashboard.html" class="topbar-logo">intern<span>ly</span></a>
+  <span class="topbar-bbl-tag">BBL-traject</span>
+  <nav class="topbar-bbl-nav">
+    <a href="bbl-dashboard.html">Dashboard</a>
+    <a href="bbl-hub.html" class="active">Hub</a>
+  </nav>
+  <div class="topbar-right">
+    <span class="topbar-user" id="topbarUser"></span>
+    <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
+    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
+  </div>
+</div>
+
+<div class="hub-shell">
+
+  <!-- ── Contract strip (altijd zichtbaar, klasse wisselt via JS) ── -->
+  <div class="contract-strip cs-ok" id="contractStrip">
+    <div class="cs-left">
+      <div class="cs-dot"></div>
+      <span id="contractStripText">Contract laden…</span>
+    </div>
+    <button class="cs-action" onclick="goView('verlenging')">Bekijk verlenging</button>
+  </div>
+
+  <!-- ── View tabs ── -->
+  <div class="view-tabs">
+    <button class="vtab active" id="tab-berichten"  onclick="goView('berichten')">Berichten</button>
+    <button class="vtab"        id="tab-kalender"   onclick="goView('kalender')">Kalender</button>
+    <button class="vtab"        id="tab-evaluatie"  onclick="goView('evaluatie')">Evaluatie</button>
+    <button class="vtab"        id="tab-verlenging" onclick="goView('verlenging')">
+      Verlenging<span class="urgent-dot" id="urgentDot" style="display:none;"></span>
+    </button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       VIEW 1 — BERICHTEN
+  ════════════════════════════════════════════════════════ -->
+  <div class="view active" id="view-berichten">
+    <div class="hcard">
+      <div class="slbl">Deelnemers</div>
+      <div class="participants" id="participantsRow">
+        <!-- Gevuld door JS na laden match -->
+        <div class="participant"><div class="av av-blue" style="width:20px;height:20px;font-size:8px;">?</div><span>Laden…</span></div>
+      </div>
+
+      <div class="msg-thread" id="msgThread">
+        <div class="msg-system">Berichten laden…</div>
+      </div>
+
+      <!-- Snelacties -->
+      <div class="quick-actions">
+        <button class="qa" onclick="prefill('Kunnen we een evaluatiegesprek plannen?')">+ Evaluatiegesprek plannen</button>
+        <button class="qa" onclick="prefill('Kunnen we een driegesprek plannen met de ROC-begeleider?')">+ Driegesprek plannen</button>
+        <button class="qa" onclick="prefill('Voortgangsupdate: ')">+ Voortgangsupdate</button>
+      </div>
+
+      <div class="chat-input-row">
+        <textarea class="msg-textarea" id="msgInput"
+          placeholder="Schrijf een bericht… (Enter = versturen, Shift+Enter = nieuwe regel)"
+          rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Versturen">➤</button>
+      </div>
+    </div>
+
+    <!-- Buddy kaart in berichten (wordt gevuld na buddyInit) -->
+    <div class="hcard" id="buddyCard" style="display:none;">
+      <div class="slbl">BBL-buddy (anoniem)</div>
+      <div id="buddyCardContent"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       VIEW 2 — KALENDER
+  ════════════════════════════════════════════════════════ -->
+  <div class="view" id="view-kalender">
+    <div class="hcard">
+      <div class="cal-toolbar">
+        <div class="cal-nav">
+          <button onclick="calPrev()">‹</button>
+          <span class="cal-month-label" id="calMonthLabel">April 2026</span>
+          <button onclick="calNext()">›</button>
+        </div>
+        <button class="btn-small" onclick="toggleNewMeeting()">+ Afspraak plannen</button>
+      </div>
+
+      <!-- Nieuw afspraak paneel -->
+      <div class="new-meeting-panel" id="newMeetingPanel" style="display:none;">
+        <div class="slbl" style="margin-bottom:8px;">Kies type afspraak</div>
+        <div class="meet-type-grid">
+          <button class="mtype-btn eval" onclick="selectMeetType(this,'evaluatie')">
+            <div class="mtype-name">Evaluatiegesprek</div>
+            <div class="mtype-note">Leerdoelen + digitale handtekening</div>
+          </button>
+          <button class="mtype-btn vpg" onclick="selectMeetType(this,'voortgangsgesprek')">
+            <div class="mtype-name">Voortgangsgesprek</div>
+            <div class="mtype-note">Informeel, geen handtekening vereist</div>
+          </button>
+          <button class="mtype-btn drie" onclick="selectMeetType(this,'driegesprek')">
+            <div class="mtype-name">Driegesprek <span class="mtype-verplicht">Wettelijk verplicht</span></div>
+            <div class="mtype-note">Student + bedrijf + ROC tegelijk</div>
+          </button>
+          <button class="mtype-btn urg" onclick="selectMeetType(this,'verlengingsgesprek')">
+            <div class="mtype-name">Verlengingsgesprek</div>
+            <div class="mtype-note">Contractbeslissing + documentatie</div>
+          </button>
+        </div>
+        <div class="meeting-form-row">
+          <select id="meetingDateSelect">
+            <option value="">Kies een datum</option>
+            <!-- Gevuld door JS — schooldagen zijn disabled -->
+          </select>
+          <select id="meetingTimeSelect">
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="11:00">11:00</option>
+            <option value="13:00">13:00</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+          </select>
+          <button class="btn-small" onclick="createMeeting()">Aanmaken</button>
+        </div>
+      </div>
+
+      <!-- Legende -->
+      <div class="cal-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#e8f0fb;border:1px solid rgba(26,79,138,.2);"></div><span>Evaluatie</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:#eaf5ed;border:1px solid rgba(26,122,74,.2);"></div><span>Voortgang</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:#fdf3e3;border:1px solid rgba(160,96,10,.2);"></div><span>Driegesprek</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:#fdecea;border:1px solid rgba(184,41,26,.2);"></div><span>Verlenging</span></div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f1efe8;border:1px solid rgba(15,17,23,.1);"></div><span>Schooldag</span></div>
+      </div>
+
+      <!-- Maandgrid — gevuld door JS -->
+      <div class="cal-grid" id="calGrid"></div>
+
+      <button class="btn-full" onclick="exportIcal()">Exporteer naar agenda (.ics)</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       VIEW 3 — EVALUATIE
+  ════════════════════════════════════════════════════════ -->
+  <div class="view" id="view-evaluatie">
+    <div class="hcard" id="evalCard">
+      <div class="eval-header">
+        <div>
+          <div class="eval-title" id="evalTitle">Evaluatie laden…</div>
+          <div class="eval-sub"   id="evalSub"></div>
+        </div>
+        <span class="badge b-warn" id="evalBadge">In behandeling</span>
+      </div>
+
+      <!-- Leerdoelen checklist -->
+      <div class="eval-section">
+        <div class="eval-section-head">
+          <div class="eval-section-title">Leerdoelen doorlopen</div>
+          <span class="badge b-blue">Jouw taak</span>
+        </div>
+        <div id="leerdoelenList">
+          <!-- Gevuld door JS vanuit student_profiles.skills -->
+          <div class="waiting-block">Leerdoelen laden…</div>
+        </div>
+      </div>
+
+      <!-- Zelfreflectie -->
+      <div class="eval-section">
+        <div class="eval-section-head">
+          <div class="eval-section-title">Zelfreflectie schrijven</div>
+          <span class="badge b-blue">Jouw taak</span>
+        </div>
+        <textarea class="reflectie-textarea" id="reflectieTxt"
+          placeholder="Wat ging goed? Wat wil je verbeteren? Schrijf in je eigen woorden."></textarea>
+        <button class="btn-small" style="margin-top:6px;float:right;" onclick="saveReflectie()">Opslaan</button>
+        <div style="clear:both;"></div>
+      </div>
+
+      <!-- Feedback praktijkbegeleider — readonly voor student -->
+      <div class="eval-section">
+        <div class="eval-section-head">
+          <div class="eval-section-title">Feedback praktijkbegeleider</div>
+          <span class="badge b-neutral" id="bedrijfFeedbackBadge">Wacht op begeleider</span>
+        </div>
+        <div class="waiting-block" id="bedrijfFeedbackBlok">Jouw begeleider vult dit in na het gesprek.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Drievoudige digitale handtekening -->
+      <div class="slbl">Digitale handtekening — alle drie vereist</div>
+      <div class="signoff-row">
+        <div class="signoff-party">
+          <div class="sp-name" id="spStudentName">Student</div>
+          <div class="sp-role">Student</div>
+          <div id="signStudentArea">
+            <button class="btn-sign" onclick="signOff('student')">Zet handtekening</button>
+          </div>
+        </div>
+        <div class="signoff-party">
+          <div class="sp-name" id="spBedrijfName">Praktijkbegeleider</div>
+          <div class="sp-role">Bedrijf</div>
+          <div class="sp-wait" id="sgWait">Wacht op gesprek</div>
+          <div class="sp-signed" id="sgSigned" style="display:none;">✓ Getekend</div>
+        </div>
+        <div class="signoff-party">
+          <div class="sp-name">ROC-begeleider</div>
+          <div class="sp-role">School</div>
+          <div class="sp-wait" id="mjWait">Wacht op student</div>
+          <div class="sp-signed" id="mjSigned" style="display:none;">✓ Getekend</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Archief vorige evaluaties -->
+      <div class="slbl">Vorige evaluaties</div>
+      <div id="evalArchive">
+        <div class="waiting-block">Archief laden…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       VIEW 4 — VERLENGING
+  ════════════════════════════════════════════════════════ -->
+  <div class="view" id="view-verlenging">
+    <div class="hcard">
+      <div class="slbl">Contractverlenging</div>
+
+      <div class="renew-metrics">
+        <div class="rm-card">
+          <div class="rm-lbl">Dagen resterend</div>
+          <div class="rm-val urgent" id="renewDays">—</div>
+        </div>
+        <div class="rm-card">
+          <div class="rm-lbl">Beslissing vereist voor</div>
+          <div class="rm-val" id="renewDeadline" style="font-size:16px;">—</div>
+          <div class="rm-sub">Wettelijke termijn: 90 dagen</div>
+        </div>
+        <div class="rm-card">
+          <div class="rm-lbl">Doorstroom dit bedrijf</div>
+          <div class="rm-val good" id="renewDoorstroom">—</div>
+          <div class="rm-sub">van BBL-studenten</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="slbl">Status per partij</div>
+
+      <!-- Student -->
+      <div class="renew-party">
+        <div class="rp-left">
+          <div class="av av-blue" id="renewStudentAv">LD</div>
+          <div><div class="rp-name" id="renewStudentName">Student</div><div class="rp-role">Student</div></div>
+        </div>
+        <span class="badge b-warn" id="studentRenewBadge">Jouw keuze gevraagd</span>
+      </div>
+      <div class="student-choices">
+        <button class="choice-btn choice-yes"  id="choiceYes"  onclick="studentChoice('ja')">Ja, ik wil verder</button>
+        <button class="choice-btn choice-no"   id="choiceNo"   onclick="studentChoice('nee')">Nee, ik stop</button>
+        <button class="choice-btn choice-wait" id="choiceWait" onclick="studentChoice('weet-niet')">Ik weet het nog niet</button>
+      </div>
+
+      <!-- Bedrijf -->
+      <div class="renew-party">
+        <div class="rp-left">
+          <div class="av av-blue" id="renewBedrijfAv">VA</div>
+          <div><div class="rp-name" id="renewBedrijfName">Bedrijf</div><div class="rp-role" id="renewPraktijkbegeleider">Praktijkbegeleider</div></div>
+        </div>
+        <span class="badge b-neutral" id="bedrijfRenewBadge">Wacht op student</span>
+      </div>
+
+      <!-- School -->
+      <div class="renew-party">
+        <div class="rp-left">
+          <div class="av av-amber" id="rocRenewAv">SC</div>
+          <div><div class="rp-name" id="rocNaamDisplay">School</div><div class="rp-role">Stagebegeleider</div></div>
+        </div>
+        <span class="badge b-neutral" id="schoolRenewBadge">Wacht op student</span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="slbl">Wettelijke verplichtingen</div>
+
+      <div class="legal-row">
+        <span class="badge b-danger" style="flex-shrink:0;font-size:10px;">Verplicht</span>
+        <span>Bedrijf moet uiterlijk 90 dagen voor contracteinde beslissen.
+          Deadline: <strong id="legalDeadline">—</strong>. Niet naleven geeft student recht op schadevergoeding.</span>
+      </div>
+      <div class="legal-row">
+        <span class="badge b-warn" style="flex-shrink:0;font-size:10px;">Aanbevolen</span>
+        <span>Plan een driegesprek met student, bedrijf en ROC.
+          Internly stuurt alle drie een uitnodiging tegelijk.</span>
+      </div>
+
+      <button class="btn-action-full" onclick="goToDriegesprek()">
+        Plan driegesprek voor verlenging
+      </button>
+    </div>
+  </div>
+
+</div><!-- /hub-shell -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// SUPABASE CLIENT — zelfde keys als alle andere Internly-pagina's
+// ─────────────────────────────────────────────────────────────────────────────
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let currentUser          = null;
+let currentStudentProfile = null;  // student_profiles row
+let activeMatch          = null;   // matches row met praktijkbegeleider_profile_id, contract_end_date etc.
+let activeConvId         = null;   // conversations.id voor de match-thread
+let realtimeSub          = null;
+let praktijkbegeleiderName = 'Praktijkbegeleider';
+let selectedMeetType     = null;
+let calYear              = new Date().getFullYear();
+let calMonth             = new Date().getMonth();  // 0-indexed
+let calMeetings          = [];   // meetings voor huidige maand
+let evalMeeting          = null; // openstaande evaluatie
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPERS — exact patroon chat.html
+// ─────────────────────────────────────────────────────────────────────────────
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function formatTime(iso) {
+  return new Date(iso).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDay(iso) {
+  const d = new Date(iso), today = new Date(), yest = new Date(today);
+  yest.setDate(today.getDate() - 1);
+  if (d.toDateString() === today.toDateString()) return 'Vandaag';
+  if (d.toDateString() === yest.toDateString())  return 'Gisteren';
+  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// Notification helper — exact kopie patroon chat.html
+async function createNotification(userId, type, refId, refType, message) {
+  if (!userId) return;
+  const { error } = await db.from('notifications').insert({
+    user_id: userId, type,
+    ref_id: refId || null, ref_type: refType || null,
+    message, read: false,
+  });
+  if (error) console.warn('[bbl-hub] notification fout (non-blocking):', error.message);
+}
+
+async function signOut() {
+  await db.auth.signOut();
+  window.location.href = 'auth.html';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW SWITCHING
+// ─────────────────────────────────────────────────────────────────────────────
+function goView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+
+  // Laad kalender on demand
+  if (name === 'kalender') renderCalendar();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTRACT STRIP — kleur op basis van resterende dagen
+// ─────────────────────────────────────────────────────────────────────────────
+function updateContractStrip(contractEndDate) {
+  if (!contractEndDate) return;
+  const strip = document.getElementById('contractStrip');
+  const txt   = document.getElementById('contractStripText');
+  const days  = Math.ceil((new Date(contractEndDate) - new Date()) / 86400000);
+
+  strip.className = 'contract-strip ' + (days > 60 ? 'cs-ok' : days > 30 ? 'cs-warn' : 'cs-danger');
+  const urgentDot = document.getElementById('urgentDot');
+
+  if (days > 60) {
+    txt.innerHTML = `Contract loopt af over <strong>${days} dagen</strong> (${formatDate(contractEndDate)})`;
+    if (urgentDot) urgentDot.style.display = 'none';
+  } else if (days > 0) {
+    txt.innerHTML = `Contract loopt af over <strong>${days} dagen</strong> — heb je al een gesprek gepland?`;
+    if (urgentDot) urgentDot.style.display = 'block';
+  } else {
+    txt.innerHTML = `<strong>Contract verlopen</strong> — neem contact op met je begeleider`;
+    if (urgentDot) urgentDot.style.display = 'block';
+  }
+
+  // Verlengingsmetrieken bijwerken
+  const renewDays = document.getElementById('renewDays');
+  const renewDeadline = document.getElementById('renewDeadline');
+  const legalDeadline = document.getElementById('legalDeadline');
+  if (renewDays) {
+    renewDays.textContent = days > 0 ? days : '0';
+    renewDays.className = 'rm-val ' + (days < 30 ? 'urgent' : 'good');
+  }
+  if (renewDeadline || legalDeadline) {
+    const deadline = new Date(contractEndDate);
+    deadline.setDate(deadline.getDate() - 90);
+    const deadlineStr = deadline.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (renewDeadline) renewDeadline.textContent = deadlineStr;
+    if (legalDeadline) legalDeadline.textContent = deadlineStr;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW 1 — BERICHTEN
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderParticipants(praktijkbegeleider, rocBegeleider, hasInsiderBuddy) {
+  const container = document.getElementById('participantsRow');
+  const pb = praktijkbegeleider || praktijkbegeleiderName || 'Praktijkbegeleider';
+  const pbInit = escapeHtml(pb.slice(0, 2).toUpperCase());
+  let html = `
+    <div class="participant">
+      <div class="av av-blue" style="width:20px;height:20px;font-size:8px;">${pbInit}</div>
+      <span>${escapeHtml(pb)}</span>
+    </div>
+    <div class="participant">
+      <div class="av av-amber" style="width:20px;height:20px;font-size:8px;">${rocBegeleider ? escapeHtml(rocBegeleider.slice(0,2).toUpperCase()) : 'SC'}</div>
+      <span>${rocBegeleider ? escapeHtml(rocBegeleider) : 'School'} (ROC-begeleider)</span>
+    </div>`;
+  if (hasInsiderBuddy) {
+    html += `
+    <div class="participant">
+      <div class="av av-gray" style="width:20px;height:20px;font-size:9px;">?</div>
+      <span>Anonieme buddy</span>
+    </div>`;
+  }
+  container.innerHTML = html;
+}
+
+function renderMessages(messages) {
+  const thread = document.getElementById('msgThread');
+  if (!messages || messages.length === 0) {
+    thread.innerHTML = '<div class="msg-system">Nog geen berichten. Stuur een bericht om te starten.</div>';
+    return;
+  }
+  let html = '', lastDay = '';
+  messages.forEach(msg => {
+    // Meeting-uitnodiging als speciaal berichttype
+    if (msg.type === 'meeting_invite' && msg.metadata) {
+      let meta = {};
+      try { meta = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata; } catch(e) {}
+      const typeClass = { evaluatie:'eval', voortgangsgesprek:'vpg', driegesprek:'drie', verlengingsgesprek:'urg' }[meta.meeting_type] || 'eval';
+      const typeLabel = { evaluatie:'Evaluatiegesprek', voortgangsgesprek:'Voortgangsgesprek', driegesprek:'Driegesprek', verlengingsgesprek:'Verlengingsgesprek' }[meta.meeting_type] || 'Gesprek';
+      html += `
+        <div class="msg-invite" id="invite-${escapeHtml(msg.id)}">
+          <div class="invite-type ${typeClass}">${typeLabel}</div>
+          <div class="invite-title">${escapeHtml(meta.subject || 'Uitnodiging')}</div>
+          <div class="invite-sub">${escapeHtml(meta.date_label || '')} · ${escapeHtml(meta.organizer || '')}</div>
+          <div class="invite-btns">
+            <button class="btn-accept" onclick="acceptMeetingInvite('${escapeHtml(meta.meeting_id || '')}', '${escapeHtml(msg.id)}')">Ja, ik kom</button>
+            <button class="btn-decline" onclick="declineMeetingInvite('${escapeHtml(meta.meeting_id || '')}', '${escapeHtml(msg.id)}')">Ik kan niet</button>
+          </div>
+        </div>`;
+      return;
+    }
+    const day = formatDay(msg.created_at);
+    if (day !== lastDay) { html += `<div class="msg-system">${escapeHtml(day)}</div>`; lastDay = day; }
+    const isOwn = msg.sender_id === currentUser?.id;
+    const rowClass = isOwn ? 'own' : 'other';
+    const init = escapeHtml((msg._senderName || '?').slice(0,2).toUpperCase());
+    html += `
+      <div class="msg-row ${rowClass}">
+        ${!isOwn ? `<div class="msg-avatar">${init}</div>` : ''}
+        <div class="bubble-wrap">
+          <div class="bubble">${escapeHtml(msg.content || '')}</div>
+          <span class="msg-time">${escapeHtml(formatTime(msg.created_at))}</span>
+        </div>
+      </div>`;
+  });
+  thread.innerHTML = html;
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function appendMessage(msg) {
+  const thread = document.getElementById('msgThread');
+  const systemMsg = thread.querySelector('.msg-system');
+  if (systemMsg && systemMsg.textContent === 'Nog geen berichten. Stuur een bericht om te starten.') {
+    systemMsg.remove();
+  }
+  const isOwn = msg.sender_id === currentUser?.id;
+  const row = document.createElement('div');
+  row.className = 'msg-row ' + (isOwn ? 'own' : 'other');
+  const init = escapeHtml((msg._senderName || '?').slice(0,2).toUpperCase());
+  row.innerHTML = `
+    ${!isOwn ? `<div class="msg-avatar">${init}</div>` : ''}
+    <div class="bubble-wrap">
+      <div class="bubble">${escapeHtml(msg.content || '')}</div>
+      <span class="msg-time">${escapeHtml(formatTime(msg.created_at))}</span>
+    </div>`;
+  thread.appendChild(row);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function loadMessages() {
+  if (!activeConvId) return;
+  const { data: messages, error } = await db
+    .from('messages')
+    .select('id, sender_id, content, created_at, read, type, metadata')
+    .eq('conversation_id', activeConvId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('[bbl-hub] berichten laden fout:', error.message);
+    document.getElementById('msgThread').innerHTML =
+      '<div class="msg-system">Berichten konden niet worden geladen.</div>';
+    return;
+  }
+
+  const myName = currentUser.user_metadata?.naam
+    || currentUser.user_metadata?.name
+    || currentUser.email?.split('@')[0] || 'Jij';
+
+  const annotated = (messages || []).map(m => ({
+    ...m,
+    _senderName: m.sender_id === currentUser?.id ? myName : praktijkbegeleiderName,
+  }));
+  renderMessages(annotated);
+}
+
+// Realtime abonnement — exact patroon chat.html
+function subscribeRealtime() {
+  if (realtimeSub) { try { db.removeChannel(realtimeSub); } catch(e) {} }
+  if (!activeConvId) return;
+  realtimeSub = db
+    .channel('bbl-msgs-' + activeConvId)
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + activeConvId },
+      payload => {
+        const msg = { ...payload.new, _senderName: praktijkbegeleiderName };
+        if (msg.sender_id !== currentUser?.id) appendMessage(msg);
+      }
+    )
+    .subscribe();
+}
+
+async function markMessagesRead() {
+  if (!activeConvId || !currentUser) return;
+  await db.from('messages')
+    .update({ read: true })
+    .eq('conversation_id', activeConvId)
+    .neq('sender_id', currentUser.id)
+    .eq('read', false);
+}
+
+async function sendMessage() {
+  if (!activeConvId || !currentUser) {
+    notify('Geen actief gesprek gevonden. Controleer je BBL-koppeling.');
+    return;
+  }
+  const input = document.getElementById('msgInput');
+  const content = input.value.trim();
+  if (!content) return;
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  input.value = '';
+  input.style.height = 'auto';
+
+  const myName = currentUser.user_metadata?.naam
+    || currentUser.user_metadata?.name
+    || currentUser.email?.split('@')[0] || 'Jij';
+
+  // Optimistic append — exact patroon chat.html
+  appendMessage({
+    id:              'opt-' + Date.now(),
+    sender_id:       currentUser.id,
+    _senderName:     myName,
+    content,
+    created_at:      new Date().toISOString(),
+    conversation_id: activeConvId,
+  });
+
+  const { error } = await db.from('messages').insert({
+    conversation_id: activeConvId,
+    sender_id:       currentUser.id,
+    content,
+  });
+  btn.disabled = false;
+
+  if (error) {
+    notify('Fout bij verzenden: ' + error.message);
+    return;
+  }
+
+  // Notificeer praktijkbegeleider (fire-and-forget)
+  if (activeMatch?.praktijkbegeleider_profile_id) {
+    createNotification(
+      activeMatch.praktijkbegeleider_profile_id,
+      'new_message',
+      activeMatch.id,
+      'match',
+      myName + ' heeft een bericht gestuurd'
+    );
+  }
+}
+
+// Snelactie — vul invoerveld met template
+function prefill(text) {
+  const input = document.getElementById('msgInput');
+  input.value = text;
+  input.focus();
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+}
+
+// Auto-resize textarea
+document.getElementById('msgInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+document.getElementById('msgInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+// Meeting-uitnodiging accepteren/weigeren
+async function acceptMeetingInvite(meetingId, msgId) {
+  if (!meetingId) return;
+  const { error } = await db
+    .from('meetings')
+    .update({ status: 'bevestigd' })
+    .eq('id', meetingId);
+  if (error) { notify('Acceptatie mislukt: ' + error.message); return; }
+  const card = document.getElementById('invite-' + msgId);
+  if (card) card.querySelector('.invite-btns').innerHTML = '<span style="font-size:11px;color:#1a7a48;font-weight:500;">✓ Bevestigd</span>';
+  // Notificeer organisator
+  if (activeMatch?.praktijkbegeleider_profile_id) {
+    createNotification(
+      activeMatch.praktijkbegeleider_profile_id,
+      'meeting_accepted',
+      meetingId,
+      'meeting',
+      (currentUser.user_metadata?.naam || 'Student') + ' heeft de uitnodiging geaccepteerd'
+    );
+  }
+  notify('Bevestigd!');
+}
+
+async function declineMeetingInvite(meetingId, msgId) {
+  if (!meetingId) return;
+  const { error } = await db
+    .from('meetings')
+    .update({ status: 'afgewezen' })
+    .eq('id', meetingId);
+  if (error) { notify('Weigering mislukt: ' + error.message); return; }
+  const card = document.getElementById('invite-' + msgId);
+  if (card) card.querySelector('.invite-btns').innerHTML = '<span style="font-size:11px;color:#b8291a;font-weight:500;">Geweigerd</span>';
+  notify('Uitnodiging geweigerd');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW 2 — KALENDER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function schoolDagNummer(dag) {
+  // Vertaal dagname naar 0-indexed weekdag (maandag=1 ... zondag=0)
+  const map = { maandag:1, dinsdag:2, woensdag:3, donderdag:4, vrijdag:5, zaterdag:6, zondag:0 };
+  return map[(dag || '').toLowerCase()] ?? -1;
+}
+
+async function loadMeetings() {
+  const first = new Date(calYear, calMonth, 1).toISOString().slice(0, 10);
+  const last  = new Date(calYear, calMonth + 1, 0).toISOString().slice(0, 10);
+  const { data, error } = await db
+    .from('meetings')
+    .select('*')
+    .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
+    .gte('proposed_date', first)
+    .lte('proposed_date', last);
+
+  if (error) { console.error('[bbl-hub] meetings laden fout:', error.message); return; }
+  calMeetings = data || [];
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  const label = document.getElementById('calMonthLabel');
+  const schDagNr = schoolDagNummer(currentStudentProfile?.schooldag || '');
+
+  label.textContent = new Date(calYear, calMonth).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+
+  // Header
+  const headers = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
+  let html = headers.map(d => `<div class="cal-hdr">${d}</div>`).join('');
+
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth + 1, 0);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // Offset: ISO week starts Monday (1). first.getDay() is 0=Sun,1=Mon,...
+  let startOffset = (first.getDay() + 6) % 7; // 0=Mon
+
+  // Padding days from previous month
+  const prevLast = new Date(calYear, calMonth, 0).getDate();
+  for (let i = startOffset - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><div class="day-num">${prevLast - i}</div></div>`;
+  }
+
+  // Days of month
+  for (let d = 1; d <= last.getDate(); d++) {
+    const date = new Date(calYear, calMonth, d);
+    const isToday     = date.getTime() === today.getTime();
+    const jsWday      = date.getDay(); // 0=Sun, 1=Mon, ..., 5=Fri, 6=Sat
+    const isSchoolDay = schDagNr !== -1 && jsWday === schDagNr;
+
+    let classes = 'cal-day';
+    if (isToday)     classes += ' today';
+    if (isSchoolDay) classes += ' school-day';
+
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayMeetings = calMeetings.filter(m => (m.proposed_date || '').slice(0,10) === dateStr);
+
+    const typeClass = { evaluatie:'eval', voortgangsgesprek:'vpg', driegesprek:'drie', verlengingsgesprek:'urg' };
+    const evHtml = dayMeetings.map(m =>
+      `<div class="cal-ev ${typeClass[m.type] || 'eval'}" title="${escapeHtml(m.subject || m.type || '')}">${escapeHtml(m.subject || m.type || '')}</div>`
+    ).join('');
+
+    const tooltip = isSchoolDay ? ' title="Schooldag — geen afspraken mogelijk"' : '';
+    const clickFn = isSchoolDay ? '' : `onclick="calDayClick('${dateStr}')"`;
+    html += `<div class="${classes}"${tooltip}${clickFn ? ' ' + clickFn : ''}>
+      <div class="day-num">${d}</div>
+      ${evHtml}
+      ${isSchoolDay ? '<div style="font-size:8px;color:#9ca3af;margin-top:1px;">school</div>' : ''}
+    </div>`;
+  }
+
+  // Trailing days
+  const totalCells = startOffset + last.getDate();
+  const trail = (7 - (totalCells % 7)) % 7;
+  for (let d = 1; d <= trail; d++) {
+    html += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // Vul datum-select voor nieuw afspraak paneel
+  fillDateSelect();
+}
+
+function calDayClick(dateStr) {
+  document.getElementById('meetingDateSelect').value = dateStr;
+  if (document.getElementById('newMeetingPanel').style.display === 'none') {
+    toggleNewMeeting();
+  }
+}
+
+function calPrev() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  loadMeetings().then(() => renderCalendar());
+}
+function calNext() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  loadMeetings().then(() => renderCalendar());
+}
+
+function toggleNewMeeting() {
+  const panel = document.getElementById('newMeetingPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectMeetType(btn, type) {
+  document.querySelectorAll('.mtype-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedMeetType = type;
+}
+
+function fillDateSelect() {
+  const select = document.getElementById('meetingDateSelect');
+  const schDagNr = schoolDagNummer(currentStudentProfile?.schooldag || '');
+  const last = new Date(calYear, calMonth + 1, 0).getDate();
+  let opts = '<option value="">Kies een datum</option>';
+  for (let d = 1; d <= last; d++) {
+    const date = new Date(calYear, calMonth, d);
+    const jsWday = date.getDay();
+    const isSchool = schDagNr !== -1 && jsWday === schDagNr;
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const label = date.toLocaleDateString('nl-NL', { weekday:'short', day:'numeric', month:'short' });
+    opts += `<option value="${dateStr}" ${isSchool ? 'disabled' : ''}>${label}${isSchool ? ' — schooldag (geblokkeerd)' : ''}</option>`;
+  }
+  select.innerHTML = opts;
+}
+
+async function createMeeting() {
+  if (!selectedMeetType) { notify('Kies eerst een type afspraak.'); return; }
+  const date = document.getElementById('meetingDateSelect').value;
+  const time = document.getElementById('meetingTimeSelect').value;
+  if (!date) { notify('Kies een datum.'); return; }
+  if (!currentUser || !activeMatch) { notify('Koppeling niet geladen. Ververs de pagina.'); return; }
+
+  const subject = {
+    evaluatie: 'Evaluatiegesprek',
+    voortgangsgesprek: 'Voortgangsgesprek',
+    driegesprek: 'Driegesprek',
+    verlengingsgesprek: 'Verlengingsgesprek',
+  }[selectedMeetType] + ' — Internly';
+
+  const timeEnd = (parseInt(time.split(':')[0]) + 1).toString().padStart(2,'0') + ':00';
+
+  // Basisrij voor student
+  const { data: newMeeting, error } = await db.from('meetings').insert({
+    organizer_id:  currentUser.id,
+    attendee_id:   activeMatch.praktijkbegeleider_profile_id || currentUser.id,
+    type:          selectedMeetType,
+    subject,
+    proposed_date: date,
+    time_start:    time,
+    time_end:      timeEnd,
+    status:        'openstaand',
+    match_id:      activeMatch.id,
+  }).select('id').single();
+
+  if (error) { notify('Aanmaken mislukt: ' + error.message); return; }
+
+  // Driegesprek: ook ROC-begeleider uitnodigen
+  if (selectedMeetType === 'driegesprek') {
+    // TODO: ROC-begeleider profile_id ophalen uit school koppeling
+    // Voor nu: notificeer praktijkbegeleider + log
+    // TODO P2: driegesprek ROC-notificatie wacht op roc_profile_id kolom op matches;
+  }
+
+  // Notificeer praktijkbegeleider
+  if (activeMatch.praktijkbegeleider_profile_id) {
+    await createNotification(
+      activeMatch.praktijkbegeleider_profile_id,
+      'meeting_invite',
+      newMeeting.id,
+      'meeting',
+      (currentUser.user_metadata?.naam || 'Student') + ' heeft een ' + selectedMeetType + ' gepland op ' + date
+    );
+  }
+
+  notify('Afspraak aangemaakt — uitnodiging verzonden!');
+  await loadMeetings();
+  renderCalendar();
+  document.getElementById('newMeetingPanel').style.display = 'none';
+}
+
+// iCal export — client-side, geen externe library
+function exportIcal() {
+  if (!calMeetings.length) { notify('Geen afspraken deze maand om te exporteren.'); return; }
+
+  function icsDate(dateStr, timeStr) {
+    // dateStr: '2026-04-16', timeStr: '10:00'
+    return (dateStr + 'T' + timeStr + ':00').replace(/[-:]/g, '').slice(0, 15);
+  }
+
+  let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Internly//BBL Hub//NL\r\n';
+  calMeetings.forEach(m => {
+    const start = icsDate(m.proposed_date || '', m.time_start || '09:00');
+    const end   = icsDate(m.proposed_date || '', m.time_end   || '10:00');
+    ics += `BEGIN:VEVENT\r\n`;
+    ics += `DTSTART:${start}\r\n`;
+    ics += `DTEND:${end}\r\n`;
+    ics += `SUMMARY:${(m.subject || m.type || 'Afspraak').replace(/[,;]/g, '\\$&')}\r\n`;
+    ics += `DESCRIPTION:Internly BBL-afspraak\r\n`;
+    ics += `END:VEVENT\r\n`;
+  });
+  ics += 'END:VCALENDAR';
+
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `internly-bbl-${calYear}-${String(calMonth+1).padStart(2,'0')}.ics`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  notify('Agenda geëxporteerd!');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW 3 — EVALUATIE
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function loadEvaluatie() {
+  if (!currentUser) return;
+
+  // Meest recente openstaande evaluatie
+  const { data: meeting } = await db
+    .from('meetings')
+    .select('*')
+    .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
+    .eq('type', 'evaluatie')
+    .in('status', ['openstaand', 'student_getekend', 'bedrijf_getekend'])
+    .order('proposed_date', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  evalMeeting = meeting;
+  const titleEl  = document.getElementById('evalTitle');
+  const subEl    = document.getElementById('evalSub');
+  const badgeEl  = document.getElementById('evalBadge');
+
+  if (meeting) {
+    titleEl.textContent = meeting.subject || 'Evaluatiegesprek';
+    subEl.textContent   = 'Datum: ' + formatDate(meeting.proposed_date) + ' · Alle drie partijen moeten tekenen';
+    badgeEl.textContent = 'In behandeling';
+    badgeEl.className   = 'badge b-warn';
+    renderSignoffStatus(meeting.status);
+  } else {
+    titleEl.textContent = 'Geen openstaande evaluatie';
+    subEl.textContent   = '';
+    badgeEl.textContent = 'Geen openstaande evaluatie';
+    badgeEl.className   = 'badge b-neutral';
+  }
+
+  // Leerdoelen
+  renderLeerdoelen(currentStudentProfile?.skills || []);
+
+  // Naam student in handtekening
+  const myName = currentUser.user_metadata?.naam
+    || currentUser.user_metadata?.name
+    || currentUser.email?.split('@')[0] || 'Student';
+  const el = document.getElementById('spStudentName');
+  if (el) el.textContent = myName;
+
+  // Archief
+  loadEvalArchive();
+}
+
+function renderLeerdoelen(skills) {
+  const list = document.getElementById('leerdoelenList');
+  if (!skills || skills.length === 0) {
+    list.innerHTML = '<div class="waiting-block">Nog geen leerdoelen ingesteld — vul ze in op je profiel.</div>';
+    return;
+  }
+  // Laad voortgang uit DB (skills_progress JSONB op student_profiles)
+  let progress = {};
+  try {
+    const { data: sp } = await db
+      .from('student_profiles')
+      .select('skills_progress')
+      .eq('profile_id', currentUser.id)
+      .maybeSingle();
+    progress = sp?.skills_progress || {};
+  } catch(e) {}
+  // Lokale fallback voor offline / snelheid
+  try {
+    const local = JSON.parse(localStorage.getItem('internly_ld_' + currentUser.id) || '{}');
+    Object.assign(progress, local);
+  } catch(e) {}
+
+  list.innerHTML = skills.map((skill, i) => {
+    const checked = progress[skill] ? ' checked' : '';
+    return `<div class="leerdoel-row">
+      <div class="ld-box${checked}" onclick="toggleLeerdoel(this,'${escapeHtml(skill)}')" data-skill="${escapeHtml(skill)}"></div>
+      <span>${escapeHtml(skill)}</span>
+    </div>`;
+  }).join('');
+}
+
+async function toggleLeerdoel(box, skill) {
+  box.classList.toggle('checked');
+  const checked = box.classList.contains('checked');
+
+  // Optimistische lokale write
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem('internly_ld_' + currentUser.id) || '{}'); } catch(e) {}
+  progress[skill] = checked;
+  localStorage.setItem('internly_ld_' + currentUser.id, JSON.stringify(progress));
+
+  // DB write — JSONB merge via rpc of update
+  try {
+    const { data: sp } = await db
+      .from('student_profiles')
+      .select('skills_progress')
+      .eq('profile_id', currentUser.id)
+      .maybeSingle();
+    const merged = { ...(sp?.skills_progress || {}), [skill]: checked };
+    await db.from('student_profiles')
+      .update({ skills_progress: merged })
+      .eq('profile_id', currentUser.id);
+  } catch(e) {
+    console.warn('[bbl-hub] skills_progress DB write fout:', e?.message || e);
+  }
+}
+
+async function saveReflectie() {
+  if (!activeConvId || !currentUser) { notify('Koppeling niet geladen.'); return; }
+  const content = document.getElementById('reflectieTxt').value.trim();
+  if (!content) { notify('Schrijf eerst een reflectie.'); return; }
+
+  const { error } = await db.from('messages').insert({
+    conversation_id: activeConvId,
+    sender_id:       currentUser.id,
+    content:         '[Zelfreflectie] ' + content,
+    type:            'zelfreflectie',
+  });
+  if (error) { notify('Opslaan mislukt: ' + error.message); return; }
+  notify('Zelfreflectie opgeslagen in de gesprekhistorie');
+}
+
+function renderSignoffStatus(status) {
+  const signArea  = document.getElementById('signStudentArea');
+  const sgWait    = document.getElementById('sgWait');
+  const sgSigned  = document.getElementById('sgSigned');
+  const mjWait    = document.getElementById('mjWait');
+  const mjSigned  = document.getElementById('mjSigned');
+
+  if (status === 'student_getekend' || status === 'bedrijf_getekend' || status === 'voltooid') {
+    if (signArea) signArea.innerHTML = '<div class="sp-signed">✓ Getekend</div>';
+  } else {
+    if (signArea) signArea.innerHTML = '<button class="btn-sign" onclick="signOff(\'student\')">Zet handtekening</button>';
+  }
+  if (status === 'bedrijf_getekend' || status === 'voltooid') {
+    if (sgWait) sgWait.style.display = 'none';
+    if (sgSigned) sgSigned.style.display = 'block';
+  }
+  if (status === 'voltooid') {
+    if (mjWait) mjWait.style.display = 'none';
+    if (mjSigned) mjSigned.style.display = 'block';
+  }
+}
+
+async function signOff(party) {
+  if (!evalMeeting) { notify('Geen openstaande evaluatie om te tekenen.'); return; }
+
+  const newStatus = { student: 'student_getekend', bedrijf: 'bedrijf_getekend', school: 'voltooid' }[party];
+  const { error } = await db
+    .from('meetings')
+    .update({ status: newStatus })
+    .eq('id', evalMeeting.id);
+  if (error) { notify('Handtekening plaatsen mislukt: ' + error.message); return; }
+
+  evalMeeting.status = newStatus;
+  renderSignoffStatus(newStatus);
+
+  // Notificaties per stap
+  if (party === 'student' && activeMatch?.praktijkbegeleider_profile_id) {
+    createNotification(
+      activeMatch.praktijkbegeleider_profile_id,
+      'eval_signed',
+      evalMeeting.id,
+      'meeting',
+      (currentUser.user_metadata?.naam || 'Student') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
+    );
+  }
+  notify('Handtekening geplaatst!');
+}
+
+async function loadEvalArchive() {
+  const { data, error } = await db
+    .from('meetings')
+    .select('id, subject, proposed_date, status')
+    .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
+    .eq('type', 'evaluatie')
+    .eq('status', 'voltooid')
+    .order('proposed_date', { ascending: false });
+
+  const archive = document.getElementById('evalArchive');
+  if (error || !data || data.length === 0) {
+    archive.innerHTML = '<div class="waiting-block">Nog geen afgeronde evaluaties.</div>';
+    return;
+  }
+  archive.innerHTML = data.map(m =>
+    `<div class="archive-row">
+      <span>${escapeHtml(m.subject || 'Evaluatiegesprek')} · ${formatDate(m.proposed_date)}</span>
+      <span class="badge b-ok">Alle drie getekend</span>
+    </div>`
+  ).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW 4 — VERLENGING
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function loadRenewalStatus() {
+  if (!activeMatch?.id) return;
+  let status = {};
+
+  // DB leidend — localStorage als fallback
+  try {
+    const { data: m } = await db
+      .from('matches')
+      .select('renewal_status')
+      .eq('id', activeMatch.id)
+      .maybeSingle();
+    if (m?.renewal_status) status = m.renewal_status;
+  } catch(e) {}
+  if (!status.student) {
+    try { status = JSON.parse(localStorage.getItem('internly_renewal_' + activeMatch.id) || '{}'); } catch(e) {}
+  }
+
+  const studentChoice = status.student || null;
+  if (studentChoice) applyStudentChoiceUI(studentChoice);
+}
+
+async function studentChoice(keuze) {
+  if (!activeMatch?.id) { notify('Koppeling niet geladen. Ververs de pagina.'); return; }
+
+  // Haal huidige renewal_status op, merge student-keuze, schrijf terug
+  let status = {};
+  try {
+    const { data: m } = await db
+      .from('matches')
+      .select('renewal_status')
+      .eq('id', activeMatch.id)
+      .maybeSingle();
+    status = m?.renewal_status || {};
+  } catch(e) {}
+  status.student = keuze;
+
+  // DB write
+  const { error } = await db
+    .from('matches')
+    .update({ renewal_status: status })
+    .eq('id', activeMatch.id);
+  if (error) {
+    console.warn('[bbl-hub] renewal_status write fout:', error.message);
+    // Fallback naar localStorage
+    localStorage.setItem('internly_renewal_' + activeMatch.id, JSON.stringify(status));
+  }
+
+  applyStudentChoiceUI(keuze);
+
+  // Notificeer praktijkbegeleider en school
+  const myName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Student';
+  const msg = { ja: 'wil het contract verlengen', nee: 'wil stoppen na contract', 'weet-niet': 'heeft nog geen beslissing over verlenging' }[keuze];
+  if (activeMatch?.praktijkbegeleider_profile_id) {
+    createNotification(
+      activeMatch.praktijkbegeleider_profile_id,
+      'renewal_choice',
+      activeMatch.id,
+      'match',
+      myName + ' ' + msg
+    );
+  }
+  notify('Keuze opgeslagen — je begeleider wordt op de hoogte gesteld.');
+}
+
+function applyStudentChoiceUI(keuze) {
+  const badge = document.getElementById('studentRenewBadge');
+  const map = { ja: ['b-ok','Ja, ik wil verder'], nee: ['b-danger','Nee, ik stop'], 'weet-niet': ['b-warn','Weet het nog niet'] };
+  if (badge && map[keuze]) {
+    badge.className = 'badge ' + map[keuze][0];
+    badge.textContent = map[keuze][1];
+  }
+  // Markeer gekozen knop
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  const btnMap = { ja: 'choiceYes', nee: 'choiceNo', 'weet-niet': 'choiceWait' };
+  const btn = document.getElementById(btnMap[keuze]);
+  if (btn) btn.classList.add('selected');
+}
+
+async function loadDoorstroom() {
+  if (!activeMatch?.internship_postings?.company_user_id) return;
+  const { data } = await db
+    .from('company_doorstroom')
+    .select('doorstroom_pct')
+    .eq('company_id', activeMatch.internship_postings.company_user_id)
+    .maybeSingle();
+
+  const el = document.getElementById('renewDoorstroom');
+  if (el && data?.doorstroom_pct != null) {
+    el.textContent = Math.round(data.doorstroom_pct) + '%';
+  }
+}
+
+function goToDriegesprek() {
+  goView('kalender');
+  // Preselecteer driegesprek in het paneel
+  setTimeout(() => {
+    if (document.getElementById('newMeetingPanel').style.display === 'none') toggleNewMeeting();
+    document.querySelectorAll('.mtype-btn').forEach(b => {
+      if (b.classList.contains('drie')) {
+        b.classList.add('selected');
+        selectedMeetType = 'driegesprek';
+      }
+    });
+  }, 100);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT — authenticatie + BBL-check + data laden
+// ─────────────────────────────────────────────────────────────────────────────
+
+window.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. Auth guard — exact patroon discover.html / student-profile.html
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+  currentUser = user;
+
+  // 2. BBL-check
+  const { data: sp, error: spErr } = await db
+    .from('student_profiles')
+    .select('profile_id, opleiding, sector, opdracht_domein, schooldag, skills, bbl_mode, school')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+
+  if (spErr) console.error('[bbl-hub] student_profiles fout:', spErr.message);
+
+  if (!sp?.bbl_mode) {
+    // Geen BBL-student — doorsturen naar discover
+    window.location.href = 'discover.html';
+    return;
+  }
+
+  currentStudentProfile = sp;
+
+  // 3. Topbar gebruikersnaam
+  const name = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+  document.getElementById('topbarUser').textContent = name;
+
+  // 4. Actieve BBL-match ophalen (internship_postings voor doorstroom + company info)
+  const { data: match } = await db
+    .from('matches')
+    .select(`
+      id, party_a, party_b, status,
+      praktijkbegeleider_profile_id,
+      contract_end_date,
+      internship_postings(id, title, company_name, company_user_id, contract_start, contract_end, hours_per_week, bbl_mode)
+    `)
+    .or(`party_a.eq.${user.id},party_b.eq.${user.id}`)
+    .eq('status', 'actief')
+    .limit(1)
+    .maybeSingle();
+
+  activeMatch = match;
+
+  // Contract strip
+  const contractEnd = match?.contract_end_date || match?.internship_postings?.contract_end;
+  if (contractEnd) updateContractStrip(contractEnd);
+
+  // Praktijkbegeleider naam ophalen
+  if (match?.praktijkbegeleider_profile_id) {
+    const { data: pb } = await db
+      .from('profiles')
+      .select('naam, name')
+      .eq('id', match.praktijkbegeleider_profile_id)
+      .maybeSingle();
+    if (pb) praktijkbegeleiderName = pb.naam || pb.name || 'Praktijkbegeleider';
+  }
+
+  // ROC-begeleider: zoek schoolprofiel op basis van student_profiles.school
+  let rocNaam = null;
+  if (sp?.school) {
+    const { data: schoolProfile } = await db
+      .from('profiles')
+      .select('naam')
+      .eq('role', 'school')
+      .ilike('naam', sp.school.trim())
+      .limit(1)
+      .maybeSingle();
+    if (schoolProfile?.naam) rocNaam = schoolProfile.naam;
+  }
+  // Verlengingsmetriek: school naam + initialen tonen
+  const _rocLabel = rocNaam || sp?.school || 'School';
+  const schoolRocEl = document.getElementById('rocNaamDisplay');
+  if (schoolRocEl) schoolRocEl.textContent = _rocLabel;
+  const rocAvEl = document.getElementById('rocRenewAv');
+  if (rocAvEl) rocAvEl.textContent = _rocLabel.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+  // Verlengingsmetriek: naam student in renew-view
+  const studentAv = document.getElementById('renewStudentAv');
+  const studentNameEl = document.getElementById('renewStudentName');
+  if (studentAv && name) studentAv.textContent = name.slice(0,2).toUpperCase();
+  if (studentNameEl && name) studentNameEl.textContent = name;
+
+  // Bedrijf naam
+  if (match?.internship_postings?.company_name) {
+    const bedrijfEl = document.getElementById('renewBedrijfName');
+    if (bedrijfEl) bedrijfEl.textContent = match.internship_postings.company_name;
+    const bedrijfAv = document.getElementById('renewBedrijfAv');
+    if (bedrijfAv) bedrijfAv.textContent = match.internship_postings.company_name.slice(0,2).toUpperCase();
+  }
+  if (praktijkbegeleiderName) {
+    const pbEl = document.getElementById('renewPraktijkbegeleider');
+    if (pbEl) pbEl.textContent = 'Praktijkbegeleider: ' + praktijkbegeleiderName;
+  }
+
+  // 5. Gesprekschannel (conversations) — match-thread
+  if (match) {
+    let { data: conv } = await db
+      .from('conversations')
+      .select('id')
+      .eq('match_id', match.id)
+      .is('buddy_pair_id', null)
+      .limit(1)
+      .maybeSingle();
+
+    if (!conv) {
+      const { data: newConv } = await db
+        .from('conversations')
+        .insert({ match_id: match.id })
+        .select('id')
+        .single();
+      conv = newConv;
+    }
+
+    if (conv) {
+      activeConvId = conv.id;
+      await loadMessages();
+      subscribeRealtime();
+      markMessagesRead();
+    }
+  }
+
+  // 6. Deelnemers in berichten-view
+  renderParticipants(praktijkbegeleiderName, rocNaam, false);
+
+  // Geen actieve koppeling — toon lege staat in berichten-view
+  if (!match) {
+    document.getElementById('msgThread').innerHTML =
+      '<div class="msg-system">Nog geen actieve BBL-koppeling gevonden. Neem contact op met je school of leerbedrijf.</div>';
+    document.getElementById('participantsRow').innerHTML =
+      '<div class="participant"><div class="av av-gray" style="width:20px;height:20px;font-size:8px;">?</div><span>Geen koppeling</span></div>';
+  }
+
+  // 7. Buddy init (insider type voor BBL)
+  try {
+    await buddyInit(user.id, 'student', db, name);
+    const insiderPair = BuddyModule.activePairs.find(p => p.type === 'insider');
+    if (insiderPair) {
+      renderParticipants(praktijkbegeleiderName, rocNaam, true);
+      renderBuddyCard(insiderPair);
+    }
+  } catch(e) {
+    console.warn('[bbl-hub] buddy init fout (non-blocking):', e);
+  }
+
+  // 8. Kalender: laad meetings voor huidige maand (lazy — renderCalendar wordt aangeroepen bij view switch)
+  await loadMeetings();
+
+  // Deep-link vanuit dashboard quick-actions — na loadMeetings zodat kalender data heeft
+  const deepView = sessionStorage.getItem('bblView');
+  if (deepView) { sessionStorage.removeItem('bblView'); goView(deepView); }
+
+  // 9. Evaluatie laden
+  await loadEvaluatie();
+
+  // 10. Verlenging: doorstroom + opgeslagen keuze
+  loadDoorstroom();
+  loadRenewalStatus();
+});
+
+// Buddy kaart in berichten-view
+function renderBuddyCard(pair) {
+  const card = document.getElementById('buddyCard');
+  const content = document.getElementById('buddyCardContent');
+  if (!card || !content) return;
+
+  const isAnon = pair.reveal_after && new Date(pair.reveal_after) > new Date();
+  const name   = isAnon ? 'Anonieme buddy' : escapeHtml(pair.buddy_name || 'Buddy');
+  const sub    = isAnon ? 'Identiteit zichtbaar na je contract' : 'BBL-buddy · actief';
+  const init   = isAnon ? '?' : escapeHtml((pair.buddy_name || '?')[0].toUpperCase());
+
+  content.innerHTML = `
+    <div class="person">
+      <div class="av av-gray">${init}</div>
+      <div><div class="p-name">${name}</div><div class="p-role">${sub}</div></div>
+    </div>
+    ${!isAnon ? `<div class="pills"><button class="pill pill-primary" onclick="buddyOpenChat('${String(pair.id||'').replace(/[^a-zA-Z0-9\-]/g,'')}')">Stuur bericht</button></div>` : ''}
+    <div style="font-size:11px;color:#9ca3af;margin-top:8px;">
+      Jouw buddy werkt bij ${escapeHtml(activeMatch?.internship_postings?.company_name || 'dit bedrijf')} en kan je anoniem eerlijk vertellen hoe het er echt aan toe gaat.
+    </div>`;
+  card.style.display = 'block';
+}
+
+// Cleanup realtime op page unload
+window.addEventListener('beforeunload', () => {
+  if (realtimeSub) { try { db.removeChannel(realtimeSub); } catch(e) {} }
+});
+</script>
+
+</body>
+</html>

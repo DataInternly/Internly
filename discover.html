@@ -14,6 +14,7 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6ozhZf1wVjSq6aBMhOmW1u3nfr1UsGMc&libraries=places" defer></script>
   <script src="js/reistijd.js" defer></script>
   <script src="js/push.js"></script>
+  <script src="js/buddy.js"></script>
   <style>
     .topbar {
       background: linear-gradient(135deg, #1a7a48, #0f5c36);
@@ -276,6 +277,105 @@
       box-shadow: 0 4px 16px rgba(0,0,0,.2);
     }
     .trust-info:hover .trust-info-text { display: block; }
+
+    /* ── Buddy section ─────────────────────────────────────────── */
+    #buddySection {
+      display: none; /* shown only for authenticated students */
+      background: #f0f7f3;
+      border: 1.5px solid #c6dfd0;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-top: 40px;
+    }
+    #buddySection h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #0d1520;
+      margin: 0 0 4px;
+    }
+    #buddySection .buddy-section-sub {
+      font-size: .88rem; color: #6b7280; margin-bottom: 20px;
+    }
+    .buddy-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .buddy-tab {
+      padding: 7px 16px; border-radius: 20px; font-size: .85rem; font-weight: 600;
+      border: 1.5px solid #c6dfd0; background: #fff; color: #1a7a48;
+      cursor: pointer; transition: background .15s, color .15s;
+    }
+    .buddy-tab.active { background: #1a7a48; color: #fff; border-color: #1a7a48; }
+    .buddy-tab-panel { display: none; }
+    .buddy-tab-panel.active { display: block; }
+
+    /* buddy cards (shared with buddy.js render output) */
+    .buddy-card {
+      display: flex; align-items: center; gap: 14px;
+      background: #fff; border: 1.5px solid #e4ede8; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .buddy-card__avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #1a7a48; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 700; flex-shrink: 0;
+    }
+    .buddy-card__info { flex: 1; min-width: 0; }
+    .buddy-card__name { font-weight: 600; font-size: .95rem; color: #0d1520; }
+    .buddy-card__label { font-size: .78rem; color: #6b7280; margin-top: 2px; }
+    .buddy-card__anon-note { font-size: .75rem; color: #FF7E42; margin-top: 3px; }
+    .buddy-card__actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+    .buddy-card__actions button {
+      padding: 6px 13px; border-radius: 20px; font-size: .8rem; font-weight: 600;
+      border: none; background: #1a7a48; color: #fff; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .buddy-card__actions button:hover { opacity: .85; }
+    .buddy-card__actions .btn-ghost {
+      background: #fff; color: #6b7280;
+      border: 1.5px solid #d1d5db;
+    }
+
+    /* buddy request cards */
+    .buddy-request {
+      background: #fff; border: 1.5px solid #fde8d8; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .buddy-request__who { font-weight: 600; font-size: .92rem; color: #0d1520; }
+    .buddy-request__message {
+      font-size: .85rem; color: #4b5563; margin-top: 6px;
+      font-style: italic;
+    }
+    .buddy-request__actions { display: flex; gap: 8px; margin-top: 10px; }
+    .buddy-request__actions button {
+      padding: 6px 13px; border-radius: 20px; font-size: .8rem; font-weight: 600;
+      border: none; background: #1a7a48; color: #fff; cursor: pointer;
+    }
+    .buddy-request__actions .btn-ghost {
+      background: #fff; color: #6b7280;
+      border: 1.5px solid #d1d5db;
+    }
+
+    /* buddy widget */
+    .buddy-widget {
+      background: #fff; border: 1.5px solid #e4ede8; border-radius: 12px;
+      padding: 16px 18px;
+    }
+    .buddy-widget__description { font-size: .9rem; color: #374151; line-height: 1.6; margin-bottom: 12px; }
+    .buddy-widget__privacy { font-size: .78rem; color: #FF7E42; margin-bottom: 10px; }
+    .buddy-widget__btn {
+      padding: 9px 20px; border-radius: 20px; font-size: .88rem; font-weight: 600;
+      border: none; background: #1a7a48; color: #fff; cursor: pointer;
+      transition: opacity .15s;
+    }
+    .buddy-widget__btn:disabled { opacity: .5; cursor: not-allowed; }
+    .buddy-widget__btn:hover:not(:disabled) { opacity: .88; }
+
+    .buddy-empty { font-size: .88rem; color: #9ca3af; padding: 12px 0; }
+
+    @media (max-width: 600px) {
+      #buddySection { padding: 18px 16px; }
+      .buddy-card { flex-wrap: wrap; }
+      .buddy-card__actions { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -353,7 +453,7 @@
 
   <!-- Profile-missing banner — shown only when logged-in student has no profile yet -->
   <div id="noprofileBanner" style="display:none;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:14px 18px;margin-bottom:20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-    <span style="font-size:.9rem;color:#92400e">Je hebt nog geen profiel aangemaakt — bedrijven kunnen je dan niet vinden.</span>
+    <span style="font-size:.9rem;color:#92400e">Je hebt nog geen profiel. Zonder profiel kunnen bedrijven je niet vinden.</span>
     <a href="student-profile.html" style="background:#FF7E42;color:#fff;padding:8px 20px;border-radius:50px;font-size:.85rem;font-weight:600;text-decoration:none;white-space:nowrap">Maak je profiel aan →</a>
   </div>
 
@@ -393,6 +493,14 @@
       <option value="c">C — Let op</option>
     </select>
 
+    <select id="niveauFilter" onchange="filterCards()">
+      <option value="">Alle niveaus</option>
+      <option value="bbl">BBL</option>
+      <option value="mbo">MBO</option>
+      <option value="hbo">HBO</option>
+      <option value="wo">WO</option>
+    </select>
+
     <button onclick="filterCards()">Filter toepassen</button>
   </div>
 
@@ -428,6 +536,30 @@
     </div>
   </div>
   <div id="internshipsContainer" class="cards-container"></div>
+
+  <!-- ── BUDDY SECTION (shown only for authenticated students) ───────────────── -->
+  <section id="buddySection" aria-label="Mijn buddy's">
+    <h2>Buddy-systeem</h2>
+    <p class="buddy-section-sub">Koppel je aan een medestudent of ervaren professional voor extra steun tijdens je stage.</p>
+
+    <div class="buddy-tabs">
+      <button class="buddy-tab active" onclick="buddySwitchTab('pairs', this)">Mijn buddy's <span id="buddyPairCount"></span></button>
+      <button class="buddy-tab" onclick="buddySwitchTab('requests', this)">Verzoeken <span id="buddyReqCount"></span></button>
+      <button class="buddy-tab" onclick="buddySwitchTab('find', this)">Vind een buddy</button>
+    </div>
+
+    <div id="buddyTabPairs" class="buddy-tab-panel active">
+      <div id="buddyPairsList"><p class="buddy-empty">Laden…</p></div>
+    </div>
+
+    <div id="buddyTabRequests" class="buddy-tab-panel">
+      <div id="buddyRequestsList"><p class="buddy-empty">Laden…</p></div>
+    </div>
+
+    <div id="buddyTabFind" class="buddy-tab-panel">
+      <div id="buddyFindWidget"></div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -586,7 +718,7 @@ async function loadInternships() {
   }
 
   container.innerHTML = combined.map(renderCard).join('');
-  updateCount(combined.length);
+  filterCards(); // apply any active filters (including ?niveau= from URL)
 }
 
 // ── Reistijd filter state ──────────────────────────────────────────────────
@@ -724,14 +856,17 @@ function filterCards() {
   const sector   = document.getElementById('sectorFilter').value.toLowerCase();
   const duration = document.getElementById('durationFilter').value;
   const trust    = document.getElementById('trustFilter').value.toLowerCase();
+  const niveau   = document.getElementById('niveauFilter').value.toLowerCase();
 
   let visible = 0;
   document.querySelectorAll('.stage-card').forEach(card => {
+    const searchFields = [card.dataset.title, card.dataset.company, card.dataset.desc, card.dataset.tags, card.dataset.sector];
     const baseHit =
-      (!q        || [card.dataset.title, card.dataset.company, card.dataset.desc, card.dataset.tags, card.dataset.sector].some(v => v.includes(q))) &&
+      (!q        || searchFields.some(v => v && v.includes(q))) &&
       (!sector   || card.dataset.sector.includes(sector)) &&
       (!duration || card.dataset.duration === duration) &&
-      (!trust    || card.dataset.trust === trust);
+      (!trust    || card.dataset.trust === trust) &&
+      (!niveau   || searchFields.some(v => v && v.includes(niveau)));
 
     let reistijdHit = true;
     if (reistijdActief && studentPostcode && REISTIJD.valideer(studentPostcode)) {
@@ -849,10 +984,11 @@ async function loadNotifications() {
 
 async function markAllRead() {
   if (!currentUser) return;
-  await db.from('notifications')
+  const { error } = await db.from('notifications')
     .update({ read: true })
     .eq('user_id', currentUser.id)
     .eq('read', false);
+  if (error) console.warn('[markAllRead] failed:', error.message);
   loadNotifications();
 }
 
@@ -894,6 +1030,60 @@ function showToast() {
 }
 // ── End notification system ────────────────────────────────────────────────
 
+// ── Buddy integration ─────────────────────────────────────────────────────
+
+/**
+ * Render buddy section after init.
+ * @param {object} sp - student_profile row (may be empty object if no profile yet)
+ */
+function _buddyRenderDiscover(sp) {
+  // Pairs tab
+  const pairsList = document.getElementById('buddyPairsList');
+  if (pairsList) {
+    if (BuddyModule.activePairs.length === 0) {
+      pairsList.innerHTML = '<p class="buddy-empty">Je hebt nog geen actieve buddy-koppelingen.</p>';
+    } else {
+      pairsList.innerHTML = BuddyModule.activePairs.map(p => buddyRenderPairCard(p, 'dashboard')).join('');
+    }
+  }
+  const pairCount = document.getElementById('buddyPairCount');
+  if (pairCount) {
+    pairCount.textContent = BuddyModule.activePairs.length > 0
+      ? '(' + BuddyModule.activePairs.length + ')' : '';
+  }
+
+  // Requests tab
+  const reqList = document.getElementById('buddyRequestsList');
+  if (reqList) reqList.innerHTML = buddyRenderIncomingRequests();
+  const reqCount = document.getElementById('buddyReqCount');
+  if (reqCount) {
+    reqCount.textContent = BuddyModule.pendingRequests.length > 0
+      ? '(' + BuddyModule.pendingRequests.length + ')' : '';
+  }
+
+  // Find tab — peer widget with student context
+  const context = {
+    sector:          sp.sector          || '',
+    opleiding:       sp.opleiding       || '',
+    opdracht_domein: sp.opdracht_domein || '',
+  };
+  _buddySpContext = context;
+  buddyRenderRequestWidget('peer', context, '#buddyFindWidget');
+}
+
+function buddySwitchTab(tab, btn) {
+  ['pairs', 'requests', 'find'].forEach(t => {
+    const panel = document.getElementById('buddyTab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (panel) panel.classList.toggle('active', t === tab);
+  });
+  document.querySelectorAll('.buddy-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// Cached student profile context for re-renders triggered by realtime updates
+let _buddySpContext = {};
+// ── End buddy integration ─────────────────────────────────────────────────
+
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
   const authEl = document.getElementById('topbarAuth');
@@ -920,18 +1110,38 @@ window.addEventListener('DOMContentLoaded', async () => {
       registerPushNotifications(db, user.id).catch(() => {});
     }
 
-    // Show banner if student has no profile yet
+    // Show banner if student has no profile yet + init buddy section
     if (role !== 'company' && role !== 'school') {
       const { data: sp } = await db
         .from('student_profiles')
-        .select('profile_id')
+        .select('profile_id, opleiding, sector, opdracht_domein')
         .eq('profile_id', user.id)
         .maybeSingle();
       if (!sp) {
         const banner = document.getElementById('noprofileBanner');
         if (banner) banner.style.display = 'flex';
       }
+
+      // ── Buddy system init ────────────────────────────────────
+      const buddySec = document.getElementById('buddySection');
+      if (buddySec) {
+        buddySec.style.display = 'block';
+        await buddyInit(user.id, 'student', db, name);
+        _buddyRenderDiscover(sp || {});
+        // Re-render automatically when realtime updates arrive
+        BuddyModule.onUpdate = () => _buddyRenderDiscover(_buddySpContext);
+      }
     }
+  } else {
+    // Unauthenticated: show a subtle "log in to save" nudge in the topbar slot
+    authEl.innerHTML = `
+      <a href="auth.html" style="
+        font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;
+        color:#fff;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+        padding:6px 14px;border-radius:20px;text-decoration:none;
+        white-space:nowrap;transition:background .15s;">
+        Inloggen / registreren →
+      </a>`;
   }
 
   loadInternships();
@@ -1024,7 +1234,7 @@ window.addEventListener('beforeunload', async () => {
       padding:8px 14px;font-size:.82rem;"></div>
 
     <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
-      Door je in te schrijven ga je akkoord met ons privacybeleid.
+      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html" style="color:inherit;text-decoration:underline;">privacybeleid</a>.
     </p>
   </div>
 </div>
@@ -1133,6 +1343,14 @@ window.addEventListener('load', function() {
   });
   if (saved && saved !== 'nl') {
     setTimeout(function() { switchLang(saved); }, 1500);
+  }
+
+  // Pre-select niveau filter from URL param (passed by landing page CTA)
+  // Do NOT call filterCards() here — cards load async; loadInternships() calls it after render
+  var urlNiveau = new URLSearchParams(window.location.search).get('niveau');
+  if (urlNiveau) {
+    var nf = document.getElementById('niveauFilter');
+    if (nf) nf.value = urlNiveau.toLowerCase();
   }
 });
 </script>
