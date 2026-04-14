@@ -229,7 +229,7 @@
     <span class="mt-label">Ontdek</span>
   </button>
   <button class="mt-tab active" onclick="window.location.href='matches.html'">
-    <span class="mt-icon">❤️</span>
+    <span class="mt-icon">💫</span>
     <span class="mt-label">Matches</span>
   </button>
   <button class="mt-tab" onclick="window.location.href='mijn-sollicitaties.html'">
@@ -255,7 +255,7 @@
     <label class="toggle-row" for="poolToggle">
       <input type="checkbox" class="toggle-input" id="poolToggle" onchange="onToggleChange()">
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label">Toon vacatures in matchpool</span>
+      <span class="toggle-label">Toon vacatures in matchpool<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Meer informatie over matchpool">ⓘ<span class="info-pop">Vacatures in je <strong>matchpool</strong> zijn opdrachten van bedrijven die al interesse in jou hebben getoond. Zet dit aan om die mee te zien — je kunt er direct contact mee opnemen zonder eerst te liken.</span></span></span>
     </label>
     <div class="toggle-sub">Zet dit uit om alleen je echte matches te zien</div>
   </div>
@@ -874,5 +874,6 @@ window.addEventListener('load', function() {
 });
   </script>
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="js/info.js"></script>
 </body>
 </html>

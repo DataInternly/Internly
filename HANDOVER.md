@@ -1,34 +1,14 @@
 # Internly — Developer Handover Report
-**Session date:** 2026-04-12  
-**Tasks completed:** Task 1 (Web Push), Task 2 (Review Moderation), Task 3 (created_by null guards audit), Task 4 (Trust Score throttle fix)
+**Last updated:** 2026-04-14  
+**Sessions covered:** 2026-04-12 (Tasks 1–4), 2026-04-13/14 (Security audit, Stage Hub polish, Navigation audit, Info icons)
 
 ---
 
-## Summary of changes
+## Deploy checklist — what still needs external action
 
-| File | Status | Tasks |
-|---|---|---|
-| `sw.js` | NEW | Task 1 |
-| `js/supabase.js` | UPDATED | Task 1 |
-| `auth.html` | UPDATED | Task 1 |
-| `company-dashboard.html` | UPDATED | Tasks 1, 2, 3, 4 |
-| `school-dashboard.html` | UPDATED | Task 1 |
-| `mijn-sollicitaties.html` | UPDATED | Task 4 |
-| `admin.html` | NEW | Task 2 |
-
----
-
-## Task 1 — Web Push Notifications
-
-### What was built
-- **`sw.js`** — Service worker handling `push`, `notificationclick`, `pushsubscriptionchange`, `install`, `activate`
-- **`js/supabase.js`** — Added `VAPID_PUBLIC_KEY` constant, `urlBase64ToUint8Array()`, and `registerPushNotifications(dbClient, userId)` global helper
-- **`auth.html`** — After student login: calls `registerPushNotifications()` (native dialog, fire-and-forget)
-- **`company-dashboard.html`** — Soft HTML banner (bottom-right) shown once per device; "Ja, aanzetten" triggers `registerPushNotifications()`
-- **`school-dashboard.html`** — Same soft banner pattern as company dashboard
-
-### SQL to run (Supabase SQL Editor)
+### Supabase SQL Editor (run once)
 ```sql
+-- 1. Push subscriptions table
 CREATE TABLE push_subscriptions (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -40,19 +20,64 @@ CREATE TABLE push_subscriptions (
 ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "user manages own subscriptions"
   ON push_subscriptions FOR ALL USING (auth.uid() = user_id);
+
+-- 2. Reviews moderation columns
+ALTER TABLE reviews
+  ADD COLUMN IF NOT EXISTS flagged     bool        NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS flag_reason text,
+  ADD COLUMN IF NOT EXISTS flagged_by  uuid        REFERENCES profiles(id),
+  ADD COLUMN IF NOT EXISTS flagged_at  timestamptz;
+CREATE INDEX IF NOT EXISTS reviews_flagged_idx ON reviews(flagged) WHERE flagged = true;
 ```
 
-### VAPID keys — generate once before deploy
-```bash
-npx web-push generate-vapid-keys
+### Supabase Edge Functions
+Deploy `supabase/functions/send-push-notification/index.ts` — see full code in the Task 1 section below.  
+Set environment variables: `VAPID_PUBLIC_KEY` (copy from `js/push.js` line 11), `VAPID_PRIVATE_KEY`.
+
+### FileZilla — full upload list
 ```
-1. Copy the **public key** → replace `'REPLACE_WITH_GENERATED_PUBLIC_KEY'` in `js/supabase.js` line 22
-2. Copy the **private key** → add as Supabase Edge Function env var: `VAPID_PRIVATE_KEY`
-3. Never commit the private key to the repo
+sw.js
+js/push.js
+js/info.js
+css/style.css
+auth.html
+admin.html
+chat.html
+matches.html
+mijn-sollicitaties.html
+match-dashboard.html
+stage-hub.html
+student-profile.html
+vacature-detail.html
+company-dashboard.html
+company-discover.html
+school-dashboard.html
+.htaccess
+```
 
-### Edge Function — `send-push-notification`
-Create in Supabase Dashboard → Edge Functions. Code:
+---
 
+## Session 2026-04-12 — Tasks 1–4
+
+### Task 1 — Web Push Notifications ✅ code complete
+
+**Files:** `sw.js` (new), `js/push.js` (new), `auth.html`, `company-dashboard.html`, `school-dashboard.html`
+
+- `sw.js` — Service worker: `push`, `notificationclick`, `pushsubscriptionchange`, `install`, `activate`
+- `js/push.js` — `VAPID_PUBLIC_KEY` (real key already set), `urlBase64ToUint8Array()`, `registerPushNotifications(dbClient, userId)` — fire-and-forget, never throws
+- `auth.html` — student login calls `registerPushNotifications()` after sign-in
+- `company-dashboard.html` + `school-dashboard.html` — soft HTML banner shown once per device; "Ja, aanzetten" triggers push registration
+
+**Test checklist**
+- [ ] Run `push_subscriptions` SQL above
+- [ ] Deploy Edge Function `send-push-notification`
+- [x] VAPID public key set in `js/push.js` line 11
+- [x] pg_net trigger `push_on_notification_insert` deployed
+- [ ] Student login → browser permission dialog → accept → row in `push_subscriptions`
+- [ ] Company/school banner → accept → row in `push_subscriptions`
+- [ ] Accept a match → push arrives in OS notification centre with tab closed
+
+**Edge Function**
 ```typescript
 // supabase/functions/send-push-notification/index.ts
 import webpush from "npm:web-push";
@@ -61,134 +86,131 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 serve(async (req) => {
   const { user_id, title, body, url } = await req.json();
-
   webpush.setVapidDetails(
     "mailto:hallo@internly.pro",
     Deno.env.get("VAPID_PUBLIC_KEY")!,
     Deno.env.get("VAPID_PRIVATE_KEY")!
   );
-
   const db = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
-
   const { data: subs } = await db
     .from("push_subscriptions")
     .select("endpoint, p256dh, auth_key")
     .eq("user_id", user_id);
-
-  const sends = (subs || []).map((sub) =>
+  await Promise.all((subs || []).map((sub) =>
     webpush.sendNotification(
       { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_key } },
       JSON.stringify({ title, body, url: url || "/" })
-    ).catch(() => {}) // stale subscription — ignore
-  );
-  await Promise.all(sends);
-
+    ).catch(() => {})
+  ));
   return new Response("ok");
 });
 ```
 
-### Trigger setup (pg_net — already deployed)
-Instead of a Database Webhook (requires paid plan), a PostgreSQL trigger via `pg_net` is used. This was run in the Supabase SQL Editor:
+---
 
-- Extension `pg_net` enabled in schema `extensions`
-- Trigger function `notify_push_on_notification()` — calls `net.http_post()` with `user_id`, `title`, `body`, `url` built from `NEW.ref_type`/`NEW.ref_id`; swallows all exceptions so a failed HTTP call never blocks the INSERT
-- Trigger `push_on_notification_insert` — `AFTER INSERT FOR EACH ROW` on `notifications`
+### Task 2 — Review Moderation ✅ code complete
 
-To verify it's active:
-```sql
-SELECT trigger_name FROM information_schema.triggers
-WHERE event_object_table = 'notifications'
-  AND trigger_name = 'push_on_notification_insert';
-```
+**Files:** `company-dashboard.html`, `admin.html` (new)
 
-### Environment variables required
-| Key | Where | Value |
+- Flag button (⚑) on each review card — writes `flagged / flag_reason / flagged_by / flagged_at`
+- `admin.html` — email-guarded (`hallo@internly.pro`), direct URL only, not linked in nav:
+  - Live stats (10 counters)
+  - Flagged review queue with delete / mark-safe
+  - Trust Score overrides per company
+  - Waitlist table with CSV export
+
+**Requires** the `ALTER TABLE reviews` SQL above.
+
+---
+
+### Task 3 — `created_by` null guards ✅ no code changes needed
+
+`.eq('created_by', userId)` never returns NULL rows in Supabase. All queries confirmed safe.
+
+---
+
+### Task 4 — Trust Score throttle fix ✅ code complete
+
+**Files:** `mijn-sollicitaties.html`, `company-dashboard.html`
+
+- After review insert: clears `sessionStorage` throttle so company recalculates on next load
+- `forceTrustRecalculate()` button added to Trust Score stat card
+- `acceptMatch()` and `rejectMatch()` both clear throttle before notifications
+
+---
+
+## Session 2026-04-13/14 — Security + Polish
+
+### Security audit ✅ code complete
+
+| Fix | File | Severity |
 |---|---|---|
-| `VAPID_PUBLIC_KEY` | Edge Function env | Generated public key |
-| `VAPID_PRIVATE_KEY` | Edge Function env | Generated private key |
-| `SUPABASE_URL` | Auto-injected | — |
-| `SUPABASE_SERVICE_ROLE_KEY` | Auto-injected | — |
-
-### Manual test checklist
-- [ ] Generate VAPID keys and replace placeholder in `js/supabase.js`
-- [ ] Deploy Edge Function `send-push-notification`
-- [ ] Run `push_subscriptions` SQL above in Supabase SQL Editor
-- [x] pg_net trigger `push_on_notification_insert` deployed via SQL Editor
-- [ ] Log in as a student → browser shows native permission dialog → accept → row appears in `push_subscriptions`
-- [ ] Log in as company/school → soft banner appears → "Ja, aanzetten" → browser dialog → accept → row appears
-- [ ] Trigger a notification (e.g. accept a match) → push arrives in OS notification centre with tab closed
+| School loaded all students when `_schoolNaamFilter` was null | `school-dashboard.html` | P0 |
+| Chat conversations leaked across users (client-side filter only) | `chat.html` | P0 |
+| `select('*')` exposed all student profile fields to companies | `company-discover.html` | P1 |
+| Missing HTTP security headers | `.htaccess` | P1 |
 
 ---
 
-## Task 2 — Review Moderation
+### Stage Hub polish ✅ code complete
 
-### What was built
-- **`company-dashboard.html`** — Flag button (⚑) on each review card; `flagReview(reviewId)` prompts for reason, writes `flagged/flag_reason/flagged_by/flagged_at`; review query now includes `flagged` column
-- **`admin.html`** (new) — Protected by `user.email !== 'hallo@internly.pro'` auth guard:
-  - **Stats** — 10 live counters (students, companies, schools, postings, applications, matches, messages, waitlist, reviews, flagged reviews)
-  - **Flagged reviews** — list with reviewer/reviewee names, review body, flag reason, delete or mark-safe actions
-  - **Trust overrides** — table of all company profiles with editable score input → saves to `company_profiles` and `internship_postings`
-  - **Waitlist** — full table with copy-email button and CSV export
+**File:** `match-dashboard.html`
 
-### SQL to run
-```sql
-ALTER TABLE reviews
-  ADD COLUMN IF NOT EXISTS flagged     bool        NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS flag_reason text,
-  ADD COLUMN IF NOT EXISTS flagged_by  uuid        REFERENCES profiles(id),
-  ADD COLUMN IF NOT EXISTS flagged_at  timestamptz;
-
-CREATE INDEX IF NOT EXISTS reviews_flagged_idx ON reviews(flagged) WHERE flagged = true;
-```
+- `CAN.student.addDeadline` set to `true`
+- Kalender tab: `+ Deadline` and `+ Afspraak` buttons in page header
+- Overzicht tab: quick-nav row (Planning / Kalender / Afspraken / Taken)
+- Planning tab: `→ Kalender` button next to `+ Deadline`
 
 ---
 
-## Task 3 — `created_by` null guards
+### Navigation audit ✅ code complete
 
-### Audit result
-All queries in `company-dashboard.html` filtering on `internship_postings.created_by` use:
-```javascript
-.eq('created_by', companyUserId)
-```
-Supabase translates this to `WHERE created_by = $1`. Rows with `created_by IS NULL` are **never returned** by an equality filter — no explicit null guard is needed.
+All student pages now have a consistent 5-tab mobile nav (Ontdek · Matches · Stages · Hub · Profiel).
 
-Locations confirmed safe:
-- `herberekeningTrustScore()` — `loadPostings()` uses `.eq('created_by', currentUser.id)` 
-- `triggerCompanyMatching()` — posts `created_by` on insert; queries always filter by it
-- `loadPostings()` — `.eq('created_by', currentUser.id)`
-
-No code changes required.
+| File | Change |
+|---|---|
+| `matches.html` | Matches icon ❤️ → 💫 |
+| `vacature-detail.html` | Mobile tab bar added (Ontdek active); topbar link to Stage Hub |
+| `student-profile.html` | 5th tab 📊 Hub added |
+| `company-discover.html` | Mobile tab bar added (Stagiairs active) |
+| `chat.html` | Mobile tab bar added (Stages active); `padding-bottom: 68px` on mobile input-bar |
+| `stage-hub.html` | `renderTaken`: `+ Taak toevoegen` hidden for school role |
 
 ---
 
-## Task 4 — Trust Score throttle fix
+### Info help icons ✅ code complete
 
-### What was built
-- **`mijn-sollicitaties.html`** — After successful review insert, before firing notification:
-  ```javascript
-  sessionStorage.removeItem('internly_trust_calculated_' + revieweeId);
-  ```
-  This forces the company's dashboard to recalculate Trust Score on next load.
+**New files:** `js/info.js`, additions to `css/style.css`
 
-- **`company-dashboard.html`** — `forceTrustRecalculate()` button in Trust Score stat card; calls `sessionStorage.removeItem()` then re-runs `herberekeningTrustScore()`. Also:
-  - `acceptMatch()` now clears the throttle key before `notify()`
-  - `rejectMatch()` now clears the throttle key before `notify()`
+Click-to-reveal popovers. No hover-only — mobile-safe. Closes on outside click or Escape. Auto-positions based on viewport.
+
+| Page | Placement | Content |
+|---|---|---|
+| `matches.html` | Matchpool toggle | What the matchpool is and how it works |
+| `mijn-sollicitaties.html` | Page title | All 3 statuses explained + Stage Hub tip |
+| `match-dashboard.html` | Sidebar: Planning | Deadlines and milestones |
+| `match-dashboard.html` | Sidebar: Kalender | Monthly view + add shortcuts |
+| `match-dashboard.html` | Sidebar: Stageplan | Official plan with supervisors |
+| `match-dashboard.html` | Sidebar: Taken | Shared task list across all roles |
+| `match-dashboard.html` | Sidebar: Voortgang | Competencies + supervisor feedback |
+| `match-dashboard.html` | Sidebar: Afspraken | Scheduling meetings |
+| `company-dashboard.html` | Trust Score stat card | A/B/C/D logic + how to improve |
+| `school-dashboard.html` | Studenten heading | School-name coupling, Stage Hub access |
+| `school-dashboard.html` | Signalen heading | 14-day inactivity rule |
+
+**Note:** `match-dashboard.html` has no `<link>` to `css/style.css` (self-contained). Info CSS is duplicated into its inline `<style>` block.
 
 ---
 
-## Known limitations (unchanged from spec)
+## Known limitations
 
-### LIMITATION 1 — Push Notifications
-Background push requires the Edge Function + Database Webhook to be wired up manually (see checklist above). VAPID keys must be generated and configured before push works. The service worker at `/sw.js` must be served from the root domain — a subdirectory path will not work.
-
-### LIMITATION 2 — Admin auth
-The `admin.html` guard is client-side email check only. The actual data security is enforced by Supabase RLS policies. The admin page is not linked from any navigation — access by direct URL only. Consider adding a row-level policy on `reviews` allowing bulk delete only for service-role key, not the anon key.
-
-### LIMITATION 3 — Trust Score throttle
-The `sessionStorage` throttle prevents recalculation within a single browser tab session. If a company and a student share the same device/browser session (rare but possible), one clear could affect both. This is an acceptable trade-off for the simple throttle design.
-
-### LIMITATION 4 — Waitlist table name
-The waitlist query in `admin.html` assumes a table named `waitlist`. If the actual table name differs (e.g. `waitlist_signups`), update the `.from('waitlist')` calls in `admin.html`.
+| # | Limitation |
+|---|---|
+| 1 | Push requires Edge Function + pg_net trigger. Trigger is live; Edge Function is not yet deployed. |
+| 2 | `admin.html` auth guard is client-side email check only. Not linked in nav — direct URL access only. |
+| 3 | Trust Score `sessionStorage` throttle — one tab session. Acceptable trade-off. |
+| 4 | `admin.html` queries `.from('waitlist')` — update if table is named differently. |
+| 5 | `stage-hub.html` is a static demo hub; `match-dashboard.html` is the live DB-connected hub. Demo links should always use `match-dashboard.html?match=UUID`. |

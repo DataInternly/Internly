@@ -1770,6 +1770,40 @@
     #toast.success { background: var(--green); }
     #toast.error   { background: var(--red); }
 
+    /* ── Info help icons ──────────────────────────────────────────────────── */
+    .info-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 17px; height: 17px; border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.3);
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.7);
+      font-size: .65rem; font-weight: 700;
+      cursor: pointer; vertical-align: middle; margin-left: 5px;
+      flex-shrink: 0; position: relative;
+      transition: background .15s, border-color .15s;
+      font-family: 'Outfit', sans-serif; line-height: 1; padding: 0;
+      user-select: none; text-decoration: none;
+    }
+    .info-btn:hover, .info-btn:focus-visible {
+      background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.6);
+      color: #fff; outline: none;
+    }
+    .info-pop {
+      display: none;
+      position: absolute; z-index: 9999;
+      width: 240px; background: #0d1520; color: #d1d9e0;
+      font-size: .8rem; line-height: 1.6; border-radius: 10px;
+      padding: 11px 14px; box-shadow: 0 10px 32px rgba(0,0,0,.35);
+      font-weight: 400; white-space: normal; text-align: left;
+      pointer-events: none; font-style: normal;
+      font-family: 'Outfit', sans-serif;
+    }
+    .info-pop.info-open {
+      display: block; pointer-events: auto;
+      animation: fadeInUp .14s ease both;
+    }
+    .info-pop strong { color: #fff; font-weight: 600; }
+
   </style>
 </head>
 <body>
@@ -1852,6 +1886,7 @@
           <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
         Planning
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Planning">ⓘ<span class="info-pop">Deadlines en mijlpalen voor je stage. Voeg deadlines toe zodat jij, je bedrijfsbegeleider en school niets vergeten. Zichtbaar voor alle betrokken partijen.</span></span>
       </button>
       <button class="sidebar-item" data-tab="kalender" onclick="switchTab('kalender')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1861,6 +1896,7 @@
           <circle cx="16" cy="16" r="1" fill="currentColor"/>
         </svg>
         Kalender
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Kalender">ⓘ<span class="info-pop">Maandoverzicht van alle deadlines en afspraken. Voeg een deadline of afspraak toe via de knoppen bovenaan.</span></span>
       </button>
       <button class="sidebar-item" data-tab="stageplan" onclick="switchTab('stageplan')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1870,6 +1906,7 @@
           <polyline points="10 9 9 9 8 9"/>
         </svg>
         Stageplan
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Stageplan">ⓘ<span class="info-pop">Het officiële stageplan met doelstellingen en leerdoelen. Door jou en je begeleider(s) ingevuld en goedgekeurd.</span></span>
       </button>
       <button class="sidebar-item" data-tab="taken" onclick="switchTab('taken')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1877,12 +1914,14 @@
         </svg>
         Taken
         <span id="sidebar-badge-taken" class="sidebar-badge" style="display:none"></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Taken">ⓘ<span class="info-pop">Gedeelde takenlijst voor student, bedrijf en school. Maak taken aan, stel een prioriteit in en vink ze af als ze klaar zijn. Iedereen ziet dezelfde lijst.</span></span>
       </button>
       <button class="sidebar-item" data-tab="voortgang" onclick="switchTab('voortgang')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         Voortgang
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Voortgang">ⓘ<span class="info-pop">Overzicht van behaalde competenties en leerdoelen. Je begeleiders kunnen hier feedback achterlaten en je voortgang beoordelen.</span></span>
       </button>
       <button class="sidebar-item" data-tab="afspraken" onclick="switchTab('afspraken')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1893,6 +1932,7 @@
         </svg>
         Afspraken
         <span id="sidebar-badge-afspraken" class="sidebar-badge" style="display:none"></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Afspraken">ⓘ<span class="info-pop">Plan gesprekken in met je bedrijfsbegeleider of schoolbegeleider. Alle partijen zien de afspraken en kunnen nieuwe toevoegen.</span></span>
       </button>
 
       <div class="sidebar-spacer"></div>
@@ -2859,7 +2899,8 @@ async function toggleTaskDone(id) {
   if (!task) return;
   task.status = task.status === 'done' ? 'todo' : 'done';
   if (MATCH_ID && task._dbId) {
-    await db.from('stage_tasks').update({ status: task.status }).eq('id', task._dbId);
+    const { error } = await db.from('stage_tasks').update({ status: task.status }).eq('id', task._dbId);
+    if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
   }
   const logMsg = task.status === 'done'
     ? `Taak "${task.title}" afgerond door ${roleName()}.`
@@ -2893,7 +2934,8 @@ async function deleteTask(id) {
 
   hubState.tasks = hubState.tasks.filter(t => t.id !== id);
   if (MATCH_ID && task._dbId) {
-    await db.from('stage_tasks').delete().eq('id', task._dbId);
+    const { error } = await db.from('stage_tasks').delete().eq('id', task._dbId);
+    if (error) { toast('Verwijderen mislukt — probeer opnieuw.', 'error'); hubState.tasks.push(task); switchTab('taken'); return; }
   }
   addLog(`Taak "${task.title}" verwijderd.`, 'orange');
   updateTakenBadge();
@@ -3119,7 +3161,8 @@ async function saveTaak(id) {
       task.title = title; task.desc = desc; task.deadline = deadline;
       task.assignee = assignee; task.status = status; task.priority = priority;
       if (MATCH_ID && task._dbId) {
-        await db.from('stage_tasks').update({ title, desc, deadline, assignee, status, priority }).eq('id', task._dbId);
+        const { error } = await db.from('stage_tasks').update({ title, desc, deadline, assignee, status, priority }).eq('id', task._dbId);
+        if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     addLog(`Taak "${title}" bewerkt.`, 'blue');
@@ -3127,9 +3170,10 @@ async function saveTaak(id) {
   } else {
     const newTask = { id: hubState.nextId++, _dbId: null, title, desc, deadline, assignee, status, priority, maker: hubState.role };
     if (MATCH_ID) {
-      const { data } = await db.from('stage_tasks')
+      const { data, error } = await db.from('stage_tasks')
         .insert({ match_id: MATCH_ID, title, desc, deadline, assignee, status, priority, maker: hubState.role })
         .select().single();
+      if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newTask._dbId = data.id;
     }
     hubState.tasks.push(newTask);
@@ -3176,16 +3220,18 @@ async function saveDeadline(id) {
     if (d) {
       d.title = title; d.date = date;
       if (MATCH_ID && d._dbId) {
-        await db.from('stage_deadlines').update({ title, date }).eq('id', d._dbId);
+        const { error } = await db.from('stage_deadlines').update({ title, date }).eq('id', d._dbId);
+        if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     toast('Deadline bijgewerkt!');
   } else {
     const newD = { id: 'd' + hubState.nextId++, _dbId: null, title, date, type: 'future' };
     if (MATCH_ID) {
-      const { data } = await db.from('stage_deadlines')
+      const { data, error } = await db.from('stage_deadlines')
         .insert({ match_id: MATCH_ID, title, date, type: 'future' })
         .select().single();
+      if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newD._dbId = data.id;
     }
     hubState.deadlines.push(newD);
@@ -3232,7 +3278,8 @@ async function saveLeerdoel(id) {
   l.progress = parseInt(document.getElementById('m-ld-progress').value, 10);
   l.notes    = document.getElementById('m-ld-notes').value.trim();
   if (MATCH_ID && l._dbId) {
-    await db.from('stage_leerdoelen').update({ progress: l.progress, notes: l.notes }).eq('id', l._dbId);
+    const { error } = await db.from('stage_leerdoelen').update({ progress: l.progress, notes: l.notes }).eq('id', l._dbId);
+    if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
   }
   addLog(`Leerdoel "${l.title}" bijgewerkt naar ${l.progress}%.`, 'green');
   toast('Leerdoel bijgewerkt!', 'success');
@@ -3246,7 +3293,8 @@ async function quickSetLeerdoel(id, pct) {
   if (!l) return;
   l.progress = pct;
   if (MATCH_ID && l._dbId) {
-    await db.from('stage_leerdoelen').update({ progress: pct }).eq('id', l._dbId);
+    const { error } = await db.from('stage_leerdoelen').update({ progress: pct }).eq('id', l._dbId);
+    if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
   }
   addLog(`Leerdoel "${l.title}" bijgewerkt naar ${pct}%.`, 'green');
   toast(`${pct}% ingesteld`, 'success');
@@ -3292,16 +3340,18 @@ async function saveReflectie(id) {
     if (r) {
       r.period = period; r.date = date; r.text = text;
       if (MATCH_ID && r._dbId) {
-        await db.from('stage_reflecties').update({ period, date, text }).eq('id', r._dbId);
+        const { error } = await db.from('stage_reflecties').update({ period, date, text }).eq('id', r._dbId);
+        if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     toast('Reflectie bijgewerkt!');
   } else {
     const newR = { id: 'r' + hubState.nextId++, _dbId: null, period, date, text, editAllowed: true };
     if (MATCH_ID) {
-      const { data } = await db.from('stage_reflecties')
+      const { data, error } = await db.from('stage_reflecties')
         .insert({ match_id: MATCH_ID, period, date, text, author_role: hubState.role })
         .select().single();
+      if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newR._dbId = data.id;
     }
     hubState.reflecties.unshift(newR);
@@ -4679,5 +4729,6 @@ function nowStr() {
     now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
 }
 </script>
+<script src="js/info.js"></script>
 </body>
 </html>

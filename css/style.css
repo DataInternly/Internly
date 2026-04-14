@@ -930,3 +930,73 @@ select:focus {
 .ical-cell.selected {
   animation: cardIn 0.15s ease both;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   INFO HELP ICONS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(26, 122, 72, .35);
+  background: rgba(26, 122, 72, .07);
+  color: #1a7a48;
+  font-size: .65rem;
+  font-weight: 700;
+  cursor: pointer;
+  vertical-align: middle;
+  margin-left: 5px;
+  flex-shrink: 0;
+  position: relative;
+  transition: background .15s, border-color .15s;
+  font-family: 'Outfit', sans-serif;
+  line-height: 1;
+  padding: 0;
+  user-select: none;
+  text-decoration: none;
+}
+.info-btn:hover,
+.info-btn:focus-visible {
+  background: rgba(26, 122, 72, .16);
+  border-color: #1a7a48;
+  outline: none;
+}
+
+/* Dark-background variant (e.g. inside sidebars with dark theme) */
+.info-btn--inv {
+  border-color: rgba(255, 255, 255, .3);
+  background: rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .7);
+}
+.info-btn--inv:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.6); color: #fff; }
+
+/* Popover bubble */
+.info-pop {
+  display: none;
+  position: absolute;
+  z-index: 9999;
+  width: 240px;
+  background: #0d1520;
+  color: #d1d9e0;
+  font-size: .8rem;
+  line-height: 1.6;
+  border-radius: 10px;
+  padding: 11px 14px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, .28);
+  font-weight: 400;
+  white-space: normal;
+  text-align: left;
+  pointer-events: none;
+  font-style: normal;
+  font-family: 'Outfit', sans-serif;
+}
+.info-pop.info-open {
+  display: block;
+  pointer-events: auto;
+  animation: fadeInUp .14s ease both;
+}
+.info-pop strong { color: #fff; font-weight: 600; }

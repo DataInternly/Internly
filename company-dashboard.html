@@ -654,7 +654,7 @@
           <div class="stat-note">dit kwartaal</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Trust Score</div>
+          <div class="stat-label" style="display:flex;align-items:center;">Trust Score<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Trust Score">ⓘ<span class="info-pop">De <strong>Trust Score</strong> bepaalt hoe betrouwbaar uw profiel overkomt bij studenten. Een hogere score verhoogt uw zichtbaarheid.<br><br><strong>A</strong> = Hoog &nbsp;·&nbsp; <strong>B</strong> = Gemiddeld &nbsp;·&nbsp; <strong>C</strong> = Laag &nbsp;·&nbsp; <strong>D</strong> = Onvoldoende<br><br>Vul uw profiel verder in om de score te verhogen.</span></span></div>
           <div class="stat-val" id="stat-trust">—</div>
           <div class="stat-note" id="stat-grade">berekenen…</div>
           <button onclick="forceTrustRecalculate()" style="margin-top:6px;font-size:.72rem;padding:3px 8px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;color:var(--ink3)">↻ Herberekenen</button>
@@ -2098,5 +2098,6 @@ window.addEventListener('load', function() {
 </script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="js/calendar.js"></script>
+<script src="js/info.js"></script>
 </body>
 </html>
