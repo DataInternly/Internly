@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
@@ -2501,6 +2501,18 @@ async function loadHubFromDB() {
 
 /* ── Auth boot (runs only when ?match=UUID is present) ────────────────────── */
 
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+window.addEventListener('unhandledrejection', function(e) {
+  if (e.reason && (
+    e.reason.message?.includes('JWT') ||
+    e.reason.message?.includes('session') ||
+    e.reason.code === 'PGRST301'
+  )) {
+    sessionStorage.clear();
+    window.location.replace('auth.html?expired=1');
+  }
+});
+
 window.addEventListener('DOMContentLoaded', async () => {
   if (!MATCH_ID) return; // demo mode — role-picker handles boot
   showSpinner();
@@ -4273,7 +4285,7 @@ async function saveStageplan() {
     const { data, error } = await db.from('stage_plans')
       .upsert(payload, { onConflict: 'match_id' })
       .select().single();
-    if (error) { toast('Fout bij opslaan: ' + error.message); return; }
+    if (error) { toast('Fout bij opslaan: ' + (error?.message || 'onbekende fout')); return; }
     if (data) sp._dbId = data.id;
   }
 
@@ -4290,13 +4302,13 @@ async function saveSchoolnoot() {
     if (sp._dbId) {
       // Plan row exists — targeted UPDATE (don't overwrite other fields)
       const { error } = await db.from('stage_plans').update({ schoolnoot: val }).eq('id', sp._dbId);
-      if (error) { toast('Fout bij opslaan: ' + error.message, 'error'); return; }
+      if (error) { toast('Fout bij opslaan: ' + (error?.message || 'onbekende fout'), 'error'); return; }
     } else {
       // No plan row yet — UPSERT with only required fields
       const { data, error } = await db.from('stage_plans')
         .upsert({ match_id: MATCH_ID, schoolnoot: val }, { onConflict: 'match_id' })
         .select('id').single();
-      if (error) { toast('Fout bij opslaan: ' + error.message, 'error'); return; }
+      if (error) { toast('Fout bij opslaan: ' + (error?.message || 'onbekende fout'), 'error'); return; }
       if (data) sp._dbId = data.id;
     }
   }

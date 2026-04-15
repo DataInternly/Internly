@@ -47,13 +47,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>BBL Hub — Internly</title>
+  <title>BBL Traject — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1051,6 +1051,12 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+function showLoading(containerId, tekst) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
+}
+
 function notify(msg) {
   const el = document.getElementById('notif');
   el.textContent = msg;
@@ -1088,6 +1094,7 @@ async function createNotification(userId, type, refId, refType, message) {
 
 async function signOut() {
   await db.auth.signOut();
+  sessionStorage.removeItem('internly_role');
   window.location.href = 'auth.html';
 }
 
@@ -1237,6 +1244,7 @@ function appendMessage(msg) {
 
 async function loadMessages() {
   if (!activeConvId) return;
+  showLoading('msgThread', 'Berichten laden...');
   const { data: messages, error } = await db
     .from('messages')
     .select('id, sender_id, content, created_at, read, type, metadata')
@@ -1323,7 +1331,7 @@ async function sendMessage() {
   btn.disabled = false;
 
   if (error) {
-    notify('Fout bij verzenden: ' + error.message);
+    notify('Fout bij verzenden: ' + (error?.message || 'onbekende fout'));
     return;
   }
 
@@ -1364,7 +1372,7 @@ async function acceptMeetingInvite(meetingId, msgId) {
     .from('meetings')
     .update({ status: 'bevestigd' })
     .eq('id', meetingId);
-  if (error) { notify('Acceptatie mislukt: ' + error.message); return; }
+  if (error) { notify('Acceptatie mislukt: ' + (error?.message || 'onbekende fout')); return; }
   const card = document.getElementById('invite-' + msgId);
   if (card) card.querySelector('.invite-btns').innerHTML = '<span style="font-size:11px;color:#1a7a48;font-weight:500;">✓ Bevestigd</span>';
   // Notificeer organisator
@@ -1386,7 +1394,7 @@ async function declineMeetingInvite(meetingId, msgId) {
     .from('meetings')
     .update({ status: 'afgewezen' })
     .eq('id', meetingId);
-  if (error) { notify('Weigering mislukt: ' + error.message); return; }
+  if (error) { notify('Weigering mislukt: ' + (error?.message || 'onbekende fout')); return; }
   const card = document.getElementById('invite-' + msgId);
   if (card) card.querySelector('.invite-btns').innerHTML = '<span style="font-size:11px;color:#b8291a;font-weight:500;">Geweigerd</span>';
   notify('Uitnodiging geweigerd');
@@ -1556,7 +1564,7 @@ async function createMeeting() {
     match_id:      activeMatch.id,
   }).select('id').single();
 
-  if (error) { notify('Aanmaken mislukt: ' + error.message); return; }
+  if (error) { notify('Aanmaken mislukt: ' + (error?.message || 'onbekende fout')); return; }
 
   // Driegesprek: ook ROC-begeleider uitnodigen
   if (selectedMeetType === 'driegesprek') {
@@ -2134,7 +2142,7 @@ async function saveReflectie() {
     content:         '[Zelfreflectie-STARR] ' + content,
     type:            'zelfreflectie',
   });
-  if (error) { notify('Opslaan mislukt: ' + error.message); return; }
+  if (error) { notify('Opslaan mislukt: ' + (error?.message || 'onbekende fout')); return; }
 
   // Cache to localStorage for PDF export
   try {
@@ -2185,7 +2193,7 @@ async function signOff(party) {
     .from('meetings')
     .update({ status: newStatus })
     .eq('id', evalMeeting.id);
-  if (error) { notify('Handtekening plaatsen mislukt: ' + error.message); return; }
+  if (error) { notify('Handtekening plaatsen mislukt: ' + (error?.message || 'onbekende fout')); return; }
 
   evalMeeting.status = newStatus;
   renderSignoffStatus(newStatus);
@@ -2339,6 +2347,18 @@ function goToDriegesprek() {
 // INIT — authenticatie + BBL-check + data laden
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+window.addEventListener('unhandledrejection', function(e) {
+  if (e.reason && (
+    e.reason.message?.includes('JWT') ||
+    e.reason.message?.includes('session') ||
+    e.reason.code === 'PGRST301'
+  )) {
+    sessionStorage.clear();
+    window.location.replace('auth.html?expired=1');
+  }
+});
+
 window.addEventListener('DOMContentLoaded', async () => {
 
   // 1. Auth guard — exact patroon discover.html / student-profile.html
@@ -2349,7 +2369,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 2. BBL-check
   const { data: sp, error: spErr } = await db
     .from('student_profiles')
-    .select('profile_id, opleiding, sector, opdracht_domein, schooldag, skills, bbl_mode, school')
+    .select('profile_id, naam, opleiding, sector, opdracht_domein, schooldag, skills, bbl_mode, school, pb_naam, contract_start, contract_end, jaar')
     .eq('profile_id', user.id)
     .maybeSingle();
 
@@ -2360,6 +2380,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'discover.html';
     return;
   }
+  sessionStorage.setItem('internly_role', 'bbl');
 
   currentStudentProfile = sp;
 
@@ -2377,7 +2398,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       internship_postings(id, title, company_name, company_user_id, contract_start, contract_end, hours_per_week, bbl_mode)
     `)
     .or(`party_a.eq.${user.id},party_b.eq.${user.id}`)
-    .eq('status', 'actief')
+    .in('status', ['active', 'accepted'])
     .limit(1)
     .maybeSingle();
 
@@ -2394,7 +2415,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       .select('naam, name')
       .eq('id', match.praktijkbegeleider_profile_id)
       .maybeSingle();
-    if (pb) praktijkbegeleiderName = pb.naam || pb.name || 'Praktijkbegeleider';
+    praktijkbegeleiderName = pb?.naam || pb?.name || sp?.pb_naam || 'Praktijkbegeleider';
+  } else if (sp?.pb_naam) {
+    praktijkbegeleiderName = sp.pb_naam;
   }
 
   // ROC-begeleider: zoek schoolprofiel op basis van student_profiles.school
@@ -2422,12 +2445,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (studentAv && name) studentAv.textContent = name.slice(0,2).toUpperCase();
   if (studentNameEl && name) studentNameEl.textContent = name;
 
-  // Bedrijf naam
-  if (match?.internship_postings?.company_name) {
+  // Bedrijf naam — gebruik match data of val terug op localStorage (ingevuld in bbl-profile.html)
+  const _bblExtra = (() => { try { return JSON.parse(localStorage.getItem('internly_bbl_bedrijf_' + user.id) || '{}'); } catch(e) { return {}; } })();
+  const _companyName = match?.internship_postings?.company_name || _bblExtra?.bedrijfsnaam;
+  if (_companyName) {
     const bedrijfEl = document.getElementById('renewBedrijfName');
-    if (bedrijfEl) bedrijfEl.textContent = match.internship_postings.company_name;
+    if (bedrijfEl) bedrijfEl.textContent = _companyName;
     const bedrijfAv = document.getElementById('renewBedrijfAv');
-    if (bedrijfAv) bedrijfAv.textContent = match.internship_postings.company_name.slice(0,2).toUpperCase();
+    if (bedrijfAv) bedrijfAv.textContent = _companyName.slice(0,2).toUpperCase();
   }
   if (praktijkbegeleiderName) {
     const pbEl = document.getElementById('renewPraktijkbegeleider');

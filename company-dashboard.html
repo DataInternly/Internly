@@ -2,13 +2,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Internly — Bedrijfsdashboard</title>
+  <title>Bedrijfsdashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -487,8 +487,8 @@
     <div class="modal-title" id="modal-title">Weet je het zeker?</div>
     <div class="modal-body" id="modal-body">Deze actie kan niet ongedaan worden gemaakt.</div>
     <div class="modal-actions">
-      <button class="btn-ghost" onclick="closeModal()">Annuleren</button>
-      <button class="btn-xs btn-del" id="modal-confirm" style="padding:9px 18px;font-size:.88rem">Verwijderen</button>
+      <button type="button" class="btn-ghost" onclick="closeModal()">Annuleren</button>
+      <button type="button" class="btn-xs btn-del" id="modal-confirm" style="padding:9px 18px;font-size:.88rem">Verwijderen</button>
     </div>
   </div>
 </div>
@@ -848,7 +848,7 @@
           <div>
             <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="cpv-naam">—</div>
             <div style="font-size:.88rem;color:var(--ink3);margin-top:2px" id="cpv-sector-size">—</div>
-            <a id="cpv-website" href="#" target="_blank" style="font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none;margin-top:4px;display:none">—</a>
+            <a id="cpv-website" href="#" target="_blank" rel="noopener noreferrer" style="font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none;margin-top:4px;display:none">—</a>
           </div>
           <button onclick="toonBedrijfFormulier()" class="btn-ghost">✏️ Bewerken</button>
         </div>
@@ -1047,6 +1047,12 @@ function startNotifSubscription() {
     .subscribe();
 }
 
+function showLoading(containerId, tekst) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
+}
+
 function showToast(message) {
   let t = document.getElementById('notif-toast');
   if (!t) {
@@ -1102,7 +1108,7 @@ async function resetPassword() {
   const { error } = await db.auth.resetPasswordForEmail(currentUser.email, {
     redirectTo: window.location.origin + '/auth.html'
   });
-  if (error) notify('Fout: ' + error.message);
+  if (error) notify('Fout: ' + (error?.message || 'onbekende fout'));
   else notify('✓ Resetlink verstuurd naar ' + currentUser.email);
 }
 
@@ -1184,6 +1190,7 @@ function updateTrustDisplay(score, grade, reviewCount) {
 // ── Load ──
 async function loadPostings() {
   if (!currentUser) return;
+  showLoading('recent-postings', 'Vacatures laden...');
   const { data, error } = await db
     .from('internship_postings')
     .select('*')
@@ -1349,7 +1356,7 @@ async function loadCompanyMatches() {
 
 async function acceptMatch(matchId, studentId) {
   const { error } = await db.from('matches').update({ status: 'accepted' }).eq('id', matchId).eq('party_b', currentUser.id);
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
 
   // Create conversation
   let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).limit(1).maybeSingle();
@@ -1370,7 +1377,7 @@ async function acceptMatch(matchId, studentId) {
 
 async function rejectMatch(matchId, studentId) {
   const { error } = await db.from('matches').update({ status: 'rejected' }).eq('id', matchId).eq('party_b', currentUser.id);
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
 
   // Notify student
   const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een bedrijf';
@@ -1776,7 +1783,7 @@ async function submitPosting() {
 // ── Status ──
 async function setStatus(id, status) {
   const { error } = await db.from('internship_postings').update({ status }).eq('id', id);
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
   notify(status === 'active' ? '✓ Vacature geactiveerd' : '⏸ Vacature gepauzeerd');
   await loadPostings();
   renderList('all-postings', postings);
@@ -1789,7 +1796,7 @@ async function delPosting(id) {
     'Weet je zeker dat je deze vacature definitief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.',
     async () => {
       const { error } = await db.from('internship_postings').delete().eq('id', id).eq('created_by', currentUser.id);
-      if (error) { notify('Fout: ' + error.message); return; }
+      if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
       notify('✓ Vacature verwijderd');
       await loadPostings();
       renderList('all-postings', postings);
@@ -1884,7 +1891,7 @@ async function saveProfile() {
   }, { onConflict: 'profile_id' });
 
   btn.disabled = false; btn.textContent = 'Profiel opslaan →';
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
   notify('✓ Profiel opgeslagen');
   toonBedrijfOverzicht({
     bedrijfsnaam: document.getElementById('p-naam').value.trim()    || null,
@@ -1933,7 +1940,7 @@ async function submitFlagReview() {
   }).eq('id', _flagReviewId);
 
   closeFlagModal();
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
   notify('Beoordeling gemeld — wordt beoordeeld door het Internly team');
   loadReviews();
 }
@@ -1985,6 +1992,22 @@ function notify(msg) {
   el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3200);
 }
+
+// Offline/online listeners
+window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
+window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
+
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+window.addEventListener('unhandledrejection', function(e) {
+  if (e.reason && (
+    e.reason.message?.includes('JWT') ||
+    e.reason.message?.includes('session') ||
+    e.reason.code === 'PGRST301'
+  )) {
+    sessionStorage.clear();
+    window.location.replace('auth.html?expired=1');
+  }
+});
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
@@ -2084,7 +2107,7 @@ function googleTranslateElementInit() {
 }
 
 function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
+  const select = document.querySelector('.goog-te-combo');
   if (select) {
     select.value = lang;
     select.dispatchEvent(new Event('change'));
@@ -2096,7 +2119,7 @@ function switchLang(lang) {
 }
 
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
+  const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
   });

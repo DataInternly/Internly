@@ -2,13 +2,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Internly — Schooldashboard</title>
+  <title>Schooldashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -451,8 +451,8 @@
     <div class="modal-title" id="modalTitle">Bevestig actie</div>
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-actions">
-      <button class="btn-ghost" style="padding:9px 20px;font-size:.88rem" onclick="closeModal()">Annuleren</button>
-      <button class="btn-xs btn-del" id="modalConfirmBtn" style="padding:9px 16px;font-size:.88rem">Verwijderen</button>
+      <button type="button" class="btn-ghost" style="padding:9px 20px;font-size:.88rem" onclick="closeModal()">Annuleren</button>
+      <button type="button" class="btn-xs btn-del" id="modalConfirmBtn" style="padding:9px 16px;font-size:.88rem">Verwijderen</button>
     </div>
   </div>
 </div>
@@ -956,6 +956,12 @@ function startNotifSubscription() {
     .subscribe();
 }
 
+function showLoading(containerId, tekst) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
+}
+
 function showToast(message) {
   let t = document.getElementById('notif-toast');
   if (!t) {
@@ -1013,7 +1019,7 @@ async function resetPassword() {
   const { error } = await db.auth.resetPasswordForEmail(currentUser.email, {
     redirectTo: window.location.origin + '/auth.html'
   });
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
   notify('✓ Herstelmail verstuurd naar ' + currentUser.email);
 }
 
@@ -1095,6 +1101,9 @@ async function loadStudenten() {
     if (el2) el2.innerHTML = msg;
     return;
   }
+
+  showLoading('studenten-list', 'Studenten laden...');
+  showLoading('dashboard-studenten', 'Studenten laden...');
 
   let q = db
     .from('student_profiles')
@@ -1499,7 +1508,7 @@ async function confirmKoppel() {
 
   btn.disabled = false; btn.textContent = 'Koppelen →';
 
-  if (error) { notify('Fout bij koppelen: ' + error.message); return; }
+  if (error) { notify('Fout bij koppelen: ' + (error?.message || 'onbekende fout')); return; }
 
   // Notify student of school referral
   const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw school';
@@ -1523,7 +1532,7 @@ async function loadOproepen() {
     .select('*')
     .eq('created_by', currentUser.id)
     .order('created_at', { ascending: false });
-  if (error) { notify('Fout bij laden oproepen: ' + error.message); return; }
+  if (error) { notify('Fout bij laden oproepen: ' + (error?.message || 'onbekende fout')); return; }
   oproepen = data || [];
   document.getElementById('stat-oproepen').textContent = oproepen.filter(o => o.status === 'active').length;
 }
@@ -1615,7 +1624,7 @@ async function submitOproep() {
 
   btn.disabled = false; btn.textContent = 'Oproep plaatsen →';
 
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
 
   notify('✓ Oproep geplaatst!');
   ['o-school','o-sector','o-title','o-desc'].forEach(id => document.getElementById(id).value = '');
@@ -1629,7 +1638,7 @@ async function submitOproep() {
 async function delOproep(id) {
   openModal('Oproep verwijderen', 'Weet je zeker dat je deze oproep wilt verwijderen? Dit kan niet ongedaan worden gemaakt.', async () => {
     const { error } = await db.from('school_postings').delete().eq('id', id).eq('created_by', currentUser.id);
-    if (error) { notify('Fout: ' + error.message); return; }
+    if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
     notify('✓ Oproep verwijderd');
     await loadOproepen();
     renderOproepen();
@@ -1684,7 +1693,7 @@ async function saveProfiel() {
   }, { onConflict: 'profile_id' });
 
   btn.disabled = false; btn.textContent = 'Profiel opslaan →';
-  if (error) { notify('Fout: ' + error.message); return; }
+  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
   notify('✓ Profiel opgeslagen');
   toonSchoolOverzicht({
     schoolnaam:     naam     || null,
@@ -1730,6 +1739,22 @@ function notify(msg) {
   el.textContent = msg; el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 3200);
 }
+
+// Offline/online listeners
+window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
+window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
+
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+window.addEventListener('unhandledrejection', function(e) {
+  if (e.reason && (
+    e.reason.message?.includes('JWT') ||
+    e.reason.message?.includes('session') ||
+    e.reason.code === 'PGRST301'
+  )) {
+    sessionStorage.clear();
+    window.location.replace('auth.html?expired=1');
+  }
+});
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();

@@ -2,13 +2,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Internly — Matches</title>
+  <title>Mijn matches — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -791,6 +791,10 @@
     setTimeout(() => el.classList.remove('show'), 3200);
   }
 
+  // Offline/online listeners
+  window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
+  window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
+
   async function signOut() {
     try {
       await db.auth.signOut();
@@ -811,6 +815,18 @@
     }
   });
 
+  // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+  window.addEventListener('unhandledrejection', function(e) {
+    if (e.reason && (
+      e.reason.message?.includes('JWT') ||
+      e.reason.message?.includes('session') ||
+      e.reason.code === 'PGRST301'
+    )) {
+      sessionStorage.clear();
+      window.location.replace('auth.html?expired=1');
+    }
+  });
+
   // ─────────────────────────────────────────────────────────────────────────
   // Init
   // ─────────────────────────────────────────────────────────────────────────
@@ -824,6 +840,9 @@
 
     const { data: _roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
     if (_roleRow?.role === 'gepensioneerd') { window.location.href = 'buddy-dashboard.html'; return; }
+
+    // BBL-studenten horen niet op de BOL-matches pagina
+    if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-dashboard.html'); return; }
 
     const authEl = document.getElementById('topbarAuth');
     if (user) {

@@ -912,6 +912,7 @@ select:focus {
 /* ── Sidebar nav item stagger (dashboards) ───────────────────────────────── */
 .nav-item {
   animation: sidebarIn 0.25s ease both;
+  min-height: 44px;
 }
 .nav-item:nth-child(1) { animation-delay: 0.03s; }
 .nav-item:nth-child(2) { animation-delay: 0.06s; }
@@ -971,7 +972,6 @@ select:focus {
 .info-btn:focus-visible {
   background: rgba(26, 122, 72, .16);
   border-color: #1a7a48;
-  outline: none;
 }
 
 /* Dark-background variant (e.g. inside sidebars with dark theme) */
@@ -1008,3 +1008,28 @@ select:focus {
   animation: fadeInUp .14s ease both;
 }
 .info-pop strong { color: #fff; font-weight: 600; }
+
+/* ── iOS zoom prevention — inputs < 16px font-size trigger auto-zoom ─────── */
+input:not([type="hidden"]),
+textarea,
+select {
+  font-size: 16px;
+}
+input:not([type="hidden"]),
+textarea,
+select,
+button {
+  min-height: 44px;
+}
+
+/* ── Keyboard focus indicator (WCAG 2.1 AA) ──────────────────────────────── */
+:focus-visible {
+  outline: 3px solid var(--accent, #FF7E42);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Info-btn already has a custom focus style — keep it, remove outline:none */
+.info-btn:focus-visible {
+  outline: 2px solid #1a7a48;
+  outline-offset: 2px;
+}

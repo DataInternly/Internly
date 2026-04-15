@@ -2,12 +2,12 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Internly — Maak je profiel</title>
+  <title>Mijn profiel — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -1132,7 +1132,7 @@ async function submitProfile() {
 
   if (error) {
     console.error(error);
-    notify(`Fout: ${error.message}`);
+    notify(`Fout: ${error?.message || 'onbekende fout'}`);
     btn.disabled = false;
     btn.textContent = wasEditing ? 'Wijzigingen opslaan →' : 'Profiel opslaan →';
     return;

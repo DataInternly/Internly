@@ -7,7 +7,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Internly — Zoek stagiairs</title>
+  <title>Studenten ontdekken — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -244,6 +244,7 @@
 </nav>
 
 <div class="container">
+  <a href="company-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--ink3,#888);font-size:.88rem;text-decoration:none;">← Terug naar dashboard</a>
   <h1>Zoek een stagiair</h1>
   <p class="page-sub">Studenten die zichzelf hebben aangemeld — inclusief hun opdracht en onderzoeksvraag</p>
 
@@ -504,7 +505,7 @@ function googleTranslateElementInit() {
 }
 
 function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
+  const select = document.querySelector('.goog-te-combo');
   if (select) {
     select.value = lang;
     select.dispatchEvent(new Event('change'));
@@ -516,7 +517,7 @@ function switchLang(lang) {
 }
 
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
+  const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
   });

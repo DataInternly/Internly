@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <meta name="description" content="Log in op Internly of maak een account aan als student, bedrijf of school.">
-  <title>Internly — Inloggen</title>
+  <title>Inloggen — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -405,7 +405,7 @@
           width:15px;height:15px;cursor:pointer;
         ">
         <span>Ik heb het
-          <a href="privacybeleid.html" target="_blank"
+          <a href="privacybeleid.html" target="_blank" rel="noopener noreferrer"
              style="color:var(--green);text-decoration:none;">privacybeleid</a>
           gelezen en ga akkoord met de verwerking van mijn gegevens door
           Sasubo Holding B.V.
@@ -431,6 +431,14 @@
 const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Sessie verlopen melding ──
+if (new URLSearchParams(window.location.search).get('expired') === '1') {
+  document.addEventListener('DOMContentLoaded', () => {
+    const box = document.getElementById('errorBox');
+    if (box) { box.textContent = 'Je sessie is verlopen. Log opnieuw in.'; box.style.display = 'block'; }
+  });
+}
 
 // ── Routing per rol ──
 const ROUTES = {
@@ -521,7 +529,7 @@ async function doLogin() {
   btn.textContent = 'Inloggen →';
 
   if (error) {
-    showError('Inloggen mislukt: ' + error.message);
+    showError('Inloggen mislukt: ' + (error?.message || 'onbekende fout'));
     return;
   }
 
@@ -550,6 +558,7 @@ async function doLogin() {
     if (sp?.bbl_mode) {
       // Nieuw BBL-account zonder naam → eerst profiel invullen
       redirectUrl = sp?.naam ? 'bbl-dashboard.html' : 'bbl-profile.html';
+      sessionStorage.setItem('internly_role', 'bbl');
     }
   }
 
@@ -600,7 +609,7 @@ async function doRegister() {
   btn.textContent = 'Account aanmaken →';
 
   if (error) {
-    showError('Registreren mislukt: ' + error.message);
+    showError('Registreren mislukt: ' + (error?.message || 'onbekende fout'));
     return;
   }
 
@@ -691,6 +700,18 @@ async function switchAccount() {
   if (logoSub) logoSub.textContent = 'Welkom terug.';
 }
 
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+window.addEventListener('unhandledrejection', function(e) {
+  if (e.reason && (
+    e.reason.message?.includes('JWT') ||
+    e.reason.message?.includes('session') ||
+    e.reason.code === 'PGRST301'
+  )) {
+    sessionStorage.clear();
+    window.location.replace('auth.html?expired=1');
+  }
+});
+
 window.addEventListener('DOMContentLoaded', async () => {
   // Al ingelogd? Toon panel met optie naar dashboard of ander account.
   const { data: { user } } = await db.auth.getUser();
@@ -754,7 +775,7 @@ function googleTranslateElementInit() {
 }
 
 function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
+  const select = document.querySelector('.goog-te-combo');
   if (select) {
     select.value = lang;
     select.dispatchEvent(new Event('change'));
@@ -766,7 +787,7 @@ function switchLang(lang) {
 }
 
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
+  const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
   });

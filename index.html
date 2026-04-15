@@ -960,7 +960,7 @@ function googleTranslateElementInit() {
 }
 
 function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
+  const select = document.querySelector('.goog-te-combo');
   if (select) {
     select.value = lang;
     select.dispatchEvent(new Event('change'));
@@ -972,7 +972,7 @@ function switchLang(lang) {
 }
 
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
+  const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
   });

@@ -9,13 +9,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Mijn BBL-profiel — Internly</title>
+  <title>BBL Profiel — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -244,6 +244,8 @@
 </div>
 
 <div class="shell">
+
+  <a href="bbl-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--ink3,#888);font-size:.88rem;text-decoration:none;">← Terug naar dashboard</a>
 
   <!-- ── Profieloverzicht (toon na opslaan) ── -->
   <div id="view-overview" style="display:none">
@@ -582,7 +584,7 @@ async function saveProfile() {
 
   if (error) {
     console.error('[bbl-profile] upsert fout:', error.message);
-    notify('Fout bij opslaan: ' + error.message);
+    notify('Fout bij opslaan: ' + (error?.message || 'onbekende fout'));
     return;
   }
 
@@ -645,6 +647,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   // sp === null: nieuw BBL-account, auth.html heeft bbl_mode=true gezet bij registratie
+  sessionStorage.setItem('internly_role', 'bbl');
 
   // Naam tonen in topbar
   const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';

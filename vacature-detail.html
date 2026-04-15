@@ -7,7 +7,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Vacaturedetail — Internly</title>
+  <title>Vacature — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -594,9 +594,37 @@ async function handleSave() {
       btn.textContent = '✓ Opgeslagen in profiel';
       notify('✓ Sollicitatie opgeslagen — bekijk je voortgang bij Mijn Stages');
     } else {
-      // internship_postings — no FK in applications, localStorage only
-      btn.textContent = '✓ Opgeslagen';
-      notify('✓ Vacature opgeslagen');
+      // internship_postings — insert into applications table (localStorage already saved above)
+      try {
+        const { data: existing } = await db
+          .from('applications')
+          .select('id')
+          .eq('profile_id', user.id)
+          .eq('posting_id', v.id)
+          .maybeSingle();
+
+        if (!existing) {
+          const { error: appErr } = await db
+            .from('applications')
+            .insert({
+              profile_id: user.id,
+              posting_id: v.id,
+              status:     'pending',
+              created_at: new Date().toISOString(),
+            });
+
+          if (appErr && appErr.code !== '23505') {
+            console.error('Application insert fout:', appErr);
+            // localStorage fallback already saved — non-fatal
+          }
+        }
+      } catch (insertErr) {
+        console.error('Application insert onverwachte fout:', insertErr);
+        // localStorage fallback already saved — non-fatal
+      }
+
+      btn.textContent = '✓ Opgeslagen in profiel';
+      notify('✓ Sollicitatie opgeslagen — bekijk je voortgang bij Mijn Stages');
     }
   } catch(e) {
     console.error('handleSave error:', e);

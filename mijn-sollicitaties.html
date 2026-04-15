@@ -2,13 +2,13 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Mijn Sollicitaties - Internly</title>
+  <title>Mijn sollicitaties — Internly</title>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -723,6 +723,9 @@
 
       const { data: _roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
       if (_roleRow?.role === 'gepensioneerd') { window.location.href = 'buddy-dashboard.html'; return; }
+
+      // BBL-studenten horen niet op de sollicitaties pagina
+      if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-dashboard.html'); return; }
 
       const authEl = document.getElementById('topbarAuth');
       const email  = user.email || '';

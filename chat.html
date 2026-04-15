@@ -2,12 +2,12 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Chat — Internly</title>
+  <title>Berichten — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -294,6 +294,10 @@
     setTimeout(() => el.classList.remove('show'), 3200);
   }
 
+  // Offline/online listeners
+  window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
+  window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
+
   // ── Auto-resize textarea ──────────────────────────────────────────────────
 
   const msgInput = document.getElementById('msgInput');
@@ -565,7 +569,7 @@
     btn.disabled = false;
 
     if (error) {
-      notify('Fout bij verzenden: ' + error.message);
+      notify('Fout bij verzenden: ' + (error?.message || 'onbekende fout'));
       console.error('Send error:', error);
       return;
     }
@@ -822,6 +826,18 @@
     markMessagesRead();
   }
 
+  // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+  window.addEventListener('unhandledrejection', function(e) {
+    if (e.reason && (
+      e.reason.message?.includes('JWT') ||
+      e.reason.message?.includes('session') ||
+      e.reason.code === 'PGRST301'
+    )) {
+      sessionStorage.clear();
+      window.location.replace('auth.html?expired=1');
+    }
+  });
+
   // ── Init ──────────────────────────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', async () => {
@@ -865,7 +881,7 @@ function googleTranslateElementInit() {
 }
 
 function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
+  const select = document.querySelector('.goog-te-combo');
   if (select) {
     select.value = lang;
     select.dispatchEvent(new Event('change'));
@@ -877,7 +893,7 @@ function switchLang(lang) {
 }
 
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
+  const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
   });

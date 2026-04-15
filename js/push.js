@@ -23,12 +23,12 @@ function urlBase64ToUint8Array(base64String) {
 
 async function registerPushNotifications(dbClient, userId) {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('[push] Not supported in this browser');
+    console.warn('[push] Not supported in this browser');
     return false;
   }
   if (!userId) return false;
   if (!VAPID_PUBLIC_KEY || VAPID_PUBLIC_KEY.startsWith('REPLACE_')) {
-    console.log('[push] VAPID_PUBLIC_KEY not configured — push skipped');
+    console.warn('[push] VAPID_PUBLIC_KEY not configured — push skipped');
     return false;
   }
 

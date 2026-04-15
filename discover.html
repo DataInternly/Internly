@@ -2,14 +2,14 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FF7E42">
   <meta name="description" content="Ontdek stageplaatsen bij transparante bedrijven. Filter op sector, locatie en reistijd.">
-  <title>Internly — Ontdek Stages</title>
+  <title>Vacatures zoeken — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -906,6 +906,10 @@ function notify(msg) {
   setTimeout(() => el.classList.remove('show'), 3200);
 }
 
+// Offline/online listeners
+window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
+window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
+
 async function signOut() {
   if (notifSubscription) {
     try { await db.removeChannel(notifSubscription); } catch(e) {}
@@ -1087,6 +1091,18 @@ function buddySwitchTab(tab, btn) {
 let _buddySpContext = {};
 // ── End buddy integration ─────────────────────────────────────────────────
 
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+window.addEventListener('unhandledrejection', function(e) {
+  if (e.reason && (
+    e.reason.message?.includes('JWT') ||
+    e.reason.message?.includes('session') ||
+    e.reason.code === 'PGRST301'
+  )) {
+    sessionStorage.clear();
+    window.location.replace('auth.html?expired=1');
+  }
+});
+
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
   const authEl = document.getElementById('topbarAuth');
@@ -1116,14 +1132,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Verkeerde rol — stuur weg voor de rest van de pagina laadt
-    if (role === 'bedrijf' || role === 'school' || role === 'gepensioneerd') {
-      const routes = { bedrijf: 'company-dashboard.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html' };
+    if (role === 'bedrijf' || role === 'school' || role === 'gepensioneerd' || role === 'bbl') {
+      const routes = { bedrijf: 'company-dashboard.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html', bbl: 'bbl-dashboard.html' };
       window.location.replace(routes[role] || 'auth.html');
       return;
     }
 
     // Show banner if student has no profile yet + init buddy section
-    if (role !== 'company' && role !== 'school') {
+    if (role !== 'bedrijf' && role !== 'school') {
       const { data: sp } = await db
         .from('student_profiles')
         .select('profile_id, opleiding, sector, opdracht_domein, bbl_mode')
@@ -1341,7 +1357,7 @@ function googleTranslateElementInit() {
 }
 
 function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
+  const select = document.querySelector('.goog-te-combo');
   if (select) {
     select.value = lang;
     select.dispatchEvent(new Event('change'));
@@ -1353,7 +1369,7 @@ function switchLang(lang) {
 }
 
 window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
+  const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
   });
@@ -1363,9 +1379,9 @@ window.addEventListener('load', function() {
 
   // Pre-select niveau filter from URL param (passed by landing page CTA)
   // Do NOT call filterCards() here — cards load async; loadInternships() calls it after render
-  var urlNiveau = new URLSearchParams(window.location.search).get('niveau');
+  const urlNiveau = new URLSearchParams(window.location.search).get('niveau');
   if (urlNiveau) {
-    var nf = document.getElementById('niveauFilter');
+    const nf = document.getElementById('niveauFilter');
     if (nf) nf.value = urlNiveau.toLowerCase();
   }
 });
