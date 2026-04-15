@@ -791,6 +791,12 @@
     setTimeout(() => el.classList.remove('show'), 3200);
   }
 
+  function showLoading(containerId, tekst) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
+  }
+
   // Offline/online listeners
   window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
   window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });

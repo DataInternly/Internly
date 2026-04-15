@@ -327,6 +327,12 @@ function notify(msg) {
   el._t = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
+function showLoading(containerId, tekst) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
+}
+
 async function signOut() {
   await db.auth.signOut();
   window.location.href = 'auth.html';
@@ -442,7 +448,6 @@ function renderPairs() {
 }
 
 function openChat(pairId) {
-  // TODO (fase 2): chat.html moet ook buddy_pair_id ondersteunen
   window.location.href = `chat.html?buddy_pair_id=${encodeURIComponent(pairId)}`;
 }
 

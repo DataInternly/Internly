@@ -2384,12 +2384,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   currentStudentProfile = sp;
 
+  // ── EINDE AUTH GUARD ─────────────────────────────────────────────────────────
+  // Elke BBL-student (bbl_mode = true) mag de hub zien, ook zonder koppeling.
+  // Alles hieronder is niet-blokkerend — geen redirect als er geen match is.
+
   // 3. Topbar gebruikersnaam
   const name = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
   document.getElementById('topbarUser').textContent = name;
 
-  // 4. Actieve BBL-match ophalen (internship_postings voor doorstroom + company info)
-  const { data: match } = await db
+  // 4. Actieve BBL-match ophalen (optioneel — hub laadt altijd)
+  const { data: match, error: matchErr } = await db
     .from('matches')
     .select(`
       id, party_a, party_b, status,
@@ -2401,6 +2405,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     .in('status', ['active', 'accepted'])
     .limit(1)
     .maybeSingle();
+
+  if (matchErr) console.error('[bbl-hub] match query fout:', matchErr.message, matchErr.code, matchErr.details);
 
   activeMatch = match;
 
@@ -2461,7 +2467,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 5. Gesprekschannel (conversations) — match-thread
   if (match) {
-    let { data: conv } = await db
+    let { data: conv, error: convErr } = await db
       .from('conversations')
       .select('id')
       .eq('match_id', match.id)
@@ -2469,12 +2475,15 @@ window.addEventListener('DOMContentLoaded', async () => {
       .limit(1)
       .maybeSingle();
 
+    if (convErr) console.error('[bbl-hub] conversations query fout:', convErr.message, convErr.code);
+
     if (!conv) {
-      const { data: newConv } = await db
+      const { data: newConv, error: newConvErr } = await db
         .from('conversations')
         .insert({ match_id: match.id })
         .select('id')
         .single();
+      if (newConvErr) console.error('[bbl-hub] conversation aanmaken fout:', newConvErr.message);
       conv = newConv;
     }
 
@@ -2489,10 +2498,24 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 6. Deelnemers in berichten-view
   renderParticipants(praktijkbegeleiderName, rocNaam, false);
 
-  // Geen actieve koppeling — toon lege staat in berichten-view
+  // Geen actieve koppeling — toon lege staat met CTA in berichten-view
   if (!match) {
-    document.getElementById('msgThread').innerHTML =
-      '<div class="msg-system">Nog geen actieve BBL-koppeling gevonden. Neem contact op met je school of leerbedrijf.</div>';
+    document.getElementById('msgThread').innerHTML = `
+      <div style="padding:40px 24px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:14px;">🏭</div>
+        <p style="font-weight:600;font-size:15px;color:#0d1520;margin:0 0 8px;">
+          Nog geen leerbedrijf gekoppeld
+        </p>
+        <p style="font-size:13px;color:#6b7280;line-height:1.6;margin:0 0 22px;">
+          Je BBL-account is klaar. Voeg je leerbedrijf toe om berichten,
+          kalender en evaluaties te activeren.
+        </p>
+        <a href="bbl-profile.html"
+           style="display:inline-block;padding:11px 24px;background:#1a7a48;color:#fff;
+                  border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">
+          Leerbedrijf koppelen →
+        </a>
+      </div>`;
     document.getElementById('participantsRow').innerHTML =
       '<div class="participant"><div class="av av-gray" style="width:20px;height:20px;font-size:8px;">?</div><span>Geen koppeling</span></div>';
   }
