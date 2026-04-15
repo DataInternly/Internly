@@ -17,3 +17,19 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Push helpers live in js/push.js — loaded by all app pages that need push.
 // index.html is a public landing page and does not register push notifications.
+
+/* ── FEATURE FLAGS ──────────────────────────────────────────────────────────
+   hasActivePlan(minPlan) — returns true if the current user has at least the
+   given plan tier active. Currently always returns true so feature-gated code
+   can be written and tested before Mollie payments go live.
+
+   Plans:  'company_starter' | 'company_pro' | 'company_business'
+           'school_freemium' | 'school_premium'
+
+   Usage:
+     if (await hasActivePlan('company_pro')) { renderESGExport(); }
+   ─────────────────────────────────────────────────────────────────────────── */
+async function hasActivePlan(_minPlan) {
+  // TODO: vervangen door echte subscription check na Mollie-integratie
+  return true;
+}

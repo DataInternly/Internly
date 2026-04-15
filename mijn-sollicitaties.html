@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <title>Mijn Sollicitaties - Internly</title>
@@ -718,6 +721,9 @@
       if (!user) { window.location.href = 'auth.html'; return; }
       currentUserId = user.id;
 
+      const { data: _roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      if (_roleRow?.role === 'gepensioneerd') { window.location.href = 'buddy-dashboard.html'; return; }
+
       const authEl = document.getElementById('topbarAuth');
       const email  = user.email || '';
       const name   = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
@@ -773,7 +779,7 @@ window.addEventListener('load', function() {
   }
 });
   </script>
-  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   <script src="js/info.js"></script>
 
 </body>

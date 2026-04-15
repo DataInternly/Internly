@@ -1,6 +1,6 @@
 # Internly — Developer Handover Report
-**Last updated:** 2026-04-14  
-**Sessions covered:** 2026-04-12 (Tasks 1–4), 2026-04-13/14 (Security audit, Stage Hub polish, Navigation audit, Info icons), 2026-04-14 (Landing page redesign)
+**Last updated:** 2026-04-14 (evening)
+**Sessions covered:** 2026-04-12 (Tasks 1–4), 2026-04-13/14 (Security audit, Stage Hub polish, Navigation audit, Info icons), 2026-04-14 (Landing page redesign), 2026-04-14 (Reflectieverslag systeem)
 
 ---
 
@@ -226,6 +226,135 @@ Implemented a 10-step redesign spec using `internly-demo-v10.html` as visual ref
 - Hero mobile padding (`padding:80px 24px`) → `48px 16px 40px` at ≤680px
 - `.struck` clamp minimum too large for 375px phones → `clamp(2.6rem,13vw,5rem)` at ≤480px
 - Pulse animation used `box-shadow` (clipped by `overflow:hidden`) → switched to `transform:scale(1.04)`
+
+---
+
+---
+
+## Session 2026-04-14 (evening) — Reflectieverslag systeem
+
+### ⚠️ SQL — MUST RUN BEFORE TESTING
+
+Run these in the Supabase SQL editor in order:
+
+```sql
+-- 1. STARR-kolommen op stage_reflecties
+ALTER TABLE stage_reflecties
+  ADD COLUMN IF NOT EXISTS situatie   TEXT,
+  ADD COLUMN IF NOT EXISTS taak       TEXT,
+  ADD COLUMN IF NOT EXISTS actie      TEXT,
+  ADD COLUMN IF NOT EXISTS resultaat  TEXT,
+  ADD COLUMN IF NOT EXISTS leermoment TEXT,
+  ADD COLUMN IF NOT EXISTS leerdoel   TEXT;
+
+-- 2. Toelichting-kolom op student_profiles (BBL leerdoelen)
+ALTER TABLE student_profiles
+  ADD COLUMN IF NOT EXISTS skills_toelichting JSONB DEFAULT '{}';
+
+-- 3. Verlengingsstatus (al eerder gepland, nog steeds pending)
+ALTER TABLE matches
+  ADD COLUMN IF NOT EXISTS renewal_status JSONB DEFAULT '{}';
+
+-- 4. Meetings-status constraint uitbreiden (BBL evaluatie handtekeningen)
+ALTER TABLE meetings DROP CONSTRAINT IF EXISTS meetings_status_check;
+ALTER TABLE meetings ADD CONSTRAINT meetings_status_check
+  CHECK (status IN (
+    'openstaand','bevestigd','afgewezen','student_getekend',
+    'bedrijf_getekend','voltooid','geannuleerd'
+  ));
+```
+
+### FTP — upload deze bestanden
+
+```
+match-dashboard.html
+bbl-hub.html
+```
+
+### Wat is gebouwd
+
+#### match-dashboard.html (Stage Hub — student/bedrijf/school)
+
+| Feature | Detail |
+|---|---|
+| STARR reflectie modal | 5 velden (S/T/A/R/R) + periode + datum + leerdoel-koppeling |
+| STARR chip indicators | Groene/grijze chips op elke reflectie-kaart; "x/5 ingevuld" label |
+| Expand/collapse per reflectie | "Bekijk STARR-analyse ▾" toggle per kaart |
+| Leerdoel-chip op kaart | Blauwe chip als reflectie gekoppeld is aan een leerdoel |
+| Verwijder-knop | Rood prullenbak-icoon, bevestigingsdialoog, DB delete |
+| PDF export | Volledig jsPDF A4: groene header, samenvatting, leerdoelen met minibalk, alle reflecties met STARR-secties en gekleurde badges |
+| Voortgang stat-strip | Bovenaan voortgang-tab: leerdoelen gem. / reflecties count / STARR % |
+| PDF shortcut in kaart | "📄 PDF" knop in reflectie-kaart header (verschijnt als er ≥1 reflectie is) |
+| Volledigheid-kaart in overzicht | Voortgangsbalk + teller op de overzicht-tab |
+| DB load uitgebreid | `reflectiesRes.data.map()` leest nu alle 7 STARR-velden |
+| Demo data gevuld | Beide demo-reflecties hebben volledige STARR-inhoud + leerdoel-koppeling |
+
+#### bbl-hub.html (BBL Hub — student)
+
+| Feature | Detail |
+|---|---|
+| STARR zelfreflectie-form | 5 gekleurde STARR-velden vervangt enkelvoudige textarea |
+| Live voortgangsteller | "x/5 velden ingevuld" — groen bij volledig |
+| Auto-save draft | Elke toetsaanslag schrijft naar `internly_bbl_reflectie_draft_[uid]`; herstel bij tabwisseling |
+| Opslaan naar DB | Sla op als `[Zelfreflectie-STARR] JSON` in messages-tabel |
+| Velden wissen na opslaan | Draft + velden leeg na succesvolle opslag |
+| Zelfreflectie-geschiedenis | Panel met eerdere STARR-reflecties (datum + chips + expand); verborgen als leeg |
+| `loadBBLReflecties()` | Laadt van DB (messages), parset oud én nieuw formaat, synct naar localStorage |
+| PDF export | Volledig jsPDF A4: leerdoelen met toelichtingen + alle zelfreflecties met STARR-breakdown |
+| Leerdoel toelichtingen | Toggle-knop per leerdoel → textarea → opslaan naar `student_profiles.skills_toelichting` |
+| jsPDF CDN | Toegevoegd aan `<head>` |
+
+### Bekende beperkingen na vandaag
+
+| # | Beperking |
+|---|---|
+| 1 | `stage_reflecties` STARR-kolommen werken pas na SQL-migratie (zie boven). Tot dan: nieuwe reflecties slaan STARR op in DB, oude rijen hebben NULL. Fallback: `leermoment` valt terug op `text`. |
+| 2 | `student_profiles.skills_toelichting` werkt pas na SQL-migratie. Tot dan: toelichtingen alleen in localStorage. |
+| 3 | BBL-history panel laadt alleen als `activeConvId` bekend is (= user heeft een actieve koppeling). Studenten zonder koppeling zien het panel niet. Correct gedrag. |
+| 4 | PDF-export van match-dashboard gebruikt demo-`match`-object voor naam/bedrijf. Wanneer live DB-data wordt geladen, moeten `match.student.name` en `match.company.name` vanuit de DB worden gevuld (dat is al het geval zodra `loadHubFromDB()` de data overschrijft). |
+
+---
+
+## Morgen verder — instructies voor de volgende sessie
+
+### Prioriteit 1 — SQL uitvoeren (5 min)
+Voer de 4 SQL-statements uit in de Supabase SQL editor (zie boven). Zonder deze migraties mislukken STARR-opslag en leerdoel-toelichtingen in de DB.
+
+### Prioriteit 2 — FTP uploaden
+Upload `match-dashboard.html` en `bbl-hub.html` via FileZilla.
+
+### Prioriteit 3 — Testen
+Testscript:
+1. Log in als BBL-student → bbl-hub.html
+2. Ga naar Evaluatie-tab → schrijf een STARR-reflectie in alle 5 velden → Opslaan
+3. Ververs de pagina → controleer dat de reflectie in "Eerdere zelfreflecties" verschijnt
+4. Exporteer PDF → controleer dat leerdoelen, toelichtingen en reflectie erin staan
+5. Log in als student (BOL) → match-dashboard.html
+6. Ga naar Voortgang-tab → klik "+ Reflectie toevoegen" → vul STARR in → Opslaan
+7. Controleer dat de chips groen zijn, de stat-strip klopt, en de "📄 PDF" knop werkt
+
+### Prioriteit 4 — Volgende features (kies één)
+
+**Optie A — Buddy-systeem afmaken**
+- `buddy_pair_id` kolom op `conversations` (SQL in bbl-hub.html comment blok #4 — buddy_queue)
+- Buddy-matching logica in `js/buddy.js` afmaken
+- Test: student zonder koppeling → buddy-flow
+
+**Optie B — Mollie betaalintegratie**
+- `hasActivePlan()` in `js/supabase.js` is momenteel altijd `true` (stub)
+- Pricing pagina heeft `startCheckout(plan)` stub
+- Implementeer Mollie Payment Links of Checkout API
+- Koppel subscription-status aan `profiles.plan` kolom
+
+**Optie C — Privacybeleid afronden**
+- Postadres Sasubo Holding ontbreekt in `privacybeleid.html`
+- DPA met Supabase aanvragen (formulier bij Supabase dashboard → Settings → Legal)
+- FTP upload `privacybeleid.html` na aanpassing
+
+**Optie D — Admin-pagina versterken**
+- `admin.html` auth-guard is alleen client-side e-mailcheck → voeg Supabase RLS-rol toe
+- Waitlist CSV-export testen
+- Flagged reviews queue testen met echte data
 
 ---
 

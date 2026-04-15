@@ -23,6 +23,16 @@
   --              "bedrijf": "verlengd"|"gestopt"|null,
   --              "school":  "akkoord"|null }
 
+  -- 5. STARR-kolommen op stage_reflecties (reflectieverslag infrastructuur):
+  -- ALTER TABLE stage_reflecties
+  --   ADD COLUMN IF NOT EXISTS situatie   TEXT,
+  --   ADD COLUMN IF NOT EXISTS taak       TEXT,
+  --   ADD COLUMN IF NOT EXISTS actie      TEXT,
+  --   ADD COLUMN IF NOT EXISTS resultaat  TEXT,
+  --   ADD COLUMN IF NOT EXISTS leermoment TEXT,
+  --   ADD COLUMN IF NOT EXISTS leerdoel   TEXT;
+  -- RLS (reeds gedekt door bestaand stage_reflecties-beleid — check met: SELECT * FROM pg_policies WHERE tablename='stage_reflecties';)
+
   -- 4. buddy_queue tabel (als nog niet bestaat):
   -- CREATE TABLE IF NOT EXISTS buddy_queue (
   --   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -38,12 +48,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <title>BBL Hub — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/buddy.js"></script>
   <style>
@@ -456,8 +470,84 @@
     .ld-box.checked { background: #eaf5ed; border-color: rgba(26,122,74,.4); }
     .ld-box.checked::after { content: '✓'; font-size: 10px; color: #1a7a48; font-weight: 500; }
 
+    /* Competentie toelichting */
+    .ld-toelichting-wrap {
+      margin: 4px 0 8px 26px;
+    }
+    .ld-toelichting-btn {
+      background: none; border: none; padding: 0;
+      font-size: 11px; color: #1a7a48; cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+    .ld-toelichting-textarea {
+      display: none;
+      width: 100%; margin-top: 4px;
+      font-size: 12px; color: #0d1520;
+      border: 1px solid rgba(15,17,23,.15); border-radius: 6px;
+      padding: 6px 8px; resize: vertical; min-height: 60px;
+      font-family: inherit; box-sizing: border-box;
+    }
+    .ld-toelichting-textarea.open { display: block; }
+    .ld-toelichting-save {
+      display: none; margin-top: 4px;
+      font-size: 11px; background: #1a7a48; color: #fff;
+      border: none; border-radius: 5px; padding: 3px 10px; cursor: pointer;
+    }
+    .ld-toelichting-save.open { display: inline-block; }
+
+    /* Zelfreflectie geschiedenis */
+    .refl-hist-list { margin-top: 8px; }
+    .refl-hist-item {
+      border: 1px solid rgba(15,17,23,.1); border-radius: 8px;
+      margin-bottom: 8px; overflow: hidden;
+    }
+    .refl-hist-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: #f9f8f5; cursor: pointer;
+      user-select: none;
+    }
+    .refl-hist-head:hover { background: #f1efe8; }
+    .refl-hist-date { font-size: 11px; font-weight: 600; color: #0d1520; }
+    .refl-hist-chips { display: flex; gap: 3px; }
+    .refl-hist-chip {
+      width: 16px; height: 16px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 700; color: #fff;
+    }
+    .refl-hist-chip.on  { background: #1a7a48; }
+    .refl-hist-chip.off { background: #d1d5db; }
+    .refl-hist-toggle { font-size: 10px; color: #6b7280; }
+    .refl-hist-body {
+      display: none; padding: 10px 12px; background: #fff;
+      border-top: 1px solid rgba(15,17,23,.07);
+    }
+    .refl-hist-body.open { display: block; }
+    .refl-hist-section { margin-bottom: 8px; }
+    .refl-hist-section:last-child { margin-bottom: 0; }
+    .refl-hist-lbl {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: #1a7a48; margin-bottom: 3px;
+    }
+    .refl-hist-val {
+      font-size: 12px; color: #0d1520; line-height: 1.5; white-space: pre-wrap;
+    }
+    .refl-hist-empty { font-size: 11px; color: #9ca3af; font-style: italic; }
+    .refl-hist-del {
+      background: none; border: none; padding: 2px 6px; cursor: pointer;
+      color: #9ca3af; font-size: 11px; border-radius: 4px;
+    }
+    .refl-hist-del:hover { background: #fee2e2; color: #dc2626; }
+
+    /* PDF ankerpunt card */
+    .pdf-anchor-card {
+      background: #eaf5ed; border: 1.5px solid rgba(26,122,74,.25);
+      border-radius: 10px; padding: 16px 18px; margin-top: 16px;
+    }
+    .pdf-anchor-card .pac-title { font-size: 13px; font-weight: 600; color: #0d1520; margin-bottom: 4px; }
+    .pdf-anchor-card .pac-sub { font-size: 12px; color: #4b5563; margin-bottom: 12px; }
+
     .reflectie-textarea {
-      width: 100%; padding: 9px 12px; height: 80px;
+      width: 100%; padding: 9px 12px; min-height: 64px;
       border: 1.5px solid #e2e8f0; border-radius: 10px;
       font-family: 'Outfit', sans-serif; font-size: 12px;
       color: #0d1520; background: #fff; resize: none;
@@ -569,7 +659,9 @@
   <span class="topbar-bbl-tag">BBL-traject</span>
   <nav class="topbar-bbl-nav">
     <a href="bbl-dashboard.html">Dashboard</a>
-    <a href="bbl-hub.html" class="active">Hub</a>
+    <a href="bbl-hub.html" class="active">BBL Traject Hub</a>
+    <a href="buddy-dashboard.html">Buddy</a>
+    <a href="bbl-profile.html">Profiel</a>
   </nav>
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
@@ -730,16 +822,65 @@
         </div>
       </div>
 
-      <!-- Zelfreflectie -->
+      <!-- Zelfreflectie STARR -->
       <div class="eval-section">
         <div class="eval-section-head">
           <div class="eval-section-title">Zelfreflectie schrijven</div>
           <span class="badge b-blue">Jouw taak</span>
         </div>
-        <textarea class="reflectie-textarea" id="reflectieTxt"
-          placeholder="Wat ging goed? Wat wil je verbeteren? Schrijf in je eigen woorden."></textarea>
-        <button class="btn-small" style="margin-top:6px;float:right;" onclick="saveReflectie()">Opslaan</button>
-        <div style="clear:both;"></div>
+        <div style="background:#eaf5ed;border-radius:7px;padding:8px 12px;font-size:11px;color:#1a7a48;font-weight:500;margin-bottom:10px;">
+          Gebruik het STARR-model — beschrijf elke fase in je eigen woorden.
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:11px;font-weight:600;color:#0d1520;margin-bottom:3px;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1a7a48;color:#fff;font-size:9px;font-weight:700;margin-right:5px;">S</span>Situatie
+          </div>
+          <textarea class="reflectie-textarea" id="reflectie-situatie" style="min-height:52px;"
+            placeholder="Wat was de context of aanleiding?"></textarea>
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:11px;font-weight:600;color:#0d1520;margin-bottom:3px;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1a7a48;color:#fff;font-size:9px;font-weight:700;margin-right:5px;">T</span>Taak
+          </div>
+          <textarea class="reflectie-textarea" id="reflectie-taak" style="min-height:52px;"
+            placeholder="Wat was jouw rol of opdracht?"></textarea>
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:11px;font-weight:600;color:#0d1520;margin-bottom:3px;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1a7a48;color:#fff;font-size:9px;font-weight:700;margin-right:5px;">A</span>Actie
+          </div>
+          <textarea class="reflectie-textarea" id="reflectie-actie" style="min-height:52px;"
+            placeholder="Wat heb je concreet gedaan?"></textarea>
+        </div>
+        <div style="margin-bottom:6px;">
+          <div style="font-size:11px;font-weight:600;color:#0d1520;margin-bottom:3px;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1a7a48;color:#fff;font-size:9px;font-weight:700;margin-right:5px;">R</span>Resultaat
+          </div>
+          <textarea class="reflectie-textarea" id="reflectie-resultaat" style="min-height:52px;"
+            placeholder="Wat was het effect of de uitkomst?"></textarea>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:600;color:#0d1520;margin-bottom:3px;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1a7a48;color:#fff;font-size:9px;font-weight:700;margin-right:5px;">R</span>Reflectie / Leermoment
+          </div>
+          <textarea class="reflectie-textarea" id="reflectie-leermoment" style="min-height:64px;"
+            placeholder="Wat leer je hiervan? Wat doe je de volgende keer anders?"></textarea>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+          <span id="reflectie-voortgang-lbl" style="font-size:11px;color:#4b5563;">0/5 velden ingevuld</span>
+          <button class="btn-small" onclick="saveReflectie()">Opslaan</button>
+        </div>
+      </div>
+
+      <!-- Zelfreflectie geschiedenis -->
+      <div class="eval-section" id="reflHistSection" style="display:none;">
+        <div class="eval-section-head">
+          <div class="eval-section-title">Eerdere zelfreflecties</div>
+          <span class="badge b-neutral" id="reflHistCount">—</span>
+        </div>
+        <div class="refl-hist-list" id="reflHistList">
+          <div class="waiting-block">Laden…</div>
+        </div>
       </div>
 
       <!-- Feedback praktijkbegeleider — readonly voor student -->
@@ -758,23 +899,34 @@
       <div class="signoff-row">
         <div class="signoff-party">
           <div class="sp-name" id="spStudentName">Student</div>
-          <div class="sp-role">Student</div>
+          <div class="sp-role">BBL-student</div>
           <div id="signStudentArea">
             <button class="btn-sign" onclick="signOff('student')">Zet handtekening</button>
           </div>
         </div>
         <div class="signoff-party">
           <div class="sp-name" id="spBedrijfName">Praktijkbegeleider</div>
-          <div class="sp-role">Bedrijf</div>
+          <div class="sp-role">Praktijkbegeleider</div>
           <div class="sp-wait" id="sgWait">Wacht op gesprek</div>
           <div class="sp-signed" id="sgSigned" style="display:none;">✓ Getekend</div>
         </div>
         <div class="signoff-party">
           <div class="sp-name">ROC-begeleider</div>
-          <div class="sp-role">School</div>
+          <div class="sp-role">ROC-begeleider</div>
           <div class="sp-wait" id="mjWait">Wacht op student</div>
           <div class="sp-signed" id="mjSigned" style="display:none;">✓ Getekend</div>
         </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- PDF-ankerpunt — reflectieverslag exporteren -->
+      <div class="pdf-anchor-card" id="pdfAnchorCard">
+        <div class="pac-title">📄 Reflectieverslag exporteren</div>
+        <div class="pac-sub">Genereer een PDF met al jouw STARR-reflecties, leerdoelen en toelichtingen voor de eindbespreking.</div>
+        <button class="btn-small" onclick="exportBBLReflectieverslag()" style="width:100%;margin-top:4px;">
+          Exporteer reflectieverslag (PDF)
+        </button>
       </div>
 
       <div class="divider"></div>
@@ -818,7 +970,7 @@
       <div class="renew-party">
         <div class="rp-left">
           <div class="av av-blue" id="renewStudentAv">LD</div>
-          <div><div class="rp-name" id="renewStudentName">Student</div><div class="rp-role">Student</div></div>
+          <div><div class="rp-name" id="renewStudentName">Student</div><div class="rp-role">BBL-student</div></div>
         </div>
         <span class="badge b-warn" id="studentRenewBadge">Jouw keuze gevraagd</span>
       </div>
@@ -841,7 +993,7 @@
       <div class="renew-party">
         <div class="rp-left">
           <div class="av av-amber" id="rocRenewAv">SC</div>
-          <div><div class="rp-name" id="rocNaamDisplay">School</div><div class="rp-role">Stagebegeleider</div></div>
+          <div><div class="rp-name" id="rocNaamDisplay">ROC-begeleider</div><div class="rp-role">ROC-begeleider</div></div>
         </div>
         <span class="badge b-neutral" id="schoolRenewBadge">Wacht op student</span>
       </div>
@@ -1498,7 +1650,7 @@ async function loadEvaluatie() {
   }
 
   // Leerdoelen
-  renderLeerdoelen(currentStudentProfile?.skills || []);
+  await renderLeerdoelen(currentStudentProfile?.skills || []);
 
   // Naam student in handtekening
   const myName = currentUser.user_metadata?.naam
@@ -1509,9 +1661,40 @@ async function loadEvaluatie() {
 
   // Archief
   loadEvalArchive();
+  loadBBLReflecties();
+
+  // Herstel eerder opgeslagen concept (localStorage) en voortgangs-label
+  try {
+    const drafts = JSON.parse(localStorage.getItem('internly_bbl_reflectie_draft_' + currentUser.id) || '{}');
+    ['situatie','taak','actie','resultaat','leermoment'].forEach(k => {
+      const el = document.getElementById('reflectie-' + k);
+      if (el && drafts[k]) el.value = drafts[k];
+    });
+  } catch(e) {}
+  updateReflectieVoortgangLbl();
+
+  // Live voortgangsteller + automatisch concept opslaan (eenmalig per DOM-leven)
+  const firstReflEl = document.getElementById('reflectie-situatie');
+  if (firstReflEl && !firstReflEl._starrListenerAdded) {
+    firstReflEl._starrListenerAdded = true;
+    ['situatie','taak','actie','resultaat','leermoment'].forEach(k => {
+      const el = document.getElementById('reflectie-' + k);
+      if (!el) return;
+      el.addEventListener('input', () => {
+        updateReflectieVoortgangLbl();
+        try {
+          const draft = {};
+          ['situatie','taak','actie','resultaat','leermoment'].forEach(f => {
+            draft[f] = document.getElementById('reflectie-' + f)?.value || '';
+          });
+          localStorage.setItem('internly_bbl_reflectie_draft_' + currentUser.id, JSON.stringify(draft));
+        } catch(e) {}
+      });
+    });
+  }
 }
 
-function renderLeerdoelen(skills) {
+async function renderLeerdoelen(skills) {
   const list = document.getElementById('leerdoelenList');
   if (!skills || skills.length === 0) {
     list.innerHTML = '<div class="waiting-block">Nog geen leerdoelen ingesteld — vul ze in op je profiel.</div>';
@@ -1533,11 +1716,26 @@ function renderLeerdoelen(skills) {
     Object.assign(progress, local);
   } catch(e) {}
 
+  // Laad toelichtingen uit localStorage
+  let toelichtingen = {};
+  try { toelichtingen = JSON.parse(localStorage.getItem('internly_ld_toelichting_' + currentUser.id) || '{}'); } catch(e) {}
+
   list.innerHTML = skills.map((skill, i) => {
-    const checked = progress[skill] ? ' checked' : '';
-    return `<div class="leerdoel-row">
-      <div class="ld-box${checked}" onclick="toggleLeerdoel(this,'${escapeHtml(skill)}')" data-skill="${escapeHtml(skill)}"></div>
-      <span>${escapeHtml(skill)}</span>
+    const checked    = progress[skill] ? ' checked' : '';
+    const safeSkill  = escapeHtml(skill);
+    const toelichting = escapeHtml(toelichtingen[skill] || '');
+    const uid        = 'ld-' + i;
+    return `<div class="leerdoel-row" style="flex-wrap:wrap;">
+      <div class="ld-box${checked}" onclick="toggleLeerdoel(this,'${safeSkill}')" data-skill="${safeSkill}"></div>
+      <span style="flex:1;">${safeSkill}</span>
+      <div class="ld-toelichting-wrap" style="width:100%;">
+        <button class="ld-toelichting-btn" onclick="toggleToelichting('${uid}')">+ toelichting</button>
+        <textarea class="ld-toelichting-textarea" id="${uid}-txt"
+          placeholder="Geef een toelichting op dit leerdoel…"
+          data-skill="${safeSkill}">${toelichting}</textarea>
+        <button class="ld-toelichting-save" id="${uid}-save"
+          onclick="saveBBLToelichting('${uid}','${safeSkill}')">Opslaan</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1568,19 +1766,393 @@ async function toggleLeerdoel(box, skill) {
   }
 }
 
+function toggleToelichting(uid) {
+  const txt  = document.getElementById(uid + '-txt');
+  const save = document.getElementById(uid + '-save');
+  if (!txt) return;
+  const isOpen = txt.classList.toggle('open');
+  if (save) save.classList.toggle('open', isOpen);
+  const btn = txt.closest('.ld-toelichting-wrap')?.querySelector('.ld-toelichting-btn');
+  if (btn) btn.textContent = isOpen ? '− toelichting' : '+ toelichting';
+}
+
+async function saveBBLToelichting(uid, skill) {
+  const txt = document.getElementById(uid + '-txt');
+  if (!txt || !currentUser) return;
+  const value = txt.value.trim();
+
+  // Lokale opslag
+  let toelichtingen = {};
+  try { toelichtingen = JSON.parse(localStorage.getItem('internly_ld_toelichting_' + currentUser.id) || '{}'); } catch(e) {}
+  toelichtingen[skill] = value;
+  localStorage.setItem('internly_ld_toelichting_' + currentUser.id, JSON.stringify(toelichtingen));
+
+  // DB opslag — JSONB merge op student_profiles.skills_toelichting
+  try {
+    const { data: sp } = await db
+      .from('student_profiles')
+      .select('skills_toelichting')
+      .eq('profile_id', currentUser.id)
+      .maybeSingle();
+    const merged = { ...(sp?.skills_toelichting || {}), [skill]: value };
+    await db.from('student_profiles')
+      .update({ skills_toelichting: merged })
+      .eq('profile_id', currentUser.id);
+  } catch(e) {
+    console.warn('[bbl-hub] skills_toelichting DB write fout:', e?.message || e);
+  }
+
+  notify('Toelichting opgeslagen');
+}
+
+// Geladen reflecties (merged DB + localStorage) — gedeeld door history panel en PDF export
+let bblReflecties = [];
+
+async function loadBBLReflecties() {
+  if (!currentUser || !activeConvId) return;
+
+  // Haal op uit messages tabel
+  let dbEntries = [];
+  try {
+    const { data } = await db
+      .from('messages')
+      .select('id, content, created_at')
+      .eq('conversation_id', activeConvId)
+      .eq('type', 'zelfreflectie')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (data) {
+      dbEntries = data.map(m => {
+        const raw = m.content || '';
+        // Ondersteuning voor oud formaat ([Zelfreflectie] tekst) en nieuw formaat ([Zelfreflectie-STARR] JSON)
+        if (raw.startsWith('[Zelfreflectie-STARR] ')) {
+          try {
+            const parsed = JSON.parse(raw.slice('[Zelfreflectie-STARR] '.length));
+            return { ...parsed, savedAt: m.created_at, msgId: m.id };
+          } catch(e) {}
+        }
+        // Oud formaat: sla hele tekst op als leermoment
+        const text = raw.replace(/^\[Zelfreflectie\] /, '');
+        return { situatie: '', taak: '', actie: '', resultaat: '', leermoment: text, savedAt: m.created_at, msgId: m.id, legacy: true };
+      });
+    }
+  } catch(e) {
+    console.warn('[bbl-hub] loadBBLReflecties DB fout:', e?.message || e);
+  }
+
+  // Merge: DB is leidend; localStorage als fallback wanneer DB leeg is
+  if (dbEntries.length > 0) {
+    bblReflecties = dbEntries;
+    // Sync naar localStorage cache
+    try {
+      localStorage.setItem('internly_bbl_reflecties_' + currentUser.id, JSON.stringify(
+        dbEntries.map(({ msgId, legacy, ...rest }) => rest)
+      ));
+    } catch(e) {}
+  } else {
+    try {
+      bblReflecties = JSON.parse(localStorage.getItem('internly_bbl_reflecties_' + currentUser.id) || '[]');
+    } catch(e) { bblReflecties = []; }
+  }
+
+  renderReflHistory();
+}
+
+function renderReflHistory() {
+  const section  = document.getElementById('reflHistSection');
+  const list     = document.getElementById('reflHistList');
+  const countEl  = document.getElementById('reflHistCount');
+  if (!section || !list) return;
+
+  if (bblReflecties.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+  if (countEl) countEl.textContent = bblReflecties.length;
+
+  const KEYS = [
+    ['S', 'Situatie',             'situatie'],
+    ['T', 'Taak',                 'taak'],
+    ['A', 'Actie',                'actie'],
+    ['R', 'Resultaat',            'resultaat'],
+    ['R', 'Reflectie/Leermoment', 'leermoment'],
+  ];
+
+  list.innerHTML = bblReflecties.map((r, idx) => {
+    const dateStr = r.savedAt
+      ? new Date(r.savedAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+      : 'Onbekende datum';
+    const chips = KEYS.map(([letter,, key]) =>
+      `<span class="refl-hist-chip ${r[key] ? 'on' : 'off'}" title="${key}">${letter}</span>`
+    ).join('');
+    const bodyId = `rh-body-${idx}`;
+
+    const sections = KEYS.map(([, label, key]) => `
+      <div class="refl-hist-section">
+        <div class="refl-hist-lbl">${label}</div>
+        ${r[key]
+          ? `<div class="refl-hist-val">${escapeHtml(r[key])}</div>`
+          : `<div class="refl-hist-empty">Niet ingevuld</div>`}
+      </div>`).join('');
+
+    return `
+      <div class="refl-hist-item">
+        <div class="refl-hist-head" onclick="toggleReflHist('${bodyId}',this)">
+          <div>
+            <div class="refl-hist-date">${dateStr}</div>
+            <div class="refl-hist-chips" style="margin-top:4px;">${chips}</div>
+          </div>
+          <span class="refl-hist-toggle" id="${bodyId}-arrow">▾</span>
+        </div>
+        <div class="refl-hist-body" id="${bodyId}">
+          ${sections}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleReflHist(bodyId, headEl) {
+  const body  = document.getElementById(bodyId);
+  const arrow = document.getElementById(bodyId + '-arrow');
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  if (arrow) arrow.textContent = open ? '▴' : '▾';
+}
+
+function exportBBLReflectieverslag() {
+  if (!window.jspdf) { notify('PDF-bibliotheek nog niet geladen.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc      = new jsPDF({ unit: 'mm', format: 'a4' });
+  const margin   = 18;
+  const pageW    = 210;
+  const contentW = pageW - margin * 2;
+  let y          = 0;
+
+  function addPage() { doc.addPage(); y = 20; }
+  function check(needed = 10) { if (y + needed > 278) addPage(); }
+
+  // Student naam
+  const naam = currentUser?.user_metadata?.naam
+    || currentUser?.user_metadata?.name
+    || currentUser?.email?.split('@')[0] || 'BBL-student';
+
+  // ── Koptekst ──
+  doc.setFillColor(26, 122, 72);
+  doc.rect(0, 0, 210, 30, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(17);
+  doc.setTextColor(255, 255, 255);
+  doc.text('BBL Reflectieverslag', margin, 14);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(`${naam} · ${new Date().toLocaleDateString('nl-NL')}`, margin, 23);
+  y = 38;
+
+  // ── Leerdoelen + toelichtingen ──
+  const skills = currentStudentProfile?.skills || [];
+  let progress = {};
+  let toelichtingen = {};
+  try { progress     = JSON.parse(localStorage.getItem('internly_ld_' + currentUser.id) || '{}'); } catch(e) {}
+  try { toelichtingen = JSON.parse(localStorage.getItem('internly_ld_toelichting_' + currentUser.id) || '{}'); } catch(e) {}
+
+  if (skills.length > 0) {
+    check(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(13, 21, 32);
+    doc.text('Leerdoelen', margin, y);
+    y += 8;
+
+    skills.forEach(skill => {
+      check(14);
+      const done = !!progress[skill];
+      doc.setFillColor(done ? 232 : 244, done ? 245 : 243, done ? 238 : 239);
+      doc.roundedRect(margin, y - 4, contentW, 8, 1.5, 1.5, 'F');
+      // Vinkje
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(done ? 26 : 107, done ? 122 : 114, done ? 72 : 128);
+      doc.text(done ? '✓' : '○', margin + 3, y + 1);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(13, 21, 32);
+      doc.text(skill, margin + 9, y + 1);
+      y += 10;
+
+      const toelichting = toelichtingen[skill];
+      if (toelichting) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8.5);
+        doc.setTextColor(75, 85, 99);
+        const lines = doc.splitTextToSize(toelichting, contentW - 12);
+        lines.forEach(line => { check(6); doc.text(line, margin + 9, y); y += 5; });
+        y += 2;
+      }
+    });
+    y += 4;
+  }
+
+  // ── Zelfreflecties (uit gedeelde bblReflecties array — geladen door loadBBLReflecties) ──
+  const reflecties = bblReflecties.length > 0 ? bblReflecties : (() => {
+    try { return JSON.parse(localStorage.getItem('internly_bbl_reflecties_' + currentUser.id) || '[]'); } catch(e) { return []; }
+  })();
+
+  // Haal ook huidige concept op (niet-opgeslagen)
+  const draft = {
+    situatie:   document.getElementById('reflectie-situatie')?.value.trim()   || '',
+    taak:       document.getElementById('reflectie-taak')?.value.trim()       || '',
+    actie:      document.getElementById('reflectie-actie')?.value.trim()      || '',
+    resultaat:  document.getElementById('reflectie-resultaat')?.value.trim()  || '',
+    leermoment: document.getElementById('reflectie-leermoment')?.value.trim() || '',
+  };
+  const hasDraft = Object.values(draft).some(v => v !== '');
+
+  check(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(13, 21, 32);
+  doc.text('Zelfreflecties', margin, y);
+  y += 8;
+
+  const STARR_DEFS = [
+    ['S', 'Situatie',             'situatie'],
+    ['T', 'Taak',                 'taak'],
+    ['A', 'Actie',                'actie'],
+    ['R', 'Resultaat',            'resultaat'],
+    ['R', 'Reflectie/Leermoment', 'leermoment'],
+  ];
+
+  const allEntries = hasDraft
+    ? [{ ...draft, savedAt: null }, ...reflecties]
+    : reflecties;
+
+  if (allEntries.length === 0) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text('Geen zelfreflecties opgeslagen.', margin + 2, y);
+    y += 8;
+  } else {
+    allEntries.forEach((r, i) => {
+      check(28);
+      const dateStr = r.savedAt
+        ? new Date(r.savedAt).toLocaleDateString('nl-NL')
+        : 'Concept (niet opgeslagen)';
+
+      doc.setFillColor(232, 245, 238);
+      doc.roundedRect(margin, y, contentW, 9, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(26, 122, 72);
+      doc.text(`Zelfreflectie ${allEntries.length - i}`, margin + 3, y + 6.2);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(107, 114, 128);
+      doc.text(dateStr, pageW - margin - 3, y + 6.2, { align: 'right' });
+      y += 12;
+
+      STARR_DEFS.forEach(([letter, label, key]) => {
+        const val = r[key];
+        check(12);
+        doc.setFillColor(val ? 26 : 156, val ? 122 : 163, val ? 72 : 175);
+        doc.circle(margin + 2.5, y - 1, 2.5, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text(letter, margin + 2.5, y - 0.5, { align: 'center' });
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(val ? 26 : 107, val ? 122 : 114, val ? 72 : 128);
+        doc.text(label, margin + 7, y);
+        y += 5;
+
+        if (val) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(13, 21, 32);
+          const lines = doc.splitTextToSize(val, contentW - 6);
+          lines.forEach(line => { check(6); doc.text(line, margin + 7, y); y += 5; });
+        } else {
+          doc.setFont('helvetica', 'italic');
+          doc.setFontSize(8.5);
+          doc.setTextColor(156, 163, 175);
+          doc.text('Nog niet ingevuld', margin + 7, y);
+          y += 5;
+        }
+        y += 2;
+      });
+      y += 6;
+    });
+  }
+
+  // ── Paginanummering ──
+  const pages = doc.getNumberOfPages();
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(156, 163, 175);
+    doc.text(`Internly BBL Reflectieverslag · pagina ${p} van ${pages}`, pageW / 2, 291, { align: 'center' });
+  }
+
+  const safeName = naam.replace(/\s+/g, '-').toLowerCase();
+  doc.save(`bbl-reflectieverslag-${safeName}.pdf`);
+  notify('PDF gedownload!');
+}
+
+function updateReflectieVoortgangLbl() {
+  const ids = ['reflectie-situatie','reflectie-taak','reflectie-actie','reflectie-resultaat','reflectie-leermoment'];
+  const filled = ids.filter(id => (document.getElementById(id)?.value.trim() || '') !== '').length;
+  const lbl = document.getElementById('reflectie-voortgang-lbl');
+  if (lbl) {
+    lbl.textContent = `${filled}/5 velden ingevuld`;
+    lbl.style.color = filled === 5 ? '#1a7a48' : '#4b5563';
+    lbl.style.fontWeight = filled === 5 ? '600' : '400';
+  }
+}
+
 async function saveReflectie() {
   if (!activeConvId || !currentUser) { notify('Koppeling niet geladen.'); return; }
-  const content = document.getElementById('reflectieTxt').value.trim();
-  if (!content) { notify('Schrijf eerst een reflectie.'); return; }
+
+  const situatie   = document.getElementById('reflectie-situatie')?.value.trim()   || '';
+  const taak       = document.getElementById('reflectie-taak')?.value.trim()       || '';
+  const actie      = document.getElementById('reflectie-actie')?.value.trim()      || '';
+  const resultaat  = document.getElementById('reflectie-resultaat')?.value.trim()  || '';
+  const leermoment = document.getElementById('reflectie-leermoment')?.value.trim() || '';
+
+  if (!leermoment) { notify('Vul minimaal het Reflectie/Leermoment-veld in.'); return; }
+
+  const payload = { situatie, taak, actie, resultaat, leermoment };
+  const content = JSON.stringify(payload);
 
   const { error } = await db.from('messages').insert({
     conversation_id: activeConvId,
     sender_id:       currentUser.id,
-    content:         '[Zelfreflectie] ' + content,
+    content:         '[Zelfreflectie-STARR] ' + content,
     type:            'zelfreflectie',
   });
   if (error) { notify('Opslaan mislukt: ' + error.message); return; }
-  notify('Zelfreflectie opgeslagen in de gesprekhistorie');
+
+  // Cache to localStorage for PDF export
+  try {
+    const existing = JSON.parse(localStorage.getItem('internly_bbl_reflecties_' + currentUser.id) || '[]');
+    existing.unshift({ ...payload, savedAt: new Date().toISOString() });
+    localStorage.setItem('internly_bbl_reflecties_' + currentUser.id, JSON.stringify(existing.slice(0, 20)));
+  } catch(e) {}
+
+  // Wis velden en draft na opslaan
+  ['situatie','taak','actie','resultaat','leermoment'].forEach(k => {
+    const el = document.getElementById('reflectie-' + k);
+    if (el) el.value = '';
+  });
+  try { localStorage.removeItem('internly_bbl_reflectie_draft_' + currentUser.id); } catch(e) {}
+  updateReflectieVoortgangLbl();
+  await loadBBLReflecties();
+
+  notify('Zelfreflectie opgeslagen');
 }
 
 function renderSignoffStatus(status) {

@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <title>Chat — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -288,7 +291,7 @@
   function notify(msg) {
     const el = document.getElementById('notif');
     el.textContent = msg; el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 3000);
+    setTimeout(() => el.classList.remove('show'), 3200);
   }
 
   // ── Auto-resize textarea ──────────────────────────────────────────────────
@@ -795,7 +798,7 @@
         .single();
       if (cErr) {
         // Fallback: kolom bestaat nog niet → sla op als match_id-loze conversatie
-        console.warn('[chat] buddy_pair_id kolom ontbreekt:', cErr.message);
+        console.warn('[chat] buddy_pair_id kolom ontbreekt');
         const { data: fb } = await db
           .from('conversations')
           .insert({ match_id: null })
@@ -883,7 +886,7 @@ window.addEventListener('load', function() {
   }
 });
 </script>
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="js/calendar.js"></script>
 </body>
 </html>

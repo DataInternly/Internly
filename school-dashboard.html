@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <title>Internly — Schooldashboard</title>
@@ -568,7 +571,7 @@
         <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
           <span class="nav-icon">💬</span> Berichten
         </button>
-        <button class="nav-btn" onclick="window.location.href='match-dashboard.html'">
+        <button class="nav-btn" id="nav-stagehub" onclick="show('studenten')">
           <span class="nav-icon">📊</span> Stage Hub
         </button>
       </div>
@@ -578,10 +581,14 @@
         <button class="nav-btn" id="nav-profiel" onclick="show('profiel')">
           <span class="nav-icon">🎓</span> Schoolprofiel
         </button>
+        <button class="nav-btn" onclick="window.location.href='pricing.html?for=school'">
+          <span class="nav-icon">💳</span> Abonnement
+        </button>
       </div>
 
     </div>
     <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
+    <a href="spelregels.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Spelregels</a>
     <button class="btn-logout" onclick="signOut()">🚪 Uitloggen</button>
   </aside>
 
@@ -1621,7 +1628,7 @@ async function submitOproep() {
 
 async function delOproep(id) {
   openModal('Oproep verwijderen', 'Weet je zeker dat je deze oproep wilt verwijderen? Dit kan niet ongedaan worden gemaakt.', async () => {
-    const { error } = await db.from('school_postings').delete().eq('id', id);
+    const { error } = await db.from('school_postings').delete().eq('id', id).eq('created_by', currentUser.id);
     if (error) { notify('Fout: ' + error.message); return; }
     notify('✓ Oproep verwijderd');
     await loadOproepen();
@@ -1721,7 +1728,7 @@ function dismissPush() {
 function notify(msg) {
   const el = document.getElementById('notif');
   el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1809,7 +1816,7 @@ window.addEventListener('load', function() {
   }
 });
 </script>
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="js/calendar.js"></script>
 <script src="js/info.js"></script>
 </body>

@@ -10,6 +10,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <title>BBL Dashboard — Internly</title>
@@ -246,11 +249,14 @@
   <span class="topbar-bbl-tag">BBL-traject</span>
   <nav class="topbar-bbl-nav">
     <a href="bbl-dashboard.html" class="active">Dashboard</a>
-    <a href="bbl-hub.html">Hub</a>
+    <a href="bbl-hub.html">BBL Traject Hub</a>
+    <a href="buddy-dashboard.html">Buddy</a>
+    <a href="bbl-profile.html">Profiel</a>
   </nav>
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
     <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
+    <a href="spelregels.html" class="topbar-privacy">Spelregels</a>
     <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
   </div>
 </div>
@@ -476,15 +482,15 @@ async function renderLeerdoelen(skills, userId) {
     container.innerHTML = '<div class="empty-block">Nog geen leerdoelen — vul ze in op je profiel.</div>';
     return;
   }
-  // Laad voortgang uit DB (skills_progress JSONB)
+  // Laad voortgang uit DB (skills JSONB)
   let progress = {};
   try {
     const { data: sp } = await db
       .from('student_profiles')
-      .select('skills_progress')
+      .select('skills')
       .eq('profile_id', userId)
       .maybeSingle();
-    progress = sp?.skills_progress || {};
+    progress = sp?.skills || {};
   } catch(e) {}
   // Lokale fallback
   if (!Object.keys(progress).length) {
@@ -525,11 +531,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 2. BBL-check
   const { data: sp, error: spErr } = await db
     .from('student_profiles')
-    .select('profile_id, opleiding, sector, schooldag, skills, bbl_mode, school')
+    .select('profile_id, opleiding, schooldag, skills, bbl_mode, school')
     .eq('profile_id', user.id)
     .maybeSingle();
 
-  if (spErr) console.error('[bbl-dashboard] student_profiles fout:', spErr.message);
+  if (spErr) {
+    console.error('[bbl-dashboard] student_profiles fout:', spErr.message);
+    // Bij query-fout niet automatisch doorsturen — gebruiker kan wel BBL zijn.
+    // Toon hersteloptie zodat de gebruiker kan herladen.
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div style="position:fixed;top:0;left:0;right:0;background:#b82020;color:#fff;' +
+      'padding:12px 20px;text-align:center;font-size:.88rem;z-index:9999;">' +
+      'Profiel kon niet worden geladen. ' +
+      '<a href="" style="color:#fff;font-weight:700;text-decoration:underline;">Opnieuw proberen</a>' +
+      '</div>');
+    return;
+  }
 
   if (!sp?.bbl_mode) {
     window.location.href = 'discover.html';
@@ -548,10 +565,10 @@ window.addEventListener('DOMContentLoaded', async () => {
       id, party_a, party_b, status,
       praktijkbegeleider_profile_id,
       contract_end_date,
-      internship_postings(id, title, company_name, company_user_id, contract_start, contract_end, hours_per_week)
+      internship_postings(id, title, company_name, contract_start, contract_end, hours_per_week)
     `)
     .or(`party_a.eq.${user.id},party_b.eq.${user.id}`)
-    .eq('status', 'actief')
+    .eq('status', 'accepted')
     .limit(1)
     .maybeSingle();
 

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a7a48">
+<meta name="description" content="De gedragsregels en het zero tolerance beleid van Internly — voor studenten, bedrijven en scholen.">
+<title>Spelregels — Internly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+:root {
+  --ink:       #0d1520;
+  --ink2:      #374151;
+  --ink3:      #6b7280;
+  --bg:        #f4f3ef;
+  --white:     #ffffff;
+  --border:    rgba(13,21,32,0.09);
+  --green:     #1a7a48;
+  --green-bg:  #e8f5ee;
+  --orange:    #FF7E42;
+  --red:       #b82020;
+  --red-bg:    #fdeaea;
+  --amber:     #a06010;
+  --amber-bg:  #fdf3e0;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg); color: var(--ink);
+  font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ── */
+.topbar {
+  background: var(--ink);
+  padding: 0 32px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.t-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: #fff; letter-spacing: -.02em; text-decoration: none;
+}
+.t-logo span { color: var(--orange); }
+.t-back {
+  font-size: .82rem; color: rgba(255,255,255,.55);
+  text-decoration: none; transition: color .12s;
+}
+.t-back:hover { color: #fff; }
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(148deg, #1e8a52 0%, #1a7a48 42%, #145e38 100%);
+  padding: 64px 32px 56px; text-align: center;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(255,255,255,.6); margin-bottom: 16px;
+}
+.hero-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--orange); flex-shrink: 0;
+}
+.hero h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 700;
+  color: #fff; letter-spacing: -.03em; line-height: 1.1; margin-bottom: 16px;
+}
+.hero h1 span { color: var(--orange); }
+.hero-sub {
+  font-size: .95rem; color: rgba(255,255,255,.72);
+  max-width: 520px; margin: 0 auto; line-height: 1.7;
+}
+
+/* ── Content ── */
+.content { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+/* ── Intro card ── */
+.intro-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green);
+  border-radius: 0 12px 12px 0;
+  padding: 1.1rem 1.25rem; margin-bottom: 2rem;
+}
+.intro-card p { font-size: .9rem; color: var(--ink2); line-height: 1.7; }
+
+/* ── Section ── */
+.section { margin-bottom: 2.5rem; }
+.section-label {
+  font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: .75rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.section-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.15rem; font-weight: 700; color: var(--ink);
+  margin-bottom: 1rem; letter-spacing: -.02em;
+}
+
+/* ── Rule card ── */
+.rule-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 8px;
+}
+.rule-head { display: flex; align-items: flex-start; gap: .75rem; margin-bottom: .35rem; }
+.rule-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+.rule-num.green { background: var(--green-bg); color: var(--green); }
+.rule-num.amber { background: var(--amber-bg); color: var(--amber); }
+.rule-title { font-size: .92rem; font-weight: 600; color: var(--ink); }
+.rule-body { font-size: .84rem; color: var(--ink3); line-height: 1.65; padding-left: 36px; }
+
+/* ── Zero tolerance card ── */
+.zero-card {
+  background: var(--red-bg);
+  border: 1px solid rgba(184,32,32,.15);
+  border-left: 4px solid var(--red);
+  border-radius: 0 12px 12px 0;
+  padding: 1.1rem 1.25rem; margin-bottom: 8px;
+}
+.zero-head { display: flex; align-items: center; gap: .6rem; margin-bottom: .35rem; }
+.zero-badge {
+  font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--red); color: #fff; flex-shrink: 0;
+}
+.zero-title { font-size: .92rem; font-weight: 600; color: #7a1a1a; }
+.zero-body { font-size: .84rem; color: #7a1a1a; line-height: 1.65; opacity: .85; }
+
+/* ── Consequence grid ── */
+.consequence-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: .75rem;
+}
+.cq {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 8px; padding: .85rem 1rem; text-align: center;
+}
+.cq-step {
+  font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink3); margin-bottom: .3rem;
+}
+.cq-val {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .95rem; font-weight: 700; color: var(--ink); margin-bottom: .2rem;
+}
+.cq-note { font-size: .75rem; color: var(--ink3); }
+.cq.red  .cq-val { color: var(--red); }
+.cq.amber .cq-val { color: var(--amber); }
+
+/* ── Pledge ── */
+.pledge {
+  background: linear-gradient(148deg, #1e8a52 0%, #145e38 100%);
+  border-radius: 12px; padding: 1.5rem; text-align: center; margin-top: 2rem;
+}
+.pledge-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: .5rem;
+}
+.pledge-text {
+  font-size: .84rem; color: rgba(255,255,255,.75);
+  line-height: 1.65; margin-bottom: 1rem;
+}
+.pledge-btn {
+  display: inline-block; padding: 10px 24px;
+  background: var(--orange); color: #fff; border-radius: 50px;
+  font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 600;
+  text-decoration: none; border: none; cursor: pointer; transition: background .12s;
+}
+.pledge-btn:hover { background: #e05c1a; }
+
+/* ── Footer ── */
+.footer {
+  background: #0d1a10;
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.footer-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .88rem; font-weight: 700; color: rgba(255,255,255,.45);
+}
+.footer-logo span { color: #e05c1a; }
+.footer-links { display: flex; gap: 14px; list-style: none; }
+.footer-links a {
+  font-size: .71rem; color: rgba(255,255,255,.3); text-decoration: none;
+}
+.footer-links a:hover { color: rgba(255,255,255,.6); }
+.footer-copy { font-size: .65rem; color: rgba(255,255,255,.18); }
+.footer-tagline {
+  width: 100%; text-align: center; margin-top: 8px;
+  font-size: .72rem; color: rgba(255,255,255,.18);
+}
+
+/* ── Responsive ── */
+@media(max-width:680px) {
+  .hero { padding: 40px 16px; }
+  .content { padding: 32px 16px 60px; }
+}
+@media(max-width:520px) {
+  .consequence-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 16px; }
+  .footer { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <a class="t-logo" href="index.html">intern<span>ly</span></a>
+  <a class="t-back" href="#" onclick="history.back();return false;">← Terug</a>
+</div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-eyebrow"><span class="hero-dot"></span> Sasubo Holding B.V.</div>
+  <h1>De spelregels van <span>Internly</span></h1>
+  <p class="hero-sub">Een eerlijk platform werkt alleen als iedereen zich aan dezelfde regels houdt. Dit zijn ze.</p>
+</div>
+
+<!-- ── Content ── -->
+<div class="content">
+
+  <div class="intro-card">
+    <p>Internly verbindt studenten, bedrijven en scholen. Dat vertrouwen is de kern van alles wat we doen. We vragen daarom weinig, maar wat we vragen is niet onderhandelbaar. Wie de regels schendt, verliest toegang tot het platform.</p>
+  </div>
+
+  <!-- Sectie 1: Basisgedrag -->
+  <div class="section">
+    <div class="section-label">Voor iedereen</div>
+    <div class="section-title">Basisgedrag</div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">1</div>
+        <div class="rule-title">Behandel anderen zoals je zelf behandeld wil worden</div>
+      </div>
+      <div class="rule-body">Iedereen op dit platform — student, begeleider of bedrijf — verdient respect. Geen uitzonderingen.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">2</div>
+        <div class="rule-title">Wees eerlijk over wie je bent en wat je kunt</div>
+      </div>
+      <div class="rule-body">Geen valse profielen, geen verzonnen ervaringen, geen misleidende vacatureteksten. Eerlijkheid is de reden dat dit platform bestaat.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">3</div>
+        <div class="rule-title">Kom je afspraken na</div>
+      </div>
+      <div class="rule-body">Als je een gesprek inplant, verschijn je. Als je niet kunt, zeg je het op tijd af. Niet reageren is geen optie.</div>
+    </div>
+  </div>
+
+  <!-- Sectie 2: Zero tolerance -->
+  <div class="section">
+    <div class="section-label">Zero tolerance</div>
+    <div class="section-title">Dit dulden we niet</div>
+
+    <div class="zero-card">
+      <div class="zero-head">
+        <span class="zero-badge">Zero tolerance</span>
+        <div class="zero-title">Schelden, beledigen of intimideren in de chat</div>
+      </div>
+      <div class="zero-body">Één incident is genoeg voor directe schorsing. Het maakt niet uit of je student of bedrijf bent, of wat de aanleiding was.</div>
+    </div>
+
+    <div class="zero-card">
+      <div class="zero-head">
+        <span class="zero-badge">Zero tolerance</span>
+        <div class="zero-title">Meervoudig niet opnemen zonder bericht</div>
+      </div>
+      <div class="zero-body">Twee keer een afgesproken gesprek niet verschijnen zonder afmelding leidt tot automatische verlaging van de Trust Score en tijdelijke schorsing van nieuwe aanmeldingen.</div>
+    </div>
+
+    <div class="zero-card">
+      <div class="zero-head">
+        <span class="zero-badge">Zero tolerance</span>
+        <div class="zero-title">Discriminatie op basis van afkomst, geslacht of achtergrond</div>
+      </div>
+      <div class="zero-body">1 op 10 MBO-studenten ervaart discriminatie bij een stage (CBS, 2025). Op Internly is dit direct aanleiding tot permanente verwijdering van het platform.</div>
+    </div>
+
+    <div class="zero-card">
+      <div class="zero-head">
+        <span class="zero-badge">Zero tolerance</span>
+        <div class="zero-title">Neppe reviews of gemanipuleerde Trust Scores</div>
+      </div>
+      <div class="zero-body">Het Trust Score-systeem is de kern van Internly. Fraude hierop — valse beoordelingen, druk op studenten om positief te scoren — leidt tot permanente verwijdering.</div>
+    </div>
+  </div>
+
+  <!-- Sectie 3: Consequenties -->
+  <div class="section">
+    <div class="section-label">Consequenties</div>
+    <div class="section-title">Wat er gebeurt bij overtredingen</div>
+
+    <div class="consequence-grid">
+      <div class="cq amber">
+        <div class="cq-step">Stap 1</div>
+        <div class="cq-val">Waarschuwing</div>
+        <div class="cq-note">Schriftelijk via e-mail, zichtbaar in je account</div>
+      </div>
+      <div class="cq amber">
+        <div class="cq-step">Stap 2</div>
+        <div class="cq-val">Schorsing</div>
+        <div class="cq-note">Tijdelijk geen nieuwe matches of berichten</div>
+      </div>
+      <div class="cq red">
+        <div class="cq-step">Stap 3</div>
+        <div class="cq-val">Verwijdering</div>
+        <div class="cq-note">Permanent, zonder terugbetaling van abonnement</div>
+      </div>
+    </div>
+
+    <div class="rule-card" style="margin-top:8px">
+      <div class="rule-head">
+        <div class="rule-num amber">!</div>
+        <div class="rule-title">Zero tolerance gevallen slaan stap 1 over</div>
+      </div>
+      <div class="rule-body">Bij schelden, intimidatie of discriminatie volgt direct schorsing of verwijdering — zonder voorafgaande waarschuwing.</div>
+    </div>
+  </div>
+
+  <!-- Sectie 4: Responsplicht bedrijven -->
+  <div class="section">
+    <div class="section-label">Voor bedrijven</div>
+    <div class="section-title">Responsplicht</div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">1</div>
+        <div class="rule-title">Reageer binnen de opgegeven responstermijn</div>
+      </div>
+      <div class="rule-body">Als je een responsgarantie hebt ingesteld (bijv. 2 dagen), is dat een platformverplichting. Geen reactie binnen die termijn verlaagt automatisch je Trust Score.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">2</div>
+        <div class="rule-title">Geef altijd een antwoord — ook als het nee is</div>
+      </div>
+      <div class="rule-body">77% van studenten wordt geghost door werkgevers. Op Internly is dit niet mogelijk. Elke sollicitatie krijgt een reactie, hoe kort ook.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">3</div>
+        <div class="rule-title">Zorg voor een veilige leeromgeving</div>
+      </div>
+      <div class="rule-body">BBL-studenten en stagiairs hebben recht op begeleiding, duidelijke leerdoelen en een werkplek waar ze fouten mogen maken. Dit is geen nice-to-have — het is een wettelijke verplichting.</div>
+    </div>
+  </div>
+
+  <!-- Sectie 5: Melden -->
+  <div class="section">
+    <div class="section-label">Melden</div>
+    <div class="section-title">Zie je iets wat niet klopt?</div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">1</div>
+        <div class="rule-title">Meld overtredingen via hallo@internly.pro</div>
+      </div>
+      <div class="rule-body">We nemen elke melding serieus. Je kunt anoniem melden. We reageren binnen 2 werkdagen.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num green">2</div>
+        <div class="rule-title">Gebruik de vlag-knop in de chat</div>
+      </div>
+      <div class="rule-body">In elk gesprek kun je een bericht markeren als ongepast. Het Internly-team beoordeelt dit binnen 24 uur.</div>
+    </div>
+  </div>
+
+  <!-- Pledge -->
+  <div class="pledge">
+    <div class="pledge-title">Internly belooft hetzelfde aan jou</div>
+    <p class="pledge-text">Wij reageren op elk signaal. Wij beschermen je gegevens. Wij corrigeren bedrijven die zich niet aan de regels houden. En we geven je altijd een antwoord — ook als het nee is.</p>
+    <a class="pledge-btn" href="index.html">Terug naar het platform →</a>
+  </div>
+
+</div><!-- /content -->
+
+<!-- ── Footer ── -->
+<footer class="footer">
+  <div class="footer-logo">intern<span>ly</span></div>
+  <ul class="footer-links">
+    <li><a href="privacybeleid.html">Privacybeleid</a></li>
+    <li><a href="spelregels.html">Spelregels</a></li>
+    <li><a href="about.html">Over ons</a></li>
+    <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+  <p class="footer-tagline">Gebouwd door mensen die het zelf hebben meegemaakt.</p>
+</footer>
+
+</body>
+</html>

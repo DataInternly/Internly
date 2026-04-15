@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <title>Internly — Maak je profiel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -492,35 +495,6 @@
       <input type="date" id="beschikbaar_vanaf">
     </div>
 
-    <div class="bbl-only" style="display:none;">
-      <div class="field">
-        <label>Vaste schooldag</label>
-        <select id="schooldag">
-          <option value="">Kies je vaste schooldag</option>
-          <option value="maandag">Maandag</option>
-          <option value="dinsdag">Dinsdag</option>
-          <option value="woensdag">Woensdag</option>
-          <option value="donderdag">Donderdag</option>
-          <option value="vrijdag">Vrijdag</option>
-        </select>
-        <small style="color:#9ca3af;font-size:.75rem;margin-top:4px;display:block;">Wordt automatisch geblokkeerd in je kalender.</small>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Start contract bij leerbedrijf</label>
-          <input type="date" id="contract_start">
-        </div>
-        <div class="field">
-          <label>Einde contract</label>
-          <input type="date" id="contract_end">
-        </div>
-      </div>
-      <small style="color:#9ca3af;font-size:.75rem;margin-bottom:14px;display:block;">Internly berekent automatisch wanneer je leerbedrijf een beslissing moet nemen.</small>
-      <div class="field">
-        <label>Naam praktijkbegeleider (werkvloer)</label>
-        <input type="text" id="pb_naam" placeholder="Wie begeleidt jou op het werk?">
-      </div>
-    </div>
     <div class="field">
       <label>Jouw postcode <span class="hint">voor reistijdfilter</span></label>
       <input type="text" id="postcode" placeholder="1234AB" maxlength="7"
@@ -1091,21 +1065,7 @@ function populateForm(data) {
     if (el) el.value = data.beschikbaar_vanaf;
   }
 
-  // BBL-only fields
-  if (data.schooldag) {
-    const el = document.getElementById('schooldag');
-    if (el) el.value = data.schooldag;
-  }
-  ['contract_start','contract_end'].forEach(id => {
-    if (data[id]) {
-      const el = document.getElementById(id);
-      if (el) el.value = data[id];
-    }
-  });
-  if (data.pb_naam) {
-    const el = document.getElementById('pb_naam');
-    if (el) el.value = data.pb_naam;
-  }
+
 
   // Motivatie textarea + char count
   if (data.motivatie) {
@@ -1168,13 +1128,6 @@ async function submitProfile() {
     methode_beschrijving:      document.getElementById('methode_beschrijving').value.trim() || null,
   };
 
-  // BBL-specifieke velden (schooldag opgeslagen op student_profiles)
-  if (document.body.classList.contains('bbl-mode')) {
-    payload.bbl_mode = true;
-    const schooldag = document.getElementById('schooldag')?.value || null;
-    if (schooldag) payload.schooldag = schooldag;
-  }
-
   const { error } = await db.from('student_profiles').upsert(payload, { onConflict: 'profile_id' });
 
   if (error) {
@@ -1189,7 +1142,7 @@ async function submitProfile() {
   isEditMode = true;
 
   const savedPostcode = payload.postcode;
-  if (savedPostcode) localStorage.setItem('internly_student_postcode', savedPostcode);
+  if (savedPostcode) localStorage.setItem('internly_student_postcode_' + currentUser.id, savedPostcode);
 
   if (wasEditing) {
     // Edit save: show overview + toast
@@ -1215,7 +1168,7 @@ function notify(msg) {
   const el = document.getElementById('notif');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 async function signOut() {
@@ -1263,15 +1216,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     .eq('profile_id', user.id)
     .maybeSingle();
 
-  const isBBLProfile = existing?.bbl_mode === true;
-  if (isBBLProfile) {
-    document.body.classList.add('bbl-mode');
-    document.querySelectorAll('.bbl-only').forEach(el => el.style.display = 'block');
-    document.querySelectorAll('.bol-only').forEach(el => el.style.display = 'none');
-    const wizTitle = document.querySelector('.page-title');
-    if (wizTitle && wizTitle.textContent === 'Maak je profiel aan') {
-      wizTitle.textContent = 'Jouw BBL-profiel aanmaken';
-    }
+  // BBL-studenten hebben een eigen profielpagina
+  if (existing?.bbl_mode === true) {
+    window.location.replace('bbl-profile.html');
+    return;
   }
 
   if (existing) {
@@ -1281,7 +1229,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     _initBuddyProfileSection(user, existing); // non-blocking — buddy section
   } else {
     // Pre-fill postcode from localStorage on fresh form only
-    const savedPc = localStorage.getItem('internly_student_postcode');
+    const savedPc = localStorage.getItem('internly_student_postcode_' + user.id);
     if (savedPc) {
       const pcField = document.getElementById('postcode');
       if (pcField && !pcField.value) pcField.value = savedPc;
@@ -1633,7 +1581,7 @@ window.addEventListener('load', function() {
   }
 });
 </script>
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="js/calendar.js"></script>
 </body>
 </html>

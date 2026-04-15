@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
 <link rel="manifest" href="/manifest.json">
 <title>Internly — Stage Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1161,7 +1164,7 @@ function notify(msg, type = '') {
   const el = document.getElementById('notif');
   el.textContent = msg;
   el.className = 'notif show' + (type ? ' notif-' + type : '');
-  setTimeout(() => el.classList.remove('show'), 2800);
+  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 // ── Quick todos & personal note ───────────────────────────────────────────────

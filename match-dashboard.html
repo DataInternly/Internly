@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <title>Stage Hub — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -264,6 +267,21 @@
       border-color: var(--primary);
       color: var(--primary);
     }
+
+    .student-switcher-select {
+      font-family: 'Outfit', sans-serif;
+      font-size: .8rem;
+      padding: 5px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--ink2);
+      cursor: pointer;
+      outline: none;
+      transition: border-color .15s;
+      max-width: 180px;
+    }
+    .student-switcher-select:focus { border-color: var(--primary); }
 
     /* Hub layout */
     .hub-layout {
@@ -886,6 +904,89 @@
       color: var(--text);
       line-height: 1.6;
     }
+
+    /* STARR */
+    .starr-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .volledigheid-bar-wrap {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 6px 0 2px;
+    }
+    .volledigheid-bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width .4s ease;
+    }
+    .volledigheid-label {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    /* STARR card components */
+    .starr-chips {
+      display: flex; gap: 5px; margin: 8px 0 4px; flex-wrap: wrap;
+    }
+    .starr-chip {
+      font-size: .67rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; border: 1px solid; letter-spacing: .03em;
+    }
+    .starr-chip.filled {
+      background: var(--green-bg); color: var(--primary); border-color: #86efac;
+    }
+    .starr-chip.empty {
+      background: var(--bg); color: var(--muted); border-color: var(--border);
+    }
+    .starr-body {
+      display: none; margin-top: 12px;
+      border-top: 1px solid var(--border); padding-top: 12px;
+    }
+    .starr-body.open { display: block; }
+    .starr-section { margin-bottom: 12px; }
+    .starr-section:last-child { margin-bottom: 0; }
+    .starr-section-lbl {
+      font-size: .69rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--primary); margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .starr-section-text {
+      font-size: .85rem; color: var(--text); line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .starr-section-missing {
+      font-size: .82rem; color: var(--muted); font-style: italic;
+    }
+    .refl-toggle-btn {
+      background: none; border: none; padding: 0;
+      font-size: .77rem; color: var(--primary); cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px; margin-top: 6px;
+    }
+    .leerdoel-chip {
+      display: inline-block; font-size: .71rem;
+      background: var(--blue-bg); color: var(--blue);
+      border: 1px solid #bfdbfe; border-radius: 10px;
+      padding: 2px 8px; margin: 4px 0 0;
+    }
+    .refl-completeness {
+      font-size: .72rem; color: var(--muted); margin-top: 2px;
+    }
+    .refl-completeness.done { color: var(--primary); font-weight: 600; }
 
     /* Score bar */
     .score-row {
@@ -1860,7 +1961,9 @@
 
     <div class="hub-topbar-right">
       <span id="role-badge-display" class="role-badge"></span>
-      <button class="role-switch-btn" onclick="switchRole()">Wissel rol</button>
+      <select id="student-switcher" class="student-switcher-select" style="display:none;" onchange="switchStudent(this.value)" aria-label="Wissel student"></select>
+      <a id="back-to-dash" href="#" class="role-switch-btn" style="display:none;text-decoration:none;">← Dashboard</a>
+      <button class="role-switch-btn" id="demo-switch-btn" onclick="switchRole()">Wissel rol</button>
     </div>
   </header>
 
@@ -2073,14 +2176,26 @@ let hubState = {
       id: 'r1',
       period: 'Week 1–2 reflectie',
       date: '2026-03-14',
-      text: 'De eerste twee weken waren een goede kennismaking met het team en de werkwijze van NIOZ. Ik voel me welkom en de begeleider neemt de tijd om dingen uit te leggen. Het schrijven voor een breed publiek is uitdagender dan verwacht — wetenschappelijke taal vereenvoudigen zonder inhoud te verliezen is een vaardigheid die ik nog moet ontwikkelen.',
+      situatie:   'De eerste twee weken bij NIOZ Zeewetenschappen. Ik werd gekoppeld aan het communicatieteam en mijn begeleider legde de interne werkwijze uit.',
+      taak:       'Kennismaken met het team, de lopende projecten begrijpen en mijn eerste schrijfopdracht afronden: een korte introductie-tekst voor de NIOZ-nieuwsbrief.',
+      actie:      'Ik voerde gesprekken met drie onderzoekers, verzamelde bronmateriaal en schreef een eerste versie van de tekst. Daarna heb ik feedback verwerkt en de tekst aangepast.',
+      resultaat:  'De tekst is gepubliceerd in de nieuwsbrief. Mijn begeleider gaf positieve feedback op de toon, maar merkte op dat ik soms te technisch schrijf.',
+      leermoment: 'Wetenschappelijke taal toegankelijk maken is lastiger dan ik dacht. Ik ga bewust oefenen met "gewone lezers" als doelgroep. Volgende keer vraag ik eerder tussentijdse feedback.',
+      leerdoel:   'Klantgericht schrijven',
+      text:       '',
       editAllowed: true
     },
     {
       id: 'r2',
       period: 'Maand 1 evaluatie',
       date: '2026-04-01',
-      text: 'Na een maand merk ik dat mijn schrijfstijl al merkbaar toegankelijker is geworden. Ik heb twee gepubliceerde artikelen voor de NIOZ website geschreven. Het werken met onderzoekers als bron is soms lastig qua tijdsplanning — een volgende stap is om beter te plannen en eerder interviews in te plannen.',
+      situatie:   'Na een maand stage. Ik heb twee artikelen gepubliceerd en werk nu aan een langere feature over zeebodemonderzoek.',
+      taak:       'De feature schrijven én tegelijk de samenwerking met onderzoekers efficiënter organiseren dan bij de vorige opdrachten.',
+      actie:      'Ik heb een vaste interviewtijd ingepland met de hoofdonderzoeker, een schrijfplanning gemaakt en een woordenlijst aangelegd van veelgebruikte wetenschappelijke termen.',
+      resultaat:  'Mijn schrijfstijl is merkbaar toegankelijker geworden. De feature staat ingepland voor publicatie volgende week. De planning werkte goed.',
+      leermoment: 'Vroeg plannen maakt een groot verschil. Door de interviewtijd vast in te stellen had ik minder last van last-minute afhankelijkheden. Dit ga ik voor alle opdrachten zo doen.',
+      leerdoel:   'Content strategie',
+      text:       '',
       editAllowed: true
     }
   ],
@@ -2356,7 +2471,15 @@ async function loadHubFromDB() {
     if (reflectiesRes.data?.length) {
       hubState.reflecties = reflectiesRes.data.map(r => ({
         id: 'r' + hubState.nextId++, _dbId: r.id,
-        period: r.period, date: r.date || '', text: r.text,
+        period:     r.period,
+        date:       r.date || '',
+        text:       r.text,
+        situatie:   r.situatie   || '',
+        taak:       r.taak       || '',
+        actie:      r.actie      || '',
+        resultaat:  r.resultaat  || '',
+        leermoment: r.leermoment || r.text || '',
+        leerdoel:   r.leerdoel   || '',
         editAllowed: r.author_role === hubState.role
       }));
     }
@@ -2393,6 +2516,11 @@ async function loadMatchFromDB(user) {
   // Spinner already showing from DOMContentLoaded handler.
   // loadHubFromDB (called via startHub) will hide it when done.
   try {
+    // 0. Role guard — doorstuur rollen die hier niet thuishoren
+    const { data: _prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+    const WRONG_ROLE_ROUTES = { gepensioneerd: 'buddy-dashboard.html' };
+    if (WRONG_ROLE_ROUTES[_prof?.role]) { hideSpinner(); window.location.href = WRONG_ROLE_ROUTES[_prof.role]; return; }
+
     // 1. Load match record + vacature name via FK join
     const { data: matchRow, error: matchErr } = await db
       .from('matches')
@@ -2422,6 +2550,17 @@ async function loadMatchFromDB(user) {
       hideSpinner();
       return;
     }
+
+    // Verberg demo-knop in auth-modus; toon back-button en student-switcher
+    const demoBtn  = document.getElementById('demo-switch-btn');
+    const backBtn  = document.getElementById('back-to-dash');
+    if (demoBtn) demoBtn.style.display = 'none';
+    if (backBtn) {
+      if (role === 'bedrijf') { backBtn.href = 'company-dashboard.html'; backBtn.style.display = ''; }
+      if (role === 'school')  { backBtn.href = 'school-dashboard.html';  backBtn.style.display = ''; }
+    }
+    if (role === 'bedrijf') buildStudentSwitcher(user.id, MATCH_ID);
+    if (role === 'school')  buildSchoolSwitcher(user.id, MATCH_ID);
 
     // 3. Load student + company names in parallel
     const [studentRes, companyRes] = await Promise.all([
@@ -2465,6 +2604,97 @@ async function loadMatchFromDB(user) {
   } catch (e) {
     hideSpinner();
     toast('Fout bij laden: ' + (e.message || e));
+  }
+}
+
+// ── Student-switcher (bedrijf met meerdere studenten) ──────────────────────
+async function buildStudentSwitcher(companyUserId, currentMatchId) {
+  try {
+    const { data: allMatches } = await db
+      .from('matches')
+      .select('id, party_a')
+      .eq('party_b', companyUserId)
+      .eq('status', 'accepted');
+
+    if (!allMatches || allMatches.length <= 1) return; // slechts één student — geen switcher nodig
+
+    const ids = allMatches.map(m => m.party_a);
+    const { data: profiles } = await db
+      .from('student_profiles')
+      .select('profile_id, naam')
+      .in('profile_id', ids);
+
+    const nameMap = {};
+    (profiles || []).forEach(p => { nameMap[p.profile_id] = p.naam || 'Student'; });
+
+    const select = document.getElementById('student-switcher');
+    if (!select) return;
+    select.innerHTML = '';
+    allMatches.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = nameMap[m.party_a] || 'Student';
+      if (m.id === currentMatchId) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.style.display = '';
+  } catch(e) {
+    console.error('[student-switcher] fout:', e.message);
+  }
+}
+
+function switchStudent(matchId) {
+  if (matchId && matchId !== MATCH_ID) {
+    window.location.href = 'match-dashboard.html?match=' + encodeURIComponent(matchId);
+  }
+}
+
+// ── School-switcher (school begeleider met meerdere studenten) ─────────────
+async function buildSchoolSwitcher(schoolUserId, currentMatchId) {
+  try {
+    // Haal de schoolnaam op van de ingelogde begeleider
+    const { data: schoolProfile } = await db
+      .from('school_profiles')
+      .select('schoolnaam')
+      .eq('profile_id', schoolUserId)
+      .maybeSingle();
+
+    if (!schoolProfile?.schoolnaam) return;
+
+    // Haal alle student_profiles met die schoolnaam op
+    const { data: students } = await db
+      .from('student_profiles')
+      .select('profile_id, naam')
+      .eq('school', schoolProfile.schoolnaam);
+
+    if (!students || students.length <= 1) return;
+
+    // Haal voor elke student hun actieve match op
+    const ids = students.map(s => s.profile_id);
+    const { data: matchRows } = await db
+      .from('matches')
+      .select('id, party_a')
+      .in('party_a', ids)
+      .eq('status', 'accepted');
+
+    if (!matchRows || matchRows.length <= 1) return;
+
+    const nameMap = {};
+    students.forEach(s => { nameMap[s.profile_id] = s.naam || 'Student'; });
+
+    const select = document.getElementById('student-switcher');
+    if (!select) return;
+    select.innerHTML = '';
+    matchRows.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = nameMap[m.party_a] || 'Student';
+      if (m.id === currentMatchId) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.style.display = '';
+  } catch(e) {
+    console.error('[school-switcher] fout:', e.message);
   }
 }
 
@@ -2677,6 +2907,30 @@ function renderOverzicht() {
           </div>
           ${recentTasks}
         </div>
+
+        <!-- Reflectie volledigheid -->
+        ${can('addReflectie') || can('editReflectie') ? (() => {
+          const total    = hubState.reflecties.length;
+          const volledig = hubState.reflecties.filter(r =>
+            r.situatie && r.taak && r.actie && r.resultaat && r.leermoment).length;
+          const pct = total === 0 ? 0 : Math.round((volledig / total) * 100);
+          return `
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Reflectieverslag</div>
+              <div class="card-sub">STARR-volledigheid</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="switchTab('voortgang')">Bekijk</button>
+          </div>
+          <div class="volledigheid-bar-wrap">
+            <div class="volledigheid-bar" id="refl-voortgang-bar" style="width:${pct}%"></div>
+          </div>
+          <div class="volledigheid-label" id="refl-voortgang-label">${pct}% volledig ingevuld</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px;" id="refl-voortgang-count">${volledig} van ${total} reflecties volledig (STARR)</div>
+          ${can('addReflectie') ? `<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="exportReflectieverslag()">📄 Exporteer verslag</button>` : ''}
+        </div>`;
+        })() : ''}
 
         <!-- Activity log -->
         <div class="card">
@@ -2943,7 +3197,7 @@ async function deleteTask(id) {
 
   hubState.tasks = hubState.tasks.filter(t => t.id !== id);
   if (MATCH_ID && task._dbId) {
-    const { error } = await db.from('stage_tasks').delete().eq('id', task._dbId);
+    const { error } = await db.from('stage_tasks').delete().eq('id', task._dbId).eq('match_id', MATCH_ID);
     if (error) { toast('Verwijderen mislukt — probeer opnieuw.', 'error'); hubState.tasks.push(task); switchTab('taken'); return; }
   }
   addLog(`Taak "${task.title}" verwijderd.`, 'orange');
@@ -2958,6 +3212,10 @@ function renderVoortgang() {
   const avgPct = hubState.leerdoelen.length
     ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
     : 0;
+  const reflTotal    = hubState.reflecties.length;
+  const reflVolledig = hubState.reflecties.filter(r =>
+    r.situatie && r.taak && r.actie && r.resultaat && r.leermoment).length;
+  const reflPct = reflTotal === 0 ? 0 : Math.round((reflVolledig / reflTotal) * 100);
 
   const avgBar = `
     <div class="avg-progress-wrap">
@@ -2993,11 +3251,39 @@ function renderVoortgang() {
       </div>`;
   }).join('');
 
+  const STARR_DEFS = [
+    ['S', 'Situatie',             'situatie'],
+    ['T', 'Taak',                 'taak'],
+    ['A', 'Actie',                'actie'],
+    ['R', 'Resultaat',            'resultaat'],
+    ['R', 'Reflectie/Leermoment', 'leermoment'],
+  ];
+
   const reflectiesHtml = hubState.reflecties.length === 0 ? `
     <div class="empty-state">
       <div class="empty-icon">📝</div>
       Nog geen reflecties ingediend.
-    </div>` : hubState.reflecties.map(r => `
+    </div>` : hubState.reflecties.map(r => {
+    const filledCount = STARR_DEFS.filter(([,,k]) => r[k]).length;
+    const isVolledig  = filledCount === 5;
+
+    const chips = STARR_DEFS.map(([letter, label, key]) =>
+      `<span class="starr-chip ${r[key] ? 'filled' : 'empty'}" title="${label}">${letter}</span>`
+    ).join('');
+
+    const starrSections = STARR_DEFS.map(([letter, label, key]) => `
+      <div class="starr-section">
+        <div class="starr-section-lbl">
+          <span class="starr-tag" style="width:16px;height:16px;font-size:.6rem;">${letter}</span>
+          ${label}
+        </div>
+        ${r[key]
+          ? `<div class="starr-section-text">${escHtml(r[key])}</div>`
+          : `<div class="starr-section-missing">Nog niet ingevuld</div>`
+        }
+      </div>`).join('');
+
+    return `
     <div class="reflectie-card">
       <div class="reflectie-head">
         <div class="reflectie-period">${escHtml(r.period)}</div>
@@ -3006,11 +3292,23 @@ function renderVoortgang() {
           ${can('editReflectie') && r.editAllowed ? `
             <button class="icon-btn" onclick="openReflectieModal('${r.id}')" title="Bewerken">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="icon-btn" onclick="deleteReflectie('${r.id}')" title="Verwijderen" style="color:var(--red);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
             </button>` : ''}
         </div>
       </div>
-      <div class="reflectie-text">${escHtml(r.text)}</div>
-    </div>`).join('');
+      <div class="starr-chips">${chips}</div>
+      <div class="refl-completeness${isVolledig ? ' done' : ''}">
+        ${isVolledig ? '✓ Volledig ingevuld' : `${filledCount}/5 velden ingevuld`}
+      </div>
+      ${r.leerdoel ? `<div class="leerdoel-chip">📎 ${escHtml(r.leerdoel)}</div>` : ''}
+      <button class="refl-toggle-btn" onclick="toggleStarrBody('${r.id}')">Bekijk STARR-analyse ▾</button>
+      <div class="starr-body" id="starr-${r.id}">
+        ${starrSections}
+      </div>
+    </div>`;
+  }).join('');
 
   const addReflectieBtn = can('addReflectie') ? `
     <button class="btn btn-primary btn-sm" onclick="openReflectieModal(null)">
@@ -3034,6 +3332,22 @@ function renderVoortgang() {
 
     ${schoolReadOnly}
 
+    <!-- Stat strip -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+      <div class="stat-card">
+        <div class="stat-num" style="color:${pctColor(avgPct)};">${avgPct}%</div>
+        <div class="stat-label">Leerdoelen gem.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:var(--text);">${reflTotal}</div>
+        <div class="stat-label">Reflecties</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:${reflPct === 100 ? 'var(--green)' : reflPct >= 50 ? 'var(--orange)' : 'var(--muted)'};">${reflPct}%</div>
+        <div class="stat-label">STARR volledig</div>
+      </div>
+    </div>
+
     <div class="grid-2">
       <div>
         <!-- Leerdoelen -->
@@ -3051,6 +3365,7 @@ function renderVoortgang() {
         <div class="card" style="margin-bottom:16px;">
           <div class="card-head">
             <div class="card-title">Reflecties</div>
+            ${can('addReflectie') && reflTotal > 0 ? `<button class="btn btn-ghost btn-sm" onclick="exportReflectieverslag()">📄 PDF</button>` : ''}
           </div>
           ${reflectiesHtml}
         </div>
@@ -3317,20 +3632,52 @@ function openReflectieModal(id) {
   const r = id ? hubState.reflecties.find(x => x.id === id) : null;
   const isNew = !r;
 
+  const leerdoelOptions = hubState.leerdoelen.map(l =>
+    `<option value="${escHtml(l.title)}" ${r?.leerdoel === l.title ? 'selected' : ''}>${escHtml(l.title)}</option>`
+  ).join('');
+
   openModal(`
     <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title">${isNew ? 'Reflectie toevoegen' : 'Reflectie bewerken'}</div>
-    <div class="form-group">
-      <label class="form-label">Periode</label>
-      <input class="form-input" id="m-r-period" value="${escHtml(r?.period || '')}" placeholder="Bijv. Week 3–4 reflectie" />
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Periode</label>
+        <input class="form-input" id="m-r-period" value="${escHtml(r?.period || '')}" placeholder="Bijv. Week 3–4" />
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Datum</label>
+        <input class="form-input" id="m-r-date" type="date" value="${r?.date || ''}" />
+      </div>
+    </div>
+    ${leerdoelOptions ? `<div class="form-group" style="margin-top:12px;">
+      <label class="form-label">Gekoppeld leerdoel <span style="color:var(--muted);font-weight:400;">(optioneel)</span></label>
+      <select class="form-input" id="m-r-leerdoel">
+        <option value="">— geen koppeling —</option>
+        ${leerdoelOptions}
+      </select>
+    </div>` : ''}
+    <div class="starr-hint" style="background:var(--green-bg);border-radius:8px;padding:10px 14px;margin:14px 0 4px;font-size:.8rem;color:var(--primary);font-weight:500;">
+      Gebruik het STARR-model: beschrijf elke fase in je eigen woorden.
     </div>
     <div class="form-group">
-      <label class="form-label">Datum</label>
-      <input class="form-input" id="m-r-date" type="date" value="${r?.date || ''}" />
+      <label class="form-label">Situatie <span class="starr-tag">S</span></label>
+      <textarea class="form-textarea" id="m-r-situatie" style="min-height:72px;" placeholder="Wat was de context of aanleiding?">${escHtml(r?.situatie || '')}</textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Reflectietekst</label>
-      <textarea class="form-textarea" id="m-r-text" style="min-height:140px;" placeholder="Beschrijf je ervaringen, leerpunten en verbeterpunten…">${escHtml(r?.text || '')}</textarea>
+      <label class="form-label">Taak <span class="starr-tag">T</span></label>
+      <textarea class="form-textarea" id="m-r-taak" style="min-height:72px;" placeholder="Wat was jouw rol of opdracht?">${escHtml(r?.taak || '')}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Actie <span class="starr-tag">A</span></label>
+      <textarea class="form-textarea" id="m-r-actie" style="min-height:72px;" placeholder="Wat heb je concreet gedaan?">${escHtml(r?.actie || '')}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Resultaat <span class="starr-tag">R</span></label>
+      <textarea class="form-textarea" id="m-r-resultaat" style="min-height:72px;" placeholder="Wat was het effect of de uitkomst?">${escHtml(r?.resultaat || '')}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reflectie / Leermoment <span class="starr-tag">R</span></label>
+      <textarea class="form-textarea" id="m-r-leermoment" style="min-height:72px;" placeholder="Wat leer je hiervan? Wat doe je de volgende keer anders?">${escHtml(r?.leermoment || r?.text || '')}</textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
@@ -3341,26 +3688,36 @@ function openReflectieModal(id) {
 async function saveReflectie(id) {
   const requiredPerm = id ? 'editReflectie' : 'addReflectie';
   if (!can(requiredPerm)) { toast('Geen toegang.', 'error'); return; }
-  const period = document.getElementById('m-r-period').value.trim();
-  const date   = document.getElementById('m-r-date').value;
-  const text   = document.getElementById('m-r-text').value.trim();
-  if (!period || !text) { toast('Vul het periode-veld en de reflectietekst in.', 'error'); return; }
+  const period     = document.getElementById('m-r-period').value.trim();
+  const date       = document.getElementById('m-r-date').value;
+  const situatie   = document.getElementById('m-r-situatie')?.value.trim()  || '';
+  const taak       = document.getElementById('m-r-taak')?.value.trim()      || '';
+  const actie      = document.getElementById('m-r-actie')?.value.trim()     || '';
+  const resultaat  = document.getElementById('m-r-resultaat')?.value.trim() || '';
+  const leermoment = document.getElementById('m-r-leermoment')?.value.trim()|| '';
+  const leerdoel   = document.getElementById('m-r-leerdoel')?.value         || '';
+  // backwards-compat: keep `text` as concatenated summary for reflectie-card display
+  const text = [situatie, taak, actie, resultaat, leermoment].filter(Boolean).join('\n\n') || leermoment;
+
+  if (!period || !leermoment) { toast('Vul minimaal Periode en Reflectie/Leermoment in.', 'error'); return; }
+
+  const payload = { period, date, text, situatie, taak, actie, resultaat, leermoment, leerdoel };
 
   if (id) {
     const r = hubState.reflecties.find(x => x.id === id);
     if (r) {
-      r.period = period; r.date = date; r.text = text;
+      Object.assign(r, payload);
       if (MATCH_ID && r._dbId) {
-        const { error } = await db.from('stage_reflecties').update({ period, date, text }).eq('id', r._dbId);
+        const { error } = await db.from('stage_reflecties').update(payload).eq('id', r._dbId);
         if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     toast('Reflectie bijgewerkt!');
   } else {
-    const newR = { id: 'r' + hubState.nextId++, _dbId: null, period, date, text, editAllowed: true };
+    const newR = { id: 'r' + hubState.nextId++, _dbId: null, ...payload, editAllowed: true };
     if (MATCH_ID) {
       const { data, error } = await db.from('stage_reflecties')
-        .insert({ match_id: MATCH_ID, period, date, text, author_role: hubState.role })
+        .insert({ match_id: MATCH_ID, author_role: hubState.role, ...payload })
         .select().single();
       if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newR._dbId = data.id;
@@ -3371,7 +3728,237 @@ async function saveReflectie(id) {
   }
 
   closeModal();
+  updateReflectieVoortgang();
   switchTab('voortgang');
+}
+
+async function deleteReflectie(id) {
+  if (!can('editReflectie')) { toast('Geen toegang.', 'error'); return; }
+  const r = hubState.reflecties.find(x => x.id === id);
+  if (!r) return;
+  if (!confirm(`Reflectie "${r.period}" definitief verwijderen?`)) return;
+
+  hubState.reflecties = hubState.reflecties.filter(x => x.id !== id);
+  if (MATCH_ID && r._dbId) {
+    const { error } = await db.from('stage_reflecties').delete().eq('id', r._dbId).eq('match_id', MATCH_ID);
+    if (error) {
+      toast('Verwijderen mislukt — probeer opnieuw.', 'error');
+      hubState.reflecties.unshift(r);
+      switchTab('voortgang');
+      return;
+    }
+  }
+  addLog(`Reflectie "${r.period}" verwijderd.`, 'orange');
+  updateReflectieVoortgang();
+  switchTab('voortgang');
+  toast('Reflectie verwijderd.');
+}
+
+function toggleStarrBody(id) {
+  const body = document.getElementById('starr-' + id);
+  if (!body) return;
+  const isOpen = body.classList.toggle('open');
+  const btn = body.previousElementSibling;
+  if (btn && btn.classList.contains('refl-toggle-btn')) {
+    btn.textContent = isOpen ? 'Verberg STARR-analyse ▴' : 'Bekijk STARR-analyse ▾';
+  }
+}
+
+/* ── Reflectie voortgang & export ───────────────────────────────────────── */
+
+function updateReflectieVoortgang() {
+  const total = hubState.reflecties.length;
+  const volledig = hubState.reflecties.filter(r =>
+    r.situatie && r.taak && r.actie && r.resultaat && r.leermoment
+  ).length;
+  const pct = total === 0 ? 0 : Math.round((volledig / total) * 100);
+
+  const bar   = document.getElementById('refl-voortgang-bar');
+  const label = document.getElementById('refl-voortgang-label');
+  const count = document.getElementById('refl-voortgang-count');
+  if (bar)   bar.style.width   = pct + '%';
+  if (label) label.textContent = pct + '% volledig ingevuld';
+  if (count) count.textContent = `${volledig} van ${total} reflecties volledig (STARR)`;
+}
+
+function exportReflectieverslag() {
+  if (!window.jspdf) { toast('PDF-bibliotheek nog niet geladen.', 'error'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc       = new jsPDF({ unit: 'mm', format: 'a4' });
+  const margin    = 18;
+  const pageW     = 210;
+  const contentW  = pageW - margin * 2;
+  let y           = 0;
+
+  const STARR_DEFS = [
+    ['S', 'Situatie',             'situatie'],
+    ['T', 'Taak',                 'taak'],
+    ['A', 'Actie',                'actie'],
+    ['R', 'Resultaat',            'resultaat'],
+    ['R', 'Reflectie/Leermoment', 'leermoment'],
+  ];
+
+  function addPage() { doc.addPage(); y = 20; }
+  function check(needed = 10) { if (y + needed > 278) addPage(); }
+
+  // ── Koptekst ──
+  doc.setFillColor(26, 122, 72);
+  doc.rect(0, 0, 210, 30, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(17);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Reflectieverslag', margin, 14);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(
+    `${match.student.name} · ${match.company.name} · ${new Date().toLocaleDateString('nl-NL')}`,
+    margin, 23
+  );
+  y = 38;
+
+  // ── Samenvatting ──
+  const total    = hubState.reflecties.length;
+  const volledig = hubState.reflecties.filter(r =>
+    r.situatie && r.taak && r.actie && r.resultaat && r.leermoment).length;
+  const avgLd    = hubState.leerdoelen.length
+    ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
+    : 0;
+
+  doc.setFillColor(232, 245, 238);
+  doc.roundedRect(margin, y, contentW, 18, 2, 2, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(26, 122, 72);
+  doc.text('Samenvatting', margin + 4, y + 6);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(13, 21, 32);
+  doc.text(
+    `${total} reflecties · ${volledig} volledig (STARR) · Gem. leerdoelvoortgang: ${avgLd}%`,
+    margin + 4, y + 13
+  );
+  y += 26;
+
+  // ── Leerdoelen ──
+  if (hubState.leerdoelen.length > 0) {
+    check(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(13, 21, 32);
+    doc.text('Leerdoelen', margin, y);
+    y += 7;
+    hubState.leerdoelen.forEach(l => {
+      check(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(13, 21, 32);
+      doc.text(`${l.title}`, margin + 2, y);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(26, 122, 72);
+      doc.text(`${l.progress}%`, pageW - margin - 2, y, { align: 'right' });
+      doc.setTextColor(13, 21, 32);
+      doc.setFont('helvetica', 'normal');
+      // Progress mini-bar
+      const barW = contentW - 60;
+      const barX = pageW - margin - barW - 14;
+      doc.setFillColor(229, 227, 222);
+      doc.rect(barX, y - 3.5, barW, 2.5, 'F');
+      doc.setFillColor(26, 122, 72);
+      doc.rect(barX, y - 3.5, barW * (l.progress / 100), 2.5, 'F');
+      y += 7;
+    });
+    y += 4;
+  }
+
+  // ── Reflecties ──
+  check(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(13, 21, 32);
+  doc.text('Reflecties', margin, y);
+  y += 8;
+
+  if (hubState.reflecties.length === 0) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text('Geen reflecties ingediend.', margin + 2, y);
+    y += 8;
+  } else {
+    hubState.reflecties.forEach((r, i) => {
+      check(28);
+      // Kaart-header
+      doc.setFillColor(232, 245, 238);
+      doc.roundedRect(margin, y, contentW, 9, 2, 2, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(26, 122, 72);
+      doc.text(r.period || `Reflectie ${i + 1}`, margin + 3, y + 6.2);
+      if (r.date) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(107, 114, 128);
+        doc.text(formatDate(r.date), pageW - margin - 3, y + 6.2, { align: 'right' });
+      }
+      y += 12;
+
+      if (r.leerdoel) {
+        check(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(23, 86, 168);
+        doc.text(`Leerdoel: ${r.leerdoel}`, margin + 2, y);
+        y += 6;
+      }
+
+      STARR_DEFS.forEach(([letter, label, key]) => {
+        const val = r[key];
+        check(12);
+        // Sectie-label
+        doc.setFillColor(val ? 26 : 156, val ? 122 : 163, val ? 72 : 175);
+        doc.circle(margin + 2.5, y - 1, 2.5, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text(letter, margin + 2.5, y - 0.5, { align: 'center' });
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(val ? 26 : 107, val ? 122 : 114, val ? 72 : 128);
+        doc.text(label, margin + 7, y);
+        y += 5;
+
+        if (val) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(13, 21, 32);
+          const lines = doc.splitTextToSize(val, contentW - 6);
+          lines.forEach(line => { check(6); doc.text(line, margin + 7, y); y += 5; });
+        } else {
+          doc.setFont('helvetica', 'italic');
+          doc.setFontSize(8.5);
+          doc.setTextColor(156, 163, 175);
+          doc.text('Nog niet ingevuld', margin + 7, y);
+          y += 5;
+        }
+        y += 2;
+      });
+      y += 6;
+    });
+  }
+
+  // ── Paginanummering ──
+  const pages = doc.getNumberOfPages();
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(156, 163, 175);
+    doc.text(`Internly Reflectieverslag · pagina ${p} van ${pages}`, pageW / 2, 291, { align: 'center' });
+  }
+
+  const safeName = (match.student.name || 'student').replace(/\s+/g, '-').toLowerCase();
+  doc.save(`reflectieverslag-${safeName}.pdf`);
+  toast('PDF gedownload!', 'success');
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
