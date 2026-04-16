@@ -2,18 +2,5 @@ User-agent: *
 Disallow: /admin.html
 Disallow: /auth.html
 Disallow: /internly_simulator.html
-Disallow: /bbl-dashboard.html
-Disallow: /bbl-hub.html
-Disallow: /bbl-profile.html
-Disallow: /buddy-dashboard.html
-Disallow: /chat.html
-Disallow: /company-dashboard.html
-Disallow: /company-discover.html
-Disallow: /match-dashboard.html
-Disallow: /matches.html
-Disallow: /mijn-sollicitaties.html
-Disallow: /school-dashboard.html
-Disallow: /student-profile.html
 Allow: /
-
 Sitemap: https://internly.pro/sitemap.xml
