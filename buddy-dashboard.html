@@ -535,8 +535,8 @@ async function acceptRequest(reqId) {
     .insert({ requester_id: req.requester_id, receiver_id: req.receiver_id, type: req.type, status: 'active', reveal_after: null })
     .select('id').single();
   if (pErr) {
-    // Roll back
-    await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId);
+    // Roll back acceptance
+    await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId).catch(() => {});
     notify('Koppeling aanmaken mislukt — probeer opnieuw.'); return;
   }
 
@@ -666,9 +666,11 @@ async function togglePause() {
 
 // ── Realtime ───────────────────────────────────────────────────────────────
 
+let realtimeSub = null;
+
 function subscribeRealtime() {
   const uid = currentUser.id;
-  db.channel('buddy-dash-' + uid)
+  realtimeSub = db.channel('buddy-dash-' + uid)
     .on('postgres_changes', {
       event: 'INSERT', schema: 'public', table: 'buddy_requests',
       filter: `receiver_id=eq.${uid}`,
@@ -686,6 +688,10 @@ function subscribeRealtime() {
     }, () => loadPairs())
     .subscribe();
 }
+
+window.addEventListener('beforeunload', () => {
+  if (realtimeSub) { try { db.removeChannel(realtimeSub); } catch(e) {} }
+});
 
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
@@ -767,5 +773,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

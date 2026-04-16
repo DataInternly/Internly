@@ -30,6 +30,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
      if (await hasActivePlan('company_pro')) { renderESGExport(); }
    ─────────────────────────────────────────────────────────────────────────── */
 async function hasActivePlan(_minPlan) {
-  // TODO: vervangen door echte subscription check na Mollie-integratie
+  // STUB: altijd true totdat Mollie-integratie live is.
+  // Vervang door echte subscription check op `subscriptions` tabel.
   return true;
 }

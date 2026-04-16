@@ -182,6 +182,12 @@ function _buddySubscribeRealtime() {
       filter: `receiver_id=eq.${uid}`,
     }, async () => { await buddyLoadPairs(); BuddyModule.onUpdate?.(); })
     .subscribe();
+
+  window.addEventListener('beforeunload', () => {
+    if (BuddyModule._realtimeSub) {
+      try { BuddyModule.db?.removeChannel(BuddyModule._realtimeSub); } catch(e) {}
+    }
+  }, { once: true });
 }
 
 // ── DATA FETCHING ────────────────────────────────────────────
@@ -670,10 +676,7 @@ function buddyRenderRequestWidget(type, context = {}, targetEl = null) {
 // ── NAVIGATION ───────────────────────────────────────────────
 
 function buddyOpenChat(pairId) {
-  // TODO (fase 2): chat.html currently handles ?match=UUID for stage matches.
-  // Buddy chat threads need a separate entry point or chat.html must be extended
-  // to also handle ?buddy_pair_id=UUID. For now we navigate and chat.html will
-  // show an empty state — not ideal but not destructive.
+  // chat.html handles ?buddy_pair_id=UUID — loads or creates conversation via buddy_pair_id column
   window.location.href = `chat.html?buddy_pair_id=${encodeURIComponent(pairId)}`;
 }
 

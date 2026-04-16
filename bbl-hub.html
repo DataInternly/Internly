@@ -1566,11 +1566,11 @@ async function createMeeting() {
 
   if (error) { notify('Aanmaken mislukt: ' + (error?.message || 'onbekende fout')); return; }
 
-  // Driegesprek: ook ROC-begeleider uitnodigen
+  // Driegesprek: ROC-begeleider uitnodiging — wordt automatisch verzonden
+  // zodra roc_profile_id beschikbaar is op de match (fase 2 database-kolom).
+  // Voor nu: melding aan gebruiker dat ROC apart geïnformeerd moet worden.
   if (selectedMeetType === 'driegesprek') {
-    // TODO: ROC-begeleider profile_id ophalen uit school koppeling
-    // Voor nu: notificeer praktijkbegeleider + log
-    // TODO P2: driegesprek ROC-notificatie wacht op roc_profile_id kolom op matches;
+    notify('Driegesprek aangemaakt — vergeet je ROC-begeleider persoonlijk uit te nodigen.');
   }
 
   // Notificeer praktijkbegeleider
@@ -1933,82 +1933,155 @@ function toggleReflHist(bodyId, headEl) {
 function exportBBLReflectieverslag() {
   if (!window.jspdf) { notify('PDF-bibliotheek nog niet geladen.'); return; }
   const { jsPDF } = window.jspdf;
-  const doc      = new jsPDF({ unit: 'mm', format: 'a4' });
-  const margin   = 18;
-  const pageW    = 210;
-  const contentW = pageW - margin * 2;
-  let y          = 0;
+  const doc    = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW  = 210;
+  const margin = 18;
+  const cW     = pageW - margin * 2;   // 174 mm
+  const BODY_END  = 274;               // last usable y before footer zone
+  const FOOTER_Y  = 280;              // footer line y
+  let y = 0;
 
-  function addPage() { doc.addPage(); y = 20; }
-  function check(needed = 10) { if (y + needed > 278) addPage(); }
-
-  // Student naam
   const naam = currentUser?.user_metadata?.naam
     || currentUser?.user_metadata?.name
     || currentUser?.email?.split('@')[0] || 'BBL-student';
+  const dateNl = new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  // ── Koptekst ──
-  doc.setFillColor(26, 122, 72);
-  doc.rect(0, 0, 210, 30, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(17);
-  doc.setTextColor(255, 255, 255);
-  doc.text('BBL Reflectieverslag', margin, 14);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.text(`${naam} · ${new Date().toLocaleDateString('nl-NL')}`, margin, 23);
-  y = 38;
+  // STARR: per-element colour (R,G,B)
+  const STARR_COL = [[29,78,216],[109,40,217],[194,65,12],[15,118,110],[22,101,52]];
+  const STARR_DEFS = [
+    ['S','Situatie','situatie'],['T','Taak','taak'],['A','Actie','actie'],
+    ['R','Resultaat','resultaat'],['R','Reflectie / Leermoment','leermoment'],
+  ];
 
-  // ── Leerdoelen + toelichtingen ──
+  // ── Layout helpers ──────────────────────────────────────────────────────────
+  function drawPageHeader(first) {
+    if (first) {
+      doc.setFillColor(26, 122, 72);
+      doc.rect(0, 0, pageW, 38, 'F');
+      // Subtle diagonal stripe for texture
+      doc.setDrawColor(30, 130, 78);
+      doc.setLineWidth(0.4);
+      for (let x = 0; x <= 280; x += 14) {
+        doc.line(x, 0, x - 20, 38);
+      }
+      // Wordmark top-right
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(180, 230, 200);
+      doc.text('internly', pageW - margin, 9, { align: 'right' });
+      // Title
+      doc.setFontSize(20);
+      doc.setTextColor(255, 255, 255);
+      doc.text('BBL Reflectieverslag', margin, 21);
+      // Subtitle
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(200, 235, 215);
+      doc.text(`${naam}  ·  ${dateNl}`, margin, 31);
+      y = 46;
+    } else {
+      doc.setFillColor(26, 122, 72);
+      doc.rect(0, 0, pageW, 13, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      doc.text('BBL Reflectieverslag', margin, 9);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(200, 235, 215);
+      doc.text(naam, pageW - margin, 9, { align: 'right' });
+      y = 21;
+    }
+  }
+
+  function drawFooters() {
+    const total = doc.getNumberOfPages();
+    for (let p = 1; p <= total; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(220, 225, 230);
+      doc.setLineWidth(0.3);
+      doc.line(margin, FOOTER_Y, pageW - margin, FOOTER_Y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(160, 163, 175);
+      doc.text('internly.pro  ·  BBL Reflectieverslag', margin, FOOTER_Y + 5);
+      doc.text(`Pagina ${p} van ${total}`, pageW - margin, FOOTER_Y + 5, { align: 'right' });
+    }
+  }
+
+  function newPage() { doc.addPage(); drawPageHeader(false); }
+  function check(n = 10) { if (y + n > BODY_END) newPage(); }
+
+  function sectionHeader(title) {
+    check(18);
+    y += 3;
+    doc.setFillColor(26, 122, 72);
+    doc.roundedRect(margin, y, 3.5, 9, 0.8, 0.8, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(13, 21, 32);
+    doc.text(title, margin + 7, y + 6.8);
+    y += 13;
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y - 2, pageW - margin, y - 2);
+    y += 3;
+  }
+
+  // ── Page 1 header ───────────────────────────────────────────────────────────
+  drawPageHeader(true);
+
+  // ── Leerdoelen ──────────────────────────────────────────────────────────────
   const skills = currentStudentProfile?.skills || [];
-  let progress = {};
-  let toelichtingen = {};
-  try { progress     = JSON.parse(localStorage.getItem('internly_ld_' + currentUser.id) || '{}'); } catch(e) {}
+  let progress = {}, toelichtingen = {};
+  try { progress      = JSON.parse(localStorage.getItem('internly_ld_' + currentUser.id) || '{}'); } catch(e) {}
   try { toelichtingen = JSON.parse(localStorage.getItem('internly_ld_toelichting_' + currentUser.id) || '{}'); } catch(e) {}
 
   if (skills.length > 0) {
-    check(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(13, 21, 32);
-    doc.text('Leerdoelen', margin, y);
-    y += 8;
-
+    sectionHeader('Leerdoelen');
     skills.forEach(skill => {
-      check(14);
       const done = !!progress[skill];
-      doc.setFillColor(done ? 232 : 244, done ? 245 : 243, done ? 238 : 239);
-      doc.roundedRect(margin, y - 4, contentW, 8, 1.5, 1.5, 'F');
-      // Vinkje
+      check(16);
+      // Row background
+      doc.setFillColor(done ? 236 : 249, done ? 250 : 250, done ? 242 : 251);
+      doc.roundedRect(margin, y - 2, cW, 10, 1.5, 1.5, 'F');
+      // Status circle
+      doc.setFillColor(done ? 26 : 209, done ? 122 : 213, done ? 72 : 219);
+      doc.circle(margin + 5, y + 3, 3, 'F');
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(done ? 26 : 107, done ? 122 : 114, done ? 72 : 128);
-      doc.text(done ? '✓' : '○', margin + 3, y + 1);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
+      doc.setFontSize(7);
+      doc.setTextColor(255, 255, 255);
+      doc.text(done ? '✓' : ' ', margin + 5, y + 3.8, { align: 'center' });
+      // Label
+      doc.setFont('helvetica', done ? 'bold' : 'normal');
+      doc.setFontSize(10);
       doc.setTextColor(13, 21, 32);
-      doc.text(skill, margin + 9, y + 1);
-      y += 10;
-
+      doc.text(skill, margin + 11, y + 4.5);
+      if (done) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(26, 122, 72);
+        doc.text('Behaald', pageW - margin - 2, y + 4.5, { align: 'right' });
+      }
+      y += 12;
       const toelichting = toelichtingen[skill];
       if (toelichting) {
+        check(8);
         doc.setFont('helvetica', 'italic');
-        doc.setFontSize(8.5);
-        doc.setTextColor(75, 85, 99);
-        const lines = doc.splitTextToSize(toelichting, contentW - 12);
-        lines.forEach(line => { check(6); doc.text(line, margin + 9, y); y += 5; });
+        doc.setFontSize(9);
+        doc.setTextColor(107, 114, 128);
+        const lines = doc.splitTextToSize('\u201c' + toelichting + '\u201d', cW - 13);
+        lines.forEach(l => { check(6); doc.text(l, margin + 11, y); y += 5.5; });
         y += 2;
       }
     });
-    y += 4;
+    y += 5;
   }
 
-  // ── Zelfreflecties (uit gedeelde bblReflecties array — geladen door loadBBLReflecties) ──
+  // ── Zelfreflecties ──────────────────────────────────────────────────────────
   const reflecties = bblReflecties.length > 0 ? bblReflecties : (() => {
     try { return JSON.parse(localStorage.getItem('internly_bbl_reflecties_' + currentUser.id) || '[]'); } catch(e) { return []; }
   })();
-
-  // Haal ook huidige concept op (niet-opgeslagen)
   const draft = {
     situatie:   document.getElementById('reflectie-situatie')?.value.trim()   || '',
     taak:       document.getElementById('reflectie-taak')?.value.trim()       || '',
@@ -2016,95 +2089,94 @@ function exportBBLReflectieverslag() {
     resultaat:  document.getElementById('reflectie-resultaat')?.value.trim()  || '',
     leermoment: document.getElementById('reflectie-leermoment')?.value.trim() || '',
   };
-  const hasDraft = Object.values(draft).some(v => v !== '');
+  const hasDraft   = Object.values(draft).some(v => v !== '');
+  const allEntries = hasDraft ? [{ ...draft, savedAt: null }, ...reflecties] : reflecties;
 
-  check(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(13, 21, 32);
-  doc.text('Zelfreflecties', margin, y);
-  y += 8;
-
-  const STARR_DEFS = [
-    ['S', 'Situatie',             'situatie'],
-    ['T', 'Taak',                 'taak'],
-    ['A', 'Actie',                'actie'],
-    ['R', 'Resultaat',            'resultaat'],
-    ['R', 'Reflectie/Leermoment', 'leermoment'],
-  ];
-
-  const allEntries = hasDraft
-    ? [{ ...draft, savedAt: null }, ...reflecties]
-    : reflecties;
+  sectionHeader('Zelfreflecties (STARR)');
 
   if (allEntries.length === 0) {
+    check(10);
     doc.setFont('helvetica', 'italic');
-    doc.setFontSize(9);
-    doc.setTextColor(107, 114, 128);
+    doc.setFontSize(10);
+    doc.setTextColor(156, 163, 175);
     doc.text('Geen zelfreflecties opgeslagen.', margin + 2, y);
-    y += 8;
+    y += 10;
   } else {
     allEntries.forEach((r, i) => {
-      check(28);
-      const dateStr = r.savedAt
-        ? new Date(r.savedAt).toLocaleDateString('nl-NL')
-        : 'Concept (niet opgeslagen)';
+      check(36);
+      const isDraft = !r.savedAt;
+      const cardDate = isDraft
+        ? 'Concept — nog niet opgeslagen'
+        : new Date(r.savedAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
-      doc.setFillColor(232, 245, 238);
-      doc.roundedRect(margin, y, contentW, 9, 2, 2, 'F');
+      // Card header bar
+      doc.setFillColor(isDraft ? 255 : 232, isDraft ? 247 : 245, isDraft ? 237 : 238);
+      doc.roundedRect(margin, y, cW, 12, 2, 2, 'F');
+      if (isDraft) {
+        doc.setDrawColor(249, 115, 22);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(margin, y, cW, 12, 2, 2, 'S');
+      }
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(10);
-      doc.setTextColor(26, 122, 72);
-      doc.text(`Zelfreflectie ${allEntries.length - i}`, margin + 3, y + 6.2);
+      doc.setFontSize(11);
+      doc.setTextColor(isDraft ? 180 : 26, isDraft ? 90 : 122, isDraft ? 10 : 72);
+      doc.text(isDraft ? 'Concept' : `Zelfreflectie ${allEntries.length - i}`, margin + 4, y + 8);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
+      doc.setFontSize(8.5);
       doc.setTextColor(107, 114, 128);
-      doc.text(dateStr, pageW - margin - 3, y + 6.2, { align: 'right' });
-      y += 12;
+      doc.text(cardDate, pageW - margin - 3, y + 8, { align: 'right' });
+      y += 16;
 
-      STARR_DEFS.forEach(([letter, label, key]) => {
+      // STARR items
+      STARR_DEFS.forEach(([letter, label, key], si) => {
         const val = r[key];
-        check(12);
-        doc.setFillColor(val ? 26 : 156, val ? 122 : 163, val ? 72 : 175);
-        doc.circle(margin + 2.5, y - 1, 2.5, 'F');
+        const [cr, cg, cb] = val ? STARR_COL[si] : [180, 185, 195];
+        check(16);
+        // Coloured circle with letter
+        doc.setFillColor(cr, cg, cb);
+        doc.circle(margin + 3.5, y + 0.5, 3.5, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(6.5);
+        doc.setFontSize(7.5);
         doc.setTextColor(255, 255, 255);
-        doc.text(letter, margin + 2.5, y - 0.5, { align: 'center' });
+        doc.text(letter, margin + 3.5, y + 1.4, { align: 'center' });
+        // Label
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8.5);
-        doc.setTextColor(val ? 26 : 107, val ? 122 : 114, val ? 72 : 128);
-        doc.text(label, margin + 7, y);
-        y += 5;
-
+        doc.setFontSize(9.5);
+        doc.setTextColor(cr, cg, cb);
+        doc.text(label, margin + 10, y + 1.8);
+        y += 8;
         if (val) {
           doc.setFont('helvetica', 'normal');
-          doc.setFontSize(9);
-          doc.setTextColor(13, 21, 32);
-          const lines = doc.splitTextToSize(val, contentW - 6);
-          lines.forEach(line => { check(6); doc.text(line, margin + 7, y); y += 5; });
+          doc.setFontSize(10);
+          doc.setTextColor(30, 30, 40);
+          const lines = doc.splitTextToSize(val, cW - 8);
+          lines.forEach(l => { check(7); doc.text(l, margin + 4, y); y += 5.5; });
         } else {
           doc.setFont('helvetica', 'italic');
-          doc.setFontSize(8.5);
-          doc.setTextColor(156, 163, 175);
-          doc.text('Nog niet ingevuld', margin + 7, y);
-          y += 5;
+          doc.setFontSize(9);
+          doc.setTextColor(190, 195, 205);
+          doc.text('Nog niet ingevuld', margin + 4, y);
+          y += 5.5;
         }
-        y += 2;
+        y += 3;
       });
-      y += 6;
+
+      // Separator between cards
+      if (i < allEntries.length - 1) {
+        check(8);
+        y += 2;
+        doc.setDrawColor(220, 227, 235);
+        doc.setLineWidth(0.3);
+        doc.line(margin + 8, y, pageW - margin - 8, y);
+        y += 8;
+      } else {
+        y += 4;
+      }
     });
   }
 
-  // ── Paginanummering ──
-  const pages = doc.getNumberOfPages();
-  for (let p = 1; p <= pages; p++) {
-    doc.setPage(p);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    doc.setTextColor(156, 163, 175);
-    doc.text(`Internly BBL Reflectieverslag · pagina ${p} van ${pages}`, pageW / 2, 291, { align: 'center' });
-  }
+  // ── Footer on all pages ─────────────────────────────────────────────────────
+  drawFooters();
 
   const safeName = naam.replace(/\s+/g, '-').toLowerCase();
   doc.save(`bbl-reflectieverslag-${safeName}.pdf`);
@@ -2576,5 +2648,6 @@ window.addEventListener('beforeunload', () => {
 });
 </script>
 
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>
