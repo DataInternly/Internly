@@ -37,6 +37,7 @@
       --r:          16px;
       --r-sm:       8px;
       --sidebar-w:  240px;
+      --accent:     var(--orange);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -477,6 +478,7 @@
     .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
   </style>
+  <script src="js/supabase.js"></script>
 </head>
 <body>
 <div class="notif" id="notif"></div>
@@ -598,22 +600,28 @@
         <button class="nav-btn" id="nav-matches" onclick="show('matches')">
           <span class="nav-icon">🤝</span> Matches
         </button>
-        <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
+        <button class="nav-btn" id="nav-berichten" onclick="gotoBerichtenGated()">
           <span class="nav-icon">💬</span> Berichten
           <span class="nav-badge" id="badge-unread" style="display:none">0</span>
         </button>
         <button class="nav-btn" id="nav-stagehub" onclick="show('matches')">
           <span class="nav-icon">📊</span> Stage Hub
         </button>
-        <button class="nav-btn" onclick="window.location.href='company-discover.html'">
+        <button class="nav-btn" onclick="gotoDiscoverGated()">
           <span class="nav-icon">🔍</span> Zoek stagiairs
         </button>
       </div>
 
       <div class="sidebar-section">
         <span class="sidebar-label">Reputatie</span>
-        <button class="nav-btn" id="nav-reviews" onclick="show('reviews')">
+        <button class="nav-btn" id="nav-reviews" onclick="showReviewsGated()">
           <span class="nav-icon">⭐</span> Reviews
+        </button>
+        <button class="nav-btn" id="nav-esg" onclick="show('esg')">
+          <span class="nav-icon">🌱</span> ESG &amp; Rapportage
+        </button>
+        <button class="nav-btn" id="nav-vestigingen" onclick="show('vestigingen')">
+          <span class="nav-icon">📍</span> Vestigingen
         </button>
       </div>
 
@@ -645,6 +653,44 @@
       <div class="page-title">Dashboard</div>
       <p class="page-sub">Overzicht van jouw recruitmentactiviteit op Internly</p>
 
+      <div id="referral-banner" style="
+        background:var(--amber-bg,#fdf3e0);
+        border:0.5px solid rgba(160,96,16,.2);
+        border-radius:var(--r-sm,8px);
+        padding:.85rem 1rem;
+        margin-bottom:1rem;
+        display:flex;align-items:flex-start;
+        gap:.75rem;
+      ">
+        <span style="font-size:1.1rem;flex-shrink:0">🤝</span>
+        <div style="flex:1">
+          <div style="font-size:.88rem;font-weight:500;
+            color:var(--amber,#a06010);margin-bottom:.2rem;">
+            Werkt Internly voor jou?
+          </div>
+          <div style="font-size:.82rem;color:var(--ink2);
+            line-height:1.55;margin-bottom:.6rem;">
+            Dan ken je waarschijnlijk iemand voor wie het
+            ook werkt — een bedrijf, school of begeleider
+            die worstelt met hetzelfde probleem.
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;
+            align-items:center;">
+            <button onclick="copyReferralText()"
+              class="btn btn-ghost"
+              style="font-size:.78rem;padding:5px 12px;">
+              📋 Kopieer aanbevelingstekst
+            </button>
+            <button onclick="dismissReferral()"
+              style="background:none;border:none;
+              font-size:.78rem;color:var(--ink3);
+              cursor:pointer;padding:5px;">
+              Niet nu
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="stats-row">
         <div class="stat-card">
           <div class="stat-label">Actieve vacatures</div>
@@ -662,7 +708,12 @@
           <div class="stat-note">dit kwartaal</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label" style="display:flex;align-items:center;">Trust Score<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Trust Score">ⓘ<span class="info-pop">De <strong>Trust Score</strong> bepaalt hoe betrouwbaar uw profiel overkomt bij studenten. Een hogere score verhoogt uw zichtbaarheid.<br><br><strong>A</strong> = Hoog &nbsp;·&nbsp; <strong>B</strong> = Gemiddeld &nbsp;·&nbsp; <strong>C</strong> = Laag &nbsp;·&nbsp; <strong>D</strong> = Onvoldoende<br><br>Vul uw profiel verder in om de score te verhogen.</span></span></div>
+          <div class="stat-label">ESG-punten</div>
+          <div class="stat-val" id="stat-esg">—</div>
+          <div class="stat-note">dit jaar</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" style="display:flex;align-items:center;">Trust Score<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Trust Score">ⓘ<span class="info-pop">De <strong>Trust Score</strong> bepaalt hoe betrouwbaar je profiel overkomt bij studenten. Een hogere score verhoogt je zichtbaarheid.<br><br><strong>A</strong> = Hoog &nbsp;·&nbsp; <strong>B</strong> = Gemiddeld &nbsp;·&nbsp; <strong>C</strong> = Laag<br><br>Vul je profiel verder in om de score te verhogen.</span></span></div>
           <div class="stat-val" id="stat-trust">—</div>
           <div class="stat-note" id="stat-grade">berekenen…</div>
           <button onclick="forceTrustRecalculate()" style="margin-top:6px;font-size:.72rem;padding:3px 8px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;color:var(--ink3)">↻ Herberekenen</button>
@@ -676,8 +727,7 @@
       <div id="recent-postings">
         <div class="empty">
           <span class="empty-icon">📭</span>
-          Nog geen vacatures geplaatst.<br>
-          Klik op <strong>Nieuwe vacature</strong> om te beginnen.
+          Nog geen vacatures. Studenten zoeken nu actief — je eerste vacature zet je op de kaart.
         </div>
       </div>
     </div>
@@ -689,7 +739,7 @@
         <button class="btn-orange" onclick="show('new')">+ Nieuwe vacature</button>
       </div>
       <div id="all-postings">
-        <div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures.</div>
+        <div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures geplaatst. Bedrijven die actief vacatures plaatsen krijgen hogere zichtbaarheid in het matchsysteem.</div>
       </div>
     </div>
 
@@ -752,6 +802,15 @@
           <div class="field">
             <label>Startdatum <span class="hint">optioneel</span></label>
             <input type="date" id="f-start">
+          </div>
+        </div>
+
+        <div id="vestiging-selector-wrap" style="display:none">
+          <div class="field">
+            <label>Vestiging <span class="hint">koppel een vestiging — postcode wordt automatisch ingevuld</span></label>
+            <select id="f-vestiging" onchange="onVestigingChange()">
+              <option value="">— Selecteer vestiging (optioneel) —</option>
+            </select>
           </div>
         </div>
 
@@ -835,6 +894,16 @@
       <div id="reviews-content">
         <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
       </div>
+    </div>
+
+    <!-- ── ESG & RAPPORTAGE ── -->
+    <div class="screen" id="screen-esg">
+      <div id="esg-content"></div>
+    </div>
+
+    <!-- ── VESTIGINGEN ── -->
+    <div class="screen" id="screen-vestigingen">
+      <div id="vestigingen-content"></div>
     </div>
 
     <!-- ── PROFIEL ── -->
@@ -929,6 +998,7 @@ const tags = [];
 let matchTarget       = 'student';
 let postings          = [];
 let currentUser       = null;
+let currentPlan       = null;
 let notifSubscription = null;
 
 // ── Notification system ───────────────────────────────────────────────────
@@ -1163,6 +1233,87 @@ function show(id) {
   if (id === 'matches')   loadCompanyMatches();
   if (id === 'berichten') loadBerichten();
   if (id === 'reviews')   loadReviews();
+  if (id === 'esg')         renderESG();
+  if (id === 'vestigingen') renderVestigingen();
+  if (id === 'new' && currentPlan === 'company_business') {
+    const wrap = document.getElementById('vestiging-selector-wrap');
+    if (wrap) wrap.style.display = '';
+    if (_vestigingen.length === 0) loadVestigingen(); else populateVestigingSelector();
+  }
+}
+
+// ── Plan gates ──
+async function hasActivePlan(minPlan = 'company_starter') {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return false;
+    const { data: sub, error } = await db
+      .from('subscriptions')
+      .select('plan, status, current_period_end')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    if (error || !sub) return false;
+    if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
+    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
+    const tiers = ['company_starter','company_pro','company_business','school_freemium','school_premium','school_premium_monthly','begeleider_starter','begeleider_pro'];
+    return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
+  } catch (err) {
+    console.error('hasActivePlan error:', err);
+    return false;
+  }
+}
+
+function upgradeCard(requiredPlan) {
+  const labels = { company_pro: 'Pro', company_business: 'Business', school_premium: 'School Premium' };
+  const label = labels[requiredPlan] ?? requiredPlan;
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem 1.5rem;text-align:center;">
+      <div style="font-size:2.5rem;">🔒</div>
+      <h3 style="font-size:1.25rem;font-weight:700;color:var(--ink);">Beschikbaar vanaf ${label}</h3>
+      <p style="color:var(--ink3);max-width:360px;">Upgrade je abonnement om toegang te krijgen tot deze functie.</p>
+      <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;">
+        Bekijk abonnementen
+      </button>
+    </div>`;
+}
+
+async function gotoBerichtenGated() {
+  if (await hasActivePlan('company_pro')) {
+    window.location.href = 'chat.html';
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-berichten').classList.add('active');
+    const nb = document.getElementById('nav-berichten');
+    if (nb) nb.classList.add('active');
+    document.getElementById('berichten-list').innerHTML = upgradeCard('company_pro');
+  }
+}
+
+async function showReviewsGated() {
+  if (await hasActivePlan('company_pro')) {
+    show('reviews');
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-reviews').classList.add('active');
+    const nb = document.getElementById('nav-reviews');
+    if (nb) nb.classList.add('active');
+    document.getElementById('reviews-content').innerHTML = upgradeCard('company_pro');
+  }
+}
+
+async function gotoDiscoverGated() {
+  if (await hasActivePlan('company_business')) {
+    window.location.href = 'company-discover.html';
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-matches').classList.add('active');
+    const nb = document.getElementById('nav-matches');
+    if (nb) nb.classList.add('active');
+    document.getElementById('matches-list').innerHTML = upgradeCard('company_business');
+  }
 }
 
 // ── Stats ──
@@ -1229,11 +1380,39 @@ function renderList(cid, data) {
     el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures geplaatst.<br>Klik op <strong>Nieuwe vacature</strong> om te beginnen.</div>`;
     return;
   }
-  el.innerHTML = data.map(p => {
+
+  const isAllPostings = cid === 'all-postings';
+  const isStarter     = currentPlan === 'company_starter' || !currentPlan;
+
+  let html = '';
+
+  // Starter limit bar
+  if (isAllPostings && isStarter && data.length > 1) {
+    html += `
+    <div style="background:#fff7ed;border:1px solid #f97316;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span style="font-size:.88rem;color:#c2410c;font-weight:600">
+        🔒 Starter: 1 actieve vacature inbegrepen — ${escapeHtml(String(data.length - 1))} vacature${data.length - 1 !== 1 ? 's' : ''} vergrendeld
+      </span>
+      <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+        Upgraden →
+      </button>
+    </div>`;
+  }
+
+  html += data.map((p, idx) => {
     const desc    = (p.description || '').substring(0, 140);
     const hasMore = (p.description || '').length > 140;
+    const locked  = isAllPostings && isStarter && idx > 0;
     return `
-    <div class="posting-card">
+    <div class="posting-card" style="position:relative;${locked ? 'pointer-events:none;' : ''}">
+      ${locked ? `
+      <div style="position:absolute;inset:0;background:rgba(248,249,250,.88);border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2">
+        <span style="font-size:1.4rem">🔒</span>
+        <span style="font-size:.83rem;color:var(--ink3);font-weight:600">Beschikbaar vanaf Pro</span>
+        <button onclick="event.stopPropagation();window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer;pointer-events:all">
+          Upgraden →
+        </button>
+      </div>` : ''}
       <div class="pc-head">
         <div>
           <div class="pc-title">${escapeHtml(p.title)}</div>
@@ -1255,6 +1434,8 @@ function renderList(cid, data) {
       </div>
     </div>`;
   }).join('');
+
+  el.innerHTML = html;
 }
 
 // ── Tags ──
@@ -1310,9 +1491,30 @@ async function loadCompanyMatches() {
       return;
     }
 
+    // Soft limit banner: Starter users who received 5+ applications this month
+    const isStarterNow = currentPlan === 'company_starter' || !currentPlan;
+    if (isStarterNow) {
+      const monthStart = new Date();
+      monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+      const thisMonthCount = matchRows.filter(m => new Date(m.created_at) >= monthStart).length;
+      if (thisMonthCount >= 5) {
+        const banner = document.createElement('div');
+        banner.style.cssText = 'background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+        banner.innerHTML = `
+          <span style="font-size:.88rem;color:#92400e;font-weight:600">
+            ⚠️ Je hebt deze maand ${escapeHtml(String(thisMonthCount))} sollicitaties ontvangen — Starter is bedoeld voor max. 5/mnd. Upgrade voor onbeperkte matches.
+          </span>
+          <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+            Upgraden →
+          </button>`;
+        el.parentNode.insertBefore(banner, el);
+      }
+    }
+
     const statusLabel = { pending: 'In behandeling', accepted: 'Geaccepteerd', rejected: 'Afgewezen', active: 'Actief' };
     const statusCls   = { pending: 'neutral', accepted: 'green', rejected: 'red', active: 'green' };
 
+    const hasBusiness = await hasActivePlan('company_business');
     el.innerHTML = matchRows.map(m => {
       const posting = m.internship_postings || {};
       const sLabel  = statusLabel[m.status]  || m.status;
@@ -1339,7 +1541,7 @@ async function loadCompanyMatches() {
                         background:var(--green-bg);padding:7px 14px;border-radius:20px;display:inline-block;min-height:36px;align-items:center;display:inline-flex">
                 💬 Open chat →
               </a>` : ''}
-            ${hasConv ? `
+            ${hasConv && hasBusiness ? `
               <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
                  style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;
                         background:#fdf0e8;padding:7px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;min-height:36px">
@@ -1361,8 +1563,9 @@ async function acceptMatch(matchId, studentId) {
   // Create conversation
   let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).limit(1).maybeSingle();
   if (!conv) {
-    const { data: newConv, error: convErr } = await db.from('conversations').insert({ match_id: matchId }).select('id').single();
-    if (convErr) { notify('Match geaccepteerd maar chat aanmaken mislukt: ' + convErr.message); }
+    const { data: newConv, error: convErr } = await db.from('conversations').insert({ match_id: matchId }).select('id').maybeSingle();
+    if (convErr) { notify('Match geaccepteerd maar chat aanmaken mislukt: ' + convErr.message); return; }
+    if (!newConv) { notify('Gesprek kon niet worden aangemaakt'); return; }
     conv = newConv;
   }
 
@@ -1439,6 +1642,7 @@ async function loadBerichten() {
       else { badge.style.display = 'none'; }
     }
 
+    const hasBusiness = await hasActivePlan('company_business');
     el.innerHTML = matchRows.map(m => {
       const posting = m.internship_postings || {};
       const convId  = convByMatch[m.id];
@@ -1458,11 +1662,11 @@ async function loadBerichten() {
                       background:var(--green-bg);padding:6px 14px;border-radius:20px;display:inline-block">
               💬 Open gesprek →
             </a>
-            <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
+            ${hasBusiness ? `<a href="match-dashboard.html?match=${escapeHtml(m.id)}"
                style="font-size:.85rem;color:#e05c1a;font-weight:700;text-decoration:none;
                       background:#fdf0e8;padding:6px 14px;border-radius:20px;display:inline-block">
               📊 Stage Hub →
-            </a>
+            </a>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -1752,12 +1956,14 @@ async function submitPosting() {
     response_days: parseInt(document.getElementById('f-responsedays').value) || null,
     match_target:  matchTarget,
     postcode,
+    vestiging_id:  document.getElementById('f-vestiging')?.value || null,
     status:        'active',
-  }).select('id').single();
+  }).select('id').maybeSingle();
 
   btn.disabled = false; btn.textContent = 'Vacature plaatsen →';
 
-  if (error) { notify('Fout bij plaatsen. Probeer het opnieuw.'); return; }
+  if (error) { notify('Fout bij plaatsen — probeer het opnieuw'); return; }
+  if (!inserted) { notify('Er ging iets mis'); return; }
 
   const postingId  = inserted?.id;
   const matchCount = postingId
@@ -1769,6 +1975,8 @@ async function submitPosting() {
     : '✓ Vacature geplaatst!');
 
   ['f-company','f-title','f-desc','f-start','f-responsedays','f-postcode'].forEach(id => document.getElementById(id).value = '');
+  const vestSel = document.getElementById('f-vestiging');
+  if (vestSel) vestSel.value = '';
   document.getElementById('f-sector').value = '';
   document.getElementById('f-duration').value = '';
   document.getElementById('f-guarantee').value = 'false';
@@ -1986,6 +2194,217 @@ function dismissPush() {
   if (banner) banner.remove();
 }
 
+// ── ESG & Rapportage ─────────────────────────────────────────────────────────
+
+async function loadESGData(companyProfileId, year) {
+  const yStart = `${year}-01-01`;
+  const yEnd   = `${year}-12-31`;
+
+  const [q1, q2, q3, q4, q5] = await Promise.all([
+    // Q1: accepted matches this year
+    db.from('matches')
+      .select('id, created_at, party_a')
+      .eq('party_b', companyProfileId)
+      .eq('status', 'accepted')
+      .gte('created_at', yStart)
+      .lte('created_at', yEnd),
+
+    // Q2: reviews received this year
+    db.from('reviews')
+      .select('rating, created_at')
+      .eq('reviewee_id', companyProfileId)
+      .gte('created_at', yStart)
+      .lte('created_at', yEnd),
+
+    // Q3: completed meetings this year
+    db.from('meetings')
+      .select('id, type, status, proposed_date')
+      .eq('organizer_id', companyProfileId)
+      .eq('status', 'voltooid')
+      .gte('proposed_date', yStart)
+      .lte('proposed_date', yEnd),
+
+    // Q4: active postings with duration/sector data
+    db.from('internship_postings')
+      .select('id, sector, tags, duration, created_at')
+      .eq('created_by', companyProfileId)
+      .eq('status', 'active'),
+
+    // Q5: all matches this year (for response rate)
+    db.from('matches')
+      .select('id, status')
+      .eq('party_b', companyProfileId)
+      .gte('created_at', yStart)
+      .lte('created_at', yEnd),
+  ]);
+
+  const matches       = q1.data || [];
+  const reviews       = q2.data || [];
+  const meetings      = q3.data || [];
+  const postings      = q4.data || [];
+  const allMatches    = q5.data || [];
+
+  const totaalStages      = matches.length;
+  const gemiddeldeRating  = reviews.length > 0
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : 0;
+  const aantalGesprekken  = meetings.length;
+  const responsPercentage = allMatches.length > 0
+    ? (allMatches.filter(m => m.status === 'accepted').length / allMatches.length) * 100
+    : 0;
+
+  // Flatten + dedupe tags from all active postings (sectors + tags)
+  const allTags = postings.flatMap(p => {
+    const parts = [];
+    if (p.sector) parts.push(p.sector);
+    if (Array.isArray(p.tags)) parts.push(...p.tags);
+    return parts;
+  });
+  const sectoren = [...new Set(allTags)].filter(Boolean);
+
+  const esgPunten = (totaalStages * 10) + (aantalGesprekken * 2) + (gemiddeldeRating >= 4 ? 15 : 0);
+
+  return { totaalStages, gemiddeldeRating, aantalGesprekken, responsPercentage, sectoren, esgPunten };
+}
+
+function copyCsrdTekst() {
+  navigator.clipboard.writeText(
+    document.getElementById('csrd-tekst').textContent.trim()
+  ).then(() => notify('Tekst gekopieerd naar klembord'));
+}
+
+let _esgYear = new Date().getFullYear();
+
+async function renderESG() {
+  const el = document.getElementById('esg-content');
+  if (!el || !currentUser) return;
+
+  // ── Plan gate ──
+  const isPro      = currentPlan === 'company_pro';
+  const isBusiness = currentPlan === 'company_business';
+  if (!isPro && !isBusiness) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:3rem 1rem;">
+        <div style="font-size:2rem;margin-bottom:.75rem">🌱</div>
+        <div style="font-weight:500;margin-bottom:.5rem">
+          ESG-rapportage is beschikbaar vanaf Pro
+        </div>
+        <div style="font-size:.88rem;color:var(--ink3);margin-bottom:1.25rem;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6;">
+          Bedrijven op het Pro- of Business-plan krijgen automatisch een overzicht van hun investering in jong talent — klaar voor het CSRD-verslag.
+        </div>
+        <a href="pricing.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:9px 20px;background:var(--accent);color:white;border-radius:var(--r-sm);text-decoration:none;font-size:.88rem;font-weight:500;">
+          Upgraden naar Pro →
+        </a>
+      </div>`;
+    return;
+  }
+
+  // ── Loading state ──
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>ESG-data laden…</div>`;
+
+  let data;
+  try {
+    data = await loadESGData(currentUser.id, _esgYear);
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden van ESG-data.</div>`;
+    return;
+  }
+
+  const { totaalStages, gemiddeldeRating, aantalGesprekken, responsPercentage, sectoren, esgPunten } = data;
+
+  // Company name for CSRD text
+  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw bedrijf';
+  const sectorenStr = sectoren.length > 0 ? sectoren.join(', ') : 'diverse sectoren';
+
+  const csrdText = `${escapeHtml(companyName)} heeft in ${_esgYear} ${totaalStages} stageplekken aangeboden aan studenten in de sectoren ${sectorenStr}. De gemiddelde beoordeling door stagiairs bedroeg ${gemiddeldeRating.toFixed(1)} op een schaal van 1 tot 5. Er werden ${aantalGesprekken} begeleidingsgesprekken gehouden. Het platform Internly registreerde een responspercentage van ${responsPercentage.toFixed(0)}% op sollicitaties. Totale ESG-score via Internly: ${esgPunten} punten.`;
+
+  // ── Export section ──
+  let exportHtml;
+  if (isBusiness) {
+    exportHtml = `
+      <div class="sec-title" style="margin-top:28px">Exporteren</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn-ghost" onclick="notify('PDF-export is beschikbaar vanaf week 9 — je ontvangt een melding zodra het klaar is')">📄 Download PDF</button>
+        <button class="btn-ghost" onclick="notify('PDF-export is beschikbaar vanaf week 9 — je ontvangt een melding zodra het klaar is')">📊 Download CSV</button>
+      </div>`;
+  } else {
+    exportHtml = `
+      <div class="sec-title" style="margin-top:28px">Exporteren</div>
+      <div style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-sm);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <span style="font-size:.88rem;color:var(--ink3)">🔒 Volledige export beschikbaar op Business</span>
+        <a href="pricing.html" style="font-size:.82rem;color:var(--accent);font-weight:600;text-decoration:none">Upgraden naar Business →</a>
+      </div>`;
+  }
+
+  // ── Render all sections ──
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px">
+      <div>
+        <div class="page-title">ESG &amp; Rapportage</div>
+        <p class="page-sub">Automatische S1-stagedata voor je CSRD-verslag</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="_esgYear=${new Date().getFullYear()};renderESG()"
+          style="padding:6px 14px;border-radius:6px;border:1.5px solid var(--border2);background:${_esgYear === new Date().getFullYear() ? 'var(--green-bg)' : 'var(--white)'};color:${_esgYear === new Date().getFullYear() ? 'var(--green)' : 'var(--ink2)'};font-weight:600;cursor:pointer;font-size:.82rem"
+        >${new Date().getFullYear()}</button>
+        <button onclick="_esgYear=${new Date().getFullYear() - 1};renderESG()"
+          style="padding:6px 14px;border-radius:6px;border:1.5px solid var(--border2);background:${_esgYear === new Date().getFullYear() - 1 ? 'var(--green-bg)' : 'var(--white)'};color:${_esgYear === new Date().getFullYear() - 1 ? 'var(--green)' : 'var(--ink2)'};font-weight:600;cursor:pointer;font-size:.82rem"
+        >${new Date().getFullYear() - 1}</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Stages begeleid</div>
+        <div class="stat-val">${totaalStages}</div>
+        <div class="stat-note">Geaccepteerde stagiairs</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 — niet-werknemers</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Begeleidingskwaliteit</div>
+        <div class="stat-val">${gemiddeldeRating.toFixed(1)} <span style="font-size:1rem;font-weight:400;color:var(--ink4)">/ 5</span></div>
+        <div class="stat-note">gemiddelde beoordeling</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 — werkomstandigheden</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Gesprekken gehouden</div>
+        <div class="stat-val">${aantalGesprekken}</div>
+        <div class="stat-note">Voltooide afspraken</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1-13 — begeleiding &amp; ontwikkeling</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Responspercentage</div>
+        <div class="stat-val">${responsPercentage.toFixed(0)}%</div>
+        <div class="stat-note">Op sollicitaties</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 — werkgeversbetrokkenheid</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">ESG-punten</div>
+        <div class="stat-val" style="color:var(--green)">${esgPunten}</div>
+        <div class="stat-note">Berekend door Internly</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">Internly-score</div>
+      </div>
+    </div>
+
+    ${sectoren.length > 0 ? `
+    <div class="sec-title">Vertegenwoordigde sectoren</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
+      ${sectoren.map(s => `<span class="tag tag-green">${escapeHtml(s)}</span>`).join('')}
+    </div>` : ''}
+
+    <div class="sec-title">Klaar voor je verslag</div>
+    <div style="background:var(--bg2,var(--bg));border-radius:var(--r-sm);padding:1rem 1.25rem;font-size:.88rem;color:var(--ink2);line-height:1.7;font-style:italic;border:1px solid var(--border);margin-bottom:8px" id="csrd-tekst">${csrdText}</div>
+    <p style="font-size:.75rem;color:var(--ink3);margin-top:.5rem;line-height:1.5;margin-bottom:12px">
+      Deze tekst is gegenereerd op basis van platformdata en dient als richtlijn. Controleer de gegevens voor gebruik in officiële verslagen. Internly-score is geen officiële CSRD-meetwaarde.
+    </p>
+    <button onclick="copyCsrdTekst()" class="btn btn-ghost" style="background:transparent;border:1.5px solid var(--border2);color:var(--ink2);padding:9px 20px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;">
+      📋 Kopieer naar klembord
+    </button>
+
+    ${exportHtml}
+  `;
+}
+
 // ── Notify ──
 function notify(msg) {
   const el = document.getElementById('notif');
@@ -2009,6 +2428,31 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 
+function copyReferralText() {
+  const text = 'Ik gebruik Internly voor stages — ' +
+    'een platform dat ghosting structureel aanpakt. ' +
+    'Studenten zien vooraf hoe betrouwbaar een ' +
+    'werkgever is. Probeer het: internly.pro';
+  navigator.clipboard.writeText(text).then(() => {
+    notify('Aanbevelingstekst gekopieerd!');
+  });
+}
+
+function dismissReferral() {
+  localStorage.setItem('internly_referral_dismissed', 'true');
+  const banner = document.getElementById('referral-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function initReferralBanner() {
+  const dismissed = localStorage.getItem('internly_referral_dismissed');
+  const banner = document.getElementById('referral-banner');
+  if (!banner) return;
+  if (dismissed === 'true') {
+    banner.style.display = 'none';
+  }
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
@@ -2022,8 +2466,65 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  (function handlePaymentReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('payment')) return;
+    window.history.replaceState({}, '', window.location.pathname);
+
+    if (params.get('payment') === 'success') {
+      let attempts = 0;
+      const poll = setInterval(async () => {
+        attempts++;
+        const { data: { user } } = await db.auth.getUser();
+        const { data: sub } = await db
+          .from('subscriptions')
+          .select('status')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+        if (sub?.status === 'active') {
+          clearInterval(poll);
+          notify('Betaling ontvangen — je plan is actief');
+          setTimeout(() => window.location.reload(), 1500);
+        } else if (attempts >= 10) {
+          clearInterval(poll);
+          notify('Betaling verwerkt — activering volgt binnen enkele minuten');
+        }
+      }, 1000);
+    } else {
+      notify('Betaling mislukt of geannuleerd — probeer opnieuw');
+    }
+  })();
+
   await loadUser();
+
+  // ── Load subscription plan for limit enforcement ──
+  {
+    const { data: sub } = await db
+      .from('subscriptions')
+      .select('plan, status')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    if (sub && ['active','past_due','trial'].includes(sub.status)) {
+      currentPlan = sub.plan;
+    }
+  }
+
   await loadPostings();
+
+  // ── Feature gate: form fields ──
+  if (!await hasActivePlan('company_pro')) {
+    const sel = document.getElementById('f-guarantee');
+    if (sel) { sel.value = 'false'; sel.disabled = true; sel.title = 'Beschikbaar vanaf Pro'; }
+  }
+  if (!await hasActivePlan('company_business')) {
+    const beideLbl = document.getElementById('mt-beide');
+    if (beideLbl) {
+      beideLbl.style.opacity = '0.4';
+      beideLbl.style.cursor  = 'not-allowed';
+      beideLbl.style.pointerEvents = 'none';
+      beideLbl.title = 'Beschikbaar vanaf Business';
+    }
+  }
 
   const { data: cp } = await db.from('company_profiles')
     .select('*')
@@ -2044,6 +2545,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadUnreadBadge(user.id);
   herberekeningTrustScore(user.id);
 
+  // ── Dashboard ESG stat (background load, non-blocking) ──
+  loadESGData(user.id, new Date().getFullYear()).then(d => {
+    const el = document.getElementById('stat-esg');
+    if (el) el.textContent = d.esgPunten;
+  }).catch(() => {});
+
   if (!localStorage.getItem('internly_push_asked') && 'Notification' in window) {
     showPushPromptBanner();
   }
@@ -2052,6 +2559,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   startNotifSubscription();
 
   InternlyCalendar.render('ical-container', db, user.id);
+  initSessionTimeout();
+  initReferralBanner();
 });
 
 async function loadUnreadBadge(userId) {
@@ -2087,6 +2596,147 @@ async function loadUnreadBadge(userId) {
   } catch(e) {
     console.error('loadUnreadBadge fout:', e);
   }
+}
+
+// ── Vestigingen ────────────────────────────────────────────────────────────────
+let _vestigingen = [];
+
+async function renderVestigingen() {
+  const el = document.getElementById('vestigingen-content');
+  if (!el || !currentUser) return;
+
+  const isBusiness = currentPlan === 'company_business';
+
+  if (!isBusiness) {
+    el.innerHTML = `
+      <div class="page-title">📍 Vestigingen</div>
+      <p class="page-sub">Beheer meerdere kantoorlocaties en koppel ze aan vacatures</p>
+      <div class="card" style="text-align:center;padding:40px 24px">
+        <div style="font-size:2rem;margin-bottom:12px">📍</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:8px">Vestigingen — Business-functie</div>
+        <p style="font-size:.9rem;color:var(--ink2);max-width:420px;margin:0 auto 20px">
+          Voeg meerdere locaties toe en koppel elke vacature aan de juiste vestiging.
+          Studenten zien de vestigingsnaam en locatie op de vacatureskaart.
+        </p>
+        <a href="pricing.html" class="btn-primary" style="text-decoration:none;display:inline-block">Upgrade naar Business →</a>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="page-title">📍 Vestigingen</div>
+    <p class="page-sub">Beheer de locaties van jouw organisatie</p>
+    <div id="vest-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
+    <div class="card" style="margin-top:20px">
+      <div class="form-section-title">Nieuwe vestiging toevoegen</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Naam vestiging <span class="req">*</span></label>
+          <input type="text" id="vest-naam" placeholder="Bijv. Hoofdkantoor Amsterdam">
+        </div>
+        <div class="field">
+          <label>Stad <span class="req">*</span></label>
+          <input type="text" id="vest-stad" placeholder="Bijv. Amsterdam">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Postcode <span class="req">*</span></label>
+          <input type="text" id="vest-postcode" placeholder="Bijv. 1012 AB" maxlength="7">
+        </div>
+        <div class="field">
+          <label>Adres <span class="hint">optioneel</span></label>
+          <input type="text" id="vest-adres" placeholder="Bijv. Damrak 1">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addVestiging()">Vestiging opslaan →</button>
+    </div>`;
+
+  await loadVestigingen();
+}
+
+async function loadVestigingen() {
+  if (!currentUser) return;
+  const { data } = await db
+    .from('vestigingen')
+    .select('*')
+    .eq('profile_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  _vestigingen = data || [];
+  renderVestigingenList();
+  populateVestigingSelector();
+}
+
+function renderVestigingenList() {
+  const el = document.getElementById('vest-list');
+  if (!el) return;
+  if (_vestigingen.length === 0) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">📍</span>Nog geen vestigingen toegevoegd.</div>';
+    return;
+  }
+  el.innerHTML = _vestigingen.map(v => `
+    <div class="card" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+      <div>
+        <div style="font-weight:700;color:var(--ink)">${escapeHtml(v.naam)}</div>
+        <div style="font-size:.85rem;color:var(--ink3);margin-top:2px">
+          ${escapeHtml(v.stad)} · ${escapeHtml(v.postcode)}${v.adres ? ' · ' + escapeHtml(v.adres) : ''}
+        </div>
+      </div>
+      <button class="btn-ghost" style="font-size:.8rem;color:#e53e3e" onclick="deleteVestiging('${v.id}')">Verwijderen</button>
+    </div>`).join('');
+}
+
+function populateVestigingSelector() {
+  const sel = document.getElementById('f-vestiging');
+  if (!sel) return;
+  while (sel.options.length > 1) sel.remove(1);
+  _vestigingen.forEach(v => {
+    const opt = new Option(`${v.naam} — ${v.stad} (${v.postcode})`, v.id);
+    sel.add(opt);
+  });
+}
+
+async function addVestiging() {
+  const naam     = document.getElementById('vest-naam').value.trim();
+  const stad     = document.getElementById('vest-stad').value.trim();
+  const postcode = document.getElementById('vest-postcode').value.trim().toUpperCase().replace(/\s+/g, ' ');
+  const adres    = document.getElementById('vest-adres').value.trim() || null;
+
+  if (!naam || !stad || !postcode) { notify('Naam, stad en postcode zijn verplicht'); return; }
+
+  const { error } = await db.from('vestigingen').insert({
+    profile_id: currentUser.id,
+    naam, stad, postcode, adres,
+  });
+
+  if (error) { notify('Fout bij opslaan — probeer het opnieuw'); return; }
+  notify('✓ Vestiging toegevoegd');
+  ['vest-naam','vest-stad','vest-postcode','vest-adres'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  await loadVestigingen();
+}
+
+async function deleteVestiging(id) {
+  openModal(
+    'Vestiging verwijderen?',
+    'De vestiging wordt losgekoppeld van toekomstige vacatures. Bestaande vacatures worden niet aangepast.',
+    async () => {
+      const { error } = await db.from('vestigingen').delete().eq('id', id).eq('profile_id', currentUser.id);
+      if (error) { notify('Fout bij verwijderen'); return; }
+      notify('Vestiging verwijderd');
+      await loadVestigingen();
+    }
+  );
+}
+
+function onVestigingChange() {
+  const sel = document.getElementById('f-vestiging');
+  const postcodeEl = document.getElementById('f-postcode');
+  if (!sel || !postcodeEl) return;
+  const v = _vestigingen.find(x => x.id === sel.value);
+  postcodeEl.value = v ? v.postcode : '';
 }
 
 window.addEventListener('beforeunload', () => {

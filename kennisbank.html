@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
+  <meta name="description" content="Kennisbank voor stagiairs — alles wat je moet weten over stages: rechten, plichten, tips en reflectie.">
+  <meta property="og:title" content="Kennisbank — Internly">
+  <meta property="og:description" content="Alles wat je moet weten over stages: rechten, plichten, tips en reflectie voor MBO- en HBO-studenten.">
+  <meta property="og:image" content="https://internly.pro/og-image.png">
+  <meta property="og:url" content="https://internly.pro/kennisbank.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Internly">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Kennisbank — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:      #1a7a48;
+      --green-dark: #0f5c36;
+      --green-bg:   #e8f5ee;
+      --orange:     #FF7E42;
+      --orange-dark:#e05c1a;
+      --orange-bg:  #fdf0e8;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --bg2:        #eceae4;
+      --white:      #ffffff;
+      --border:     #e2e8f0;
+      --r:          14px;
+      --r-sm:       8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+    p { line-height: 1.7; }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      padding: 0 32px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.25rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-nav { display: flex; gap: 8px; align-items: center; }
+    .topbar-nav a {
+      color: rgba(255,255,255,.7); text-decoration: none;
+      font-size: .88rem; font-weight: 500; padding: 6px 12px;
+      border-radius: 8px; transition: all .15s;
+    }
+    .topbar-nav a:hover { color: #fff; background: rgba(255,255,255,.1); }
+    .topbar-cta {
+      background: var(--orange); color: #fff !important;
+      border-radius: 20px !important; font-weight: 600 !important;
+    }
+    .topbar-cta:hover { background: var(--orange-dark) !important; }
+
+    /* ── Hero ── */
+    .kb-hero {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      padding: 80px 24px 72px;
+      text-align: center; color: #fff;
+    }
+    .kb-eyebrow {
+      display: inline-block;
+      font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: rgba(255,255,255,.6);
+      margin-bottom: 16px;
+    }
+    .kb-hero h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 700;
+      letter-spacing: -.03em; line-height: 1.1; margin-bottom: 14px;
+    }
+    .kb-hero h1 span { color: var(--orange); }
+    .kb-hero p {
+      font-size: 1.05rem; color: rgba(255,255,255,.75);
+      max-width: 520px; margin: 0 auto; line-height: 1.7;
+    }
+
+    /* ── Category cards ── */
+    .kb-cards-section {
+      max-width: 1000px; margin: 0 auto;
+      padding: 56px 24px 32px;
+    }
+    .kb-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 720px) {
+      .kb-cards { grid-template-columns: 1fr; }
+    }
+    .kb-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px 24px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: box-shadow .2s, border-color .2s;
+    }
+    .kb-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      border-color: #c7d7e2;
+    }
+    .kb-card-icon {
+      font-size: 2rem; line-height: 1;
+    }
+    .kb-card h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--ink);
+    }
+    .kb-card p {
+      font-size: .9rem; color: var(--ink3);
+      line-height: 1.65; flex: 1;
+    }
+    .kb-card-btn {
+      display: inline-block;
+      background: var(--green-bg); color: var(--green);
+      font-weight: 700; font-size: .85rem;
+      padding: 8px 16px; border-radius: 20px;
+      text-decoration: none; transition: background .15s;
+      align-self: flex-start;
+    }
+    .kb-card-btn:hover { background: #c9e8d5; }
+
+    /* ── Article sections ── */
+    .kb-articles {
+      max-width: 760px; margin: 0 auto;
+      padding: 16px 24px 80px;
+    }
+    .kb-article {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 40px 40px;
+      margin-bottom: 32px;
+      scroll-margin-top: 80px;
+    }
+    @media (max-width: 600px) {
+      .kb-article { padding: 28px 20px; }
+    }
+    .kb-article-eyebrow {
+      font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--green);
+      margin-bottom: 8px;
+    }
+    .kb-article h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--ink);
+      letter-spacing: -.02em; margin-bottom: 20px; line-height: 1.2;
+    }
+    .kb-tip {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 16px 20px;
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      margin-bottom: 12px;
+    }
+    .kb-tip:last-of-type { margin-bottom: 0; }
+    .kb-tip-num {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .8rem; font-weight: 700; color: var(--green);
+      background: var(--green-bg); border-radius: 50%;
+      width: 26px; height: 26px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kb-tip-body { flex: 1; }
+    .kb-tip-body strong {
+      display: block; font-weight: 700; color: var(--ink);
+      font-size: .92rem; margin-bottom: 3px;
+    }
+    .kb-tip-body span {
+      font-size: .87rem; color: var(--ink3); line-height: 1.6;
+    }
+
+    /* ── CTA band ── */
+    .kb-cta {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      padding: 56px 24px;
+      text-align: center; color: #fff;
+    }
+    .kb-cta h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;
+      letter-spacing: -.02em; margin-bottom: 12px;
+    }
+    .kb-cta p {
+      font-size: .97rem; color: rgba(255,255,255,.72);
+      margin-bottom: 28px; max-width: 460px; margin-left: auto; margin-right: auto;
+      line-height: 1.65;
+    }
+    .kb-cta-btn {
+      display: inline-block;
+      background: var(--orange); color: #fff;
+      font-family: 'Outfit', sans-serif; font-weight: 700;
+      font-size: 1rem; padding: 14px 32px;
+      border-radius: 50px; text-decoration: none;
+      transition: background .15s, transform .1s;
+    }
+    .kb-cta-btn:hover { background: var(--orange-dark); transform: translateY(-1px); }
+
+    /* ── Disclaimer ── */
+    .kb-disclaimer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .kb-disclaimer p {
+      font-size: .78rem; color: var(--ink4);
+      max-width: 680px; margin: 0 auto; line-height: 1.6;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--ink);
+      padding: 20px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .footer-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .95rem; font-weight: 700; color: rgba(255,255,255,.45);
+    }
+    .footer-logo span { color: var(--orange); }
+    .footer-links {
+      display: flex; gap: 20px; flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: rgba(255,255,255,.35); text-decoration: none;
+      font-size: .8rem; transition: color .15s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,.7); }
+    .footer-copy {
+      font-size: .75rem; color: rgba(255,255,255,.22); width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar" role="navigation" aria-label="Hoofdnavigatie">
+  <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
+  <div class="topbar-nav">
+    <a href="discover.html">Stages</a>
+    <a href="stagebegeleiding.html">Begeleiding</a>
+    <a href="pricing.html">Tarieven</a>
+    <a href="auth.html" class="topbar-cta">Inloggen →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="kb-hero">
+  <span class="kb-eyebrow">Gratis voor studenten</span>
+  <h1>Kennisbank<br><span>Alles over stages</span></h1>
+  <p>Praktische informatie voor MBO- en HBO-studenten: hoe vind je een stage, wat zijn je rechten, en hoe haal je het meeste uit je stageperiode.</p>
+</header>
+
+<!-- CATEGORY CARDS -->
+<section class="kb-cards-section" aria-label="Categorieën">
+  <div class="kb-cards">
+
+    <div class="kb-card">
+      <div class="kb-card-icon">🔍</div>
+      <h2>Stage zoeken</h2>
+      <p>Tips voor het vinden van een stageplek die bij jou past — van je cv tot je eerste gesprek. Goed voorbereid ben je al een stap verder.</p>
+      <a href="#stage-zoeken" class="kb-card-btn">Lees meer →</a>
+    </div>
+
+    <div class="kb-card">
+      <div class="kb-card-icon">⚖️</div>
+      <h2>Rechten &amp; plichten</h2>
+      <p>Wat mag je verwachten van je stageplek, en wat verwacht het bedrijf van jou? Weet wat er in je stageovereenkomst hoort te staan.</p>
+      <a href="#rechten-plichten" class="kb-card-btn">Lees meer →</a>
+    </div>
+
+    <div class="kb-card">
+      <div class="kb-card-icon">🌱</div>
+      <h2>Reflecteren &amp; groeien</h2>
+      <p>Leren doe je niet alleen door te doen — maar door terug te kijken. Ontdek hoe reflectie je stage waardevoller maakt voor nu én later.</p>
+      <a href="#reflecteren" class="kb-card-btn">Lees meer →</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ARTICLES -->
+<main class="kb-articles">
+
+  <!-- STAGE ZOEKEN -->
+  <article class="kb-article" id="stage-zoeken">
+    <div class="kb-article-eyebrow">Stage zoeken</div>
+    <h3>Zo vind je een stageplek die écht bij je past</h3>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">1</div>
+      <div class="kb-tip-body">
+        <strong>Begin met je leerdoelen, niet met Google</strong>
+        <span>Vraag jezelf eerst: wat wil ik deze stage leren? Welke vaardigheden wil ik oefenen? Een stageplek die aansluit bij je leerdoelen levert je meer op dan een bekende naam op je cv.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">2</div>
+      <div class="kb-tip-body">
+        <strong>Check de Trust Score van bedrijven</strong>
+        <span>Op Internly zie je de publieke Trust Score van elk bedrijf vóórdat je solliciteert. Een lage score betekent dat eerdere studenten minder goed zijn begeleid. Dat is nuttige informatie.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">3</div>
+      <div class="kb-tip-body">
+        <strong>Schrijf een gerichte motivatiebrief — geen standaardtekst</strong>
+        <span>Bedrijven merken direct of een brief kopieerwerk is. Noem één concreet project of uitdaging van het bedrijf en leg uit waarom dat jou aanspreekt. Twee alinea's die kloppen zijn beter dan vier die niets zeggen.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">4</div>
+      <div class="kb-tip-body">
+        <strong>Stel vragen in het gesprek — ook over begeleiding</strong>
+        <span>Vraag wie je praktijkbegeleider wordt, hoe vaak jullie afspreken, en wat er van jou verwacht wordt. Een goed bedrijf heeft hier een duidelijk antwoord op. Geen antwoord is ook een antwoord.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">5</div>
+      <div class="kb-tip-body">
+        <strong>Reageer snel, maar geef niet op na één poging</strong>
+        <span>Reageer binnen twee werkdagen als een bedrijf contact opneemt. Hoor je na twee weken niets? Één beleefd opvolgbericht mag. Bedrijven die structureel niet reageren — dat zegt iets over hun manier van werken.</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- RECHTEN & PLICHTEN -->
+  <article class="kb-article" id="rechten-plichten">
+    <div class="kb-article-eyebrow">Rechten &amp; plichten</div>
+    <h3>Wat staat er in je stageovereenkomst — en wat hoort erin?</h3>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">1</div>
+      <div class="kb-tip-body">
+        <strong>Een stageovereenkomst is verplicht</strong>
+        <span>Elke stage moet vastgelegd worden in een driepartijenovereenkomst: jij, je school en het stagebedrijf. Zonder getekend contract ben je niet verzekerd en heeft het bedrijf geen juridische basis. Begin nooit zonder overeenkomst.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">2</div>
+      <div class="kb-tip-body">
+        <strong>Stagevergoeding is geen recht, maar wel normaal</strong>
+        <span>Er is geen wettelijke verplichting voor een stagevergoeding bij MBO-stages, maar de meeste bedrijven betalen iets. De SBB-richtlijn is €500–750 per maand voor een fulltime MBO-stage. Vraag hier altijd naar — het is legitiem.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">3</div>
+      <div class="kb-tip-body">
+        <strong>Je hebt recht op begeleiding</strong>
+        <span>Het bedrijf is verplicht een praktijkbegeleider aan te stellen die jou beoordeelt en coacht. Dit moet iemand zijn met tijd en kennis. Als je geen begeleiding krijgt, geef dit aan bij je school — zij kunnen ingrijpen.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">4</div>
+      <div class="kb-tip-body">
+        <strong>Je mag de stage beëindigen als het niet veilig is</strong>
+        <span>Voel je je niet veilig, word je gediscrimineerd of pestgedrag ervaren? Meld dit direct bij je school. Je school is verplicht om op te treden. Je hoeft dit niet alleen te oplossen. Documenteer alles schriftelijk.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">5</div>
+      <div class="kb-tip-body">
+        <strong>Werktijden en taken moeten kloppen</strong>
+        <span>Je uren mogen niet structureel meer zijn dan je studiebelasting toelaat. Je mag ook geen regulier werk uitvoeren dat een betaalde werknemer zou doen. Ben je in feite gewoon een goedkope arbeidskracht? Bespreek dit met je schoolbegeleider.</span>
+      </div>
+    </div>
+  </article>
+
+  <!-- REFLECTEREN & GROEIEN -->
+  <article class="kb-article" id="reflecteren">
+    <div class="kb-article-eyebrow">Reflecteren &amp; groeien</div>
+    <h3>Meer halen uit je stage met de juiste reflectie</h3>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">1</div>
+      <div class="kb-tip-body">
+        <strong>Reflecteer wekelijks, niet alleen aan het einde</strong>
+        <span>Neem elke vrijdag vijf minuten. Schrijf één ding op dat goed ging, één ding dat moeilijk was, en wat je volgende week anders wil doen. Kleine aantekeningen nu zijn goud waard bij je eindgesprek.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">2</div>
+      <div class="kb-tip-body">
+        <strong>Gebruik de STARR-methode voor diepere reflectie</strong>
+        <span><strong>S</strong>ituatie — <strong>T</strong>aak — <strong>A</strong>ctie — <strong>R</strong>esultaat — <strong>R</strong>eflectie. Dit is de standaard bij MBO en HBO. Door een situatie systematisch te beschrijven leer je meer dan bij oppervlakkig terugkijken. Internly heeft hier ingebouwde ondersteuning voor in de Stage Hub.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">3</div>
+      <div class="kb-tip-body">
+        <strong>Koppel je ervaringen aan je leerdoelen</strong>
+        <span>Elke reflectie wordt waardevoller als je hem verbindt aan een concreet leerdoel. "Ik heb dit gedaan" is minder sterk dan "Ik heb dit gedaan en daarmee gewerkt aan mijn leerdoel communicatie." Je beoordelaar ziet dat direct.</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">4</div>
+      <div class="kb-tip-body">
+        <strong>Vraag actief om feedback — wacht er niet op</strong>
+        <span>De meeste begeleiders geven pas feedback als je erom vraagt. Wees concreet: "Kun je me vertellen wat ik deze week beter kon doen bij de klantvergadering?" is een betere vraag dan "Doe ik het goed?"</span>
+      </div>
+    </div>
+
+    <div class="kb-tip">
+      <div class="kb-tip-num">5</div>
+      <div class="kb-tip-body">
+        <strong>Je stageperiode is ook een cv-moment</strong>
+        <span>Beschrijf na je stage precies wat je gedaan hebt en welke resultaten je behaalde. Niet "meegewerkt aan projecten" maar "zelfstandig drie klantrapporten opgesteld die gebruikt zijn in de kwartaalpresentatie." Concreet en aantoonbaar.</span>
+      </div>
+    </div>
+  </article>
+
+</main>
+
+<!-- CTA BAND -->
+<section class="kb-cta">
+  <h2>Klaar om een stage te vinden?</h2>
+  <p>Maak gratis een account aan en ontdek stageplekken die bij jouw leerdoelen en niveau passen.</p>
+  <a href="auth.html" class="kb-cta-btn">Maak gratis een account aan →</a>
+</section>
+
+<!-- DISCLAIMER -->
+<div class="kb-disclaimer">
+  <p>De informatie op deze pagina is algemeen van aard en vormt geen juridisch advies. Raadpleeg je school of een juridisch adviseur voor specifieke vragen.</p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">intern<span>ly</span></div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="discover.html">Stages</a>
+    <a href="pricing.html">Tarieven</a>
+    <a href="privacybeleid.html">Privacybeleid</a>
+    <a href="auth.html">Inloggen</a>
+  </div>
+  <div class="footer-copy">© 2026 Sasubo Holding B.V. — Kennisbank is gratis toegankelijk voor alle studenten.</div>
+</footer>
+
+</body>
+</html>

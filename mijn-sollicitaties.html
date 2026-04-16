@@ -766,41 +766,7 @@
     });
   </script>
 
-  <!-- Google Translate Widget -->
-  <div id="google_translate_element" style="display:none"></div>
-  <script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'nl',
-    includedLanguages: 'nl,en,de,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event('change'));
-  }
-  localStorage.setItem('internly_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
-
-window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === saved);
-  });
-  if (saved && saved !== 'nl') {
-    setTimeout(function() { switchLang(saved); }, 1500);
-  }
-});
-  </script>
-  <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="js/translate.js"></script>
   <script src="js/info.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>

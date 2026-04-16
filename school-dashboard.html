@@ -39,6 +39,7 @@
       --r:          16px;
       --r-sm:       8px;
       --sidebar-w:  240px;
+      --accent:     var(--blue);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -441,6 +442,7 @@
     .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
   </style>
+  <script src="js/supabase.js"></script>
 </head>
 <body>
 <div class="notif" id="notif"></div>
@@ -551,7 +553,7 @@
           <span class="nav-icon">👥</span> Studenten
           <span class="nav-badge" id="badge-studenten" style="display:none">0</span>
         </button>
-        <button class="nav-btn" id="nav-signalen" onclick="show('signalen')">
+        <button class="nav-btn" id="nav-signalen" onclick="showSignalenGated()">
           <span class="nav-icon">⚠️</span> Signalen
           <span class="nav-badge" id="badge-signalen" style="display:none">0</span>
         </button>
@@ -565,7 +567,7 @@
         <button class="nav-btn" id="nav-new-oproep" onclick="show('new-oproep')">
           <span class="nav-icon">➕</span> Nieuwe oproep
         </button>
-        <button class="nav-btn" id="nav-bedrijven" onclick="show('bedrijven')">
+        <button class="nav-btn" id="nav-bedrijven" onclick="showBedrijvenGated()">
           <span class="nav-icon">🏢</span> Bedrijven bekijken
         </button>
         <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
@@ -584,6 +586,9 @@
         <button class="nav-btn" onclick="window.location.href='pricing.html?for=school'">
           <span class="nav-icon">💳</span> Abonnement
         </button>
+        <button class="nav-btn" id="nav-bundeling" onclick="show('bundeling')">
+          <span class="nav-icon">🔗</span> Opleidingen bundelen
+        </button>
       </div>
 
     </div>
@@ -599,6 +604,44 @@
     <div class="screen active" id="screen-dashboard">
       <div class="page-title">Schooldashboard</div>
       <p class="page-sub" id="dashboardSub">Stageoverzicht voor jouw cohort</p>
+
+      <div id="referral-banner" style="
+        background:var(--amber-bg,#fdf3e0);
+        border:0.5px solid rgba(160,96,16,.2);
+        border-radius:var(--r-sm,8px);
+        padding:.85rem 1rem;
+        margin-bottom:1rem;
+        display:flex;align-items:flex-start;
+        gap:.75rem;
+      ">
+        <span style="font-size:1.1rem;flex-shrink:0">🤝</span>
+        <div style="flex:1">
+          <div style="font-size:.88rem;font-weight:500;
+            color:var(--amber,#a06010);margin-bottom:.2rem;">
+            Werkt Internly voor jou?
+          </div>
+          <div style="font-size:.82rem;color:var(--ink2);
+            line-height:1.55;margin-bottom:.6rem;">
+            Dan ken je waarschijnlijk iemand voor wie het
+            ook werkt — een bedrijf, school of begeleider
+            die worstelt met hetzelfde probleem.
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;
+            align-items:center;">
+            <button onclick="copyReferralText()"
+              class="btn btn-ghost"
+              style="font-size:.78rem;padding:5px 12px;">
+              📋 Kopieer aanbevelingstekst
+            </button>
+            <button onclick="dismissReferral()"
+              style="background:none;border:none;
+              font-size:.78rem;color:var(--ink3);
+              cursor:pointer;padding:5px;">
+              Niet nu
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="stats-row">
         <div class="stat-card">
@@ -635,7 +678,7 @@
         <button class="btn-blue" onclick="show('studenten')">Alle studenten →</button>
       </div>
       <div id="dashboard-studenten">
-        <div class="empty"><span class="empty-icon">👥</span>Nog geen studentprofielen beschikbaar.</div>
+        <div class="empty"><span class="empty-icon">👥</span>Nog geen studenten gekoppeld. Deel de Internly-link met je studenten om ze aan deze opleiding te koppelen.</div>
       </div>
     </div>
 
@@ -644,13 +687,13 @@
       <div class="page-title" style="display:flex;align-items:center;gap:6px;">Studenten<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Studenten">ⓘ<span class="info-pop">Studenten worden automatisch gekoppeld op basis van de <strong>schoolnaam</strong> in hun profiel. Klik op een student om hun Stage Hub te openen en hun voortgang te bekijken.</span></span></div>
       <p class="page-sub">Individueel stageverloop en signalen per student</p>
       <div id="studenten-list">
-        <div class="empty"><span class="empty-icon">👥</span>Nog geen studentprofielen beschikbaar.</div>
+        <div class="empty"><span class="empty-icon">👥</span>Nog geen studenten gekoppeld. Deel de Internly-link met je studenten om ze aan deze opleiding te koppelen.</div>
       </div>
     </div>
 
     <!-- ── SIGNALEN ── -->
     <div class="screen" id="screen-signalen">
-      <div class="page-title" style="display:flex;align-items:center;gap:6px;">Signalen<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Signalen">ⓘ<span class="info-pop">Signalen verschijnen automatisch wanneer een student <strong>meer dan 14 dagen</strong> geen activiteit heeft in de Stage Hub, of een deadline heeft gemist. Zo ziet u in één oogopslag welke studenten extra aandacht nodig hebben.</span></span></div>
+      <div class="page-title" style="display:flex;align-items:center;gap:6px;">Signalen<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Signalen">ⓘ<span class="info-pop">Signalen verschijnen automatisch wanneer een student <strong>meer dan 14 dagen</strong> geen activiteit heeft in de Stage Hub, of een deadline heeft gemist. Zo zie je in één oogopslag welke studenten extra aandacht nodig hebben.</span></span></div>
       <p class="page-sub">Proactief gesignaleerde aandachtspunten per student</p>
       <div id="signalen-list">
         <div class="empty"><span class="empty-icon">✅</span>Geen actieve signalen.</div>
@@ -826,6 +869,11 @@
         </p>
         <div id="ical-container"></div>
       </div>
+    </div>
+
+    <!-- ── BUNDELING ── -->
+    <div class="screen" id="screen-bundeling">
+      <div id="bundeling-content"></div>
     </div>
 
   </main>
@@ -1082,8 +1130,73 @@ function show(id) {
   document.getElementById('screen-' + id).classList.add('active');
   const nb = document.getElementById('nav-' + id);
   if (nb) nb.classList.add('active');
-  if (id === 'bedrijven') loadBedrijven();
-  if (id === 'oproepen')  renderOproepen();
+  if (id === 'bedrijven')  loadBedrijven();
+  if (id === 'oproepen')   renderOproepen();
+  if (id === 'bundeling')  renderBundeling();
+}
+
+// ── Plan gates ──
+let _isPremiumSchool  = false;
+let _isBundledSchool  = false;
+
+async function hasActivePlan(minPlan = 'school_freemium') {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return false;
+    const { data: sub, error } = await db
+      .from('subscriptions')
+      .select('plan, status, current_period_end')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    if (error || !sub) return false;
+    if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
+    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
+    const tiers = ['company_starter','company_pro','company_business','school_freemium','school_premium','school_premium_monthly','begeleider_starter','begeleider_pro'];
+    return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
+  } catch (err) {
+    console.error('hasActivePlan error:', err);
+    return false;
+  }
+}
+
+function upgradeCard(requiredPlan) {
+  const labels = { company_pro: 'Pro', company_business: 'Business', school_premium: 'School Premium' };
+  const label = labels[requiredPlan] ?? requiredPlan;
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem 1.5rem;text-align:center;">
+      <div style="font-size:2.5rem;">🔒</div>
+      <h3 style="font-size:1.25rem;font-weight:700;color:var(--ink);">Beschikbaar vanaf ${label}</h3>
+      <p style="color:var(--ink3);max-width:360px;">Upgrade je abonnement om toegang te krijgen tot deze functie.</p>
+      <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;">
+        Bekijk abonnementen
+      </button>
+    </div>`;
+}
+
+async function showSignalenGated() {
+  if (await hasActivePlan('school_premium')) {
+    show('signalen');
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-signalen').classList.add('active');
+    const nb = document.getElementById('nav-signalen');
+    if (nb) nb.classList.add('active');
+    document.getElementById('signalen-list').innerHTML = upgradeCard('school_premium');
+  }
+}
+
+async function showBedrijvenGated() {
+  if (await hasActivePlan('school_premium')) {
+    show('bedrijven');
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-bedrijven').classList.add('active');
+    const nb = document.getElementById('nav-bedrijven');
+    if (nb) nb.classList.add('active');
+    document.getElementById('bedrijven-list').innerHTML = upgradeCard('school_premium');
+  }
 }
 
 // ── Load student data ──
@@ -1105,11 +1218,31 @@ async function loadStudenten() {
   showLoading('studenten-list', 'Studenten laden...');
   showLoading('dashboard-studenten', 'Studenten laden...');
 
-  let q = db
-    .from('student_profiles')
-    .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
-    .eq('school', _schoolNaamFilter)
-    .order('created_at', { ascending: false });
+  // Check for active bundeling before querying students
+  const { data: subRow } = await db
+    .from('subscriptions')
+    .select('bundle_approved, bundled_opleidingen')
+    .eq('profile_id', currentUser.id)
+    .maybeSingle();
+
+  const bundleActive = subRow?.bundle_approved === true &&
+                       (subRow?.bundled_opleidingen?.length ?? 0) > 0;
+  _isBundledSchool = bundleActive;
+
+  let q;
+  if (bundleActive) {
+    q = db
+      .from('student_profiles')
+      .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
+      .in('opleiding', subRow.bundled_opleidingen)
+      .order('created_at', { ascending: false });
+  } else {
+    q = db
+      .from('student_profiles')
+      .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
+      .eq('school', _schoolNaamFilter)
+      .order('created_at', { ascending: false });
+  }
 
   const { data, error } = await q;
 
@@ -1119,14 +1252,15 @@ async function loadStudenten() {
   } else {
     // Start with base data (all zoekend / progress 0)
     studenten = (data || []).map(s => ({
-      naam:       s.naam || 'Onbekende student',
-      opleiding:  [s.opleiding, s.school].filter(Boolean).join(' — ') || '—',
-      jaar:       s.jaar || '—',
-      status:     'zoekend',
-      progress:   0,
-      bedrijf:    null,
-      profileId:  s.profile_id,
-      matchId:    null,
+      naam:            s.naam || 'Onbekende student',
+      opleiding:       [s.opleiding, s.school].filter(Boolean).join(' — ') || '—',
+      bundleOpleiding: bundleActive ? (s.opleiding || null) : null,
+      jaar:            s.jaar || '—',
+      status:          'zoekend',
+      progress:        0,
+      bedrijf:         null,
+      profileId:       s.profile_id,
+      matchId:         null,
     }));
 
     // Enrich with real match + progress data when profile_ids are available
@@ -1202,7 +1336,27 @@ async function loadStudenten() {
   if (studenten.length > 0) { badge.textContent = studenten.length; badge.style.display = 'inline'; }
 
   renderStudentenRows('dashboard-studenten', studenten.slice(0, 4));
-  renderStudentenRows('studenten-list', studenten);
+
+  // Freemium cap: max 25 visible students; amber banner if more exist
+  let studentenForList = studenten;
+  if (!_isPremiumSchool && studenten.length > 25) {
+    studentenForList = studenten.slice(0, 25);
+    const listEl = document.getElementById('studenten-list');
+    if (listEl) {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+      banner.innerHTML = `
+        <span style="font-size:.88rem;color:#92400e;font-weight:600">
+          ⚠️ Gratis plan: je ziet ${escapeHtml(String(studentenForList.length))} van de ${escapeHtml(String(studenten.length))} studenten — upgrade voor onbeperkt overzicht.
+        </span>
+        <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+          Upgraden →
+        </button>`;
+      listEl.parentNode.insertBefore(banner, listEl);
+    }
+  }
+
+  renderStudentenRows('studenten-list', studentenForList);
   renderSignalen();
 }
 
@@ -1234,9 +1388,10 @@ function renderStudentenRows(cid, data) {
       <div class="sr-info">
         <div class="sr-name">${eNaam}</div>
         <div class="sr-meta">${escapeHtml(s.opleiding)} · Jaar ${escapeHtml(String(s.jaar ?? ''))}${eBedrijf ? ' — ' + eBedrijf : ''}</div>
+        ${_isBundledSchool && s.bundleOpleiding ? `<span class="tag tag-neutral" style="font-size:.72rem;margin-top:3px;display:inline-block">${escapeHtml(s.bundleOpleiding)}</span>` : ''}
       </div>
       <div class="sr-right">
-        ${s.status !== 'zoekend' ? `
+        ${_isPremiumSchool && s.status !== 'zoekend' ? `
           <div class="progress-wrap">
             <div class="progress-track">
               <div class="progress-fill" style="width:${progress}%;background:${progressColor(progress)}"></div>
@@ -1246,7 +1401,7 @@ function renderStudentenRows(cid, data) {
         <span class="signal-badge ${s.status === 'actief' ? 'sb-green' : s.status === 'risico' ? 'sb-red' : 'sb-amber'}">
           ${s.status === 'actief' ? 'Actief' : s.status === 'risico' ? '⚠ Risico' : 'Zoekend'}
         </span>
-        ${s.matchId ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
+        ${_isPremiumSchool && s.matchId ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
            style="font-size:.75rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:3px 9px;border-radius:20px;white-space:nowrap;margin-left:4px;">
            📊 Hub</a>` : ''}
       </div>
@@ -1426,6 +1581,10 @@ let _koppelCompanyId = null;
 let _koppelPostingId = null;
 
 async function openKoppelModal(companyId, postingId, companyNaam) {
+  if (!await hasActivePlan('school_premium')) {
+    notify('Koppelen is beschikbaar vanaf Internly School Premium');
+    return;
+  }
   if (!_schoolNaamFilter) { notify('Vul eerst je schoolnaam in bij Profiel'); return; }
   _koppelCompanyId = companyId;
   _koppelPostingId = postingId;
@@ -1504,11 +1663,12 @@ async function confirmKoppel() {
     initiated_by: currentUser.id,
     match_target: 'posting',
     posting_id:   _koppelPostingId || null,
-  }).select('id').single();
+  }).select('id').maybeSingle();
 
   btn.disabled = false; btn.textContent = 'Koppelen →';
 
   if (error) { notify('Fout bij koppelen: ' + (error?.message || 'onbekende fout')); return; }
+  if (!matchRow) { notify('Er ging iets mis bij opslaan'); return; }
 
   // Notify student of school referral
   const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw school';
@@ -1520,7 +1680,7 @@ async function confirmKoppel() {
     schoolName + ' heeft je gekoppeld aan een stagebedrijf — bekijk het in je Matches'
   );
 
-  notify('✓ Student gekoppeld aan bedrijf!');
+  notify('✓ Student gekoppeld aan bedrijf');
   closeKoppelModal();
 }
 
@@ -1626,7 +1786,7 @@ async function submitOproep() {
 
   if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
 
-  notify('✓ Oproep geplaatst!');
+  notify('✓ Oproep geplaatst');
   ['o-school','o-sector','o-title','o-desc'].forEach(id => document.getElementById(id).value = '');
   oTags.length = 0;
   document.getElementById('oTagsBox').querySelectorAll('.tag-chip').forEach(c => c.remove());
@@ -1734,6 +1894,165 @@ function dismissPush() {
   if (banner) banner.remove();
 }
 
+// ── Bundeling ─────────────────────────────────────────────────────────────
+async function renderBundeling() {
+  const el = document.getElementById('bundeling-content');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--ink3)"><div style="font-size:.88rem">Laden…</div></div>';
+
+  const { data: sub } = await db
+    .from('subscriptions')
+    .select('plan, bundle_approved, bundled_opleidingen')
+    .eq('profile_id', currentUser.id)
+    .maybeSingle();
+
+  // STATE 1 — bundle_approved
+  if (sub?.bundle_approved === true) {
+    const bundled = sub?.bundled_opleidingen || [];
+    el.innerHTML = `
+      <div class="page-title">Opleidingen bundelen</div>
+      <div style="background:#dcfce7;border:1px solid #86efac;border-radius:var(--r);padding:1.5rem;margin-top:1rem">
+        <div style="font-size:1.1rem;font-weight:700;color:#166534;margin-bottom:.75rem">✓ Bundeling actief</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem">
+          ${bundled.map(o => `<span class="tag" style="background:#bbf7d0;color:#166534;border:none">${escapeHtml(o)}</span>`).join('')}
+        </div>
+        <p style="font-size:.88rem;color:#166534;line-height:1.6">
+          Je opleidingen zijn samengevoegd onder één licentie. Neem contact op via
+          <a href="mailto:hallo@internly.pro" style="color:#166534;font-weight:600">hallo@internly.pro</a>
+          als je wijzigingen wil doorgeven.
+        </p>
+      </div>`;
+    return;
+  }
+
+  // STATE 2 — pending request
+  const { data: pending } = await db
+    .from('bundling_requests')
+    .select('id, requested_at')
+    .eq('school_profile_id', currentUser.id)
+    .eq('status', 'pending')
+    .maybeSingle();
+
+  if (pending) {
+    const dateStr = pending.requested_at
+      ? new Date(pending.requested_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '—';
+    el.innerHTML = `
+      <div class="page-title">Opleidingen bundelen</div>
+      <div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:var(--r);padding:1.5rem;margin-top:1rem">
+        <div style="font-size:1.1rem;font-weight:700;color:#92400e;margin-bottom:.75rem">⏳ Verzoek ingediend</div>
+        <p style="font-size:.88rem;color:#92400e;line-height:1.6">
+          We bekijken je verzoek persoonlijk en nemen binnen 5 werkdagen contact op via
+          <a href="mailto:hallo@internly.pro" style="color:#92400e;font-weight:600">hallo@internly.pro</a>.
+        </p>
+        <p style="font-size:.8rem;color:#b45309;margin-top:.5rem">Ingediend op: ${escapeHtml(dateStr)}</p>
+      </div>`;
+    return;
+  }
+
+  // STATE 3 — school_freemium or no plan
+  if (!sub || sub.plan === 'school_freemium') {
+    el.innerHTML = `
+      <div class="page-title">Opleidingen bundelen</div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem 1.5rem;text-align:center">
+        <div style="font-size:2.5rem">🔒</div>
+        <h3 style="font-size:1.1rem;font-weight:700;color:var(--ink)">Opleidingen bundelen is beschikbaar voor Premium-abonnees.</h3>
+        <p style="color:var(--ink3);max-width:360px;font-size:.88rem;line-height:1.6">
+          Heb je een kleine opleiding met meerdere studierichtingen? Als Premium-abonnee kun je een verzoek
+          indienen om ze samen te voegen.
+        </p>
+        <button onclick="window.location.href='pricing.html'"
+          style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer">
+          Upgraden naar Premium →
+        </button>
+      </div>`;
+    return;
+  }
+
+  // STATE 4 — Premium, no pending, not approved → form
+  el.innerHTML = `
+    <div class="page-title">Opleidingen bundelen</div>
+    <p class="page-sub">Heb je een kleine opleiding? We kijken graag naar een passende oplossing. Vertel ons over je situatie en we bekijken je verzoek persoonlijk.</p>
+
+    <div class="card" style="margin-top:1.25rem;max-width:640px">
+      <div class="field">
+        <label>Welke opleidingen wil je bundelen?</label>
+        <textarea id="bundle-opleidingen" rows="4" required
+          placeholder="Bijv: Zorg &amp; Welzijn niveau 3&#10;Helpende Zorg &amp; Welzijn niveau 2&#10;(één opleiding per regel)"
+          style="width:100%;font-family:inherit;padding:.65rem .85rem;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:.9rem;resize:vertical"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Waarom wil je deze opleidingen bundelen?</label>
+        <textarea id="bundle-motivatie" rows="4" required
+          placeholder="Vertel ons over je situatie — aantal studenten, schaalgrootte, waarom één licentie beter past."
+          style="width:100%;font-family:inherit;padding:.65rem .85rem;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:.9rem;resize:vertical"></textarea>
+      </div>
+
+      <div style="background:var(--bg2,var(--bg));border-radius:var(--r-sm);padding:.85rem 1rem;margin:.75rem 0;border:1px solid var(--border)">
+        <label style="display:flex;gap:.75rem;align-items:flex-start;cursor:pointer;font-size:.85rem;color:var(--ink2);line-height:1.6">
+          <input type="checkbox" id="bundle-disclaimer" style="margin-top:3px;flex-shrink:0">
+          <span>Dit is een maatwerkarrangement dat per verzoek individueel wordt beoordeeld door Internly.
+          Een ingediend verzoek geeft <strong>geen recht op goedkeuring</strong>.
+          Aan de beoordeling of het resultaat kunnen door <strong>geen enkele partij rechten worden ontleend</strong>.
+          Internly behoudt het recht een verzoek <strong>zonder opgave van redenen af te wijzen</strong>.</span>
+        </label>
+      </div>
+
+      <button id="bundle-submit" disabled onclick="submitBundelVerzoek()"
+        style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.7rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;opacity:.5;transition:opacity .15s">
+        Verzoek indienen →
+      </button>
+    </div>`;
+
+  document.getElementById('bundle-disclaimer').addEventListener('change', function() {
+    const btn = document.getElementById('bundle-submit');
+    btn.disabled = !this.checked;
+    btn.style.opacity = this.checked ? '1' : '.5';
+  });
+}
+
+async function submitBundelVerzoek() {
+  const oplText    = document.getElementById('bundle-opleidingen')?.value || '';
+  const opleidingen = oplText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const motivatie  = (document.getElementById('bundle-motivatie')?.value || '').trim();
+  const disclaimer = document.getElementById('bundle-disclaimer')?.checked;
+
+  if (!opleidingen.length) {
+    notify('Voer minimaal één opleiding in');
+    return;
+  }
+  if (motivatie.length < 20) {
+    notify('Geef een toelichting van minimaal 20 tekens');
+    return;
+  }
+  if (!disclaimer) {
+    notify('Bevestig de voorwaarden om door te gaan');
+    return;
+  }
+
+  const btn = document.getElementById('bundle-submit');
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+
+  const { error } = await db
+    .from('bundling_requests')
+    .insert({
+      school_profile_id:     currentUser.id,
+      requested_opleidingen: opleidingen,
+      motivatie:             motivatie,
+      status:                'pending'
+    });
+
+  if (error) {
+    notify('Er ging iets mis — probeer het opnieuw');
+    if (btn) { btn.disabled = false; btn.textContent = 'Verzoek indienen →'; }
+    return;
+  }
+
+  notify('Verzoek ingediend — je hoort binnen 5 werkdagen van ons');
+  renderBundeling();
+}
+
 function notify(msg) {
   const el = document.getElementById('notif');
   el.textContent = msg; el.classList.add('show');
@@ -1756,6 +2075,31 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 
+function copyReferralText() {
+  const text = 'Ik gebruik Internly voor stages — ' +
+    'een platform dat ghosting structureel aanpakt. ' +
+    'Studenten zien vooraf hoe betrouwbaar een ' +
+    'werkgever is. Probeer het: internly.pro';
+  navigator.clipboard.writeText(text).then(() => {
+    notify('Aanbevelingstekst gekopieerd!');
+  });
+}
+
+function dismissReferral() {
+  localStorage.setItem('internly_referral_dismissed', 'true');
+  const banner = document.getElementById('referral-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function initReferralBanner() {
+  const dismissed = localStorage.getItem('internly_referral_dismissed');
+  const banner = document.getElementById('referral-banner');
+  if (!banner) return;
+  if (dismissed === 'true') {
+    banner.style.display = 'none';
+  }
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
@@ -1769,6 +2113,35 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  (function handlePaymentReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('payment')) return;
+    window.history.replaceState({}, '', window.location.pathname);
+
+    if (params.get('payment') === 'success') {
+      let attempts = 0;
+      const poll = setInterval(async () => {
+        attempts++;
+        const { data: { user } } = await db.auth.getUser();
+        const { data: sub } = await db
+          .from('subscriptions')
+          .select('status')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+        if (sub?.status === 'active') {
+          clearInterval(poll);
+          notify('Betaling ontvangen — je plan is actief');
+          setTimeout(() => window.location.reload(), 1500);
+        } else if (attempts >= 10) {
+          clearInterval(poll);
+          notify('Betaling verwerkt — activering volgt binnen enkele minuten');
+        }
+      }, 1000);
+    } else {
+      notify('Betaling mislukt of geannuleerd — probeer opnieuw');
+    }
+  })();
+
   await loadUser();
 
   // Laad school-profiel eerst zodat we kunnen filteren op eigen school
@@ -1780,6 +2153,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (sp?.schoolnaam) _schoolNaamFilter = sp.schoolnaam;
 
+  _isPremiumSchool = await hasActivePlan('school_premium');
   await loadStudenten();
   await loadOproepen();
 
@@ -1800,6 +2174,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   startNotifSubscription();
 
   InternlyCalendar.render('ical-container', db, user.id);
+  initSessionTimeout();
+  initReferralBanner();
 });
 
 window.addEventListener('beforeunload', () => {

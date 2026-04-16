@@ -647,6 +647,7 @@
       .topbar { padding: 0 14px; }
     }
   </style>
+  <script src="js/supabase.js"></script>
 </head>
 <body>
 
@@ -724,6 +725,17 @@
     <!-- Buddy kaart in berichten (wordt gevuld na buddyInit) -->
     <div class="hcard" id="buddyCard" style="display:none;">
       <div class="slbl">BBL-buddy (anoniem)</div>
+      <div style="background:var(--amber-bg,#fdf3e0);
+        border-radius:var(--r-sm,8px);
+        padding:.75rem 1rem;
+        font-size:.82rem;
+        color:var(--amber,#a06010);
+        margin-bottom:.75rem;">
+        Het insider-beoordelingssysteem is momenteel
+        in ontwikkeling. Je anonimiteit is beschermd
+        — beoordelingen worden zichtbaar zodra het
+        systeem volledig geactiveerd is.
+      </div>
       <div id="buddyCardContent"></div>
     </div>
   </div>
@@ -1297,7 +1309,7 @@ async function markMessagesRead() {
 
 async function sendMessage() {
   if (!activeConvId || !currentUser) {
-    notify('Geen actief gesprek gevonden. Controleer je BBL-koppeling.');
+    notify('Geen actief gesprek gevonden — controleer je BBL-koppeling');
     return;
   }
   const input = document.getElementById('msgInput');
@@ -1385,7 +1397,7 @@ async function acceptMeetingInvite(meetingId, msgId) {
       (currentUser.user_metadata?.naam || 'Student') + ' heeft de uitnodiging geaccepteerd'
     );
   }
-  notify('Bevestigd!');
+  notify('Bevestigd');
 }
 
 async function declineMeetingInvite(meetingId, msgId) {
@@ -1536,11 +1548,11 @@ function fillDateSelect() {
 }
 
 async function createMeeting() {
-  if (!selectedMeetType) { notify('Kies eerst een type afspraak.'); return; }
+  if (!selectedMeetType) { notify('Kies eerst een type afspraak'); return; }
   const date = document.getElementById('meetingDateSelect').value;
   const time = document.getElementById('meetingTimeSelect').value;
-  if (!date) { notify('Kies een datum.'); return; }
-  if (!currentUser || !activeMatch) { notify('Koppeling niet geladen. Ververs de pagina.'); return; }
+  if (!date) { notify('Kies een datum'); return; }
+  if (!currentUser || !activeMatch) { notify('Koppeling niet geladen — ververs de pagina'); return; }
 
   const subject = {
     evaluatie: 'Evaluatiegesprek',
@@ -1562,15 +1574,24 @@ async function createMeeting() {
     time_end:      timeEnd,
     status:        'openstaand',
     match_id:      activeMatch.id,
-  }).select('id').single();
+  }).select('id').maybeSingle();
 
   if (error) { notify('Aanmaken mislukt: ' + (error?.message || 'onbekende fout')); return; }
+  if (!newMeeting) { notify('Er ging iets mis'); return; }
 
-  // Driegesprek: ROC-begeleider uitnodiging — wordt automatisch verzonden
-  // zodra roc_profile_id beschikbaar is op de match (fase 2 database-kolom).
-  // Voor nu: melding aan gebruiker dat ROC apart geïnformeerd moet worden.
   if (selectedMeetType === 'driegesprek') {
-    notify('Driegesprek aangemaakt — vergeet je ROC-begeleider persoonlijk uit te nodigen.');
+    if (activeMatch.roc_profile_id) {
+      await createNotification(
+        activeMatch.roc_profile_id,
+        'meeting_invite',
+        newMeeting.id,
+        'meeting',
+        (currentUser.user_metadata?.naam || 'Student') + ' heeft een driegesprek gepland op ' + date
+      );
+      notify('Driegesprek aangemaakt — ROC-begeleider is automatisch uitgenodigd');
+    } else {
+      notify('Driegesprek aangemaakt — vergeet je ROC-begeleider persoonlijk uit te nodigen');
+    }
   }
 
   // Notificeer praktijkbegeleider
@@ -1584,7 +1605,7 @@ async function createMeeting() {
     );
   }
 
-  notify('Afspraak aangemaakt — uitnodiging verzonden!');
+  notify('Afspraak aangemaakt — uitnodiging verzonden');
   await loadMeetings();
   renderCalendar();
   document.getElementById('newMeetingPanel').style.display = 'none';
@@ -1592,7 +1613,7 @@ async function createMeeting() {
 
 // iCal export — client-side, geen externe library
 function exportIcal() {
-  if (!calMeetings.length) { notify('Geen afspraken deze maand om te exporteren.'); return; }
+  if (!calMeetings.length) { notify('Geen afspraken deze maand om te exporteren'); return; }
 
   function icsDate(dateStr, timeStr) {
     // dateStr: '2026-04-16', timeStr: '10:00'
@@ -1618,7 +1639,7 @@ function exportIcal() {
   a.download = `internly-bbl-${calYear}-${String(calMonth+1).padStart(2,'0')}.ics`;
   a.click();
   URL.revokeObjectURL(a.href);
-  notify('Agenda geëxporteerd!');
+  notify('Agenda geëxporteerd');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1931,7 +1952,7 @@ function toggleReflHist(bodyId, headEl) {
 }
 
 function exportBBLReflectieverslag() {
-  if (!window.jspdf) { notify('PDF-bibliotheek nog niet geladen.'); return; }
+  if (!window.jspdf) { notify('PDF-bibliotheek nog niet geladen'); return; }
   const { jsPDF } = window.jspdf;
   const doc    = new jsPDF({ unit: 'mm', format: 'a4' });
   const pageW  = 210;
@@ -2180,7 +2201,7 @@ function exportBBLReflectieverslag() {
 
   const safeName = naam.replace(/\s+/g, '-').toLowerCase();
   doc.save(`bbl-reflectieverslag-${safeName}.pdf`);
-  notify('PDF gedownload!');
+  notify('PDF gedownload');
 }
 
 function updateReflectieVoortgangLbl() {
@@ -2195,7 +2216,7 @@ function updateReflectieVoortgangLbl() {
 }
 
 async function saveReflectie() {
-  if (!activeConvId || !currentUser) { notify('Koppeling niet geladen.'); return; }
+  if (!activeConvId || !currentUser) { notify('Koppeling niet geladen'); return; }
 
   const situatie   = document.getElementById('reflectie-situatie')?.value.trim()   || '';
   const taak       = document.getElementById('reflectie-taak')?.value.trim()       || '';
@@ -2203,7 +2224,7 @@ async function saveReflectie() {
   const resultaat  = document.getElementById('reflectie-resultaat')?.value.trim()  || '';
   const leermoment = document.getElementById('reflectie-leermoment')?.value.trim() || '';
 
-  if (!leermoment) { notify('Vul minimaal het Reflectie/Leermoment-veld in.'); return; }
+  if (!leermoment) { notify('Vul minimaal het Reflectie/Leermoment-veld in'); return; }
 
   const payload = { situatie, taak, actie, resultaat, leermoment };
   const content = JSON.stringify(payload);
@@ -2258,7 +2279,7 @@ function renderSignoffStatus(status) {
 }
 
 async function signOff(party) {
-  if (!evalMeeting) { notify('Geen openstaande evaluatie om te tekenen.'); return; }
+  if (!evalMeeting) { notify('Geen openstaande evaluatie om te tekenen'); return; }
 
   const newStatus = { student: 'student_getekend', bedrijf: 'bedrijf_getekend', school: 'voltooid' }[party];
   const { error } = await db
@@ -2280,7 +2301,7 @@ async function signOff(party) {
       (currentUser.user_metadata?.naam || 'Student') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
     );
   }
-  notify('Handtekening geplaatst!');
+  notify('Handtekening geplaatst');
 }
 
 async function loadEvalArchive() {
@@ -2331,7 +2352,7 @@ async function loadRenewalStatus() {
 }
 
 async function studentChoice(keuze) {
-  if (!activeMatch?.id) { notify('Koppeling niet geladen. Ververs de pagina.'); return; }
+  if (!activeMatch?.id) { notify('Koppeling niet geladen — ververs de pagina'); return; }
 
   // Haal huidige renewal_status op, merge student-keuze, schrijf terug
   let status = {};
@@ -2370,7 +2391,7 @@ async function studentChoice(keuze) {
       myName + ' ' + msg
     );
   }
-  notify('Keuze opgeslagen — je begeleider wordt op de hoogte gesteld.');
+  notify('Keuze opgeslagen — je begeleider wordt op de hoogte gesteld');
 }
 
 function applyStudentChoiceUI(keuze) {
@@ -2554,7 +2575,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         .from('conversations')
         .insert({ match_id: match.id })
         .select('id')
-        .single();
+        .maybeSingle();
       if (newConvErr) console.error('[bbl-hub] conversation aanmaken fout:', newConvErr.message);
       conv = newConv;
     }
@@ -2617,6 +2638,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 10. Verlenging: doorstroom + opgeslagen keuze
   loadDoorstroom();
   loadRenewalStatus();
+  initSessionTimeout();
 });
 
 // Buddy kaart in berichten-view

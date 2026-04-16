@@ -588,6 +588,11 @@
   // ─────────────────────────────────────────────────────────────────────────
 
   async function likeCard() {
+    if (window._isLiking) return;
+    window._isLiking = true;
+    const likeBtn = document.querySelector('.btn-like');
+    if (likeBtn) likeBtn.disabled = true;
+    try {
     const card = allCards[currentIndex];
     if (!card) return;
 
@@ -611,8 +616,9 @@
           const { data: newConv } = await db.from('conversations')
             .insert({ match_id: card.matchId })
             .select('id')
-            .single();
+            .maybeSingle();
           conv = newConv;
+          if (!conv) { notify('Gesprek kon niet worden aangemaakt — probeer opnieuw'); return; }
         }
 
         // Notify the other party
@@ -632,7 +638,7 @@
         window.location.href = 'chat.html?match=' + encodeURIComponent(card.matchId);
         return;
       }
-      notify('🎉 Match bevestigd!');
+      notify('🎉 Match bevestigd');
     } else {
       // Pool vacature
       if (currentUser && card.source === 'internship_postings') {
@@ -651,9 +657,10 @@
               initiated_by: currentUser.id,
               match_target: 'posting',
               posting_id:   card.id,
-            }).select('id').single();
+            }).select('id').maybeSingle();
+            if (!match) { notify('Er ging iets mis bij het aanmaken van de match — probeer opnieuw'); return; }
             if (match) {
-              await db.from('conversations').insert({ match_id: match.id }).select('id').single();
+              await db.from('conversations').insert({ match_id: match.id }).select('id').maybeSingle();
               // Notify company of new match
               const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een student';
               createNotification(
@@ -664,7 +671,7 @@
                 myName + ' heeft interesse in jouw vacature: ' + (card.title || 'Stageplek')
               );
               saveVacatureToLocal(card);
-              notify('🎉 Match aangemaakt! Bekijk bij Matches om te chatten.');
+              notify('🎉 Match aangemaakt — bekijk bij Matches om te chatten');
               advanceCard();
               return;
             }
@@ -672,10 +679,15 @@
         } catch(e) { console.error('Match aanmaken fout:', e); }
       }
       saveVacatureToLocal(card);
-      notify('🔖 Opgeslagen bij Mijn Stages!');
+      notify('🔖 Opgeslagen bij Mijn Stages');
     }
 
     advanceCard();
+    } finally {
+      window._isLiking = false;
+      const lb = document.querySelector('.btn-like');
+      if (lb) lb.disabled = false;
+    }
   }
 
   async function skipCard() {
@@ -693,7 +705,7 @@
     currentIndex++;
     if (currentIndex >= allCards.length) {
       currentIndex = 0;
-      notify('Dat was de laatste kaart — kom later terug!');
+      notify('Dat was de laatste kaart — kom later terug');
     }
     loadCards();
   }
@@ -872,41 +884,7 @@
   });
 </script>
 
-  <!-- Google Translate Widget -->
-  <div id="google_translate_element" style="display:none"></div>
-  <script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'nl',
-    includedLanguages: 'nl,en,de,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function switchLang(lang) {
-  var select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event('change'));
-  }
-  localStorage.setItem('internly_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
-
-window.addEventListener('load', function() {
-  var saved = localStorage.getItem('internly_lang') || 'nl';
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === saved);
-  });
-  if (saved && saved !== 'nl') {
-    setTimeout(function() { switchLang(saved); }, 1500);
-  }
-});
-  </script>
-  <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="js/translate.js"></script>
   <script src="js/info.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>

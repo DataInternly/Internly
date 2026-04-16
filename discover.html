@@ -388,6 +388,7 @@
   <a href="index.html" class="logo">intern<span>ly</span></a>
   <nav class="nav">
     <a href="discover.html" class="active">Vacatures</a>
+    <a href="kennisbank.html">Kennisbank</a>
     <a href="about.html">Over ons</a>
     <a href="matches.html">Matches</a>
     <a href="mijn-sollicitaties.html">Mijn Stages</a>
@@ -533,11 +534,35 @@
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
     <div class="results-count" id="resultsCount"></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <button onclick="toggleDemoDiscover(true)" id="demoDiscoverBtn" style="
+        background:none;border:1px solid #f5c87a;border-radius:20px;
+        padding:4px 12px;font-size:.78rem;font-weight:600;
+        color:#a06010;cursor:pointer;white-space:nowrap;">
+        🔍 Toon voorbeeldvacature
+      </button>
     <div class="trust-info">
       <span style="font-size:.8rem;color:#9ca3af">ℹ Trust Score</span>
       <div class="trust-info-text">De Trust Score beoordeelt de betrouwbaarheid van het stagebedrijf op basis van openbare data. A = hoog vertrouwen, B = gemiddeld, C = wees voorzichtig.</div>
     </div>
+    </div>
   </div>
+  <!-- ── DEMO VACATURE TOGGLE ── -->
+  <div id="demoDiscoverBar" style="
+    display:none;
+    background:#fdf3e0;border:1px solid #f5c87a;border-radius:12px;
+    padding:10px 16px;margin-bottom:12px;
+    font-size:.85rem;color:#a06010;
+    align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <span>🔍 Voorbeeldvacature zichtbaar — zo zien echte vacatures eruit.</span>
+    <button onclick="toggleDemoDiscover(false)" style="
+      background:none;border:1px solid #f5c87a;border-radius:8px;
+      padding:4px 12px;font-size:.8rem;color:#a06010;cursor:pointer;">
+      Verbergen
+    </button>
+  </div>
+  <div id="demoDiscoverCards"></div>
+
   <div id="internshipsContainer" class="cards-container"></div>
 
   <!-- ── BUDDY SECTION (shown only for authenticated students) ───────────────── -->
@@ -599,6 +624,10 @@ function renderCard(row) {
   const eDur     = escapeHtml(row.duration     || '');
   const eDesc    = escapeHtml(row.description  || '');
   const ePostcode = escapeHtml(row.postcode || '');
+  const vestiging     = row.vestigingen || null;
+  const eVestNaam     = vestiging ? escapeHtml(vestiging.naam || '') : '';
+  const eVestStad     = vestiging ? escapeHtml(vestiging.stad || '') : '';
+  const displayLoc    = eVestStad || ePostcode;
 
   // Review stars for bedrijfs-postings
   let reviewStarsHtml = '';
@@ -627,6 +656,7 @@ function renderCard(row) {
         <div>
           <h3>${eCompany || 'Bedrijf'}</h3>
           <div class="company-sector">${eSector}</div>
+          ${eVestNaam ? `<div style="font-size:.76rem;color:var(--ink3);margin-top:2px">📍 ${eVestNaam}</div>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
           ${row._isPosting ? '<span style="font-size:.7rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 8px;border-radius:20px;white-space:nowrap">🏢 Bedrijfsposting</span>' : ''}
@@ -640,6 +670,7 @@ function renderCard(row) {
       <div class="meta">
         <span>⏱ ${eDur || '—'}</span>
         <span>📅 ${start}</span>
+        ${displayLoc ? `<span>📍 ${displayLoc}</span>` : ''}
         <span class="reistijd-badge rb-onb" style="display:none" data-badge></span>
       </div>
 
@@ -674,15 +705,14 @@ async function loadInternships() {
       .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode')
       .order('trust_score', { ascending: false }),
     db.from('internship_postings')
-      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode, created_by')
+      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode, created_by, vestigingen(naam, stad, postcode)')
       .eq('status', 'active')
       .order('trust_score', { ascending: false }),
   ]);
 
   if (err1 || err2) {
-    const msg = (err1 || err2).message;
     console.error(err1 || err2);
-    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Fout bij laden.<br><code>${escapeHtml(msg)}</code></div>`;
+    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Vacatures konden niet worden geladen. Probeer de pagina te verversen.</div>`;
     return;
   }
 
@@ -914,7 +944,7 @@ function showLoading(containerId, tekst) {
 
 // Offline/online listeners
 window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
-window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
+window.addEventListener('online',  () => { notify('Verbinding hersteld — pagina wordt vernieuwd…'); location.reload(); });
 
 async function signOut() {
   if (notifSubscription) {
@@ -1039,7 +1069,7 @@ function startNotifSubscription() {
 }
 
 function showToast() {
-  notify('Je hebt een nieuwe melding');
+  notify('Nieuwe melding ontvangen — check je overzicht');
 }
 // ── End notification system ────────────────────────────────────────────────
 
@@ -1109,7 +1139,77 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 
+// ── Demo vacature toggle (discover) ──────────────────────────────────────
+const DEMO_DISCOVER_KEY = 'internly_demo_discover';
+
+const DEMO_VACATURE = {
+  company_name: 'Vandaag Agency',
+  sector:       'Communicatie & Media',
+  title:        'Marketingstagiair — Contentcreatie & Social Media',
+  description:  'Werk mee aan campagnes voor A-merken, schrijf contentstrategie en beheer social kanalen. Volledige begeleiding door een senior strateeg.',
+  duration:     '5 maanden',
+  tags:         ['Social media', 'Copywriting', 'Adobe CC'],
+  trust_grade:  'A',
+  trust_score:  94,
+  guarantee:    true,
+};
+
+function initDemoDiscover() {
+  const enabled = localStorage.getItem(DEMO_DISCOVER_KEY) === 'true';
+  renderDiscoverDemoState(enabled);
+}
+
+function toggleDemoDiscover(force) {
+  const enabled = typeof force === 'boolean' ? force : localStorage.getItem(DEMO_DISCOVER_KEY) !== 'true';
+  localStorage.setItem(DEMO_DISCOVER_KEY, enabled);
+  renderDiscoverDemoState(enabled);
+}
+
+function renderDiscoverDemoState(enabled) {
+  const bar    = document.getElementById('demoDiscoverBar');
+  const cards  = document.getElementById('demoDiscoverCards');
+  const btn    = document.getElementById('demoDiscoverBtn');
+  if (!bar || !cards) return;
+  bar.style.display   = enabled ? 'flex' : 'none';
+  cards.style.display = enabled ? 'block' : 'none';
+  if (btn) btn.style.display = enabled ? 'none' : '';
+  if (enabled && !cards.innerHTML) {
+    const v = DEMO_VACATURE;
+    const tags = v.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+    cards.innerHTML = `
+      <div class="stage-card" style="border:2px dashed #f5c87a;position:relative;">
+        <div style="position:absolute;top:10px;right:10px;
+          background:#fdf3e0;color:#a06010;font-size:.72rem;font-weight:700;
+          padding:3px 9px;border-radius:20px;letter-spacing:.04em;">
+          Voorbeeld · Bedrijf
+        </div>
+        <div class="company-header">
+          <div>
+            <h3>${escapeHtml(v.company_name)}</h3>
+            <div class="company-sector">${escapeHtml(v.sector)}</div>
+          </div>
+          <span class="trust-badge trust-a">${escapeHtml(v.trust_grade)} · ${v.trust_score} <span style="opacity:.65;font-weight:400">Betrouwbaar</span></span>
+        </div>
+        <h4>${escapeHtml(v.title)}</h4>
+        <p class="description">${escapeHtml(v.description)}</p>
+        <div class="meta">
+          <span>⏱ ${escapeHtml(v.duration)}</span>
+          <span>📅 Flexibel</span>
+        </div>
+        <div class="tags">${tags}</div>
+        <div class="card-footer">
+          <span class="guarantee yes">⚡ Responsgarantie</span>
+          <a href="auth.html" class="apply-btn" style="background:var(--orange)">
+            Maak je profiel aan →
+          </a>
+        </div>
+      </div>`;
+  }
+}
+// ── End demo vacature toggle ──────────────────────────────────────────────
+
 window.addEventListener('DOMContentLoaded', async () => {
+  initDemoDiscover();
   const { data: { user } } = await db.auth.getUser();
   const authEl = document.getElementById('topbarAuth');
   if (user) {
@@ -1228,7 +1328,7 @@ window.addEventListener('beforeunload', async () => {
       intern<span style="color:#FF7E42;">ly</span>
     </div>
     <div style="font-size:.82rem;color:rgba(255,255,255,.65);">
-      Blijf op de hoogte van de ontwikkeling
+      Internly wordt beter met elke stageplek die werkt. Jij bent er als eerste bij.
     </div>
   </div>
 
@@ -1350,39 +1450,9 @@ window.addEventListener('beforeunload', async () => {
 </script>
 <!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
 
-<!-- Google Translate Widget -->
-<div id="google_translate_element" style="display:none"></div>
+<script src="js/translate.js"></script>
 <script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'nl',
-    includedLanguages: 'nl,en,de,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function switchLang(lang) {
-  const select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event('change'));
-  }
-  localStorage.setItem('internly_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
-
 window.addEventListener('load', function() {
-  const saved = localStorage.getItem('internly_lang') || 'nl';
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === saved);
-  });
-  if (saved && saved !== 'nl') {
-    setTimeout(function() { switchLang(saved); }, 1500);
-  }
-
   // Pre-select niveau filter from URL param (passed by landing page CTA)
   // Do NOT call filterCards() here — cards load async; loadInternships() calls it after render
   const urlNiveau = new URLSearchParams(window.location.search).get('niveau');
@@ -1392,11 +1462,11 @@ window.addEventListener('load', function() {
   }
 });
 </script>
-<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <footer style="background:#0d1a10;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,.06);">
   <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.45);">intern<span style="color:#e05c1a;">ly</span></div>
   <ul style="display:flex;gap:14px;list-style:none;margin:0;padding:0;">
+    <li><a href="kennisbank.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Kennisbank</a></li>
     <li><a href="privacybeleid.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Privacybeleid</a></li>
     <li><a href="spelregels.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Spelregels</a></li>
     <li><a href="about.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Over ons</a></li>

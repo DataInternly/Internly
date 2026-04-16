@@ -408,11 +408,16 @@ async function buddySendRequest(receiverId, type, message = '') {
     .from('buddy_requests')
     .insert({ requester_id: uid, receiver_id: receiverId, type, message, status: 'pending' })
     .select('id')
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('[buddy] sendRequest error:', error.message);
     buddyShowToast('Verzoek kon niet worden verstuurd — probeer het opnieuw.');
+    return;
+  }
+
+  if (!req) {
+    buddyShowToast('Aanvraag verstuurd — we zoeken een match');
     return;
   }
 
@@ -474,13 +479,18 @@ async function buddyAcceptRequest(requestId) {
       reveal_after: null, // set externally for 'insider' type based on contract end date
     })
     .select('id')
-    .single();
+    .maybeSingle();
 
   if (pairErr) {
     console.error('[buddy] acceptRequest pair insert error:', pairErr.message);
     // Roll back: revert request to pending so the receiver can retry
     await db.from('buddy_requests').update({ status: 'pending' }).eq('id', requestId);
     buddyShowToast('Koppeling aanmaken mislukt — probeer opnieuw.');
+    return;
+  }
+
+  if (!pair) {
+    buddyShowToast('Koppeling aangemaakt');
     return;
   }
 

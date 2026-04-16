@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/dist/browser.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -164,6 +165,42 @@
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+
+    /* ── Input bar lift ── */
+    .input-bar { position: relative; box-shadow: 0 -2px 12px rgba(0,0,0,.05); }
+
+    /* ── Emoji button ── */
+    .emoji-btn {
+      background: none; border: none; font-size: 1.22rem;
+      width: 36px; height: 44px; flex-shrink: 0;
+      display: none; align-items: center; justify-content: center;
+      border-radius: 8px; cursor: pointer; transition: background .15s;
+      color: #9ca3af; padding: 0;
+    }
+    .emoji-btn:hover, .emoji-btn.active { background: #f4f3ef; color: #374151; }
+
+    /* ── Emoji picker container ── */
+    #emoji-picker-container {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 60px;
+      z-index: 1000;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,.15));
+    }
+    #emoji-picker-container em-emoji-picker {
+      --border-radius: 14px;
+      --font-family: 'Outfit', sans-serif;
+      max-width: min(352px, calc(100vw - 32px));
+    }
+
+    /* ── Bubble chain (consecutive messages same sender) ── */
+    .msg-row.own   .bubble.chain-top    { border-top-right-radius: 4px; }
+    .msg-row.own   .bubble.chain-bottom { border-bottom-right-radius: 16px; }
+    .msg-row.other .bubble.chain-top    { border-top-left-radius: 4px; }
+    .msg-row.other .bubble.chain-bottom { border-bottom-left-radius: 16px; }
+
+    /* Spacer keeps alignment when avatar is hidden for chained messages */
+    .msg-avatar-spacer { width: 28px; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -227,6 +264,11 @@
   </div>
 
   <div class="input-bar">
+    <button class="emoji-btn" id="emojiBtn"
+            onclick="toggleEmojiPicker()"
+            aria-label="Emoji toevoegen"
+            title="Emoji toevoegen">😊</button>
+    <div id="emoji-picker-container" style="display:none"></div>
     <textarea
       class="msg-textarea"
       id="msgInput"
@@ -351,25 +393,36 @@
     let html = '';
     let lastDay = '';
 
-    messages.forEach(msg => {
+    messages.forEach((msg, i) => {
       const day = formatDay(msg.created_at);
       if (day !== lastDay) {
         html += `<div class="day-sep">${escapeHtml(day)}</div>`;
         lastDay = day;
       }
 
-      const isOwn     = msg.sender_id === currentUser?.id;
-      const rowClass  = isOwn ? 'own' : 'other';
+      const isOwn      = msg.sender_id === currentUser?.id;
+      const rowClass   = isOwn ? 'own' : 'other';
       const senderInit = escapeHtml((msg._senderName || 'X').slice(0, 2).toUpperCase());
-      const text      = escapeHtml(msg.content || '');
-      const time      = escapeHtml(formatTime(msg.created_at));
+      const text       = escapeHtml(msg.content || '');
+      const time       = escapeHtml(formatTime(msg.created_at));
+
+      // Consecutive bubble detection — don't chain across day separators
+      const prev = i > 0 ? messages[i - 1] : null;
+      const next = i < messages.length - 1 ? messages[i + 1] : null;
+      const sameDay = (a, b) => formatDay(a.created_at) === formatDay(b.created_at);
+      const sameAsPrev = prev && prev.sender_id === msg.sender_id && sameDay(prev, msg);
+      const sameAsNext = next && next.sender_id === msg.sender_id && sameDay(msg, next);
+
+      let chainClass = '';
+      if (sameAsPrev) chainClass += ' chain-top';
+      if (sameAsNext) chainClass += ' chain-bottom';
 
       html += `
         <div class="msg-row ${rowClass}">
-          ${!isOwn ? `<div class="msg-avatar">${senderInit}</div>` : ''}
+          ${!isOwn ? (sameAsPrev ? `<div class="msg-avatar-spacer"></div>` : `<div class="msg-avatar">${senderInit}</div>`) : ''}
           <div class="bubble-wrap">
-            <div class="bubble">${text}</div>
-            <span class="msg-time">${time}</span>
+            <div class="bubble${chainClass}">${text}</div>
+            ${!sameAsNext ? `<span class="msg-time">${time}</span>` : ''}
           </div>
         </div>`;
     });
@@ -383,23 +436,100 @@
     const empty = area.querySelector('.chat-empty');
     if (empty) empty.remove();
 
-    const isOwn    = msg.sender_id === currentUser?.id;
-    const rowClass = isOwn ? 'own' : 'other';
+    const isOwn      = msg.sender_id === currentUser?.id;
+    const rowClass   = isOwn ? 'own' : 'other';
     const senderInit = escapeHtml((msg._senderName || 'X').slice(0, 2).toUpperCase());
-    const text     = escapeHtml(msg.content || '');
-    const time     = escapeHtml(formatTime(msg.created_at));
+    const text       = escapeHtml(msg.content || '');
+    const time       = escapeHtml(formatTime(msg.created_at));
+
+    // Check if the previous row is from the same sender → apply chain styling
+    const rows = area.querySelectorAll('.msg-row');
+    const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
+    const sameAsPrev = lastRow && lastRow.classList.contains(rowClass);
+
+    if (sameAsPrev) {
+      // Previous message is no longer the last in its group — extend its chain
+      const prevBubble = lastRow.querySelector('.bubble');
+      if (prevBubble) prevBubble.classList.add('chain-bottom');
+      // Hide previous row's timestamp (it's no longer the end of the group)
+      const prevTime = lastRow.querySelector('.msg-time');
+      if (prevTime) prevTime.style.display = 'none';
+    }
 
     const row = document.createElement('div');
     row.className = 'msg-row ' + rowClass;
     row.innerHTML = `
-      ${!isOwn ? `<div class="msg-avatar">${senderInit}</div>` : ''}
+      ${!isOwn ? (sameAsPrev ? `<div class="msg-avatar-spacer"></div>` : `<div class="msg-avatar">${senderInit}</div>`) : ''}
       <div class="bubble-wrap">
-        <div class="bubble">${text}</div>
+        <div class="bubble${sameAsPrev ? ' chain-top' : ''}">${text}</div>
         <span class="msg-time">${time}</span>
       </div>`;
     area.appendChild(row);
     area.scrollTop = area.scrollHeight;
   }
+
+  // ── Emoji Picker ─────────────────────────────────────────────────────────────
+
+  let _emojiPickerOpen = false;
+
+  function toggleEmojiPicker(force) {
+    const container = document.getElementById('emoji-picker-container');
+    if (!container) return;
+    _emojiPickerOpen = force !== undefined ? !!force : !_emojiPickerOpen;
+    container.style.display = _emojiPickerOpen ? 'block' : 'none';
+    const btn = document.getElementById('emojiBtn');
+    if (btn) btn.classList.toggle('active', _emojiPickerOpen);
+  }
+
+  function _insertEmojiAtCursor(native) {
+    const ta = document.getElementById('msgInput');
+    if (!ta) return;
+    const start = ta.selectionStart ?? ta.value.length;
+    const end   = ta.selectionEnd   ?? ta.value.length;
+    ta.value = ta.value.slice(0, start) + native + ta.value.slice(end);
+    const pos = start + native.length;
+    ta.setSelectionRange(pos, pos);
+    ta.focus();
+    ta.dispatchEvent(new Event('input')); // trigger auto-resize
+  }
+
+  function _initEmojiMart() {
+    if (!window.EmojiMart) return; // graceful degradation if CDN fails
+    const container = document.getElementById('emoji-picker-container');
+    if (!container || container.children.length > 0) return;
+    const picker = new EmojiMart.Picker({
+      onEmojiSelect(emoji) {
+        _insertEmojiAtCursor(emoji.native);
+        toggleEmojiPicker(false);
+      },
+      theme:            'light',
+      previewPosition:  'none',
+      skinTonePosition: 'none',
+      set:              'native',
+      maxFrequentRows:  2,
+    });
+    container.appendChild(picker);
+    // Only show button once picker is confirmed ready
+    const btn = document.getElementById('emojiBtn');
+    if (btn) btn.style.display = 'flex';
+  }
+
+  // Close picker on outside click (capture phase so it fires before other handlers)
+  document.addEventListener('click', e => {
+    if (!_emojiPickerOpen) return;
+    const container = document.getElementById('emoji-picker-container');
+    const btn       = document.getElementById('emojiBtn');
+    if (container && !container.contains(e.target) && !btn?.contains(e.target)) {
+      toggleEmojiPicker(false);
+    }
+  }, true);
+
+  window.addEventListener('load', _initEmojiMart);
+
+  // Close emoji picker on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && _emojiPickerOpen) toggleEmojiPicker(false);
+  });
 
   // ── Load ──────────────────────────────────────────────────────────────────
 
@@ -467,7 +597,7 @@
         .from('conversations')
         .insert({ match_id: mId })
         .select('id')
-        .single();
+        .maybeSingle();
       conv = newConv;
     }
 
@@ -541,6 +671,7 @@
   // ── Send ──────────────────────────────────────────────────────────────────
 
   async function sendMessage() {
+    toggleEmojiPicker(false); // close picker if open
     if (!convId || !currentUser) return;
     const input = document.getElementById('msgInput');
     const content = input.value.trim();
@@ -806,7 +937,7 @@
         .from('conversations')
         .insert({ buddy_pair_id: pairId })
         .select('id')
-        .single();
+        .maybeSingle();
       if (cErr) {
         // Fallback: kolom bestaat nog niet → sla op als match_id-loze conversatie
         console.warn('[chat] buddy_pair_id kolom ontbreekt');
@@ -814,7 +945,7 @@
           .from('conversations')
           .insert({ match_id: null })
           .select('id')
-          .single();
+          .maybeSingle();
         conv = fb;
       } else {
         conv = newConv;
@@ -875,41 +1006,7 @@
   });
 </script>
 
-<!-- Google Translate Widget -->
-<div id="google_translate_element" style="display:none"></div>
-<script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'nl',
-    includedLanguages: 'nl,en,de,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function switchLang(lang) {
-  const select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event('change'));
-  }
-  localStorage.setItem('internly_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
-
-window.addEventListener('load', function() {
-  const saved = localStorage.getItem('internly_lang') || 'nl';
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === saved);
-  });
-  if (saved && saved !== 'nl') {
-    setTimeout(function() { switchLang(saved); }, 1500);
-  }
-});
-</script>
-<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/translate.js"></script>
 <script src="js/calendar.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>

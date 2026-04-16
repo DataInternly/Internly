@@ -243,10 +243,11 @@
   <!-- ── SIDEBAR ── -->
   <nav class="sidebar">
     <div class="sidebar-inner">
-      <button class="nav-btn active" data-screen="stats"    onclick="show('stats')">📊 Platform stats</button>
-      <button class="nav-btn"        data-screen="flagged"  onclick="show('flagged')">⚑ Gemelde reviews</button>
-      <button class="nav-btn"        data-screen="trust"    onclick="show('trust')">⭐ Trust overrides</button>
-      <button class="nav-btn"        data-screen="waitlist" onclick="show('waitlist')">📋 Waitlist</button>
+      <button class="nav-btn active" data-screen="stats"      onclick="show('stats')">📊 Platform stats</button>
+      <button class="nav-btn"        data-screen="flagged"    onclick="show('flagged')">⚑ Gemelde reviews</button>
+      <button class="nav-btn"        data-screen="trust"      onclick="show('trust')">⭐ Trust overrides</button>
+      <button class="nav-btn"        data-screen="waitlist"   onclick="show('waitlist')">📋 Waitlist</button>
+      <button class="nav-btn"        data-screen="bundeling"  onclick="show('bundeling')">🔗 Bundelverzoeken</button>
     </div>
   </nav>
 
@@ -296,6 +297,13 @@
       <div id="waitlist-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
     </div>
 
+    <!-- ── BUNDELVERZOEKEN ── -->
+    <div class="screen" id="screen-bundeling">
+      <div class="page-title">Bundelverzoeken</div>
+      <p class="page-sub">Openstaande verzoeken van scholen om opleidingen samen te voegen onder één licentie.</p>
+      <div id="bundeling-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
+    </div>
+
   </main>
 </div>
 
@@ -305,6 +313,9 @@
   const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentAdmin = null;  // set after auth guard passes
+  let _bundelMap   = {};    // requestId → { schoolProfileId, opleidingen }
 
   // ── Auth guard: admin only ────────────────────────────────────────────────
 
@@ -328,9 +339,10 @@
     const btn = document.querySelector(`[data-screen="${name}"]`);
     if (btn) btn.classList.add('active');
 
-    if (name === 'flagged')  loadFlaggedReviews();
-    if (name === 'trust')    loadTrustOverrides();
-    if (name === 'waitlist') loadWaitlist();
+    if (name === 'flagged')    loadFlaggedReviews();
+    if (name === 'trust')      loadTrustOverrides();
+    if (name === 'waitlist')   loadWaitlist();
+    if (name === 'bundeling')  loadBundelVerzoeken();
   }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -585,6 +597,155 @@
     }
   }
 
+  // ── Bundelverzoeken ───────────────────────────────────────────────────────
+  async function loadBundelVerzoeken() {
+    if (!currentAdmin) return;
+    const el = document.getElementById('bundeling-list');
+    if (!el) return;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
+    _bundelMap = {};
+
+    try {
+      const { data: verzoeken, error } = await db
+        .from('bundling_requests')
+        .select(`
+          id, school_profile_id, requested_opleidingen, motivatie, requested_at, status,
+          profiles!school_profile_id (naam, email)
+        `)
+        .eq('status', 'pending')
+        .order('requested_at', { ascending: true });
+
+      if (error) throw error;
+
+      if (!verzoeken || verzoeken.length === 0) {
+        el.innerHTML = `<div class="empty"><span class="empty-icon">✅</span>Geen openstaande bundelverzoeken.</div>`;
+        return;
+      }
+
+      verzoeken.forEach(v => {
+        _bundelMap[v.id] = {
+          schoolProfileId: v.school_profile_id,
+          opleidingen:     v.requested_opleidingen || []
+        };
+      });
+
+      el.innerHTML = verzoeken.map(v => {
+        const naam    = escapeHtml(v.profiles?.naam  || '—');
+        const email   = escapeHtml(v.profiles?.email || '—');
+        const dateStr = v.requested_at
+          ? new Date(v.requested_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+          : '—';
+        const pills = (v.requested_opleidingen || [])
+          .map(o => `<span class="tag" style="background:#e0e7ff;color:#3730a3;border:none;font-size:.78rem">${escapeHtml(o)}</span>`)
+          .join('');
+        return `
+          <div class="review-flag-card" id="vz-${v.id}">
+            <div class="rfc-head">
+              <div class="rfc-meta">
+                <strong>${naam}</strong>
+                <span style="font-size:.82rem;color:var(--ink3);margin-left:6px">${email}</span>
+              </div>
+              <span style="font-size:.78rem;color:var(--ink3)">Ingediend: ${escapeHtml(dateStr)}</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin:.75rem 0">${pills}</div>
+            <div style="background:var(--bg);border-radius:8px;padding:.85rem 1rem;font-size:.88rem;color:var(--ink2);line-height:1.6;margin-bottom:.75rem;border:1px solid var(--border)">
+              ${escapeHtml(v.motivatie || '—')}
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label style="font-size:.8rem;color:var(--ink3);display:block;margin-bottom:4px">
+                Toelichting voor school (verplicht bij afwijzing):
+              </label>
+              <textarea id="note-${v.id}" rows="2"
+                placeholder="Intern notitie of bericht aan school…"
+                style="width:100%;font-family:inherit;padding:.5rem .75rem;border:1.5px solid var(--border2);border-radius:8px;font-size:.85rem;resize:vertical"></textarea>
+            </div>
+            <div class="rfc-actions">
+              <button type="button" class="btn-sm btn-green"
+                onclick="approveBundeling('${v.id}')">✓ Goedkeuren</button>
+              <button type="button" class="btn-sm btn-red"
+                onclick="denyBundeling('${v.id}')">✕ Afwijzen</button>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch(e) {
+      console.error('loadBundelVerzoeken fout:', e);
+      el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  async function approveBundeling(requestId) {
+    const entry     = _bundelMap[requestId];
+    if (!entry) { notify('Verzoekdata niet gevonden — herlaad de pagina'); return; }
+    const adminNote = (document.getElementById('note-' + requestId)?.value || '').trim() || null;
+
+    try {
+      await db.from('bundling_requests')
+        .update({
+          status:      'approved',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentAdmin?.id || null,
+          admin_note:  adminNote
+        })
+        .eq('id', requestId);
+
+      await db.from('subscriptions')
+        .update({
+          bundle_approved:     true,
+          bundled_opleidingen: entry.opleidingen
+        })
+        .eq('profile_id', entry.schoolProfileId);
+
+      await db.from('notifications').insert({
+        user_id: entry.schoolProfileId,
+        type:    'bundeling_approved',
+        message: 'Je bundelverzoek is goedgekeurd. Je opleidingen zijn samengevoegd onder één licentie. Log in om je dashboard te bekijken.',
+        read:    false
+      });
+
+      notify('Verzoek goedgekeurd');
+      loadBundelVerzoeken();
+    } catch(e) {
+      notify('Fout bij goedkeuren: ' + e.message);
+      console.error('approveBundeling fout:', e);
+    }
+  }
+
+  async function denyBundeling(requestId) {
+    const entry     = _bundelMap[requestId];
+    if (!entry) { notify('Verzoekdata niet gevonden — herlaad de pagina'); return; }
+    const adminNote = (document.getElementById('note-' + requestId)?.value || '').trim();
+
+    if (!adminNote || adminNote.length < 10) {
+      notify('Voeg een toelichting toe voor de school (minimaal 10 tekens)');
+      return;
+    }
+
+    try {
+      await db.from('bundling_requests')
+        .update({
+          status:      'denied',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: currentAdmin?.id || null,
+          admin_note:  adminNote
+        })
+        .eq('id', requestId);
+
+      await db.from('notifications').insert({
+        user_id: entry.schoolProfileId,
+        type:    'bundeling_denied',
+        message: 'Je bundelverzoek is helaas niet goedgekeurd. Toelichting: ' + adminNote,
+        read:    false
+      });
+
+      notify('Verzoek afgewezen');
+      loadBundelVerzoeken();
+    } catch(e) {
+      notify('Fout bij afwijzen: ' + e.message);
+      console.error('denyBundeling fout:', e);
+    }
+  }
+
   function copyEmail(email) {
     navigator.clipboard.writeText(email).then(() => notify('Email gekopieerd: ' + email)).catch(() => notify('Kopiëren mislukt'));
   }
@@ -628,6 +789,7 @@
     const { data: prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
     if (prof?.role !== 'admin') { window.location.href = 'auth.html'; return; }
 
+    currentAdmin = user;
     loadStats();
   });
 

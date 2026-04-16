@@ -1892,7 +1892,7 @@
     }
     .info-pop {
       display: none;
-      position: absolute; z-index: 9999;
+      position: fixed; z-index: 9999;
       width: 240px; background: #0d1520; color: #d1d9e0;
       font-size: .8rem; line-height: 1.6; border-radius: 10px;
       padding: 11px 14px; box-shadow: 0 10px 32px rgba(0,0,0,.35);
@@ -2038,6 +2038,13 @@
         <span id="sidebar-badge-afspraken" class="sidebar-badge" style="display:none"></span>
         <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Afspraken">ⓘ<span class="info-pop">Plan gesprekken in met je bedrijfsbegeleider of schoolbegeleider. Alle partijen zien de afspraken en kunnen nieuwe toevoegen.</span></span>
       </button>
+      <button class="sidebar-item" data-tab="matchpool" onclick="switchTab('matchpool')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Matchpool
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Matchpool">ⓘ<span class="info-pop">Bekijk beschikbare bedrijven, scholen en buddy's. Zet voorbeeldprofielen aan om te zien hoe de pool eruitziet.</span></span>
+      </button>
 
       <div class="sidebar-spacer"></div>
 
@@ -2100,8 +2107,8 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Match ID from URL (?match=UUID) — null in demo mode
 const MATCH_ID = new URLSearchParams(window.location.search).get('match');
-// Hide role-picker immediately so it doesn't flash during auth check
-if (MATCH_ID) document.body.classList.add('auth-boot');
+// Always hide role-picker immediately; removed below only if not logged in (demo mode)
+document.body.classList.add('auth-boot');
 
 /* ── Kalender state ──────────────────────────────────────────────────────── */
 let kalState = {
@@ -2109,6 +2116,67 @@ let kalState = {
   month: new Date().getMonth(),  // 0-indexed
   filter: 'alles'                // 'alles' | 'deadlines' | 'meetings'
 };
+
+/* ── Demo profiles (matchpool) ──────────────────────────────────────────── */
+
+const DEMO_PROFILES = [
+  {
+    id: 'demo-bedrijf',
+    type: 'bedrijf',
+    naam: 'Vandaag Agency',
+    sector: 'Communicatie & Media',
+    stad: 'Amsterdam',
+    avatar: 'VA',
+    color: '#1a7a48',
+    beschrijving: 'Creatief bureau gespecialiseerd in brand storytelling en digitale campagnes voor corporate klanten.',
+    plaatsen: 2,
+    trust_scores: { respons: 92, leerdoel: 88, afspraken: 95, begeleiding: 84 },
+    tags: ['Content', 'Social Media', 'PR', 'Copywriting'],
+    info_steps: [
+      { title: 'Bedrijfsprofiel', body: 'Elk bedrijf in de matchpool heeft een volledig profiel: sector, stad, beschrijving en openstaande stageplekken.' },
+      { title: 'Trust Score', body: 'De Trust Score is gebaseerd op beoordelingen van eerdere stagiairs. Hoe hoger, hoe beter de begeleiding.' },
+      { title: 'Specialisaties', body: 'Tags tonen in welke vakgebieden je ervaring opdoet — handig om je keuze te matchen aan je leerdoelen.' },
+      { title: 'Koppeling aanvragen', body: 'Als het bedrijf bij jou past, kun je een kennismakingsgesprek aanvragen. Je school ziet dit altijd mee.' },
+    ],
+  },
+  {
+    id: 'demo-school',
+    type: 'school',
+    naam: 'Hogeschool van Amsterdam',
+    opleiding: 'Communicatie & Multimedia Design',
+    stad: 'Amsterdam',
+    avatar: 'HvA',
+    color: '#a06010',
+    beschrijving: 'Begeleiding vanuit de opleiding CMD voor studenten die een stage zoeken in de creatieve industrie.',
+    begeleiders: 3,
+    actieve_stages: 12,
+    gem_score: 87,
+    info_steps: [
+      { title: 'Schoolprofiel', body: 'Scholen in de pool bieden actieve begeleiding. Je ziet welke opleiding ze vertegenwoordigen en hoeveel stages ze momenteel begeleiden.' },
+      { title: 'Begeleiders', body: 'Elke school heeft één of meerdere stagebegeleiders. Zij zijn je contactpersoon voor vragen en beoordelingen.' },
+      { title: 'Gemiddelde score', body: 'De gemiddelde score is gebaseerd op tevredenheidsonderzoeken bij eerdere stagiairs van deze school.' },
+      { title: 'Verbinding leggen', body: 'Je koppelt automatisch aan je eigen school bij registratie. Dit profiel laat zien hoe schoolprofielen eruitzien in de pool.' },
+    ],
+  },
+  {
+    id: 'demo-buddy',
+    type: 'buddy',
+    naam: 'Johan de Vries',
+    beroep: 'Senior UX Designer',
+    stad: 'Utrecht',
+    avatar: 'JdV',
+    color: '#1756a8',
+    beschrijving: '10 jaar ervaring in UX en product design. Ik begeleid studenten graag bij hun eerste stappen in het vak.',
+    beschikbaarheid: ['Maandag', 'Woensdag', 'Vrijdag'],
+    talen: ['Nederlands', 'Engels'],
+    info_steps: [
+      { title: 'Buddy profiel', body: 'Een buddy is een professional die je informeel begeleidt naast je officiële stagebegeleider — denk aan een mentor.' },
+      { title: 'Beschikbaarheid', body: 'Buddy\'s geven aan op welke dagen ze beschikbaar zijn voor een check-in, call of koffiemoment.' },
+      { title: 'Talen', body: 'Je ziet in welke talen een buddy communiceert, handig als je stage deels in het Engels verloopt.' },
+      { title: 'Buddy koppelen', body: 'Je kunt een buddy-verzoek sturen. Als de buddy akkoord gaat, verschijnt hij of zij in jouw Stage Hub.' },
+    ],
+  },
+];
 
 /* ── Demo data ──────────────────────────────────────────────────────────── */
 
@@ -2347,6 +2415,7 @@ function startHub(role) {
   updateRoleBadge();
   updateSidebarUser();
   updateTakenBadge();
+  initDemoToggle();
   switchTab('overzicht');
   if (MATCH_ID) loadHubFromDB();
 }
@@ -2515,14 +2584,51 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
-  if (!MATCH_ID) return; // demo mode — role-picker handles boot
-  showSpinner();
-  const { data: { user } } = await db.auth.getUser();
-  if (!user) {
-    window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
-    return;
+  if (MATCH_ID) {
+    // Auth mode — load real match from DB
+    showSpinner();
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) {
+      window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+      return;
+    }
+    initSessionTimeout();
+    await loadMatchFromDB(user);
+  } else {
+    // Demo mode — auto-pick role if logged in, otherwise show role picker
+    const { data: { user } } = await db.auth.getUser();
+    if (user) {
+      const { data: prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      const dbRole = prof?.role;
+
+      // Redirect roles that don't belong in the Stage Hub
+      if (dbRole === 'gepensioneerd' || dbRole === 'buddy') {
+        window.location.href = 'buddy-dashboard.html';
+        return;
+      }
+
+      const roleMap = { student: 'student', bedrijf: 'bedrijf', school: 'school' };
+      const mappedRole = roleMap[dbRole];
+      if (mappedRole) {
+        startHub(mappedRole);
+
+        // Wire back button to the right dashboard
+        const backBtn = document.getElementById('back-to-dash');
+        const backTargets = { student: 'matches.html', bedrijf: 'company-dashboard.html', school: 'school-dashboard.html' };
+        if (backBtn && backTargets[mappedRole]) {
+          backBtn.href = backTargets[mappedRole];
+          backBtn.style.display = '';
+        }
+
+        // Hide "Wissel rol" — authenticated users go directly to their role
+        const demoBtn = document.getElementById('demo-switch-btn');
+        if (demoBtn) demoBtn.style.display = 'none';
+        return;
+      }
+    }
+    // Not logged in or unrecognised role — show role picker
+    document.body.classList.remove('auth-boot');
   }
-  await loadMatchFromDB(user);
 });
 
 async function loadMatchFromDB(user) {
@@ -2531,7 +2637,7 @@ async function loadMatchFromDB(user) {
   try {
     // 0. Role guard — doorstuur rollen die hier niet thuishoren
     const { data: _prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-    const WRONG_ROLE_ROUTES = { gepensioneerd: 'buddy-dashboard.html' };
+    const WRONG_ROLE_ROUTES = { gepensioneerd: 'buddy-dashboard.html', buddy: 'buddy-dashboard.html' };
     if (WRONG_ROLE_ROUTES[_prof?.role]) { hideSpinner(); window.location.href = WRONG_ROLE_ROUTES[_prof.role]; return; }
 
     // 1. Load match record + vacature name via FK join
@@ -2539,7 +2645,7 @@ async function loadMatchFromDB(user) {
       .from('matches')
       .select('id, party_a, party_b, internship_postings(title)')
       .eq('id', MATCH_ID)
-      .single();
+      .maybeSingle();
 
     if (matchErr || !matchRow) {
       toast('Match niet gevonden of geen toegang.');
@@ -2754,13 +2860,14 @@ function switchTab(tab) {
 
   const mc = document.getElementById('main-content');
   const renderers = {
-    overzicht:  renderOverzicht,
-    planning:   renderPlanning,
-    kalender:   renderKalender,
-    stageplan:  renderStageplan,
-    taken:      renderTaken,
-    voortgang:  renderVoortgang,
-    afspraken:  renderAfspraken
+    overzicht:   renderOverzicht,
+    planning:    renderPlanning,
+    kalender:    renderKalender,
+    stageplan:   renderStageplan,
+    taken:       renderTaken,
+    voortgang:   renderVoortgang,
+    afspraken:   renderAfspraken,
+    matchpool:   renderMatchpool,
   };
   const tabHtml = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
   mc.innerHTML = renderMatchIndicator() + tabHtml;
@@ -3511,7 +3618,7 @@ async function saveTaak(id) {
     if (MATCH_ID) {
       const { data, error } = await db.from('stage_tasks')
         .insert({ match_id: MATCH_ID, title, desc, deadline, assignee, status, priority, maker: hubState.role })
-        .select().single();
+        .select().maybeSingle();
       if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newTask._dbId = data.id;
     }
@@ -3570,7 +3677,7 @@ async function saveDeadline(id) {
     if (MATCH_ID) {
       const { data, error } = await db.from('stage_deadlines')
         .insert({ match_id: MATCH_ID, title, date, type: 'future' })
-        .select().single();
+        .select().maybeSingle();
       if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newD._dbId = data.id;
     }
@@ -3732,7 +3839,7 @@ async function saveReflectie(id) {
     if (MATCH_ID) {
       const { data, error } = await db.from('stage_reflecties')
         .insert({ match_id: MATCH_ID, author_role: hubState.role, ...payload })
-        .select().single();
+        .select().maybeSingle();
       if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newR._dbId = data.id;
     }
@@ -4056,7 +4163,7 @@ async function inviteSchool() {
     } else {
       const { data } = await db.from('stage_plans')
         .upsert({ match_id: MATCH_ID, school_invited: true }, { onConflict: 'match_id' })
-        .select('id').single();
+        .select('id').maybeSingle();
       if (data) sp._dbId = data.id;
     }
   }
@@ -4355,7 +4462,7 @@ async function saveStageplan() {
     };
     const { data, error } = await db.from('stage_plans')
       .upsert(payload, { onConflict: 'match_id' })
-      .select().single();
+      .select().maybeSingle();
     if (error) { toast('Fout bij opslaan: ' + (error?.message || 'onbekende fout')); return; }
     if (data) sp._dbId = data.id;
   }
@@ -4378,7 +4485,7 @@ async function saveSchoolnoot() {
       // No plan row yet — UPSERT with only required fields
       const { data, error } = await db.from('stage_plans')
         .upsert({ match_id: MATCH_ID, schoolnoot: val }, { onConflict: 'match_id' })
-        .select('id').single();
+        .select('id').maybeSingle();
       if (error) { toast('Fout bij opslaan: ' + (error?.message || 'onbekende fout'), 'error'); return; }
       if (data) sp._dbId = data.id;
     }
@@ -5614,12 +5721,227 @@ function exportPDF() {
      All demo data unchanged — page works fully without ?match= param
    ──────────────────────────────────────────────────────────────────────── */
 
+/* ── Matchpool demo toggle ────────────────────────────────────────────────── */
+
+let _demoEnabled = localStorage.getItem('internly_demo_profiles') === 'true';
+let _guideStep = 0;
+const _guideSteps = DEMO_PROFILES.flatMap(p => p.info_steps.map(s => ({ ...s, profileNaam: p.naam, profileType: p.type })));
+
+function initDemoToggle() {
+  const track = document.getElementById('demo-toggle');
+  const knob  = document.getElementById('demo-knob');
+  if (!track || !knob) return;
+  if (_demoEnabled) {
+    track.style.background = 'var(--amber,#a06010)';
+    knob.style.transform = 'translateX(18px)';
+  } else {
+    track.style.background = '#d1d5db';
+    knob.style.transform = 'translateX(0)';
+  }
+}
+
+function toggleDemoProfiles() {
+  _demoEnabled = !_demoEnabled;
+  localStorage.setItem('internly_demo_profiles', _demoEnabled ? 'true' : 'false');
+  initDemoToggle();
+  // Re-render matchpool if currently visible
+  if (hubState.currentTab === 'matchpool') switchTab('matchpool');
+}
+
+function renderDemoCards() {
+  if (!_demoEnabled) return '';
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:1.5rem;">
+    ${DEMO_PROFILES.map((p, i) => renderDemoCard(p, i)).join('')}
+  </div>`;
+}
+
+function renderDemoCard(p, idx) {
+  let bodyHtml = '';
+
+  if (p.type === 'bedrijf') {
+    const scores = p.trust_scores;
+    const avg = Math.round((scores.respons + scores.leerdoel + scores.afspraken + scores.begeleiding) / 4);
+    bodyHtml = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="font-size:.78rem;font-weight:600;color:var(--muted);">Trust Score</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--primary);">${avg}</div>
+        <div class="grade-badge A" style="font-size:.7rem;padding:1px 6px;">A</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        ${p.tags.map(t => `<span style="font-size:.72rem;padding:2px 8px;background:var(--bedrijf-bg,#e8f5ee);color:var(--bedrijf,#1a7a48);border-radius:20px;font-weight:500;">${escHtml(t)}</span>`).join('')}
+      </div>`;
+  } else if (p.type === 'school') {
+    bodyHtml = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
+        <div style="background:var(--school-bg,#fdf3e0);border-radius:8px;padding:8px 4px;">
+          <div style="font-size:1rem;font-weight:700;color:var(--school,#a06010);">${p.begeleiders}</div>
+          <div style="font-size:.7rem;color:var(--muted);">Begeleiders</div>
+        </div>
+        <div style="background:var(--school-bg,#fdf3e0);border-radius:8px;padding:8px 4px;">
+          <div style="font-size:1rem;font-weight:700;color:var(--school,#a06010);">${p.actieve_stages}</div>
+          <div style="font-size:.7rem;color:var(--muted);">Actieve stages</div>
+        </div>
+        <div style="background:var(--school-bg,#fdf3e0);border-radius:8px;padding:8px 4px;">
+          <div style="font-size:1rem;font-weight:700;color:var(--school,#a06010);">${p.gem_score}</div>
+          <div style="font-size:.7rem;color:var(--muted);">Gem. score</div>
+        </div>
+      </div>`;
+  } else if (p.type === 'buddy') {
+    bodyHtml = `
+      <div style="margin-bottom:8px;">
+        <div style="font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:4px;">Beschikbaarheid</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${p.beschikbaarheid.map(d => `<span style="font-size:.72rem;padding:2px 8px;background:var(--blue-bg,#e8f0fc);color:var(--blue,#1756a8);border-radius:20px;">${escHtml(d)}</span>`).join('')}
+        </div>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);">${p.talen.join(' · ')}</div>`;
+  }
+
+  const typeLabel = { bedrijf: 'Bedrijf', school: 'School', buddy: 'Buddy' }[p.type] || p.type;
+  const typeColor = { bedrijf: 'var(--bedrijf,#1a7a48)', school: 'var(--school,#a06010)', buddy: 'var(--blue,#1756a8)' }[p.type];
+  const typeBg    = { bedrijf: 'var(--bedrijf-bg,#e8f5ee)', school: 'var(--school-bg,#fdf3e0)', buddy: 'var(--blue-bg,#e8f0fc)' }[p.type];
+
+  return `
+  <div style="background:#fff;border:1px solid var(--border,#e5e3de);border-radius:var(--r,14px);padding:16px;position:relative;">
+    <div style="position:absolute;top:10px;right:10px;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;background:${typeBg};color:${typeColor};">
+      ${typeLabel} · Voorbeeld
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">${escHtml(p.avatar)}</div>
+      <div>
+        <div style="font-size:.9rem;font-weight:600;color:var(--ink);">${escHtml(p.naam)}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${escHtml(p.stad)}${p.sector ? ' · ' + escHtml(p.sector) : p.beroep ? ' · ' + escHtml(p.beroep) : p.opleiding ? ' · ' + escHtml(p.opleiding) : ''}</div>
+      </div>
+    </div>
+    <div style="font-size:.78rem;color:var(--ink3,#6b7280);margin-bottom:12px;line-height:1.45;">${escHtml(p.beschrijving)}</div>
+    ${bodyHtml}
+    <div style="
+      margin-top:.85rem;
+      padding-top:.75rem;
+      border-top:1px solid var(--border, rgba(13,21,32,.09));
+      display:flex; align-items:center; justify-content:space-between;
+    ">
+      <span style="font-size:.75rem;color:var(--ink3);font-style:italic">
+        Dit is een voorbeeldprofiel
+      </span>
+      <a href="auth.html" style="
+        font-size:.75rem; color:var(--accent, #e05c1a);
+        text-decoration:none; font-weight:500;
+      ">Maak je profiel aan →</a>
+    </div>
+  </div>`;
+}
+
+/* ── Matchpool tab ────────────────────────────────────────────────────────── */
+
+function renderMatchpool() {
+  const toggleBar = `
+    <div id="demo-toggle-bar" style="display:flex;align-items:center;gap:10px;padding:.6rem .85rem;background:var(--amber-bg,#fdf3e0);border:0.5px solid rgba(160,96,16,.2);border-radius:var(--r-sm,8px);margin-bottom:1rem;">
+      <label class="demo-switch" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;color:var(--amber,#a06010);font-weight:500;" onclick="toggleDemoProfiles()">
+        <span style="font-size:16px;">🎓</span> Voorbeeldprofielen tonen
+        <div id="demo-toggle" style="width:36px;height:20px;border-radius:10px;background:${_demoEnabled ? 'var(--amber,#a06010)' : '#d1d5db'};position:relative;transition:background .2s;flex-shrink:0;">
+          <div id="demo-knob" style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;transform:${_demoEnabled ? 'translateX(18px)' : 'translateX(0)'};box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+        </div>
+      </label>
+      <button onclick="openDemoGuide()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--amber,#a06010);padding:2px 6px;border-radius:4px;" title="Uitleg matchpool">ℹ️ Uitleg</button>
+    </div>`;
+
+  const emptyState = !_demoEnabled ? `
+    <div class="empty-state" style="padding:40px 20px;">
+      <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
+      <div style="font-size:.95rem;font-weight:600;color:var(--ink2);margin-bottom:6px;">Matchpool</div>
+      <div style="font-size:.82rem;color:var(--muted);max-width:320px;margin:0 auto 16px;">Hier verschijnen beschikbare bedrijven, scholen en buddy's zodra er profielen zijn gekoppeld. Zet voorbeeldprofielen aan om te zien hoe de pool eruitziet.</div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleDemoProfiles()">Voorbeeldprofielen tonen</button>
+    </div>` : '';
+
+  return `
+    <div class="page-head">
+      <div>
+        <div class="page-title">Matchpool</div>
+        <div class="page-sub">Beschikbare bedrijven, scholen en buddy's</div>
+      </div>
+    </div>
+    ${toggleBar}
+    ${renderDemoCards()}
+    ${emptyState}`;
+}
+
+/* ── Demo guide overlay ───────────────────────────────────────────────────── */
+
+function openDemoGuide() {
+  _guideStep = 0;
+  renderGuideStep();
+  const overlay = document.getElementById('demo-guide-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function closeDemoGuide() {
+  const overlay = document.getElementById('demo-guide-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function demoGuideStep(dir) {
+  _guideStep = Math.max(0, Math.min(_guideSteps.length - 1, _guideStep + dir));
+  renderGuideStep();
+}
+
+function renderGuideStep() {
+  const s    = _guideSteps[_guideStep];
+  const tot  = _guideSteps.length;
+  const isLast = _guideStep === tot - 1;
+
+  const typeColor = { bedrijf: 'var(--bedrijf,#1a7a48)', school: 'var(--school,#a06010)', buddy: 'var(--blue,#1756a8)' }[s.profileType] || 'var(--primary)';
+  const typeBg    = { bedrijf: 'var(--bedrijf-bg,#e8f5ee)', school: 'var(--school-bg,#fdf3e0)', buddy: 'var(--blue-bg,#e8f0fc)' }[s.profileType] || '#e8f5ee';
+
+  const el = document.getElementById('guide-body');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="font-size:.72rem;font-weight:600;padding:2px 10px;border-radius:20px;background:${typeBg};color:${typeColor};display:inline-block;margin-bottom:12px;">${escHtml(s.profileNaam)}</div>
+    <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:10px;">${escHtml(s.title)}</div>
+    <div style="font-size:.87rem;color:var(--ink2);line-height:1.55;">${escHtml(s.body)}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
+      <button onclick="demoGuideStep(-1)" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.82rem;cursor:pointer;${_guideStep === 0 ? 'opacity:.4;pointer-events:none;' : ''}">← Vorige</button>
+      <span style="font-size:.75rem;color:var(--muted);">${_guideStep + 1} / ${tot}</span>
+      ${isLast
+        ? `<button onclick="closeDemoGuide()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Sluiten ✓</button>`
+        : `<button onclick="demoGuideStep(1)" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Volgende →</button>`}
+    </div>`;
+
+  // Update dot indicators
+  const dots = document.querySelectorAll('.guide-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === _guideStep));
+}
+
 function nowStr() {
   const now = new Date();
   return now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
     now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
 }
 </script>
+<!-- Demo guide overlay -->
+<div id="demo-guide-overlay" onclick="if(event.target===this)closeDemoGuide()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1100;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:var(--r,14px);width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+    <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:.78rem;font-weight:600;color:var(--muted);">Matchpool uitleg</div>
+      <button onclick="closeDemoGuide()" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--muted);line-height:1;">×</button>
+    </div>
+    <div id="guide-body" style="padding:16px 20px 20px;"></div>
+    <div style="padding:0 20px 16px;display:flex;justify-content:center;gap:6px;">
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+      <div class="guide-dot" style="width:6px;height:6px;border-radius:50%;background:#d1d5db;transition:background .2s;"></div>
+    </div>
+  </div>
+</div>
 <script src="js/info.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>

@@ -460,6 +460,21 @@
       <label>Naam <span class="req">*</span></label>
       <input type="text" id="naam" placeholder="Voornaam Achternaam">
     </div>
+
+    <div class="field">
+      <label>Geslacht <span class="hint">optioneel</span></label>
+      <div style="font-size:.78rem;color:var(--ink3);margin-bottom:6px;line-height:1.4">
+        Alleen gebruikt voor anonieme diversiteitsrapportage — nooit zichtbaar voor bedrijven
+      </div>
+      <select id="sp-geslacht">
+        <option value="">Selecteer (optioneel)</option>
+        <option value="man">Man</option>
+        <option value="vrouw">Vrouw</option>
+        <option value="non-binair">Non-binair</option>
+        <option value="zeg_liever_niet">Zeg ik liever niet</option>
+      </select>
+    </div>
+
     <div class="field-row">
       <div class="field">
         <label>Opleiding <span class="req">*</span></label>
@@ -1111,6 +1126,7 @@ async function submitProfile() {
   const payload = {
     profile_id:                currentUser?.id || null,
     naam:                      document.getElementById('naam').value.trim(),
+    geslacht:                  document.getElementById('sp-geslacht')?.value || null,
     opleiding:                 document.getElementById('opleiding').value.trim(),
     school:                    document.getElementById('school').value.trim(),
     jaar:                      parseInt(document.getElementById('jaar').value),
@@ -1153,16 +1169,16 @@ async function submitProfile() {
     btn.disabled = false;
     btn.textContent = 'Wijzigingen opslaan →';
     toonOverzicht(payload);
-    notify('Profiel bijgewerkt!');
+    notify('Profiel bijgewerkt');
   } else {
     // First creation: trigger matching, then show overview
     const sector     = document.getElementById('opdracht_domein').value;
     const matchCount = await triggerStudentMatching(currentUser?.id, sector);
     toonOverzicht(payload);
     if (matchCount > 0) {
-      notify(`Profiel aangemaakt! ${matchCount} mogelijke match${matchCount !== 1 ? 'es' : ''} gevonden.`);
+      notify(`Profiel aangemaakt — ${matchCount} mogelijke match${matchCount !== 1 ? 'es' : ''} gevonden`);
     } else {
-      notify('Profiel aangemaakt en zichtbaar voor bedrijven!');
+      notify('Profiel aangemaakt en zichtbaar voor bedrijven');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

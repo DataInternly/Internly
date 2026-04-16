@@ -346,9 +346,10 @@ const InternlyCalendar = (() => {
         note:           note||null,
         organizer_email: orgEmail,
         attendee_email:  otherEmail,
-      }).select().single();
+      }).select().maybeSingle();
 
       if (error) throw error;
+      if (!mtg) { notify('Beschikbaarheid kon niet worden opgeslagen — probeer opnieuw'); return; }
 
       // E-mail via Edge Function — faalt stil als nog niet deployed
       try {

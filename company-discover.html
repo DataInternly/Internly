@@ -285,7 +285,32 @@
     <button onclick="filterCards()">Filter toepassen</button>
   </div>
 
-  <div class="results-count" id="resultsCount"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div class="results-count" id="resultsCount"></div>
+    <button onclick="toggleDemoCompanyDiscover(true)" id="demoCDBtn" style="
+      background:none;border:1px solid #f5c87a;border-radius:20px;
+      padding:4px 12px;font-size:.78rem;font-weight:600;
+      color:#a06010;cursor:pointer;white-space:nowrap;">
+      🔍 Toon voorbeeldstudent
+    </button>
+  </div>
+
+  <!-- ── DEMO STUDENT TOGGLE ── -->
+  <div id="demoCDBar" style="
+    display:none;
+    background:#fdf3e0;border:1px solid #f5c87a;border-radius:12px;
+    padding:10px 16px;margin-bottom:12px;
+    font-size:.85rem;color:#a06010;
+    align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <span>🔍 Voorbeeldprofiel zichtbaar — zo zien echte studentprofielen eruit.</span>
+    <button onclick="toggleDemoCompanyDiscover(false)" style="
+      background:none;border:1px solid #f5c87a;border-radius:8px;
+      padding:4px 12px;font-size:.8rem;color:#a06010;cursor:pointer;">
+      Verbergen
+    </button>
+  </div>
+  <div id="demoCDCards"></div>
+
   <div id="studentsContainer" class="cards-container"></div>
 </div>
 
@@ -390,7 +415,7 @@ async function loadStudents() {
 
   if (error) {
     console.error(error);
-    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Fout bij laden.<br><code>${escapeHtml(error.message)}</code></div>`;
+    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Studentprofielen konden niet worden geladen. Probeer de pagina te verversen.</div>`;
     return;
   }
 
@@ -398,8 +423,7 @@ async function loadStudents() {
     container.innerHTML = `
       <div class="state-box">
         <span class="state-icon">📭</span>
-        Nog geen studentprofielen beschikbaar.<br>
-        <small>Studenten vullen hun profiel in via <strong>student-profile.html</strong>.</small>
+        Studenten die hun profiel hebben ingevuld verschijnen hier automatisch. Deel de link naar Internly om studenten uit te nodigen.
       </div>`;
     return;
   }
@@ -443,7 +467,7 @@ function filterCards() {
 }
 
 function contact(naam) {
-  notify(`Contactverzoek verstuurd naar ${naam}`);
+  notify(`Verzoek verstuurd aan ${naam} — de student ontvangt een melding`);
 }
 
 function notify(msg) {
@@ -482,7 +506,76 @@ async function signOut() {
   }
 }
 
+// ── Demo student toggle (company-discover) ────────────────────────────────
+const DEMO_CD_KEY = 'internly_demo_company_discover';
+
+function initDemoCompanyDiscover() {
+  const enabled = localStorage.getItem(DEMO_CD_KEY) === 'true';
+  renderCDDemoState(enabled);
+}
+
+function toggleDemoCompanyDiscover(force) {
+  const enabled = typeof force === 'boolean' ? force : localStorage.getItem(DEMO_CD_KEY) !== 'true';
+  localStorage.setItem(DEMO_CD_KEY, enabled);
+  renderCDDemoState(enabled);
+}
+
+function renderCDDemoState(enabled) {
+  const bar   = document.getElementById('demoCDBar');
+  const cards = document.getElementById('demoCDCards');
+  const btn   = document.getElementById('demoCDBtn');
+  if (!bar || !cards) return;
+  bar.style.display   = enabled ? 'flex' : 'none';
+  cards.style.display = enabled ? 'block' : 'none';
+  if (btn) btn.style.display = enabled ? 'none' : '';
+  if (enabled && !cards.innerHTML) {
+    cards.innerHTML = `
+      <div class="student-card" style="border:2px dashed #f5c87a;position:relative;">
+        <div style="position:absolute;top:10px;right:10px;
+          background:#fdf3e0;color:#a06010;font-size:.72rem;font-weight:700;
+          padding:3px 9px;border-radius:20px;letter-spacing:.04em;">
+          Voorbeeld · Student
+        </div>
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="avatar">LH</div>
+            <div>
+              <div class="card-name">Lena Hartman</div>
+              <div class="card-meta">Communication &amp; Multimedia Design · HvA · Jaar 3</div>
+            </div>
+          </div>
+          <span class="avail-badge">📅 September 2026</span>
+        </div>
+        <div style="margin-bottom:10px">
+          <span class="tag domain">Marketing &amp; Communicatie</span>
+          <span class="tag" style="background:#f0f4ff;color:#1756a8">Praktijkgericht</span>
+          <span class="tag">Kwalitatief</span>
+        </div>
+        <div class="onderzoek-box">
+          <div class="ob-label">Onderzoeksvraag</div>
+          <div class="ob-vraag">"Hoe vergroot je de betrokkenheid van Gen Z via social storytelling?"</div>
+        </div>
+        <div class="card-section">
+          <div class="cs-label">Skills</div>
+          <div class="tags">
+            <span class="tag">Figma</span>
+            <span class="tag">Adobe Premiere</span>
+            <span class="tag">Social strategy</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="duur-text">⏱ 5 maanden</span>
+          <a href="auth.html" class="btn-contact" style="text-decoration:none;display:inline-block">
+            Maak je profiel aan →
+          </a>
+        </div>
+      </div>`;
+  }
+}
+// ── End demo student toggle ───────────────────────────────────────────────
+
 window.addEventListener('DOMContentLoaded', async () => {
+  initDemoCompanyDiscover();
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
 
@@ -511,41 +604,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-  <!-- Google Translate Widget -->
-  <div id="google_translate_element" style="display:none"></div>
-  <script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'nl',
-    includedLanguages: 'nl,en,de,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function switchLang(lang) {
-  const select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event('change'));
-  }
-  localStorage.setItem('internly_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
-
-window.addEventListener('load', function() {
-  const saved = localStorage.getItem('internly_lang') || 'nl';
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === saved);
-  });
-  if (saved && saved !== 'nl') {
-    setTimeout(function() { switchLang(saved); }, 1500);
-  }
-});
-  </script>
-  <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script src="js/translate.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

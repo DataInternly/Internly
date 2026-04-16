@@ -286,6 +286,34 @@
   </a>
 </nav>
 
+<div id="auth-banner" style="
+  display:none;
+  background:var(--amber-bg);
+  border:1px solid #f5c87a;
+  border-radius:var(--r);
+  padding:14px 20px;
+  margin:16px auto 0;
+  max-width:720px;
+  font-size:.9rem;
+  color:var(--amber);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;">
+  <span>🔒 Log in om te solliciteren en vacatures op te slaan.</span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <a href="auth.html" style="
+      background:var(--green);color:#fff;padding:7px 16px;
+      border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none;">
+      Inloggen
+    </a>
+    <button onclick="document.getElementById('auth-banner').style.display='none'" style="
+      background:none;border:none;cursor:pointer;font-size:1.1rem;
+      color:var(--amber);padding:4px 6px;line-height:1;">×</button>
+  </div>
+</div>
+
 <div class="container">
   <a href="discover.html" class="back-link">← Alle vacatures</a>
   <div id="content">
@@ -478,6 +506,21 @@ function render(v, source) {
         </div>` : ''}
     </div>
 
+    ${source === 'internship_postings' && v.vestigingen ? `
+    <!-- ── SECTIE 1B: Vestiging ── -->
+    <div class="detail-card">
+      <div class="sec-head">Vestiging</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:1.5rem">📍</span>
+        <div>
+          <div style="font-weight:700;color:var(--ink)">${escapeHtml(v.vestigingen.naam || '')}</div>
+          <div style="font-size:.85rem;color:var(--ink3);margin-top:2px">
+            ${v.vestigingen.adres ? escapeHtml(v.vestigingen.adres) + ' &nbsp;·&nbsp; ' : ''}${escapeHtml(v.vestigingen.stad || '')} &nbsp;·&nbsp; ${escapeHtml(v.vestigingen.postcode || '')}
+          </div>
+        </div>
+      </div>
+    </div>` : ''}
+
     <!-- ── SECTIE 2: Trust Score uitleg ── -->
     <div class="detail-card">
       <div class="sec-head">Trust Score uitleg</div>
@@ -654,6 +697,13 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
+  // Soft auth check — show banner if not logged in, but don't redirect (page is publicly shareable)
+  const { data: { user: _guestCheck } } = await db.auth.getUser();
+  if (!_guestCheck) {
+    const banner = document.getElementById('auth-banner');
+    if (banner) banner.style.display = 'flex';
+  }
+
   const params = new URLSearchParams(window.location.search);
   const id     = params.get('id');
   const source = params.get('source');
@@ -665,14 +715,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  let query = db.from(source).select('*').eq('id', id);
+  const selectCols = source === 'internship_postings'
+    ? '*, vestigingen(naam, stad, postcode, adres)'
+    : '*';
+  let query = db.from(source).select(selectCols).eq('id', id);
   if (source === 'internship_postings') query = query.eq('status', 'active');
 
-  const { data, error } = await query.single();
+  const { data, error } = await query.maybeSingle();
 
-  if (error || !data) {
+  if (error) {
     document.getElementById('content').innerHTML =
       `<div class="state-box error"><span class="state-icon">⚠️</span>Vacature niet gevonden.<br><a href="discover.html" style="color:#1a7a48">Terug naar overzicht →</a></div>`;
+    return;
+  }
+  if (!data) {
+    notify('Deze vacature is niet meer beschikbaar');
+    setTimeout(() => { window.location.href = 'discover.html'; }, 2000);
     return;
   }
 

@@ -135,6 +135,9 @@
     .bbl-role { border-left: 3px solid rgba(93,202,165,.5); }
     .role-card.selected.bbl-role { border-color: #0f6e56; background: #edfaf5; }
     .role-card.selected.bbl-role .role-check { background: #0f6e56; border-color: #0f6e56; }
+    .begeleider-role { border-left: 3px solid rgba(14,116,144,.4); }
+    .role-card.selected.begeleider-role { border-color: #0e7490; background: #ecfeff; }
+    .role-card.selected.begeleider-role .role-check { background: #0e7490; border-color: #0e7490; }
 
     /* Buddy extra velden in registratieformulier */
     .buddy-extra { display: none; margin-top: 4px; }
@@ -309,6 +312,14 @@
         </div>
         <div class="role-check" id="check-school"></div>
       </div>
+      <div class="role-card begeleider-role" id="rc-begeleider" onclick="selectRole('begeleider')">
+        <div class="role-icon-wrap">📋</div>
+        <div>
+          <div class="role-name">Ik ben stagebegeleider</div>
+          <div class="role-desc">Ik begeleid studenten individueel tijdens hun stage</div>
+        </div>
+        <div class="role-check" id="check-begeleider"></div>
+      </div>
       <div class="role-card buddy-role" id="rc-gepensioneerd" onclick="selectRole('gepensioneerd')">
         <div class="role-icon-wrap">🤝</div>
         <div>
@@ -409,6 +420,7 @@
              style="color:var(--green);text-decoration:none;">privacybeleid</a>
           gelezen en ga akkoord met de verwerking van mijn gegevens door
           Sasubo Holding B.V.
+          <span style="display:block;margin-top:4px;color:var(--ink3);">Jouw stagegegevens worden anoniem gebruikt voor ESG-rapportages van bedrijven.</span>
         </span>
       </label>
       <button class="btn-submit" id="registerBtn" onclick="doRegister()">
@@ -423,6 +435,9 @@
     <a href="index.html">← Terug naar homepagina</a>
     &nbsp;·&nbsp;
     <a href="spelregels.html">Spelregels</a>
+    &nbsp;·&nbsp;
+    <a href="kennisbank.html">Kennisbank</a>
+    <div style="margin-top:8px;font-size:.7rem;color:var(--ink4);">© 2026 Sasubo Holding B.V.</div>
   </div>
 
 </div>
@@ -445,13 +460,19 @@ const ROUTES = {
   student:       'discover.html',
   bedrijf:       'company-dashboard.html',
   school:        'school-dashboard.html',
+  begeleider:    'begeleider-dashboard.html',
   gepensioneerd: 'buddy-dashboard.html',
 };
 
 // ── State ──
-let selectedRole = null;
-let activeTab    = 'login';
-let isBBL        = false;
+let selectedRole  = null;
+let activeTab     = 'login';
+let isBBL         = false;
+
+// ── Rate limiting ──
+let _loginAttempts = 0;
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS   = 60 * 1000; // 60 seconds
 
 // ── Tab switch ──
 function switchTab(tab) {
@@ -482,7 +503,7 @@ function selectRole(role) {
   }
 
   // Reset alle kaarten
-  ['student','bbl','bedrijf','school','gepensioneerd'].forEach(r => {
+  ['student','bbl','bedrijf','school','begeleider','gepensioneerd'].forEach(r => {
     const card  = document.getElementById('rc-' + r);
     const check = document.getElementById('check-' + r);
     if (card)  card.classList.remove('selected');
@@ -520,6 +541,8 @@ async function doLogin() {
   if (!email || !pass) { showError('Vul e-mailadres en wachtwoord in.'); return; }
 
   const btn = document.getElementById('loginBtn');
+  if (btn.disabled) return; // locked out
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Inloggen…';
 
@@ -529,9 +552,29 @@ async function doLogin() {
   btn.textContent = 'Inloggen →';
 
   if (error) {
-    showError('Inloggen mislukt: ' + (error?.message || 'onbekende fout'));
+    _loginAttempts++;
+    if (_loginAttempts >= MAX_ATTEMPTS) {
+      btn.disabled = true;
+      let remaining = Math.ceil(LOCKOUT_MS / 1000);
+      showError(`Te veel mislukte pogingen. Wacht ${remaining} seconden.`);
+      const countdown = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(countdown);
+          _loginAttempts = 0;
+          btn.disabled = false;
+          btn.textContent = 'Inloggen →';
+          clearMessages();
+        } else {
+          showError(`Te veel mislukte pogingen. Wacht nog ${remaining} seconden.`);
+        }
+      }, 1000);
+      return;
+    }
+    showError('Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
     return;
   }
+  _loginAttempts = 0; // reset on success
 
   // Haal rol op uit profiles tabel
   const { data: profile } = await db
@@ -609,7 +652,7 @@ async function doRegister() {
   btn.textContent = 'Account aanmaken →';
 
   if (error) {
-    showError('Registreren mislukt: ' + (error?.message || 'onbekende fout'));
+    showError('Registreren mislukt. Probeer het opnieuw of neem contact met ons op.');
     return;
   }
 
@@ -626,7 +669,25 @@ async function doRegister() {
       console.warn('[auth] Profile insert fout:', profileError.message);
     }
 
-    // 3. BBL-student: zet bbl_mode=true op student_profiles
+    // 3. Gratis abonnement aanmaken voor bedrijf / school
+    await seedFreeSubscription(data.user.id, selectedRole);
+
+    // 3b. Begeleider: start 30-dagen gratis proefperiode
+    if (selectedRole === 'begeleider') {
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 30);
+      await db.from('subscriptions').upsert(
+        {
+          profile_id:         data.user.id,
+          plan:               'begeleider_starter',
+          status:             'trial',
+          current_period_end: trialEnd.toISOString(),
+        },
+        { onConflict: 'profile_id' }
+      );
+    }
+
+    // 4. BBL-student: zet bbl_mode=true op student_profiles
     // Gebruik upsert — bij registratie bestaat de rij nog niet, UPDATE zou 0 rijen raken.
     if (isBBL) {
       await db.from('student_profiles')
@@ -654,6 +715,16 @@ async function doRegister() {
   }
 
   showSuccess('Account aangemaakt! Controleer je e-mail en klik op de bevestigingslink om in te loggen.');
+}
+
+// ── Seed free subscription ────────────────────────────────────────────────────
+async function seedFreeSubscription(userId, role) {
+  if (role !== 'bedrijf' && role !== 'school') return;
+  const plan = role === 'bedrijf' ? 'company_starter' : 'school_freemium';
+  await db.from('subscriptions').upsert(
+    { profile_id: userId, plan, status: 'active' },
+    { onConflict: 'profile_id' }
+  );
 }
 
 // ── Helpers ──
@@ -724,7 +795,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const role = profile?.role || sessionStorage.getItem('internly_role');
     if (role && ROUTES[role]) {
       let dest = ROUTES[role];
-      let roleLabel = { student: 'Student (BOL)', bedrijf: 'Bedrijf', school: 'School', gepensioneerd: 'Gepensioneerde buddy' }[role] || role;
+      let roleLabel = { student: 'Student (BOL)', bedrijf: 'Bedrijf', school: 'School', begeleider: 'Stagebegeleider', gepensioneerd: 'Gepensioneerde buddy' }[role] || role;
       if (role === 'student') {
         const { data: sp } = await db
           .from('student_profiles')
@@ -762,40 +833,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-<!-- Google Translate Widget (no buttons on this page — language preference persists via cookie) -->
-<div id="google_translate_element" style="display:none"></div>
-<script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({
-    pageLanguage: 'nl',
-    includedLanguages: 'nl,en,de,fr',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-}
-
-function switchLang(lang) {
-  const select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = lang;
-    select.dispatchEvent(new Event('change'));
-  }
-  localStorage.setItem('internly_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
-
-window.addEventListener('load', function() {
-  const saved = localStorage.getItem('internly_lang') || 'nl';
-  document.querySelectorAll('.lang-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.lang === saved);
-  });
-  if (saved && saved !== 'nl') {
-    setTimeout(function() { switchLang(saved); }, 1500);
-  }
-});
-</script>
-<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/translate.js"></script>
 </body>
 </html>

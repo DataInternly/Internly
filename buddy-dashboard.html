@@ -533,11 +533,17 @@ async function acceptRequest(reqId) {
   const { data: pair, error: pErr } = await db
     .from('buddy_pairs')
     .insert({ requester_id: req.requester_id, receiver_id: req.receiver_id, type: req.type, status: 'active', reveal_after: null })
-    .select('id').single();
+    .select('id').maybeSingle();
   if (pErr) {
     // Roll back acceptance
     await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId).catch(() => {});
     notify('Koppeling aanmaken mislukt — probeer opnieuw.'); return;
+  }
+  if (!pair) {
+    notify('Koppeling bevestigd — student wordt op de hoogte gesteld');
+    await loadPendingRequests();
+    await loadPairs();
+    return;
   }
 
   // 3. Notify student

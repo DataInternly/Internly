@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a7a48">
+  <title>Begeleiderdashboard — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --teal:       #0e7490;
+      --teal-dark:  #0a5668;
+      --teal-bg:    #ecfeff;
+      --orange:     #FF7E42;
+      --orange-dark:#e05c1a;
+      --green:      #1a7a48;
+      --green-bg:   #e8f5ee;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --white:      #ffffff;
+      --border:     #f0f0ee;
+      --border2:    #e2e8f0;
+      --red:        #b82020;
+      --red-bg:     #fdeaea;
+      --amber:      #a06010;
+      --amber-bg:   #fdf3e0;
+      --r:          16px;
+      --r-sm:       8px;
+      --sidebar-w:  240px;
+      --accent:     var(--teal);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--teal-dark);
+      height: 56px; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .topbar-user {
+      color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500;
+    }
+    .role-pill {
+      background: rgba(255,255,255,.15);
+      color: rgba(255,255,255,.9);
+      font-size: .75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+    }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: calc(100vh - 56px); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: sticky; top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto; flex-shrink: 0;
+    }
+    .sidebar-inner { padding: 20px 12px; }
+    .sidebar-section { margin-bottom: 24px; }
+    .sidebar-label {
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--ink4); padding: 0 8px; margin-bottom: 6px; display: block;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 9px;
+      width: 100%; padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: .88rem;
+      color: var(--ink2); text-align: left;
+      transition: background .12s, color .12s; margin-bottom: 2px;
+    }
+    .nav-btn:hover { background: var(--bg); }
+    .nav-btn.active { background: var(--teal-bg); color: var(--teal); font-weight: 600; }
+    .nav-icon { font-size: .95rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+    /* ── SIDEBAR USER ── */
+    .sidebar-user {
+      padding: 16px 12px 12px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-user-info { min-width: 0; }
+    .sidebar-user-name {
+      font-size: .84rem; font-weight: 600; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sidebar-user-email {
+      font-size: .72rem; color: var(--ink4);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .btn-logout {
+      display: flex; align-items: center; gap: 9px;
+      width: calc(100% - 24px); margin: 8px 12px;
+      padding: 8px 10px; border-radius: var(--r-sm);
+      background: none; border: 1.5px solid var(--border2);
+      cursor: pointer; font-family: 'Outfit', sans-serif;
+      font-size: .84rem; color: var(--ink3); text-align: left;
+      transition: all .12s;
+    }
+    .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
+
+    /* ── MAIN ── */
+    .main { flex: 1; padding: 32px 32px 80px; max-width: 900px; }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 4px;
+    }
+    .page-sub { font-size: .88rem; color: var(--ink3); margin-bottom: 24px; }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 16px 18px;
+    }
+    .stat-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink4); margin-bottom: 6px;
+    }
+    .stat-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.9rem; font-weight: 700; color: var(--ink); line-height: 1;
+    }
+    .stat-note { font-size: .75rem; color: var(--ink4); margin-top: 3px; }
+
+    /* ── PLAN INFO CARD ── */
+    .plan-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 20px 22px; margin-bottom: 20px;
+    }
+    .plan-card-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .plan-badge {
+      font-size: .72rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 20px; background: var(--teal-bg); color: var(--teal);
+    }
+    .plan-detail-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: .85rem; color: var(--ink2); margin-bottom: 8px;
+    }
+    .plan-detail-label { color: var(--ink4); font-size: .8rem; }
+    .plan-bar-wrap { margin: 10px 0 14px; }
+    .plan-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: .78rem; color: var(--ink4); margin-bottom: 5px;
+    }
+    .plan-bar-track {
+      height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden;
+    }
+    .plan-bar-fill {
+      height: 100%; border-radius: 4px;
+      background: var(--teal); transition: width .4s;
+    }
+    .plan-bar-fill.warn { background: var(--amber); }
+    .plan-bar-fill.full { background: var(--red); }
+
+    /* ── ACTIVITY / NOTIFICATION LIST ── */
+    .activity-list { margin-top: 4px; }
+    .activity-item {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 12px 16px;
+      margin-bottom: 7px; display: flex; align-items: flex-start; gap: 12px;
+    }
+    .activity-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--teal); flex-shrink: 0; margin-top: 5px;
+    }
+    .activity-dot.read { background: var(--ink4); }
+    .activity-msg { font-size: .86rem; color: var(--ink2); flex: 1; }
+    .activity-time { font-size: .75rem; color: var(--ink4); flex-shrink: 0; }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 14px;
+    }
+
+    /* ── STUDENT ROWS ── */
+    .student-row {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 16px 18px;
+      margin-bottom: 8px; display: flex; align-items: center;
+      gap: 14px; transition: border-color .15s;
+    }
+    .student-row:hover { border-color: var(--teal); }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--teal-bg); color: var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .88rem; font-weight: 700; flex-shrink: 0;
+    }
+    .sr-info { flex: 1; min-width: 0; }
+    .sr-name { font-size: .92rem; font-weight: 600; color: var(--ink); }
+    .sr-meta { font-size: .78rem; color: var(--ink3); }
+
+    /* ── FORM / CARD ── */
+    .form-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 24px; margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: .9rem; font-weight: 700; color: var(--ink);
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: .84rem; font-weight: 600; color: var(--ink2); margin-bottom: 5px; }
+    .field input[type="text"],
+    .field input[type="email"],
+    .field select {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border2); border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .9rem;
+      color: var(--ink); background: var(--white);
+      outline: none; transition: border-color .15s; box-sizing: border-box;
+    }
+    .field input:focus, .field select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,116,144,.12); }
+    .field input[readonly] { background: var(--bg); color: var(--ink3); cursor: not-allowed; }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--teal); color: #fff; border: none;
+      padding: 11px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-upgrade {
+      background: var(--orange); color: #fff; border: none;
+      padding: 9px 18px; border-radius: var(--r-sm);
+      font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 600;
+      cursor: pointer; transition: background .15s; text-decoration: none; display: inline-block;
+    }
+    .btn-upgrade:hover { background: var(--orange-dark); }
+
+    /* Alert / empty */
+    .alert-box {
+      border-left: 3px solid; border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      padding: 12px 16px; margin-bottom: 16px;
+      font-size: .85rem; line-height: 1.6;
+    }
+    .alert-amber { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+    .alert-red   { background: var(--red-bg);   border-color: var(--red);   color: var(--red); }
+    .empty {
+      text-align: center; padding: 48px 20px;
+      color: var(--ink4); font-size: .88rem; line-height: 1.9;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r);
+    }
+    .empty-icon { font-size: 2.2rem; display: block; margin-bottom: 12px; }
+
+    /* Notif toast */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff; padding: 12px 24px;
+      border-radius: var(--r); font-size: .88rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── MOBILE ── */
+    .mobile-tabs {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--white); border-top: 1px solid var(--border);
+      height: 60px; z-index: 200;
+      justify-content: space-around; align-items: center;
+    }
+    .mt-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      gap: 3px; background: none; border: none; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: .62rem; font-weight: 500;
+      color: var(--ink4); padding: 6px 4px; transition: color .12s;
+    }
+    .mt-tab.active { color: var(--teal); font-weight: 600; }
+    .mt-icon { font-size: 1.2rem; line-height: 1; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .mobile-tabs { display: flex; }
+      .main { padding: 20px 16px 80px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
+  <div class="topbar-right">
+    <span class="topbar-user" id="topbarUser"></span>
+    <span class="role-pill">📋 Begeleider</span>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM TABS -->
+<nav class="mobile-tabs" aria-label="Navigatie">
+  <button class="mt-tab active" id="mt-dashboard" onclick="show('dashboard')">
+    <span class="mt-icon">📊</span>
+    <span>Dashboard</span>
+  </button>
+  <button class="mt-tab" id="mt-studenten" onclick="show('studenten')">
+    <span class="mt-icon">👥</span>
+    <span>Studenten</span>
+  </button>
+  <button class="mt-tab" id="mt-profiel" onclick="show('profiel')">
+    <span class="mt-icon">👤</span>
+    <span>Profiel</span>
+  </button>
+</nav>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">??</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="userName">Laden…</div>
+        <div class="sidebar-user-email" id="userEmail"></div>
+      </div>
+    </div>
+    <div class="sidebar-inner">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Overzicht</span>
+        <button class="nav-btn active" id="nav-dashboard" onclick="show('dashboard')">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-btn" id="nav-studenten" onclick="show('studenten')">
+          <span class="nav-icon">👥</span> Mijn studenten
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Account</span>
+        <button class="nav-btn" id="nav-profiel" onclick="show('profiel')">
+          <span class="nav-icon">👤</span> Profiel
+        </button>
+        <a href="pricing.html" class="nav-btn" style="text-decoration:none">
+          <span class="nav-icon">💳</span> Abonnement
+        </a>
+        <a href="kennisbank.html" class="nav-btn" style="text-decoration:none">
+          <span class="nav-icon">📚</span> Kennisbank
+        </a>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doSignOut()">
+      <span>⬅</span> Uitloggen
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="welcomeMsg">Welkom terug</div>
+
+      <div id="referral-banner" style="
+        background:var(--amber-bg,#fdf3e0);
+        border:0.5px solid rgba(160,96,16,.2);
+        border-radius:var(--r-sm,8px);
+        padding:.85rem 1rem;
+        margin-bottom:1rem;
+        display:flex;align-items:flex-start;
+        gap:.75rem;
+      ">
+        <span style="font-size:1.1rem;flex-shrink:0">🤝</span>
+        <div style="flex:1">
+          <div style="font-size:.88rem;font-weight:500;
+            color:var(--amber,#a06010);margin-bottom:.2rem;">
+            Werkt Internly voor jou?
+          </div>
+          <div style="font-size:.82rem;color:var(--ink2);
+            line-height:1.55;margin-bottom:.6rem;">
+            Dan ken je waarschijnlijk iemand voor wie het
+            ook werkt — een bedrijf, school of begeleider
+            die worstelt met hetzelfde probleem.
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;
+            align-items:center;">
+            <button onclick="copyReferralText()"
+              class="btn btn-ghost"
+              style="font-size:.78rem;padding:5px 12px;">
+              📋 Kopieer aanbevelingstekst
+            </button>
+            <button onclick="dismissReferral()"
+              style="background:none;border:none;
+              font-size:.78rem;color:var(--ink3);
+              cursor:pointer;padding:5px;">
+              Niet nu
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Actieve studenten</div>
+          <div class="stat-val" id="statActief">—</div>
+          <div class="stat-note" id="statCapNote"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Afgeronde stages</div>
+          <div class="stat-val" id="statAfgerond">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Openstaande taken</div>
+          <div class="stat-val" id="statTaken">—</div>
+          <div class="stat-note">via Stage Hub</div>
+        </div>
+      </div>
+
+      <!-- Plan info card -->
+      <div class="plan-card" id="planInfoCard">
+        <div class="plan-card-title">
+          Jouw abonnement
+          <span class="plan-badge" id="planBadge">Laden…</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Studentenlimiet</span>
+          <span id="planLimit">—</span>
+        </div>
+        <div class="plan-detail-row">
+          <span class="plan-detail-label">Huidig aantal studenten</span>
+          <span id="planCurrent">—</span>
+        </div>
+        <div class="plan-bar-wrap">
+          <div class="plan-bar-label">
+            <span>Gebruik</span>
+            <span id="planBarPct">0%</span>
+          </div>
+          <div class="plan-bar-track">
+            <div class="plan-bar-fill" id="planBarFill" style="width:0%"></div>
+          </div>
+        </div>
+        <div id="planUpgradeCta" style="display:none">
+          <a href="pricing.html?for=begeleider" class="btn-upgrade">Upgraden naar Pro →</a>
+        </div>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="sec-title">Recente activiteit</div>
+      <div class="activity-list" id="activityList">
+        <div class="empty">
+          <span class="empty-icon">🔔</span>
+          Nog geen activiteit
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MIJN STUDENTEN ── -->
+    <div class="screen" id="screen-studenten">
+      <div class="page-title">Mijn studenten</div>
+      <div class="page-sub">Studenten die jou als begeleider hebben gekoppeld</div>
+
+      <div id="studentCapBanner" style="display:none" class="alert-box alert-amber">
+        Je hebt je studentenlimiet bereikt. Upgrade naar Pro voor tot 100 studenten.
+        <a href="pricing.html?for=begeleider" style="color:var(--amber);font-weight:700;margin-left:8px;">Upgraden →</a>
+      </div>
+
+      <div id="studentList">
+        <div class="empty">
+          <span class="empty-icon">👥</span>
+          Studenten kunnen jou als begeleider selecteren via hun eigen profiel. Zodra een student jou koppelt, verschijnen ze hier.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PROFIEL ── -->
+    <div class="screen" id="screen-profiel">
+      <div class="page-title">Profiel</div>
+      <div class="page-sub">Jouw accountgegevens</div>
+
+      <div class="form-card">
+        <div class="form-section-title">Persoonlijke gegevens</div>
+        <div class="field">
+          <label>Naam <span style="color:var(--orange)">*</span></label>
+          <input type="text" id="p-naam" placeholder="Jouw naam">
+        </div>
+        <div class="field">
+          <label>E-mailadres</label>
+          <input type="email" id="p-email" readonly>
+        </div>
+        <div class="field">
+          <label>Sector</label>
+          <select id="p-sector">
+            <option value="">Kies sector…</option>
+            <option value="techniek">Techniek</option>
+            <option value="zorg">Zorg</option>
+            <option value="economie">Economie / Handel</option>
+            <option value="ict">ICT</option>
+            <option value="onderwijs">Onderwijs</option>
+            <option value="horeca">Horeca / Toerisme</option>
+            <option value="bouw">Bouw / Infra</option>
+            <option value="logistiek">Logistiek</option>
+            <option value="media">Media / Creatief</option>
+            <option value="overig">Overig</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="saveProfiel()">Opslaan</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer style="text-align:center;padding:10px 0 14px;font-size:.6rem;color:rgba(0,0,0,.2);">© 2026 Sasubo Holding B.V.</footer>
+
+<script>
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Notify ──────────────────────────────────────────────────────────────────
+function notify(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ── Screen switching ─────────────────────────────────────────────────────────
+function show(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mt-tab').forEach(b => b.classList.remove('active'));
+
+  const el = document.getElementById('screen-' + screen);
+  if (el) el.classList.add('active');
+
+  const nb = document.getElementById('nav-' + screen);
+  if (nb) nb.classList.add('active');
+
+  const mt = document.getElementById('mt-' + screen);
+  if (mt) mt.classList.add('active');
+}
+
+// ── hasActivePlan ────────────────────────────────────────────────────────────
+async function hasActivePlan(minPlan = 'begeleider_starter') {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return false;
+    const { data: sub, error } = await db
+      .from('subscriptions')
+      .select('plan, status, current_period_end')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    if (error || !sub) return false;
+    if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
+    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
+    const tiers = [
+      'company_starter','company_pro','company_business',
+      'school_freemium','school_premium','school_premium_monthly',
+      'begeleider_starter','begeleider_pro',
+    ];
+    return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
+  } catch (err) {
+    console.error('hasActivePlan error:', err);
+    return false;
+  }
+}
+
+// ── initSessionTimeout ───────────────────────────────────────────────────────
+function initSessionTimeout() {
+  const WARN_MS    = 25 * 60 * 1000;
+  const SIGNOUT_MS = 30 * 60 * 1000;
+  let warnTimeout, signoutTimeout;
+
+  function resetTimers() {
+    clearTimeout(warnTimeout);
+    clearTimeout(signoutTimeout);
+    warnTimeout = setTimeout(() => {
+      notify('Je sessie verloopt over 5 minuten — sla je werk op');
+    }, WARN_MS);
+    signoutTimeout = setTimeout(async () => {
+      await db.auth.signOut().catch(() => {});
+      window.location.replace('auth.html?reason=timeout');
+    }, SIGNOUT_MS);
+  }
+
+  ['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt =>
+    document.addEventListener(evt, resetTimers, { passive: true })
+  );
+  resetTimers();
+}
+
+// ── Sign out ─────────────────────────────────────────────────────────────────
+async function doSignOut() {
+  await db.auth.signOut().catch(() => {});
+  window.location.href = 'auth.html';
+}
+
+// ── Load subscription ─────────────────────────────────────────────────────────
+async function loadSubscription(userId) {
+  const { data: sub } = await db
+    .from('subscriptions')
+    .select('plan, status, max_students, current_period_end')
+    .eq('profile_id', userId)
+    .maybeSingle();
+
+  const planLabels = { begeleider_starter: 'Starter', begeleider_pro: 'Pro' };
+  const badge = document.getElementById('planBadge');
+  const limitEl = document.getElementById('planLimit');
+  const currentEl = document.getElementById('planCurrent');
+  const barFill = document.getElementById('planBarFill');
+  const barPct = document.getElementById('planBarPct');
+  const upgradeCta = document.getElementById('planUpgradeCta');
+  const capNote = document.getElementById('statCapNote');
+
+  if (!sub || !['active','past_due','trial'].includes(sub.status)) {
+    if (badge) badge.textContent = 'Geen actief plan';
+    return { maxStudents: 0 };
+  }
+
+  // Trial handling
+  if (sub.status === 'trial') {
+    const now     = new Date();
+    const endDate = sub.current_period_end ? new Date(sub.current_period_end) : null;
+    const daysLeft = endDate ? Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)) : 0;
+
+    if (daysLeft <= 0) {
+      // Trial expired — redirect to pricing
+      window.location.replace('pricing.html?for=begeleider&reason=trial-expired');
+      return { maxStudents: 0 };
+    }
+
+    // Insert trial banner after planInfoCard
+    const planInfoCard = document.getElementById('planInfoCard');
+    if (planInfoCard && !document.getElementById('trialBanner')) {
+      const isLastDay = daysLeft <= 1;
+      const bannerColor = daysLeft <= 3 ? '#fef2f2' : '#f0fdf4';
+      const borderColor = daysLeft <= 3 ? '#f87171' : '#86efac';
+      const textColor   = daysLeft <= 3 ? '#991b1b' : '#166534';
+      const icon        = daysLeft <= 3 ? '⚠️' : '🎉';
+      planInfoCard.insertAdjacentHTML('afterend', `
+        <div id="trialBanner" style="background:${bannerColor};border:1px solid ${borderColor};border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <span style="font-size:.88rem;color:${textColor};font-weight:600">
+            ${icon} Gratis proefperiode — nog ${escapeHtml(String(daysLeft))} dag${daysLeft !== 1 ? 'en' : ''} over. Activeer een abonnement om toegang te houden.
+          </span>
+          <button onclick="window.location.href='pricing.html?for=begeleider'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+            Abonnement kiezen →
+          </button>
+        </div>`);
+    }
+
+    if (badge) badge.textContent = 'Gratis proefperiode';
+    const maxStudents = sub.max_students ?? 30;
+    if (limitEl) limitEl.textContent = maxStudents + ' studenten';
+    if (upgradeCta) upgradeCta.style.display = 'block';
+    return { maxStudents, plan: sub.plan };
+  }
+
+  const planLabel = planLabels[sub.plan] || sub.plan;
+  if (badge) badge.textContent = planLabel;
+
+  const maxStudents = sub.max_students ?? (sub.plan === 'begeleider_pro' ? 100 : 30);
+  if (limitEl) limitEl.textContent = maxStudents + ' studenten';
+
+  // Show upgrade CTA only on starter plan
+  if (sub.plan === 'begeleider_starter' && upgradeCta) {
+    upgradeCta.style.display = 'block';
+  }
+
+  return { maxStudents, plan: sub.plan };
+}
+
+// ── Load students ─────────────────────────────────────────────────────────────
+async function loadStudents(userId, maxStudents) {
+  // Students link to a begeleider via student_profiles fields.
+  // Query student_profiles where begeleider_profile_id = userId (field may not exist yet).
+  // Graceful fallback to empty state if column is missing.
+  const { data: students, error } = await db
+    .from('student_profiles')
+    .select('profile_id, naam, opleiding, sector')
+    .eq('begeleider_profile_id', userId);
+
+  const count = (!error && students) ? students.length : 0;
+
+  // Update stat
+  const statEl = document.getElementById('statActief');
+  if (statEl) statEl.textContent = count;
+
+  const capNote = document.getElementById('statCapNote');
+  if (capNote) capNote.textContent = count + ' / ' + maxStudents;
+
+  // Progress bar
+  const pct = maxStudents > 0 ? Math.min(100, Math.round(count / maxStudents * 100)) : 0;
+  const barFill = document.getElementById('planBarFill');
+  const barPct  = document.getElementById('planBarPct');
+  const currentEl = document.getElementById('planCurrent');
+  if (barFill) {
+    barFill.style.width = pct + '%';
+    barFill.className = 'plan-bar-fill' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
+  }
+  if (barPct) barPct.textContent = pct + '%';
+  if (currentEl) currentEl.textContent = count;
+
+  // Cap banner
+  if (count >= maxStudents) {
+    const banner = document.getElementById('studentCapBanner');
+    if (banner) banner.style.display = 'block';
+  }
+
+  // Student list
+  const listEl = document.getElementById('studentList');
+  if (!listEl) return;
+
+  if (error || !students || students.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty">
+        <span class="empty-icon">👥</span>
+        Studenten kunnen jou als begeleider selecteren via hun eigen profiel. Zodra een student jou koppelt, verschijnen ze hier.
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = students.map(s => {
+    const initials = (s.naam || '??').slice(0, 2).toUpperCase();
+    return `
+      <div class="student-row">
+        <div class="avatar">${escapeHtml(initials)}</div>
+        <div class="sr-info">
+          <div class="sr-name">${escapeHtml(s.naam || 'Onbekend')}</div>
+          <div class="sr-meta">${escapeHtml(s.opleiding || '')}${s.sector ? ' · ' + escapeHtml(s.sector) : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Load notifications (recent activity) ────────────────────────────────────
+async function loadActivity(userId) {
+  const { data: notifs, error } = await db
+    .from('notifications')
+    .select('message, read, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  const listEl = document.getElementById('activityList');
+  if (!listEl) return;
+
+  if (error || !notifs || notifs.length === 0) {
+    listEl.innerHTML = `<div class="empty"><span class="empty-icon">🔔</span>Nog geen activiteit</div>`;
+    return;
+  }
+
+  listEl.innerHTML = notifs.map(n => {
+    const d = new Date(n.created_at);
+    const timeStr = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+    return `
+      <div class="activity-item">
+        <div class="activity-dot${n.read ? ' read' : ''}"></div>
+        <div class="activity-msg">${escapeHtml(n.message || '')}</div>
+        <div class="activity-time">${timeStr}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Load open tasks ───────────────────────────────────────────────────────────
+async function loadOpenTasks(userId) {
+  const { data: tasks } = await db
+    .from('hub_tasks')
+    .select('id')
+    .or(`assignee.eq.student`)
+    .eq('status', 'todo')
+    .limit(50);
+  // This is a rough indicator — a proper implementation would filter by
+  // matches where this begeleider is the supervisor.
+  const el = document.getElementById('statTaken');
+  if (el) el.textContent = (tasks?.length ?? 0).toString();
+}
+
+// ── Save profile ──────────────────────────────────────────────────────────────
+async function saveProfiel() {
+  const naam   = document.getElementById('p-naam')?.value.trim();
+  const sector = document.getElementById('p-sector')?.value;
+
+  if (!naam) { notify('We missen nog een naam — vul dit in om door te gaan'); return; }
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const { error } = await db
+    .from('profiles')
+    .update({ naam, sector })
+    .eq('id', user.id);
+
+  if (error) {
+    notify('Opslaan mislukt — probeer opnieuw');
+    console.error('[begeleider-dashboard] saveProfiel error:', error.message);
+  } else {
+    notify('Profiel bijgewerkt');
+    document.getElementById('userName').textContent = naam;
+    document.getElementById('userAvatar').textContent = naam.slice(0, 2).toUpperCase();
+    document.getElementById('topbarUser').textContent = naam;
+    document.getElementById('welcomeMsg').textContent = 'Welkom terug, ' + naam;
+  }
+}
+
+// ── escapeHtml ────────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])
+  );
+}
+
+function copyReferralText() {
+  const text = 'Ik gebruik Internly voor stages — ' +
+    'een platform dat ghosting structureel aanpakt. ' +
+    'Studenten zien vooraf hoe betrouwbaar een ' +
+    'werkgever is. Probeer het: internly.pro';
+  navigator.clipboard.writeText(text).then(() => {
+    notify('Aanbevelingstekst gekopieerd!');
+  });
+}
+
+function dismissReferral() {
+  localStorage.setItem('internly_referral_dismissed', 'true');
+  const banner = document.getElementById('referral-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+function initReferralBanner() {
+  const dismissed = localStorage.getItem('internly_referral_dismissed');
+  const banner = document.getElementById('referral-banner');
+  if (!banner) return;
+  if (dismissed === 'true') {
+    banner.style.display = 'none';
+  }
+}
+
+// ── DOMContentLoaded ──────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+
+  // 1. Auth guard
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.href = 'auth.html'; return; }
+
+  // 2. Role guard — only begeleider accounts
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role, naam, email, sector')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile || profile.role !== 'begeleider') {
+    window.location.href = 'auth.html';
+    return;
+  }
+
+  // 3. Plan guard — must have at least begeleider_starter
+  const hasPlan = await hasActivePlan('begeleider_starter');
+  if (!hasPlan) {
+    window.location.href = 'pricing.html?for=begeleider&reason=no-plan';
+    return;
+  }
+
+  // 4. Auth confirmed — start session timeout
+  initSessionTimeout();
+
+  // 5. Populate UI
+  const naam = profile.naam || user.email?.split('@')[0] || 'Begeleider';
+  document.getElementById('topbarUser').textContent = naam;
+  document.getElementById('userName').textContent = naam;
+  document.getElementById('userEmail').textContent = profile.email || user.email || '';
+  document.getElementById('userAvatar').textContent = naam.slice(0, 2).toUpperCase();
+  document.getElementById('welcomeMsg').textContent = 'Welkom terug, ' + naam;
+
+  // Pre-fill profiel form
+  const naamInput = document.getElementById('p-naam');
+  const emailInput = document.getElementById('p-email');
+  const sectorInput = document.getElementById('p-sector');
+  if (naamInput)   naamInput.value   = profile.naam   || '';
+  if (emailInput)  emailInput.value  = profile.email  || user.email || '';
+  if (sectorInput) sectorInput.value = profile.sector || '';
+
+  // 6. Load subscription (returns maxStudents)
+  const { maxStudents = 30 } = await loadSubscription(user.id);
+
+  // 7. Load students + stats
+  await loadStudents(user.id, maxStudents);
+
+  // 8. Load activity feed
+  await loadActivity(user.id);
+
+  // 9. Completed stages stat (approximate via matches with status 'completed')
+  const { data: completed } = await db
+    .from('matches')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'completed');
+  const statAfgerond = document.getElementById('statAfgerond');
+  if (statAfgerond) statAfgerond.textContent = (completed ?? 0).toString();
+  initReferralBanner();
+});
+</script>
+
+<script src="js/translate.js"></script>
+</body>
+</html>

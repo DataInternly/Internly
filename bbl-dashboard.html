@@ -238,6 +238,7 @@
       .topbar { padding: 0 14px; }
     }
   </style>
+  <script src="js/supabase.js"></script>
 </head>
 <body>
 
@@ -656,6 +657,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 9. Leerdoelen
   await renderLeerdoelen(sp?.skills || [], user.id);
+  initSessionTimeout();
 });
 </script>
 
