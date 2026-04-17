@@ -11,6 +11,7 @@
   <title>Berichten — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/dist/browser.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -214,7 +215,7 @@
     <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
     <div class="topbar-match-sub" id="topbarMatchSub"></div>
   </div>
-  <a id="stage-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
+  <a id="match-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
   <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:5px 4px;">Privacy</a>
   <button onclick="db.auth.signOut().then(()=>window.location.href='index.html')" style="
     flex-shrink:0;background:none;border:none;
@@ -281,41 +282,19 @@
 </div>
 
 <script>
-  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentUser    = null;
   let convId         = null;
   let matchId        = null;
   let realtimeSub    = null;
+  let meetingNotifSub = null;
   let otherPartyId    = null;  // used for notification trigger
   let otherPartyName  = 'Gesprekspartner';
   let otherPartyEmail = '';
 
-  // ── Notification helper ───────────────────────────────────────────────────
-
-  async function createNotification(userId, type, refId, refType, message) {
-    if (!userId) return;
-    try {
-      await db.from('notifications').insert({
-        user_id:  userId,
-        type,
-        ref_id:   refId   || null,
-        ref_type: refType || null,
-        message,
-        read:     false,
-      });
-    } catch(e) {
-      console.warn('createNotification fout (non-blocking):', e);
-    }
-  }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
-
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  }
 
   function formatTime(iso) {
     return new Date(iso).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
@@ -329,12 +308,6 @@
     if (d.toDateString() === today.toDateString()) return 'Vandaag';
     if (d.toDateString() === yesterday.toDateString()) return 'Gisteren';
     return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
-  }
-
-  function notify(msg) {
-    const el = document.getElementById('notif');
-    el.textContent = msg; el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 3200);
   }
 
   function showLoading(containerId, tekst) {
@@ -468,6 +441,186 @@
     area.scrollTop = area.scrollHeight;
   }
 
+  // ── Meeting cards ────────────────────────────────────────────────────────────
+
+  function renderMeetingCard(meeting) {
+    const typeLabel    = meeting.type === 'video' ? '📹 Video'
+                       : meeting.type === 'call'  ? '📞 Bellen'
+                       : '🏢 Fysiek';
+    const contactLine  = meeting.contact_info ? ` · ${escapeHtml(meeting.contact_info)}` : '';
+    const isAttendee   = meeting.attendee_id === currentUser?.id;
+    const isPending    = meeting.status === 'openstaand';
+    const id           = escapeHtml(String(meeting.id));
+    const nlDate       = meeting.proposed_date
+      ? new Date(meeting.proposed_date + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+
+    const statusLine = (isPending && isAttendee) ? `
+      <div style="display:flex;gap:8px;margin-top:.6rem;">
+        <button onclick="acceptMeetingFromChat('${id}')"
+          style="flex:1;padding:7px 12px;background:#1a7a48;color:#fff;border:none;
+            border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;
+            font-family:'Outfit',sans-serif;">✓ Accepteren</button>
+        <button onclick="declineMeetingFromChat('${id}')"
+          style="flex:1;padding:7px 12px;background:#fff;color:#b82020;
+            border:1.5px solid #fca5a5;border-radius:7px;font-size:.82rem;
+            font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;">✕ Afwijzen</button>
+      </div>` :
+      (!isPending ? `<div style="margin-top:.5rem;font-size:.78rem;font-weight:500;
+        color:${meeting.status === 'bevestigd' ? '#1a7a48' : '#b82020'};">
+        ${meeting.status === 'bevestigd' ? '✓ Bevestigd' : '✕ Afgewezen'}
+      </div>` : '');
+
+    return `
+      <div id="mtg-card-${id}"
+        style="background:var(--bg2,#f0ede8);border-radius:8px;padding:.75rem 1rem;
+          font-size:.85rem;border-left:3px solid var(--accent,#e05c1a);color:#0d1520;">
+        <div style="font-weight:500;margin-bottom:.25rem;">📅 Afspraak aangevraagd</div>
+        <div style="color:#3a4455;">${escapeHtml(meeting.subject)} · ${escapeHtml(nlDate)} · ${escapeHtml(meeting.time_start || '')}–${escapeHtml(meeting.time_end || '')}</div>
+        <div style="font-size:.78rem;color:#7a8799;margin-top:.25rem;">${typeLabel}${contactLine}</div>
+        ${statusLine}
+      </div>`;
+  }
+
+  function appendMeetingCardRow(meeting, isOwn) {
+    const area = document.getElementById('messagesArea');
+    if (!area) return;
+    const empty = area.querySelector('.chat-empty');
+    if (empty) empty.remove();
+
+    const rowClass   = isOwn ? 'own' : 'other';
+    const initSrc    = isOwn
+      ? (currentUser?.user_metadata?.naam || currentUser?.email || 'J')
+      : otherPartyName;
+    const senderInit = escapeHtml(initSrc.slice(0, 2).toUpperCase());
+    const timeStr    = meeting.created_at
+      ? new Date(meeting.created_at).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
+      : '';
+
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + rowClass;
+    row.dataset.meetingId = meeting.id;
+    row.innerHTML = `
+      ${!isOwn ? `<div class="msg-avatar">${senderInit}</div>` : ''}
+      <div class="bubble-wrap">
+        <div class="bubble" style="background:transparent;padding:0;max-width:340px;">
+          ${renderMeetingCard(meeting)}
+        </div>
+        ${timeStr ? `<span class="msg-time">${timeStr}</span>` : ''}
+      </div>`;
+    area.appendChild(row);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  async function loadMeetingCards() {
+    if (!matchId || !currentUser) return;
+    const { data: meetings } = await db.from('meetings')
+      .select('*')
+      .eq('match_id', matchId)
+      .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
+      .in('status', ['openstaand', 'bevestigd', 'afgewezen'])
+      .order('created_at', { ascending: true });
+    if (!meetings?.length) return;
+    for (const m of meetings) {
+      appendMeetingCardRow(m, m.organizer_id === currentUser.id);
+    }
+  }
+
+  function subscribeMeetingNotifications() {
+    if (!currentUser) return;
+    if (meetingNotifSub) meetingNotifSub.unsubscribe();
+    meetingNotifSub = db
+      .channel('mtg-notif-' + currentUser.id)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${currentUser.id}` },
+        async payload => {
+          const n = payload.new;
+          if (n.type !== 'new_meeting' || n.ref_type !== 'meeting') return;
+          const { data: meeting } = await db.from('meetings').select('*').eq('id', n.ref_id).maybeSingle();
+          if (!meeting || meeting.match_id !== matchId) return;
+          // Avoid duplicate cards (meeting already loaded on init)
+          if (document.querySelector(`[data-meeting-id="${meeting.id}"]`)) return;
+          appendMeetingCardRow(meeting, false);
+        }
+      )
+      .subscribe();
+  }
+
+  async function acceptMeetingFromChat(id) {
+    if (!currentUser) return;
+    const { error } = await db.from('meetings')
+      .update({ status: 'bevestigd' })
+      .eq('id', id)
+      .eq('attendee_id', currentUser.id);
+    if (error) { console.warn('[chat] accept meeting err:', error); return; }
+
+    // Notificatie naar organizer
+    const { data: mtg } = await db.from('meetings')
+      .select('organizer_id, subject, proposed_date')
+      .eq('id', id).maybeSingle();
+    if (mtg?.organizer_id) {
+      const nlDate = mtg.proposed_date
+        ? new Date(mtg.proposed_date + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+        : '';
+      await createNotification(
+        mtg.organizer_id,
+        'meeting_accepted',
+        id,
+        'meeting',
+        `Je afspraak "${mtg.subject}" op ${nlDate} is bevestigd.`
+      );
+    }
+
+    notify('Afspraak bevestigd');
+    const card = document.getElementById('mtg-card-' + id);
+    if (card) {
+      const btns = card.querySelector('div[style*="display:flex"]');
+      if (btns) btns.remove();
+      const status = document.createElement('div');
+      status.style.cssText = 'margin-top:.5rem;font-size:.78rem;color:#1a7a48;font-weight:500;';
+      status.textContent = '✓ Bevestigd';
+      card.appendChild(status);
+    }
+  }
+
+  async function declineMeetingFromChat(id) {
+    if (!currentUser) return;
+    const { error } = await db.from('meetings')
+      .update({ status: 'afgewezen' })
+      .eq('id', id)
+      .eq('attendee_id', currentUser.id);
+    if (error) { console.warn('[chat] decline meeting err:', error); return; }
+
+    // Notificatie naar organizer
+    const { data: mtg } = await db.from('meetings')
+      .select('organizer_id, subject, proposed_date')
+      .eq('id', id).maybeSingle();
+    if (mtg?.organizer_id) {
+      const nlDate = mtg.proposed_date
+        ? new Date(mtg.proposed_date + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
+        : '';
+      await createNotification(
+        mtg.organizer_id,
+        'meeting_rejected',
+        id,
+        'meeting',
+        `Je afspraak "${mtg.subject}" op ${nlDate} is afgewezen.`
+      );
+    }
+
+    notify('Afspraak afgewezen');
+    const card = document.getElementById('mtg-card-' + id);
+    if (card) {
+      const btns = card.querySelector('div[style*="display:flex"]');
+      if (btns) btns.remove();
+      const status = document.createElement('div');
+      status.style.cssText = 'margin-top:.5rem;font-size:.78rem;color:#b82020;font-weight:500;';
+      status.textContent = '✕ Afgewezen';
+      card.appendChild(status);
+    }
+  }
+
   // ── Emoji Picker ─────────────────────────────────────────────────────────────
 
   let _emojiPickerOpen = false;
@@ -561,7 +714,7 @@
     document.getElementById('topbarMatchSub').textContent  = posting.company_name || '';
 
     // Stage Hub shortcut (topbar pill + bottom-nav tab)
-    const stageHubLink = document.getElementById('stage-hub-topbar-link');
+    const stageHubLink = document.getElementById('match-hub-topbar-link');
     if (stageHubLink && mId) {
       stageHubLink.href = 'match-dashboard.html?match=' + encodeURIComponent(mId);
       stageHubLink.style.display = 'inline-block';
@@ -611,8 +764,10 @@
     await loadMessages();
     subscribeRealtime();
     markMessagesRead();
+    await loadMeetingCards();
+    subscribeMeetingNotifications();
     if (otherPartyId) {
-      InternlyCalendar.renderChatButton(otherPartyId, otherPartyEmail, otherPartyName, 'sendBtn', db, currentUser.id);
+      InternlyCalendar.renderChatButton(otherPartyId, otherPartyEmail, otherPartyName, 'sendBtn', db, currentUser.id, matchId);
     }
   }
 
@@ -918,7 +1073,7 @@
     document.getElementById('topbarMatchName').textContent = otherPartyName;
     document.getElementById('topbarMatchSub').textContent  = 'Buddy-chat · ' + (pair.type || 'gepensioneerd');
     // Stage Hub-pil verbergen — niet van toepassing bij buddy-chat
-    const stageHubLink = document.getElementById('stage-hub-topbar-link');
+    const stageHubLink = document.getElementById('match-hub-topbar-link');
     if (stageHubLink) stageHubLink.style.display = 'none';
 
     // 5. Conversation ophalen of aanmaken (buddy_pair_id kolom)
@@ -1002,7 +1157,8 @@
   });
 
   window.addEventListener('beforeunload', () => {
-    if (realtimeSub) realtimeSub.unsubscribe();
+    if (realtimeSub)     realtimeSub.unsubscribe();
+    if (meetingNotifSub) meetingNotifSub.unsubscribe();
   });
 </script>
 

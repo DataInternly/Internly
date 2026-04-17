@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/push.js"></script>
   <style>
@@ -573,7 +574,7 @@
         <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
           <span class="nav-icon">💬</span> Berichten
         </button>
-        <button class="nav-btn" id="nav-stagehub" onclick="show('studenten')">
+        <button class="nav-btn" id="nav-stagehub" onclick="window.location.href='match-dashboard.html'">
           <span class="nav-icon">📊</span> Stage Hub
         </button>
       </div>
@@ -880,8 +881,6 @@
 </div>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──
@@ -892,23 +891,6 @@ let oproepen          = [];
 let currentUser       = null;
 let notifSubscription = null;
 
-// ── Notification system ───────────────────────────────────────────────────
-
-async function createNotification(userId, type, refId, refType, message) {
-  if (!userId) return;
-  try {
-    await db.from('notifications').insert({
-      user_id:  userId,
-      type,
-      ref_id:   refId   || null,
-      ref_type: refType || null,
-      message,
-      read:     false,
-    });
-  } catch(e) {
-    console.warn('createNotification fout (non-blocking):', e);
-  }
-}
 
 function formatRelativeTime(iso) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -950,7 +932,7 @@ async function loadNotifications() {
          data-ref-id="${escapeHtml(n.ref_id || '')}">
       <span class="nd-dot ${n.read ? 'read' : ''}"></span>
       <div>
-        <div class="nd-msg">${escapeHtml(n.message)}</div>
+        <div class="nd-msg">${getNotifText(n)}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
@@ -1368,20 +1350,17 @@ function progressColor(p) {
   return p > 60 ? 'var(--green)' : p > 30 ? 'var(--amber)' : 'var(--red)';
 }
 
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function renderStudentenRows(cid, data) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">👥</span>Geen studenten.</div>`;
+    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">🎓</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen studenten gekoppeld</div><div style="font-size:.88rem;">Nodig studenten uit via de schoolcode of koppel ze handmatig aan jouw opleiding.</div></div>`;
     return;
   }
   el.innerHTML = data.map(s => {
     const eNaam    = escapeHtml(s.naam);
     const eBedrijf = escapeHtml(s.bedrijf || '');
     const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
+    const faseLabel = { 'actief': 'Stage loopt', 'risico': 'Stage loopt', 'zoekend': 'Zoekend' }[s.status] || '';
     return `
     <div class="student-row">
       <div class="avatar">${escapeHtml(initials(s.naam))}</div>
@@ -1389,6 +1368,7 @@ function renderStudentenRows(cid, data) {
         <div class="sr-name">${eNaam}</div>
         <div class="sr-meta">${escapeHtml(s.opleiding)} · Jaar ${escapeHtml(String(s.jaar ?? ''))}${eBedrijf ? ' — ' + eBedrijf : ''}</div>
         ${_isBundledSchool && s.bundleOpleiding ? `<span class="tag tag-neutral" style="font-size:.72rem;margin-top:3px;display:inline-block">${escapeHtml(s.bundleOpleiding)}</span>` : ''}
+        ${faseLabel ? `<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg2,#eceae4);color:var(--ink2,#374151);margin-top:3px;display:inline-block;">${faseLabel}</span>` : ''}
       </div>
       <div class="sr-right">
         ${_isPremiumSchool && s.status !== 'zoekend' ? `
@@ -2051,12 +2031,6 @@ async function submitBundelVerzoek() {
 
   notify('Verzoek ingediend — je hoort binnen 5 werkdagen van ons');
   renderBundeling();
-}
-
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 // Offline/online listeners

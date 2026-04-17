@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6ozhZf1wVjSq6aBMhOmW1u3nfr1UsGMc&libraries=places" defer></script>
   <script src="js/reistijd.js" defer></script>
@@ -591,8 +592,6 @@
 </div>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -602,10 +601,6 @@ let notifSubscription  = null;
 let reviewsByCompany   = {};
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function trustBadge(grade, score) {
   if (!grade) return '';
   const cls   = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[grade] || 'trust-a';
@@ -660,7 +655,10 @@ function renderCard(row) {
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
           ${row._isPosting ? '<span style="font-size:.7rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 8px;border-radius:20px;white-space:nowrap">🏢 Bedrijfsposting</span>' : ''}
-          ${trustBadge(row.trust_grade, row.trust_score)}
+          <div style="display:flex;flex-direction:column;align-items:flex-end">
+            ${trustBadge(row.trust_grade, row.trust_score)}
+            <span class="trust-hint" style="font-size:.72rem;color:var(--ink3,#7a8799);display:block;margin-top:2px;">A = &lt;2 dagen · B = 2–5 dagen · C = traag</span>
+          </div>
         </div>
       </div>
 
@@ -677,6 +675,8 @@ function renderCard(row) {
       <div class="tags">
         ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
       </div>
+
+      ${(row.trust_grade === 'C') ? `<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:6px;margin-top:6px;">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>` : ''}
 
       <div class="card-footer">
         <div style="display:flex;flex-direction:column;gap:4px">
@@ -920,20 +920,23 @@ function filterCards() {
     if (!nr) {
       nr = document.createElement('div');
       nr.id = 'no-results'; nr.className = 'state-box';
-      nr.innerHTML = '<span class="state-icon">🔎</span>Geen vacatures gevonden voor deze filters.';
+      nr.innerHTML = '<span class="state-icon">🔎</span>Geen vacatures gevonden voor deze filters.<br><button onclick="clearFilters()" class="btn-ghost" type="button" style="margin-top:.75rem">Alle filters wissen</button>';
       document.getElementById('internshipsContainer').appendChild(nr);
     }
   } else if (nr) nr.remove();
 }
 
-function updateCount(n) {
-  document.getElementById('resultsCount').textContent = `${n} vacature${n !== 1 ? 's' : ''} gevonden`;
+function clearFilters() {
+  const fields = ['searchInput', 'sectorFilter', 'durationFilter', 'trustFilter', 'niveauFilter'];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  filterCards();
 }
 
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
+function updateCount(n) {
+  document.getElementById('resultsCount').textContent = `${n} vacature${n !== 1 ? 's' : ''} gevonden`;
 }
 
 function showLoading(containerId, tekst) {
@@ -961,18 +964,6 @@ async function signOut() {
   }
 }
 
-// ── Notification system ────────────────────────────────────────────────────
-async function createNotification(userId, type, refId, refType, message) {
-  if (!userId) return;
-  try {
-    await db.from('notifications').insert({
-      user_id: userId, type, ref_id: refId || null,
-      ref_type: refType || null, message
-    });
-  } catch(e) {
-    console.warn('createNotification failed (non-blocking):', e);
-  }
-}
 
 function formatRelativeTime(isoString) {
   const diff = Date.now() - new Date(isoString).getTime();
@@ -1015,7 +1006,7 @@ async function loadNotifications() {
          data-ref-id="${escapeHtml(n.ref_id || '')}">
       ${!n.read ? '<span class="nd-dot"></span>' : ''}
       <div class="nd-body">
-        <div class="nd-msg">${escapeHtml(n.message || '')}</div>
+        <div class="nd-msg">${getNotifText(n)}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
@@ -1379,9 +1370,6 @@ window.addEventListener('beforeunload', async () => {
 
 <script>
 (function() {
-  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
-
   if (!localStorage.getItem('internly_waitlist_seen')) {
     setTimeout(async function() {
       const _client = (typeof db !== 'undefined') ? db

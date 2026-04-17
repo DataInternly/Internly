@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -564,18 +565,7 @@
 <footer style="text-align:center;padding:10px 0 14px;font-size:.6rem;color:rgba(0,0,0,.2);">© 2026 Sasubo Holding B.V.</footer>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ── Notify ──────────────────────────────────────────────────────────────────
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3200);
-}
 
 // ── Screen switching ─────────────────────────────────────────────────────────
 function show(screen) {
@@ -853,13 +843,6 @@ async function saveProfiel() {
     document.getElementById('topbarUser').textContent = naam;
     document.getElementById('welcomeMsg').textContent = 'Welkom terug, ' + naam;
   }
-}
-
-// ── escapeHtml ────────────────────────────────────────────────────────────────
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c =>
-    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])
-  );
 }
 
 function copyReferralText() {

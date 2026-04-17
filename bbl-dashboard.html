@@ -18,6 +18,7 @@
   <title>BBL Dashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
@@ -364,23 +365,9 @@
 </div><!-- /dash-shell -->
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3200);
-}
 
 function showLoading(containerId, tekst) {
   const el = document.getElementById(containerId);
@@ -415,12 +402,14 @@ function updateContractStrip(contractEndDate) {
   const txt   = document.getElementById('contractStripText');
   if (!contractEndDate || !strip) return;
   const days = Math.ceil((new Date(contractEndDate) - new Date()) / 86400000);
+  const decisionDeadline = new Date(new Date(contractEndDate).getTime() - 90 * 86400000);
+  const decisionDateStr  = formatDate(decisionDeadline.toISOString().split('T')[0]);
   strip.style.display = '';
   strip.className = 'contract-strip ' + (days > 60 ? 'cs-ok' : days > 30 ? 'cs-warn' : 'cs-danger');
   if (days > 60) {
-    txt.innerHTML = `Contract loopt af over <strong>${days} dagen</strong> (${formatDate(contractEndDate)})`;
+    txt.innerHTML = `Jouw recht: vóór <strong>${decisionDateStr}</strong> moet het bedrijf bevestigen of je mag blijven. Internly herinnert je.`;
   } else if (days > 0) {
-    txt.innerHTML = `Contract loopt af over <strong>${days} dagen</strong> — heb je al een gesprek gepland?`;
+    txt.innerHTML = `Jouw recht: vóór <strong>${decisionDateStr}</strong> moet het bedrijf bevestigen of je mag blijven. Internly herinnert je.`;
   } else {
     txt.innerHTML = `<strong>Contract verlopen</strong> — neem contact op met je begeleider`;
   }

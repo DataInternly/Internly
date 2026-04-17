@@ -18,13 +18,14 @@ const InternlyCalendar = (() => {
   const HOURS = [8,9,10,11,12,13,14,15,16,17];
 
   let _db = null, _userId = null, _containerId = null, _saving = false;
+  let _matchId = null; // match UUID — doorgegeven vanuit renderChatButton()
   let _slots = {}; // key: "day_hour" → status string
 
   // ── helpers ──────────────────────────────────────────────────────────────────
   const k = (d,h) => `${d}_${h}`;
   const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-  function notify(msg, ok = true) {
+  function calNotify(msg, ok = true) {
     let n = document.getElementById('cal-notif');
     if (!n) { n = document.createElement('div'); n.id='cal-notif'; document.body.appendChild(n); }
     n.textContent = msg;
@@ -75,7 +76,7 @@ const InternlyCalendar = (() => {
 .mtg-bg{position:fixed;inset:0;background:rgba(13,21,32,.45);z-index:500;display:none;align-items:flex-end;justify-content:center;}
 .mtg-bg.open{display:flex;}
 @media(min-width:520px){.mtg-bg{align-items:center;}.mtg-box{border-radius:12px!important;max-width:480px;}}
-.mtg-box{background:#fff;border-radius:12px 12px 0 0;padding:1.5rem;width:100%;max-height:90vh;overflow-y:auto;animation:calUp .2s ease;}
+.mtg-box{background:#fff;border-radius:12px 12px 0 0;padding:1.5rem;width:100%;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:calUp .2s ease;}
 @keyframes calUp{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 @keyframes calDown{from{transform:translateY(0);opacity:1;}to{transform:translateY(18px);opacity:0;}}
 .mtg-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;}
@@ -142,8 +143,8 @@ const InternlyCalendar = (() => {
         return { user_id:_userId, day_of_week:d, hour_start:h, status };
       });
       if (rows.length) { const { error } = await _db.from('availability').insert(rows); if(error) throw error; }
-      notify('Beschikbaarheid opgeslagen ✓');
-    } catch(e) { console.error('[cal] save:', e); notify('Opslaan mislukt', false); }
+      calNotify('Beschikbaarheid opgeslagen ✓');
+    } catch(e) { console.error('[cal] save:', e); calNotify('Opslaan mislukt', false); }
     finally { _saving=false; if(btn){btn.disabled=false;btn.textContent='Opslaan';} }
   }
 
@@ -169,7 +170,7 @@ const InternlyCalendar = (() => {
                 <td class="ical-hlabel">${h}:00</td>
                 ${[0,1,2,3,4].map(d=>{
                   const st = _slots[k(d,h)]||'';
-                  return `<td><button class="ical-cell ${st}" data-d="${d}" data-h="${h}"
+                  return `<td><button type="button" class="ical-cell ${st}" data-d="${d}" data-h="${h}"
                     title="${DAYS[d]} ${h}:00${st?' — '+st:''}"
                     onclick="InternlyCalendar._toggle(${d},${h})"></button></td>`;
                 }).join('')}
@@ -179,7 +180,7 @@ const InternlyCalendar = (() => {
         </div>
         <div class="ical-footer">
           <span class="ical-hint">Klik om te wisselen: leeg → beschikbaar → voorkeur → bezet → leeg</span>
-          <button class="ical-save" id="ical-save-btn" onclick="InternlyCalendar._saveAll()">Opslaan</button>
+          <button type="button" class="ical-save" id="ical-save-btn" onclick="InternlyCalendar._saveAll()">Opslaan</button>
         </div>
       </div>`;
   }
@@ -235,7 +236,7 @@ const InternlyCalendar = (() => {
       <div class="mtg-box">
         <div class="mtg-head">
           <div class="mtg-title">📅 Afspraak plannen met ${esc(otherName)}</div>
-          <button class="mtg-close" onclick="InternlyCalendar._close()">✕</button>
+          <button type="button" class="mtg-close" onclick="InternlyCalendar._close()">✕</button>
         </div>
         ${previewHTML}
         <div class="mf-row">
@@ -248,6 +249,7 @@ const InternlyCalendar = (() => {
             <option value="video">🎥 Videocall</option>
             <option value="call">📞 Telefonisch</option>
             <option value="fysiek">🏢 Fysiek gesprek</option>
+            <option value="driegesprek">👥 Driegesprek (jij + bedrijf + school)</option>
           </select>
         </div>
         <div class="mf-row">
@@ -272,7 +274,7 @@ const InternlyCalendar = (() => {
           <label class="mf-label">Toelichting (optioneel)</label>
           <textarea class="mf-ta" id="mf-note" placeholder="Wat wil je bespreken?"></textarea>
         </div>
-        <button class="mtg-submit" id="mf-submit"
+        <button type="button" class="mtg-submit" id="mf-submit"
           data-uid="${esc(otherUserId)}"
           data-email="${esc(otherEmail)}"
           data-name="${esc(otherName)}">
@@ -323,8 +325,8 @@ const InternlyCalendar = (() => {
     const end     = document.getElementById('mf-end')?.value;
     const note    = document.getElementById('mf-note')?.value.trim();
 
-    if (!subj||!contact||!date||!start||!end) { notify('Vul alle verplichte velden in',false); return; }
-    if (end<=start) { notify('Eindtijd moet na starttijd liggen',false); return; }
+    if (!subj||!contact||!date||!start||!end) { calNotify('Vul alle verplichte velden in',false); return; }
+    if (end<=start) { calNotify('Eindtijd moet na starttijd liggen',false); return; }
 
     const btn = document.getElementById('mf-submit');
     if (btn) { btn.disabled=true; btn.textContent='Versturen...'; }
@@ -346,28 +348,69 @@ const InternlyCalendar = (() => {
         note:           note||null,
         organizer_email: orgEmail,
         attendee_email:  otherEmail,
+        match_id:        _matchId || null,
       }).select().maybeSingle();
 
       if (error) throw error;
-      if (!mtg) { notify('Beschikbaarheid kon niet worden opgeslagen — probeer opnieuw'); return; }
+      if (!mtg) { calNotify('Beschikbaarheid kon niet worden opgeslagen — probeer opnieuw'); return; }
 
-      // E-mail via Edge Function — faalt stil als nog niet deployed
-      try {
-        await _db.functions.invoke('send-meeting-email', {
-          body: { meeting_id:mtg.id, subject:subj, type, contact_info:contact,
-                  proposed_date:date, time_start:start, time_end:end, note:note||'',
-                  organizer_email:orgEmail, attendee_email:otherEmail, attendee_name:otherName }
-        });
-      } catch(emailErr){ console.warn('[cal] email skipped:', emailErr); }
+      // In-app notificatie verstuurd via createNotification() — e-mail nog niet actief
 
+      // In-app notificatie naar attendee
+      if (otherUserId && mtg?.id) {
+        const userName = user?.user_metadata?.naam || user?.user_metadata?.name || orgEmail.split('@')[0] || 'Iemand';
+        await _db.from('notifications').insert({
+          user_id:  otherUserId,
+          type:     (window.MEETING_NOTIFICATION_TYPE || 'new_meeting'),
+          ref_id:   mtg.id,
+          ref_type: 'meeting',
+          message:  `${userName} wil een afspraak plannen: ${subj} op ${date} om ${start}.`,
+          read:     false,
+        }).catch(err => console.warn('[cal] notif skipped:', err));
+      }
+
+      appendMeetingCard({ subj, type, contact, date, start, end });
       closeModal();
-      notify(`Afspraak verstuurd naar ${otherName} ✓`);
+      calNotify(`Afspraak verstuurd naar ${otherName} ✓`);
 
     } catch(e) {
       console.error('[cal] submit:', e);
-      notify('Er ging iets mis — probeer opnieuw',false);
+      calNotify('Er ging iets mis — probeer opnieuw',false);
       if(btn){btn.disabled=false;btn.textContent='Afspraak versturen →';}
     }
+  }
+
+  // ── meeting card in chat ─────────────────────────────────────────────────────
+  function appendMeetingCard(data) {
+    const container = document.querySelector('#messagesArea') ||
+                      document.querySelector('.messages-list') ||
+                      document.querySelector('[data-chat-container]');
+    if (!container) return;
+    const empty = container.querySelector('.chat-empty');
+    if (empty) empty.remove();
+
+    const typeIcon = data.type === 'video' ? '📹 Video'
+                   : data.type === 'call'  ? '📞 Bellen'
+                   : '🏢 Fysiek';
+    const contactLine = data.contact ? ` · ${esc(data.contact)}` : '';
+    const now = new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+    const row = document.createElement('div');
+    row.className = 'msg-row own';
+    row.innerHTML = `
+      <div class="bubble-wrap">
+        <div class="bubble" style="background:transparent;padding:0;max-width:340px;">
+          <div style="background:var(--bg2,#f0ede8);border-radius:8px;padding:.75rem 1rem;
+            font-size:.85rem;border-left:3px solid var(--accent,#e05c1a);color:#0d1520;">
+            <div style="font-weight:500;margin-bottom:.25rem;">📅 Afspraak aangevraagd</div>
+            <div style="color:#3a4455;">${esc(data.subj)} · ${esc(data.date ? new Date(data.date + 'T12:00:00').toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '')} · ${esc(data.start)}–${esc(data.end)}</div>
+            <div style="font-size:.78rem;color:#7a8799;margin-top:.25rem;">${typeIcon}${contactLine}</div>
+          </div>
+        </div>
+        <span class="msg-time">${now}</span>
+      </div>`;
+    container.appendChild(row);
+    container.scrollTop = container.scrollHeight;
   }
 
   // ── public ────────────────────────────────────────────────────────────────────
@@ -394,17 +437,21 @@ const InternlyCalendar = (() => {
      * @param {string} insertBeforeId  ID van het element voor de knop (bijv. 'sendBtn')
      * @param {object} dbClient        Supabase client
      * @param {string} userId          UUID van de ingelogde gebruiker
+     * @param {string} [matchId]       UUID van de match (voor match_id op meetings)
      */
-    renderChatButton(otherUserId, otherEmail, otherName, insertBeforeId, dbClient, userId) {
-      _db     = dbClient;
-      _userId = userId;
+    renderChatButton(otherUserId, otherEmail, otherName, insertBeforeId, dbClient, userId, matchId) {
+      _db      = dbClient;
+      _userId  = userId;
+      _matchId = matchId || null;
       injectCSS();
       if (document.getElementById('cal-chat-btn')) return;
       const btn = document.createElement('button');
       btn.id = 'cal-chat-btn';
+      btn.type = 'button';
       btn.className = 'cal-chat-btn';
       btn.title = 'Afspraak plannen';
-      btn.textContent = '📅';
+      btn.style.cssText += ';width:auto;padding:0 10px;gap:5px;';
+      btn.innerHTML = '📅 <span style="font-size:.78rem;font-weight:600;font-family:\'Outfit\',sans-serif;">Afspraak</span>';
       btn.onclick = () => openModal(otherUserId, otherEmail, otherName);
       const anchor = document.getElementById(insertBeforeId);
       if (anchor) anchor.parentNode.insertBefore(btn, anchor);

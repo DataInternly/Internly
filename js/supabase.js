@@ -2,13 +2,18 @@
 // Laad dit bestand ALTIJD na de Supabase CDN script en vóór alle pagina-scripts.
 // Het maakt één globale `supabase` client aan die index.html kan hergebruiken.
 // Alle andere pagina's declareren hun eigen `db` client inline.
-
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+// SUPABASE_URL en SUPABASE_ANON_KEY staan uitsluitend in js/supabase.js (single source of truth).
+// De typeof-guard hieronder zorgt dat er nooit een duplicate-declaration crash kan optreden.
 
 // Globale client — beschikbaar als `supabase` op index.html
 // (gebruikt door schrijfInHero() en de waitlist-popup op index.html)
+const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Gedeelde constante voor het notification-type bij meeting-uitnodigingen.
+// Gebruik deze in alle INSERT-statements zodat typen consistent blijven.
+const MEETING_NOTIFICATION_TYPE = 'new_meeting';
 
 /* ── SESSION FIXES ──────────────────────────────────────────────────────────
    Removed dead helpers: getCurrentUser(), signUp(), getInternships(),
@@ -65,10 +70,14 @@ function initSessionTimeout() {
    ─────────────────────────────────────────────────────────────────────────── */
 async function hasActivePlan(minPlan = 'company_starter') {
   try {
-    const { data: { user } } = await db.auth.getUser();
+    const client = (typeof db !== 'undefined') ? db
+                 : (typeof supabase !== 'undefined') ? supabase
+                 : null;
+    if (!client) return false;
+    const { data: { user } } = await client.auth.getUser();
     if (!user) return false;
 
-    const { data: sub, error } = await db
+    const { data: sub, error } = await client
       .from('subscriptions')
       .select('plan, status, current_period_end')
       .eq('profile_id', user.id)

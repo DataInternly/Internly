@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/push.js"></script>
   <style>
@@ -604,7 +605,7 @@
           <span class="nav-icon">💬</span> Berichten
           <span class="nav-badge" id="badge-unread" style="display:none">0</span>
         </button>
-        <button class="nav-btn" id="nav-stagehub" onclick="show('matches')">
+        <button class="nav-btn" id="nav-stagehub" onclick="window.location.href='match-dashboard.html'">
           <span class="nav-icon">📊</span> Stage Hub
         </button>
         <button class="nav-btn" onclick="gotoDiscoverGated()">
@@ -725,10 +726,7 @@
         <button class="btn-orange" onclick="show('new')">+ Nieuw</button>
       </div>
       <div id="recent-postings">
-        <div class="empty">
-          <span class="empty-icon">📭</span>
-          Nog geen vacatures. Studenten zoeken nu actief — je eerste vacature zet je op de kaart.
-        </div>
+        <div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📌</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen →</button></div>
       </div>
     </div>
 
@@ -739,7 +737,7 @@
         <button class="btn-orange" onclick="show('new')">+ Nieuwe vacature</button>
       </div>
       <div id="all-postings">
-        <div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures geplaatst. Bedrijven die actief vacatures plaatsen krijgen hogere zichtbaarheid in het matchsysteem.</div>
+        <div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📌</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen →</button></div>
       </div>
     </div>
 
@@ -989,8 +987,6 @@
 </div>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──
@@ -1001,23 +997,6 @@ let currentUser       = null;
 let currentPlan       = null;
 let notifSubscription = null;
 
-// ── Notification system ───────────────────────────────────────────────────
-
-async function createNotification(userId, type, refId, refType, message) {
-  if (!userId) return;
-  try {
-    await db.from('notifications').insert({
-      user_id:  userId,
-      type,
-      ref_id:   refId   || null,
-      ref_type: refType || null,
-      message,
-      read:     false,
-    });
-  } catch(e) {
-    console.warn('createNotification fout (non-blocking):', e);
-  }
-}
 
 function formatRelativeTime(iso) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -1059,7 +1038,7 @@ async function loadNotifications() {
          data-ref-id="${escapeHtml(n.ref_id || '')}">
       <span class="nd-dot ${n.read ? 'read' : ''}"></span>
       <div>
-        <div class="nd-msg">${escapeHtml(n.message)}</div>
+        <div class="nd-msg">${getNotifText(n)}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
@@ -1370,14 +1349,10 @@ function targetLabel(t) {
   return t === 'student' ? '👤 Studenten' : t === 'school' ? '🎓 Scholen' : '👥 Beide';
 }
 
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function renderList(cid, data) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Nog geen vacatures geplaatst.<br>Klik op <strong>Nieuwe vacature</strong> om te beginnen.</div>`;
+    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📌</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen →</button></div>`;
     return;
   }
 
@@ -1526,7 +1501,7 @@ async function loadCompanyMatches() {
           <div class="card-head">
             <div>
               <div class="card-title">${escapeHtml(posting.title || 'Stageplek')}</div>
-              <div class="card-sub">${escapeHtml(new Date(m.created_at).toLocaleDateString('nl-NL'))}</div>
+              <div class="card-sub">${escapeHtml(formatNLDate(m.created_at))}</div>
             </div>
             <span class="tag ${sCls}">${escapeHtml(sLabel)}</span>
           </div>
@@ -1652,7 +1627,7 @@ async function loadBerichten() {
           <div class="card-head">
             <div>
               <div class="card-title">${escapeHtml(posting.title || 'Stageplek')}</div>
-              <div class="card-sub">${escapeHtml(new Date(m.created_at).toLocaleDateString('nl-NL'))}</div>
+              <div class="card-sub">${escapeHtml(formatNLDate(m.created_at))}</div>
             </div>
             ${unread > 0 ? `<span class="tag neutral" style="background:var(--orange-bg);color:var(--orange);border:none">${unread} nieuw</span>` : ''}
           </div>
@@ -2403,13 +2378,6 @@ async function renderESG() {
 
     ${exportHtml}
   `;
-}
-
-// ── Notify ──
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 // Offline/online listeners

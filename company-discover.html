@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { background: #f4f3ef; }
@@ -315,8 +316,6 @@
 </div>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function initials(naam) {
@@ -326,10 +325,6 @@ function initials(naam) {
 function formatDate(d) {
   if (!d) return 'Flexibel';
   return new Date(d).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
-}
-
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 function renderCard(s) {
@@ -410,7 +405,7 @@ async function loadStudents() {
 
   const { data, error } = await db
     .from('student_profiles')
-    .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, opdracht_aard, methode_type, onderzoeksvraag, onderzoeksvraag_type, resultaat_type, motivatie, duur, skills')
+    .select('profile_id, naam, opleiding, jaar, school, beschikbaar_vanaf, opdracht_domein, sector, skills, postcode')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -468,13 +463,6 @@ function filterCards() {
 
 function contact(naam) {
   notify(`Verzoek verstuurd aan ${naam} — de student ontvangt een melding`);
-}
-
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 function showLoading(containerId, tekst) {

@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -261,7 +262,7 @@
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
       <span class="toggle-label">Toon vacatures in matchpool<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Meer informatie over matchpool">ⓘ<span class="info-pop">Vacatures in je <strong>matchpool</strong> zijn opdrachten van bedrijven die al interesse in jou hebben getoond. Zet dit aan om die mee te zien — je kunt er direct contact mee opnemen zonder eerst te liken.</span></span></span>
     </label>
-    <div class="toggle-sub">Zet dit uit om alleen je echte matches te zien</div>
+    <div class="toggle-sub">Zet dit uit dat bedrijven jou zien</div>
   </div>
 
   <div class="swipe-area" id="swipe-container"></div>
@@ -273,8 +274,6 @@
 </div>
 
 <script>
-  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let allCards          = [];
@@ -283,24 +282,6 @@
   let notifSubscription = null;
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Notification system
-  // ─────────────────────────────────────────────────────────────────────────
-
-  async function createNotification(userId, type, refId, refType, message) {
-    if (!userId) return;
-    try {
-      await db.from('notifications').insert({
-        user_id:  userId,
-        type,
-        ref_id:   refId   || null,
-        ref_type: refType || null,
-        message,
-        read:     false,
-      });
-    } catch(e) {
-      console.warn('createNotification fout (non-blocking):', e);
-    }
-  }
 
   function formatRelativeTime(iso) {
     const diff = Date.now() - new Date(iso).getTime();
@@ -441,10 +422,6 @@
   // Trust badge
   // ─────────────────────────────────────────────────────────────────────────
 
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-  }
-
   function trustBadge(grade, score) {
     const cls   = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[grade] || 'trust-b';
     const label = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '';
@@ -565,7 +542,7 @@
             <span class="empty-icon">💫</span>
             Nog geen matches.<br>
             <small>Zet de matchpool aan om alvast vacatures te bekijken.</small>
-            <button class="btn-enable-pool" onclick="enablePool()">Matchpool aanzetten</button>
+            <button class="btn-enable-pool" onclick="enablePool()">Zet aan dat bedrijven jou kunnen vinden</button>
           </div>`;
       } else {
         container.innerHTML = `
@@ -649,14 +626,31 @@
             .eq('id', card.id)
             .maybeSingle();
           if (posting?.created_by) {
+            // Zoek ROC/school-koppeling van de student op
+            let rocProfileId = null;
+            const { data: sp } = await db
+              .from('student_profiles')
+              .select('school')
+              .eq('profile_id', currentUser.id)
+              .maybeSingle();
+            if (sp?.school) {
+              const { data: schoolProfile } = await db
+                .from('school_profiles')
+                .select('profile_id')
+                .eq('schoolnaam', sp.school)
+                .maybeSingle();
+              rocProfileId = schoolProfile?.profile_id || null;
+            }
+
             const { data: match } = await db.from('matches').insert({
-              party_a:      currentUser.id,
-              party_b:      posting.created_by,
-              type:         'student_posting',
-              status:       'accepted',
-              initiated_by: currentUser.id,
-              match_target: 'posting',
-              posting_id:   card.id,
+              party_a:        currentUser.id,
+              party_b:        posting.created_by,
+              type:           'student_posting',
+              status:         'accepted',
+              initiated_by:   currentUser.id,
+              match_target:   'posting',
+              posting_id:     card.id,
+              roc_profile_id: rocProfileId,
             }).select('id').maybeSingle();
             if (!match) { notify('Er ging iets mis bij het aanmaken van de match — probeer opnieuw'); return; }
             if (match) {
@@ -795,13 +789,6 @@
   // ─────────────────────────────────────────────────────────────────────────
   // Helpers
   // ─────────────────────────────────────────────────────────────────────────
-
-  function notify(msg) {
-    const el = document.getElementById('notif');
-    el.textContent = msg;
-    el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 3200);
-  }
 
   function showLoading(containerId, tekst) {
     const el = document.getElementById(containerId);

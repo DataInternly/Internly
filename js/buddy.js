@@ -94,12 +94,6 @@ const BUDDY_CONFIG = {
   },
 };
 
-// ── UTIL ────────────────────────────────────────────────────
-
-function buddyEsc(s) {
-  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
 // ── STATE ───────────────────────────────────────────────────
 
 const BuddyModule = {
@@ -400,7 +394,7 @@ async function buddySendRequest(receiverId, type, message = '') {
     .maybeSingle();
 
   if (existing) {
-    buddyShowToast('Je hebt al een buddyverzoek uitstaan voor dit type.');
+    buddyShowToast('Je hebt al een buddyverzoek uitstaan voor dit type');
     return;
   }
 
@@ -412,7 +406,7 @@ async function buddySendRequest(receiverId, type, message = '') {
 
   if (error) {
     console.error('[buddy] sendRequest error:', error.message);
-    buddyShowToast('Verzoek kon niet worden verstuurd — probeer het opnieuw.');
+    buddyShowToast('Verzoek kon niet worden verstuurd — probeer het opnieuw');
     return;
   }
 
@@ -452,7 +446,7 @@ async function buddyAcceptRequest(requestId) {
 
   if (reqErr || !req) {
     console.error('[buddy] acceptRequest — request not found or access denied');
-    buddyShowToast('Verzoek niet gevonden.');
+    buddyShowToast('Verzoek niet gevonden');
     return;
   }
 
@@ -464,7 +458,7 @@ async function buddyAcceptRequest(requestId) {
 
   if (updErr) {
     console.error('[buddy] acceptRequest update error:', updErr.message);
-    buddyShowToast('Accepteren mislukt — probeer opnieuw.');
+    buddyShowToast('Accepteren mislukt — probeer opnieuw');
     return;
   }
 
@@ -485,7 +479,7 @@ async function buddyAcceptRequest(requestId) {
     console.error('[buddy] acceptRequest pair insert error:', pairErr.message);
     // Roll back: revert request to pending so the receiver can retry
     await db.from('buddy_requests').update({ status: 'pending' }).eq('id', requestId);
-    buddyShowToast('Koppeling aanmaken mislukt — probeer opnieuw.');
+    buddyShowToast('Koppeling aanmaken mislukt — probeer opnieuw');
     return;
   }
 
@@ -536,7 +530,7 @@ async function buddyDeclineRequest(requestId, reason = '') {
 
   if (error) {
     console.error('[buddy] declineRequest error:', error.message);
-    buddyShowToast('Afwijzen mislukt — probeer opnieuw.');
+    buddyShowToast('Afwijzen mislukt — probeer opnieuw');
     return;
   }
 
@@ -562,14 +556,14 @@ async function buddyEndPair(pairId) {
 
   if (error) {
     console.error('[buddy] endPair error:', error.message);
-    buddyShowToast('Beëindigen mislukt — probeer opnieuw.');
+    buddyShowToast('Beëindigen mislukt — probeer opnieuw');
     return;
   }
 
   // Do NOT delete — keep for Trust Score history and analytics
   BuddyModule.activePairs = BuddyModule.activePairs.filter(p => p.id !== pairId);
   BuddyModule.onUpdate?.();
-  buddyShowToast('Buddy-koppeling beëindigd.');
+  buddyShowToast('Buddy-koppeling beëindigd');
 }
 
 // ── INTERNAL NOTIFICATION HELPER ────────────────────────────
@@ -601,16 +595,16 @@ async function _buddyNotify(userId, type, refId, refType, message) {
 function buddyRenderPairCard(pair, context = 'dashboard') {
   const config = BUDDY_CONFIG[pair.type] || {};
   const isAnon = config.anonymous && pair.reveal_after && new Date(pair.reveal_after) > new Date();
-  const name   = isAnon ? 'Anonieme buddy' : buddyEsc(pair.buddy_name || 'Buddy');
-  const label  = buddyEsc(config.label || pair.type);
+  const name   = isAnon ? 'Anonieme buddy' : escapeHtml(pair.buddy_name || 'Buddy');
+  const label  = escapeHtml(config.label || pair.type);
   // pair.id is a UUID — safe for both HTML attrs and JS string literals.
   // buddyEsc is for HTML attribute values; for onclick JS literals we keep the raw UUID.
   const pairId = String(pair.id || '').replace(/[^a-zA-Z0-9\-]/g, '');  // allow only UUID chars
 
-  const initial = isAnon ? '?' : buddyEsc((pair.buddy_name || '?')[0].toUpperCase());
+  const initial = isAnon ? '?' : escapeHtml((pair.buddy_name || '?')[0].toUpperCase());
 
   return `
-    <div class="buddy-card" data-pair-id="${pairId}" data-type="${buddyEsc(pair.type)}">
+    <div class="buddy-card" data-pair-id="${pairId}" data-type="${escapeHtml(pair.type)}">
       <div class="buddy-card__avatar">${initial}</div>
       <div class="buddy-card__info">
         <div class="buddy-card__name">${name}</div>
@@ -635,15 +629,15 @@ function buddyRenderIncomingRequests() {
 
   return BuddyModule.pendingRequests.map(req => {
     const config     = BUDDY_CONFIG[req.type] || {};
-    const senderName = buddyEsc(req.sender_name || 'Onbekend');
-    const labelText  = buddyEsc(config.label || req.type);
+    const senderName = escapeHtml(req.sender_name || 'Onbekend');
+    const labelText  = escapeHtml(config.label || req.type);
     // UUID — strip non-UUID chars so it is safe in both HTML attrs and JS onclick literals
     const reqId      = String(req.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
 
     return `
       <div class="buddy-request" data-request-id="${reqId}">
         <div class="buddy-request__who">${senderName} wil een <strong>${labelText}</strong>-koppeling</div>
-        ${req.message ? `<div class="buddy-request__message">&ldquo;${buddyEsc(req.message)}&rdquo;</div>` : ''}
+        ${req.message ? `<div class="buddy-request__message">&ldquo;${escapeHtml(req.message)}&rdquo;</div>` : ''}
         <div class="buddy-request__actions">
           <button onclick="buddyAcceptRequest('${reqId}')">Accepteren</button>
           <button class="btn-ghost" onclick="buddyDeclineRequest('${reqId}')">Afwijzen</button>
@@ -664,14 +658,14 @@ function buddyRenderRequestWidget(type, context = {}, targetEl = null) {
   const config = BUDDY_CONFIG[type];
   if (!config) return;
 
-  const contextJson = buddyEsc(JSON.stringify(context));
+  const contextJson = escapeHtml(JSON.stringify(context));
 
   const html = `
-    <div class="buddy-widget" data-type="${buddyEsc(type)}" data-context="${contextJson}">
-      <div class="buddy-widget__description">${buddyEsc(config.description)}</div>
-      ${config.privacyNote ? `<div class="buddy-widget__privacy">${buddyEsc(config.privacyNote)}</div>` : ''}
+    <div class="buddy-widget" data-type="${escapeHtml(type)}" data-context="${contextJson}">
+      <div class="buddy-widget__description">${escapeHtml(config.description)}</div>
+      ${config.privacyNote ? `<div class="buddy-widget__privacy">${escapeHtml(config.privacyNote)}</div>` : ''}
       <button class="buddy-widget__btn" onclick="buddyHandleRequestFromWidget(this)">
-        Koppel mij aan een ${buddyEsc(config.label.toLowerCase())}
+        Koppel mij aan een ${escapeHtml(config.label.toLowerCase())}
       </button>
     </div>`;
 
@@ -712,7 +706,7 @@ async function buddyHandleRequestFromWidget(btn) {
  */
 async function buddyHandleRequest(type, context = {}, triggerBtn = null) {
   if (!BuddyModule.initialized) {
-    buddyShowToast('Buddy-systeem nog niet geladen — probeer het opnieuw.');
+    buddyShowToast('Buddy-systeem nog niet geladen — probeer het opnieuw');
     return;
   }
 

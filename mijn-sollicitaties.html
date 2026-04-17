@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#1a7a48">
   <title>Mijn sollicitaties — Internly</title>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
@@ -185,8 +186,6 @@
   <div class="notif" id="notif"></div>
 
   <script>
-    const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUserId = null;
@@ -208,10 +207,6 @@
 
     function formatDate(d) {
       return new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
-    }
-
-    function escapeHtml(s) {
-      return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
     // ── Review form ────────────────────────────────────────────────────────
@@ -337,7 +332,7 @@
         } else if (app._status === 'wacht') {
           statusTag = `<span class="tag neutral">⏳ In behandeling</span>`;
         } else if (app._status === 'afgewezen') {
-          statusTag = `<span class="tag red">✕ Afgewezen</span>`;
+          statusTag = `<span class="tag red">✕ Afgewezen</span><div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Het bedrijf heeft voor een andere kandidaat gekozen. Dit zegt niets over jou als kandidaat.</div>`;
         }
 
         const detailLink = app.internship_id
@@ -503,22 +498,6 @@
       renderApplications(data || [], matchByPosting, revieweeByPosting, reviewedMatchIds);
     }
 
-    // ── Notifications ─────────────────────────────────────────────────────
-
-    async function createNotification(userId, type, refId, refType, message) {
-      if (!userId) return;
-      try {
-        await db.from('notifications').insert({
-          user_id:  userId,
-          type,
-          ref_id:   refId   || null,
-          ref_type: refType || null,
-          message,
-        });
-      } catch(e) {
-        console.warn('Notification insert failed:', e);
-      }
-    }
 
     async function loadNotifications() {
       if (!currentUserId) return;
@@ -651,12 +630,6 @@
     });
 
     // ── Helpers ───────────────────────────────────────────────────────────
-
-    function notify(msg) {
-      const el = document.getElementById('notif');
-      el.textContent = msg; el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 3200);
-    }
 
     function showLoading(containerId, tekst) {
       const el = document.getElementById(containerId);

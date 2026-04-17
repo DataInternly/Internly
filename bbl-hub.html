@@ -56,6 +56,7 @@
   <title>BBL Traject — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -843,6 +844,7 @@
         <div style="background:#eaf5ed;border-radius:7px;padding:8px 12px;font-size:11px;color:#1a7a48;font-weight:500;margin-bottom:10px;">
           Gebruik het STARR-model — beschrijf elke fase in je eigen woorden.
         </div>
+        <div style="font-size:.8rem;color:var(--green,#1a7a48);background:var(--green-bg,#e8f5ee);padding:6px 10px;border-radius:6px;margin-bottom:.5rem;display:flex;align-items:center;gap:6px;"><span>🔒</span><span>Je beoordeling blijft anoniem tot <strong id="anon-date">na het einde van je contract</strong>. Schrijf eerlijk.</span></div>
         <div style="margin-bottom:6px;">
           <div style="font-size:11px;font-weight:600;color:#0d1520;margin-bottom:3px;">
             <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:#1a7a48;color:#fff;font-size:9px;font-weight:700;margin-right:5px;">S</span>Situatie
@@ -1036,8 +1038,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SUPABASE CLIENT — zelfde keys als alle andere Internly-pagina's
 // ─────────────────────────────────────────────────────────────────────────────
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1059,22 +1059,10 @@ let evalMeeting          = null; // openstaande evaluatie
 // HELPERS — exact patroon chat.html
 // ─────────────────────────────────────────────────────────────────────────────
 
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function showLoading(containerId, tekst) {
   const el = document.getElementById(containerId);
   if (!el) return;
   el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
-}
-
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 function formatTime(iso) {
@@ -1094,16 +1082,6 @@ function formatDate(iso) {
 }
 
 // Notification helper — exact kopie patroon chat.html
-async function createNotification(userId, type, refId, refType, message) {
-  if (!userId) return;
-  const { error } = await db.from('notifications').insert({
-    user_id: userId, type,
-    ref_id: refId || null, ref_type: refType || null,
-    message, read: false,
-  });
-  if (error) console.warn('[bbl-hub] notification fout (non-blocking):', error.message);
-}
-
 async function signOut() {
   await db.auth.signOut();
   sessionStorage.removeItem('internly_role');
@@ -1423,12 +1401,14 @@ function schoolDagNummer(dag) {
 }
 
 async function loadMeetings() {
+  if (!activeMatch?.id) return;
   const first = new Date(calYear, calMonth, 1).toISOString().slice(0, 10);
   const last  = new Date(calYear, calMonth + 1, 0).toISOString().slice(0, 10);
   const { data, error } = await db
     .from('meetings')
     .select('*')
     .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
+    .eq('match_id', activeMatch.id)
     .gte('proposed_date', first)
     .lte('proposed_date', last);
 
@@ -1548,10 +1528,15 @@ function fillDateSelect() {
 }
 
 async function createMeeting() {
+  if (window._isCreatingMeeting) return;
+  window._isCreatingMeeting = true;
+  try {
   if (!selectedMeetType) { notify('Kies eerst een type afspraak'); return; }
   const date = document.getElementById('meetingDateSelect').value;
   const time = document.getElementById('meetingTimeSelect').value;
   if (!date) { notify('Kies een datum'); return; }
+  const today = new Date().toISOString().slice(0, 10);
+  if (date < today) { notify('Kies een datum in de toekomst'); return; }
   if (!currentUser || !activeMatch) { notify('Koppeling niet geladen — ververs de pagina'); return; }
 
   const subject = {
@@ -1583,7 +1568,7 @@ async function createMeeting() {
     if (activeMatch.roc_profile_id) {
       await createNotification(
         activeMatch.roc_profile_id,
-        'meeting_invite',
+        MEETING_NOTIFICATION_TYPE,
         newMeeting.id,
         'meeting',
         (currentUser.user_metadata?.naam || 'Student') + ' heeft een driegesprek gepland op ' + date
@@ -1598,7 +1583,7 @@ async function createMeeting() {
   if (activeMatch.praktijkbegeleider_profile_id) {
     await createNotification(
       activeMatch.praktijkbegeleider_profile_id,
-      'meeting_invite',
+      MEETING_NOTIFICATION_TYPE,
       newMeeting.id,
       'meeting',
       (currentUser.user_metadata?.naam || 'Student') + ' heeft een ' + selectedMeetType + ' gepland op ' + date
@@ -1609,6 +1594,9 @@ async function createMeeting() {
   await loadMeetings();
   renderCalendar();
   document.getElementById('newMeetingPanel').style.display = 'none';
+  } finally {
+    window._isCreatingMeeting = false;
+  }
 }
 
 // iCal export — client-side, geen externe library
@@ -2301,6 +2289,38 @@ async function signOff(party) {
       (currentUser.user_metadata?.naam || 'Student') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
     );
   }
+
+  if (party === 'bedrijf' && activeMatch?.roc_profile_id) {
+    createNotification(
+      activeMatch.roc_profile_id,
+      'eval_signed',
+      evalMeeting.id,
+      'meeting',
+      (currentUser.user_metadata?.naam || 'Praktijkbegeleider') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
+    );
+  }
+
+  if (party === 'school') {
+    if (activeMatch?.party_a) {
+      createNotification(
+        activeMatch.party_a,
+        'eval_completed',
+        evalMeeting.id,
+        'meeting',
+        'Je evaluatie is volledig ondertekend en afgerond.'
+      );
+    }
+    if (activeMatch?.praktijkbegeleider_profile_id) {
+      createNotification(
+        activeMatch.praktijkbegeleider_profile_id,
+        'eval_completed',
+        evalMeeting.id,
+        'meeting',
+        'De evaluatie is volledig ondertekend en afgerond.'
+      );
+    }
+  }
+
   notify('Handtekening geplaatst');
 }
 
@@ -2507,6 +2527,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   const contractEnd = match?.contract_end_date || match?.internship_postings?.contract_end;
   if (contractEnd) updateContractStrip(contractEnd);
 
+  // Anonimiteitsherinnering — vul einddatum van contract in
+  const anonDateEl = document.getElementById('anon-date');
+  if (anonDateEl) {
+    const endDate = activeMatch?.contract_end_date || activeMatch?.end_date || null;
+    anonDateEl.textContent = endDate ? formatNLDate(endDate) : 'na het einde van je contract';
+  }
+
   // Praktijkbegeleider naam ophalen
   if (match?.praktijkbegeleider_profile_id) {
     const { data: pb } = await db
@@ -2591,26 +2618,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 6. Deelnemers in berichten-view
   renderParticipants(praktijkbegeleiderName, rocNaam, false);
 
-  // Geen actieve koppeling — toon lege staat met CTA in berichten-view
+  // Geen actieve koppeling — toon lege staat in hub-shell
   if (!match) {
-    document.getElementById('msgThread').innerHTML = `
-      <div style="padding:40px 24px;text-align:center;">
-        <div style="font-size:40px;margin-bottom:14px;">🏭</div>
-        <p style="font-weight:600;font-size:15px;color:#0d1520;margin:0 0 8px;">
-          Nog geen leerbedrijf gekoppeld
-        </p>
-        <p style="font-size:13px;color:#6b7280;line-height:1.6;margin:0 0 22px;">
-          Je BBL-account is klaar. Voeg je leerbedrijf toe om berichten,
-          kalender en evaluaties te activeren.
-        </p>
-        <a href="bbl-profile.html"
-           style="display:inline-block;padding:11px 24px;background:#1a7a48;color:#fff;
-                  border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">
-          Leerbedrijf koppelen →
-        </a>
-      </div>`;
-    document.getElementById('participantsRow').innerHTML =
-      '<div class="participant"><div class="av av-gray" style="width:20px;height:20px;font-size:8px;">?</div><span>Geen koppeling</span></div>';
+    const hubShell = document.querySelector('.hub-shell');
+    if (hubShell) {
+      hubShell.innerHTML = '<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📋</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen actief BBL-contract</div><div style="font-size:.88rem;margin-bottom:1rem;">Vul je BBL-profiel in om je traject te starten.</div><a href="bbl-profile.html" style="display:inline-block;background:var(--accent,#e05c1a);color:white;padding:8px 18px;border-radius:8px;font-size:.88rem;text-decoration:none;">Profiel invullen →</a></div>';
+    }
   }
 
   // 7. Buddy init (insider type voor BBL)

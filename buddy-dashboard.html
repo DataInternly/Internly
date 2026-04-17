@@ -20,6 +20,7 @@
   <title>Buddy Dashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/buddy.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -301,8 +302,6 @@
 </div><!-- /shell -->
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -314,18 +313,6 @@ let _selectedDays  = new Set();
 const DAYS = ['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3200);
-}
 
 function showLoading(containerId, tekst) {
   const el = document.getElementById(containerId);
@@ -469,10 +456,10 @@ async function endPair(pairId) {
     .update({ status: 'ended', ended_at: new Date().toISOString() })
     .eq('id', pairId)
     .or(`requester_id.eq.${uid},receiver_id.eq.${uid}`);
-  if (error) { notify('Beëindigen mislukt — probeer opnieuw.'); return; }
+  if (error) { notify('Beëindigen mislukt — probeer opnieuw'); return; }
   activePairs = activePairs.filter(p => String(p.id) !== pairId);
   renderPairs();
-  notify('Koppeling beëindigd.');
+  notify('Koppeling beëindigd');
 }
 
 // ── Pending requests ───────────────────────────────────────────────────────
@@ -524,10 +511,10 @@ async function acceptRequest(reqId) {
     .eq('receiver_id', currentUser.id)
     .maybeSingle();
 
-  if (rErr || !req) { notify('Verzoek niet gevonden.'); return; }
+  if (rErr || !req) { notify('Verzoek niet gevonden'); return; }
 
   const { error: updErr } = await db.from('buddy_requests').update({ status: 'accepted' }).eq('id', reqId);
-  if (updErr) { notify('Accepteren mislukt — probeer opnieuw.'); return; }
+  if (updErr) { notify('Accepteren mislukt — probeer opnieuw'); return; }
 
   // 2. Create pair
   const { data: pair, error: pErr } = await db
@@ -537,7 +524,7 @@ async function acceptRequest(reqId) {
   if (pErr) {
     // Roll back acceptance
     await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId).catch(() => {});
-    notify('Koppeling aanmaken mislukt — probeer opnieuw.'); return;
+    notify('Koppeling aanmaken mislukt — probeer opnieuw'); return;
   }
   if (!pair) {
     notify('Koppeling bevestigd — student wordt op de hoogte gesteld');
@@ -564,7 +551,7 @@ async function declineRequest(reqId) {
     .update({ status: 'declined' })
     .eq('id', reqId)
     .eq('receiver_id', currentUser.id);
-  if (error) { notify('Afwijzen mislukt.'); return; }
+  if (error) { notify('Afwijzen mislukt'); return; }
   pendingReqs = pendingReqs.filter(r => String(r.id) !== reqId);
   renderRequests();
 }

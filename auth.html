@@ -12,6 +12,7 @@
   <title>Inloggen — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/push.js"></script>
   <style>
@@ -284,7 +285,7 @@
         <div class="role-icon-wrap">👤</div>
         <div>
           <div class="role-name">Student</div>
-          <div class="role-desc">Ik zoek een stage</div>
+          <div class="role-desc">Zoek een stage op basis van jouw leerdoelen en ambitie.</div>
         </div>
         <div class="role-check" id="check-student"></div>
       </div>
@@ -292,7 +293,7 @@
         <div class="role-icon-wrap">🏗</div>
         <div>
           <div class="role-name">Student — BBL</div>
-          <div class="role-desc">Ik werk én leer bij hetzelfde leerbedrijf.</div>
+          <div class="role-desc">Beheer je BBL-traject en bescherm je rechten als leerling-werknemer.</div>
         </div>
         <div class="role-check" id="check-bbl"></div>
       </div>
@@ -300,7 +301,7 @@
         <div class="role-icon-wrap">🏢</div>
         <div>
           <div class="role-name">Bedrijf</div>
-          <div class="role-desc">Ik zoek een stagiair</div>
+          <div class="role-desc">Vind gemotiveerde stagiairs en bouw je reputatie op.</div>
         </div>
         <div class="role-check" id="check-bedrijf"></div>
       </div>
@@ -308,7 +309,7 @@
         <div class="role-icon-wrap">🎓</div>
         <div>
           <div class="role-name">School</div>
-          <div class="role-desc">Ik begeleid studenten</div>
+          <div class="role-desc">Monitor je studenten en verifieer welke bedrijven betrouwbaar zijn.</div>
         </div>
         <div class="role-check" id="check-school"></div>
       </div>
@@ -316,7 +317,7 @@
         <div class="role-icon-wrap">📋</div>
         <div>
           <div class="role-name">Ik ben stagebegeleider</div>
-          <div class="role-desc">Ik begeleid studenten individueel tijdens hun stage</div>
+          <div class="role-desc">Begeleid studenten bij hun stagetraject, per sessie.</div>
         </div>
         <div class="role-check" id="check-begeleider"></div>
       </div>
@@ -324,7 +325,7 @@
         <div class="role-icon-wrap">🤝</div>
         <div>
           <div class="role-name">Gepensioneerde buddy</div>
-          <div class="role-desc">Geef je kennis door aan een student</div>
+          <div class="role-desc">Deel je ervaring als buddy met een student die dat nodig heeft.</div>
         </div>
         <div class="role-check" id="check-gepensioneerd"></div>
       </div>
@@ -443,8 +444,6 @@
 </div>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Sessie verlopen melding ──
@@ -457,7 +456,7 @@ if (new URLSearchParams(window.location.search).get('expired') === '1') {
 
 // ── Routing per rol ──
 const ROUTES = {
-  student:       'discover.html',
+  student:       'match-dashboard.html',
   bedrijf:       'company-dashboard.html',
   school:        'school-dashboard.html',
   begeleider:    'begeleider-dashboard.html',
@@ -590,7 +589,7 @@ async function doLogin() {
   showSuccess('Inloggen gelukt! Je wordt doorgestuurd…');
 
   // BBL check: student met bbl_mode → bbl-dashboard.html
-  let redirectUrl = ROUTES[role] || 'discover.html';
+  let redirectUrl = ROUTES[role] || 'match-dashboard.html';
   if (role === 'student') {
     const { data: sp, error: spErr } = await db
       .from('student_profiles')
@@ -652,7 +651,7 @@ async function doRegister() {
   btn.textContent = 'Account aanmaken →';
 
   if (error) {
-    showError('Registreren mislukt. Probeer het opnieuw of neem contact met ons op.');
+    showError('Aanmelden mislukt — probeer het nog eens, of mail ons op hallo@internly.pro');
     return;
   }
 

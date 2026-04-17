@@ -12,6 +12,7 @@
   <title>Vacature — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
@@ -322,8 +323,6 @@
 </div>
 
 <script>
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Sector tips ──
@@ -427,10 +426,6 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
 }
 
-function escapeHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
 function isSaved(id, source) {
   let saved;
   try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
@@ -488,6 +483,7 @@ function render(v, source) {
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           ${source === 'internship_postings' ? '<span style="font-size:.72rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 10px;border-radius:20px">🏢 Bedrijfsposting</span>' : ''}
           <span class="trust-badge ${gradeClass}">${eGrade} · ${eScore} <span style="opacity:.65;font-weight:400">${trustTitle(v.trust_grade)}</span></span>
+          <span class="trust-hint" style="font-size:.72rem;color:var(--ink3,#7a8799);display:block;margin-top:2px;">A = &lt;2 dagen · B = 2–5 dagen · C = traag</span>
         </div>
       </div>
 
@@ -561,6 +557,7 @@ function render(v, source) {
       <p style="font-size:.9rem;color:var(--ink3);margin-bottom:18px;line-height:1.6">
         Sla de vacature op in je profiel zodat je hem later rustig kunt bekijken of vergelijken.
       </p>
+      ${v.trust_grade === 'C' ? '<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:6px;margin-bottom:12px;">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>' : ''}
       <div class="btn-row">
         <button class="btn-save" id="saveBtn"
           onclick="handleSave()"
@@ -593,7 +590,7 @@ async function handleSave() {
     const { data: { user } } = await db.auth.getUser();
 
     if (!user) {
-      notify('Log in om te solliciteren.');
+      notify('Log in om te solliciteren');
       setTimeout(() => { window.location.href = 'auth.html'; }, 1800);
       btn.disabled    = false;
       btn.textContent = 'Opslaan';
@@ -607,7 +604,7 @@ async function handleSave() {
       .maybeSingle();
 
     if (prof?.role !== 'student') {
-      notify('Alleen studenten kunnen solliciteren.');
+      notify('Alleen studenten kunnen solliciteren');
       btn.disabled    = false;
       btn.textContent = 'Opslaan';
       return;
@@ -637,7 +634,7 @@ async function handleSave() {
         }
       }
       btn.textContent = '✓ Opgeslagen in profiel';
-      notify('✓ Sollicitatie opgeslagen — bekijk je voortgang bij Mijn Stages');
+      notify('✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties', true);
     } else {
       // internship_postings — insert into applications table (localStorage already saved above)
       try {
@@ -669,19 +666,13 @@ async function handleSave() {
       }
 
       btn.textContent = '✓ Opgeslagen in profiel';
-      notify('✓ Sollicitatie opgeslagen — bekijk je voortgang bij Mijn Stages');
+      notify('✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties', true);
     }
   } catch(e) {
     console.error('handleSave error:', e);
+    notify('Er is iets misgegaan — probeer het opnieuw', false);
     btn.textContent = '✓ Opgeslagen';
-    notify('✓ Vacature opgeslagen');
   }
-}
-
-function notify(msg) {
-  const el = document.getElementById('notif');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
@@ -816,9 +807,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 <script>
 (function() {
-  const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
-
   if (!localStorage.getItem('internly_waitlist_seen')) {
     setTimeout(async function() {
       const _client = (typeof db !== 'undefined') ? db
@@ -922,6 +910,6 @@ window.addEventListener('load', function() {
 });
 </script>
 <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:1.5rem;font-size:.8rem;color:var(--ink3,#7a8799);border-top:1px solid var(--border,#e2e0d9)">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

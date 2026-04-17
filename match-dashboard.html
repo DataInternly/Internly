@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="js/utils.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -2051,7 +2052,7 @@
       <div class="sidebar-footer">
         <div class="sidebar-footer-user" id="sidebar-user-info"></div>
         <a href="privacybeleid.html" style="display:block;margin-top:8px;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:4px 0;">Privacybeleid</a>
-        <button onclick="db.auth.signOut().then(()=>window.location.href='index.html')" style="
+        <button onclick="db.auth.signOut().then(()=>window.location.href='auth.html')" style="
           margin-top:8px;width:100%;padding:8px 12px;
           background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
           border-radius:8px;color:rgba(255,255,255,.5);
@@ -2101,14 +2102,31 @@
 'use strict';
 
 /* ── Supabase client ─────────────────────────────────────────────────────── */
-const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Match ID from URL (?match=UUID) — null in demo mode
 const MATCH_ID = new URLSearchParams(window.location.search).get('match');
 // Always hide role-picker immediately; removed below only if not logged in (demo mode)
 document.body.classList.add('auth-boot');
+
+// Auth-mode globals — set in loadMatchFromDB, null in demo mode
+let currentUser = null;
+let hubPartyIds = { student: null, bedrijf: null, school: null, roc: null };
+
+// Map role string ↔ user UUID
+function roleToUserId(role) { return hubPartyIds[role] || null; }
+function roleFromUserId(uid) {
+  if (!uid) return null;
+  if (uid === hubPartyIds.student) return 'student';
+  if (uid === hubPartyIds.bedrijf) return 'bedrijf';
+  if (uid === hubPartyIds.school)  return 'school';
+  return null;
+}
+// Map DB status → local status label
+function mapDbStatus(s) {
+  if (s === 'bevestigd') return 'geaccepteerd';
+  return s || 'openstaand';
+}
 
 /* ── Kalender state ──────────────────────────────────────────────────────── */
 let kalState = {
@@ -2561,6 +2579,33 @@ async function loadHubFromDB() {
       }));
     }
 
+    if (currentUser) {
+      const { data: meetingsData } = await db.from('meetings').select('*')
+        .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
+        .eq('match_id', MATCH_ID)
+        .order('proposed_date', { ascending: true });
+      if (meetingsData?.length) {
+        hubState.meetings = meetingsData.map(m => ({
+          id:            m.id,
+          _dbId:         m.id,
+          from:          roleFromUserId(m.organizer_id),
+          to:            roleFromUserId(m.attendee_id),
+          toAll:         false,
+          subject:       m.subject      || '',
+          type:          m.type         || 'video',
+          contactInfo:   m.contact_info || '',
+          proposedDates: [{ id: 1, date: m.proposed_date, from: m.time_start, to: m.time_end }],
+          selectedDate:  (m.status === 'bevestigd') ? 1 : null,
+          status:        mapDbStatus(m.status),
+          counterProposal: null,
+          note:          m.note || '',
+          createdAt:     '',
+          updatedAt:     '',
+          seenBy:        [roleFromUserId(m.organizer_id)]
+        }));
+      }
+    }
+
     switchTab(hubState.currentTab);
   } catch (e) {
     toast('Fout bij laden: ' + (e.message || e));
@@ -2639,11 +2684,16 @@ async function loadMatchFromDB(user) {
     const { data: _prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
     const WRONG_ROLE_ROUTES = { gepensioneerd: 'buddy-dashboard.html', buddy: 'buddy-dashboard.html' };
     if (WRONG_ROLE_ROUTES[_prof?.role]) { hideSpinner(); window.location.href = WRONG_ROLE_ROUTES[_prof.role]; return; }
+    const allowedRoles = ['student', 'begeleider'];
+    if (_prof && !allowedRoles.includes(_prof.role)) {
+      window.location.replace('auth.html');
+      return;
+    }
 
     // 1. Load match record + vacature name via FK join
     const { data: matchRow, error: matchErr } = await db
       .from('matches')
-      .select('id, party_a, party_b, internship_postings(title)')
+      .select('id, party_a, party_b, roc_profile_id, internship_postings(title)')
       .eq('id', MATCH_ID)
       .maybeSingle();
 
@@ -2718,7 +2768,14 @@ async function loadMatchFromDB(user) {
     if (topbarStage) topbarStage.textContent = match.company.vacature;
     if (topbarMeta)  topbarMeta.textContent  = match.company.name + ' · ' + match.company.start + ' – ' + match.company.eind;
 
-    // 4. Auto-start hub (also triggers loadHubFromDB which hides spinner)
+    // 4. Set global auth state for DB meeting ops
+    currentUser = user;
+    hubPartyIds.student = matchRow.party_a;
+    hubPartyIds.bedrijf = matchRow.party_b;
+    hubPartyIds.roc     = matchRow.roc_profile_id || null;
+    if (role === 'school') hubPartyIds.school = user.id;
+
+    // 5. Auto-start hub (also triggers loadHubFromDB which hides spinner)
     startHub(role);
 
   } catch (e) {
@@ -2870,7 +2927,8 @@ function switchTab(tab) {
     matchpool:   renderMatchpool,
   };
   const tabHtml = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
-  mc.innerHTML = renderMatchIndicator() + tabHtml;
+  const visibilityBar = '<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink3,#7a8799);background:var(--bg2,#eceae4);padding:5px 12px;border-radius:6px;margin-bottom:.75rem;"><span>👁</span><span>Zichtbaar voor:</span> <span style="color:var(--blue,#1756a8);">Student</span> · <span style="color:var(--green,#1a7a48);">Bedrijf</span> · <span style="color:var(--amber,#a06010);">School</span></div>';
+  mc.innerHTML = visibilityBar + renderMatchIndicator() + tabHtml;
   updateMeetingBadge();
 }
 
@@ -2905,7 +2963,7 @@ function renderOverzicht() {
         <div style="font-weight:600;font-size:.9rem;color:#9a3412;">School nog niet uitgenodigd</div>
         <div style="font-size:.82rem;color:#c2410c;margin-top:2px;">Nodig de schoolbegeleider uit om het dashboard te delen.</div>
       </div>
-      ${can('inviteSchool') ? `<button class="btn btn-sm" onclick="inviteSchool()" style="background:#ff7e42;color:#fff;border:none;">Uitnodigen</button>` : ''}
+      ${can('inviteSchool') ? `<button type="button" class="btn btn-sm" onclick="inviteSchool()" style="background:#ff7e42;color:#fff;border:none;">Uitnodigen</button>` : ''}
     </div>` : '';
 
   const leerdoelenRows = hubState.leerdoelen.map(l => `
@@ -2962,8 +3020,8 @@ function renderOverzicht() {
       <button class="btn btn-ghost btn-sm" onclick="switchTab('planning')">📅 Planning</button>
       <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">🗓 Kalender</button>
       <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken')">💬 Afspraken</button>
-      ${can('addTask') ? `<button class="btn btn-primary btn-sm" onclick="switchTab('taken');setTimeout(()=>openTaakModal(null),50)">+ Taak</button>` : ''}
-      ${can('addDeadline') ? `<button class="btn btn-primary btn-sm" onclick="switchTab('planning');setTimeout(()=>openDeadlineModal(null),50)">+ Deadline</button>` : ''}
+      ${can('addTask') ? `<button type="button" class="btn btn-primary btn-sm" onclick="switchTab('taken');setTimeout(()=>openTaakModal(null),50)">+ Taak</button>` : ''}
+      ${can('addDeadline') ? `<button type="button" class="btn btn-primary btn-sm" onclick="switchTab('planning');setTimeout(()=>openDeadlineModal(null),50)">+ Deadline</button>` : ''}
     </div>
 
     <!-- Stats row -->
@@ -3049,7 +3107,7 @@ function renderOverzicht() {
           </div>
           <div class="volledigheid-label" id="refl-voortgang-label">${pct}% volledig ingevuld</div>
           <div style="font-size:.78rem;color:var(--muted);margin-top:2px;" id="refl-voortgang-count">${volledig} van ${total} reflecties volledig (STARR)</div>
-          ${can('addReflectie') ? `<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="exportReflectieverslag()">📄 Exporteer verslag</button>` : ''}
+          ${can('addReflectie') ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="exportReflectieverslag()">📄 Exporteer verslag</button>` : ''}
         </div>`;
         })() : ''}
 
@@ -3486,7 +3544,7 @@ function renderVoortgang() {
         <div class="card" style="margin-bottom:16px;">
           <div class="card-head">
             <div class="card-title">Reflecties</div>
-            ${can('addReflectie') && reflTotal > 0 ? `<button class="btn btn-ghost btn-sm" onclick="exportReflectieverslag()">📄 PDF</button>` : ''}
+            ${can('addReflectie') && reflTotal > 0 ? `<button type="button" class="btn btn-ghost btn-sm" onclick="exportReflectieverslag()">📄 PDF</button>` : ''}
           </div>
           ${reflectiesHtml}
         </div>
@@ -4315,7 +4373,7 @@ function renderStageplan() {
         : `<input class="form-input" value="${escHtml(dv.tekst || '')}"
              oninput="hubState.stageplan.deelvragen[${i}].tekst=this.value" />`
       }
-      ${!readonly ? `<button class="deelvraag-remove btn btn-ghost btn-sm" onclick="removeDeelvraag(${i})">✕</button>` : ''}
+      ${!readonly ? `<button type="button" class="deelvraag-remove btn btn-ghost btn-sm" onclick="removeDeelvraag(${i})">✕</button>` : ''}
     </div>`).join('') || `<div class="empty-state" style="font-size:.82rem;padding:8px 0">Nog geen deelvragen toegevoegd.</div>`;
 
   const addDvBtn = !readonly ? `
@@ -4617,7 +4675,7 @@ function renderKalender() {
         <div class="page-sub">Deadlines en afspraken in één overzicht</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${can('addDeadline') ? `<button class="btn btn-primary btn-sm" onclick="openDeadlineModal(null)">+ Deadline</button>` : ''}
+        ${can('addDeadline') ? `<button type="button" class="btn btn-primary btn-sm" onclick="openDeadlineModal(null)">+ Deadline</button>` : ''}
         <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken');setTimeout(()=>openMeetingModal(),50)">+ Afspraak</button>
       </div>
     </div>
@@ -5005,7 +5063,7 @@ function selectTimeOpt(meetingId, dateId) {
 }
 
 /* ── Accept ───────────────────────────────────────────────────────── */
-function acceptMeeting(id) {
+async function acceptMeeting(id) {
   const m = hubState.meetings.find(m => m.id === id);
   if (!m) return;
   const dateId = selectedTimeOpts[id];
@@ -5015,6 +5073,28 @@ function acceptMeeting(id) {
   m.updatedAt    = nowStr();
   const pd = m.proposedDates.find(d => d.id === dateId);
   const dateLabel = pd ? formatMeetingDate(pd.date, pd.from, pd.to) : '';
+
+  if (MATCH_ID && currentUser && m._dbId) {
+    await db.from('meetings').update({
+      status:        'bevestigd',
+      proposed_date: pd?.date || null,
+      time_start:    pd?.from || null,
+      time_end:      pd?.to   || null,
+    }).eq('id', m._dbId).catch(err => console.warn('[hub] accept DB err:', err));
+    const organizerId = roleToUserId(m.from);
+    if (organizerId && organizerId !== currentUser.id) {
+      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+      await db.from('notifications').insert({
+        user_id:  organizerId,
+        type:     'meeting_accepted',
+        ref_id:   m._dbId,
+        ref_type: 'meeting',
+        message:  `${senderName} heeft je afspraak bevestigd: ${m.subject} — ${dateLabel}.`,
+        read:     false,
+      }).catch(err => console.warn('[hub] notif skipped:', err));
+    }
+  }
+
   addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek geaccepteerd — ${dateLabel}`, 'green');
   toast(`✓ Afspraak bevestigd — ${dateLabel}`);
   delete selectedTimeOpts[id];
@@ -5049,11 +5129,29 @@ function confirmDecline(id) {
   if (el) el.style.display = '';
 }
 
-function declineMeeting(id) {
+async function declineMeeting(id) {
   const m = hubState.meetings.find(m => m.id === id);
   if (!m) return;
   m.status    = 'afgewezen';
   m.updatedAt = nowStr();
+
+  if (MATCH_ID && currentUser && m._dbId) {
+    await db.from('meetings').update({ status: 'afgewezen' })
+      .eq('id', m._dbId).catch(err => console.warn('[hub] decline DB err:', err));
+    const organizerId = roleToUserId(m.from);
+    if (organizerId && organizerId !== currentUser.id) {
+      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+      await db.from('notifications').insert({
+        user_id:  organizerId,
+        type:     'meeting_declined',
+        ref_id:   m._dbId,
+        ref_type: 'meeting',
+        message:  `${senderName} heeft je afspraakverzoek "${m.subject}" afgewezen.`,
+        read:     false,
+      }).catch(err => console.warn('[hub] notif skipped:', err));
+    }
+  }
+
   addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek "${m.subject}" afgewezen`, 'red');
   toast('Verzoek afgewezen');
   switchTab('afspraken');
@@ -5065,11 +5163,29 @@ function confirmCancel(id) {
   if (el) el.style.display = '';
 }
 
-function cancelMeeting(id) {
+async function cancelMeeting(id) {
   const m = hubState.meetings.find(m => m.id === id);
   if (!m || m.from !== hubState.role) return;
   m.status    = 'geannuleerd';
   m.updatedAt = nowStr();
+
+  if (MATCH_ID && currentUser && m._dbId) {
+    await db.from('meetings').update({ status: 'geannuleerd' })
+      .eq('id', m._dbId).catch(err => console.warn('[hub] cancel DB err:', err));
+    const attendeeId = roleToUserId(m.to);
+    if (attendeeId && attendeeId !== currentUser.id) {
+      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+      await db.from('notifications').insert({
+        user_id:  attendeeId,
+        type:     'meeting_cancelled',
+        ref_id:   m._dbId,
+        ref_type: 'meeting',
+        message:  `${senderName} heeft het afspraakverzoek "${m.subject}" geannuleerd.`,
+        read:     false,
+      }).catch(err => console.warn('[hub] notif skipped:', err));
+    }
+  }
+
   addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek "${m.subject}" geannuleerd`, 'orange');
   toast('Verzoek geannuleerd');
   switchTab('afspraken');
@@ -5197,7 +5313,7 @@ function renderModalStep2() {
       <span class="slot-sep">tot</span>
       <input type="time" value="${s.to}"   onchange="modalTimeSlots[${i}].to=this.value">
       ${modalTimeSlots.length > 1
-        ? `<button class="btn btn-ghost btn-sm" onclick="removeTimeSlot(${i})" style="padding:4px 8px">✕</button>`
+        ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeTimeSlot(${i})" style="padding:4px 8px">✕</button>`
         : ''}
     </div>`).join('');
 
@@ -5243,35 +5359,94 @@ function removeTimeSlot(idx) {
   renderModalStep2();
 }
 
-function saveMeeting() {
-  const filled = modalTimeSlots.filter(s => s.date && s.from && s.to);
-  if (filled.length === 0) { toast('Voeg minimaal één tijdstip toe.', 'error'); return; }
-  const now = new Date();
-  const timeStr = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
-    now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-  const m = {
-    id:            hubState.nextMeetingId++,
-    from:          hubState.role,
-    to:            newMeeting.to === 'all' ? '' : newMeeting.to,
-    toAll:         newMeeting.to === 'all',
-    subject:       newMeeting.subject,
-    type:          newMeeting.type,
-    contactInfo:   newMeeting.contactInfo,
-    proposedDates: filled.map((s, i) => ({ id: i + 1, date: s.date, from: s.from, to: s.to })),
-    selectedDate:  null,
-    status:        'openstaand',
-    counterProposal: null,
-    note:          newMeeting.note || '',
-    createdAt:     timeStr,
-    updatedAt:     timeStr,
-    seenBy:        [hubState.role]
-  };
-  hubState.meetings.unshift(m);
-  const receiverLabel = newMeeting.to === 'all' ? 'alle partijen' : roleDisplay(newMeeting.to);
-  addLog(`${roleDisplay(hubState.role)} heeft een ${typeName(m.type).toLowerCase()}-verzoek verstuurd aan ${receiverLabel}`, 'blue');
-  toast(`Verzoek verstuurd aan ${receiverLabel}`);
-  closeMeetingModal();
-  switchTab('afspraken');
+async function saveMeeting() {
+  if (window._isSavingMeeting) return;
+  window._isSavingMeeting = true;
+  try {
+    const filled = modalTimeSlots.filter(s => s.date && s.from && s.to);
+    if (filled.length === 0) { toast('Voeg minimaal één tijdstip toe.', 'error'); return; }
+    const now = new Date();
+    const timeStr = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
+      now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    const firstSlot = filled[0];
+    const m = {
+      id:            hubState.nextMeetingId++,
+      from:          hubState.role,
+      to:            newMeeting.to === 'all' ? '' : newMeeting.to,
+      toAll:         newMeeting.to === 'all',
+      subject:       newMeeting.subject,
+      type:          newMeeting.type,
+      contactInfo:   newMeeting.contactInfo,
+      proposedDates: filled.map((s, i) => ({ id: i + 1, date: s.date, from: s.from, to: s.to })),
+      selectedDate:  null,
+      status:        'openstaand',
+      counterProposal: null,
+      note:          newMeeting.note || '',
+      createdAt:     timeStr,
+      updatedAt:     timeStr,
+      seenBy:        [hubState.role]
+    };
+
+    // DB write (auth mode only)
+    if (MATCH_ID && currentUser) {
+      const attendeeId = roleToUserId(m.to) || null;
+      let attendeeEmail = null;
+      if (attendeeId) {
+        const { data: ap } = await db
+          .from('profiles')
+          .select('email')
+          .eq('id', attendeeId)
+          .maybeSingle();
+        attendeeEmail = ap?.email || null;
+      }
+      const { data: dbRow } = await db.from('meetings').insert({
+        match_id:        MATCH_ID,
+        organizer_id:    currentUser.id,
+        attendee_id:     attendeeId,
+        subject:         m.subject,
+        type:            m.type,
+        contact_info:    m.contactInfo,
+        proposed_date:   firstSlot.date,
+        time_start:      firstSlot.from,
+        time_end:        firstSlot.to,
+        status:          'openstaand',
+        note:            m.note || null,
+        organizer_email: currentUser.email || null,
+        attendee_email:  attendeeEmail,
+      }).select('id').maybeSingle();
+      if (!dbRow) {
+        toast('Er ging iets mis — probeer opnieuw', 'error');
+        return;
+      }
+      if (dbRow?.id) {
+        m._dbId = dbRow.id;
+        m.id    = dbRow.id;
+        const notifTargets = m.toAll
+          ? [hubPartyIds.student, hubPartyIds.bedrijf, hubPartyIds.school].filter(uid => uid && uid !== currentUser.id)
+          : [attendeeId].filter(Boolean);
+        const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+        for (const uid of notifTargets) {
+          await db.from('notifications').insert({
+            user_id:  uid,
+            type:     (window.MEETING_NOTIFICATION_TYPE || 'new_meeting'),
+            ref_id:   dbRow.id,
+            ref_type: 'meeting',
+            message:  `${senderName} wil een afspraak plannen: ${m.subject} op ${firstSlot.date} om ${firstSlot.from}.`,
+            read:     false,
+          }).catch(err => console.warn('[hub] notif skipped:', err));
+        }
+      }
+    }
+
+    hubState.meetings.unshift(m);
+    const receiverLabel = newMeeting.to === 'all' ? 'alle partijen' : roleDisplay(newMeeting.to);
+    addLog(`${roleDisplay(hubState.role)} heeft een ${typeName(m.type).toLowerCase()}-verzoek verstuurd aan ${receiverLabel}`, 'blue');
+    toast(`Verzoek verstuurd aan ${receiverLabel}`);
+    closeMeetingModal();
+    switchTab('afspraken');
+  } finally {
+    window._isSavingMeeting = false;
+  }
 }
 
 /* ── Availability modal ───────────────────────────────────────────── */
@@ -5903,8 +6078,8 @@ function renderGuideStep() {
       <button onclick="demoGuideStep(-1)" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.82rem;cursor:pointer;${_guideStep === 0 ? 'opacity:.4;pointer-events:none;' : ''}">← Vorige</button>
       <span style="font-size:.75rem;color:var(--muted);">${_guideStep + 1} / ${tot}</span>
       ${isLast
-        ? `<button onclick="closeDemoGuide()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Sluiten ✓</button>`
-        : `<button onclick="demoGuideStep(1)" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Volgende →</button>`}
+        ? `<button type="button" onclick="closeDemoGuide()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Sluiten ✓</button>`
+        : `<button type="button" onclick="demoGuideStep(1)" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Volgende →</button>`}
     </div>`;
 
   // Update dot indicators
