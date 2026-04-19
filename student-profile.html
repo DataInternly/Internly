@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/buddy.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     body { background: #f4f3ef; }
 
@@ -196,6 +198,30 @@
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+
+    /* ── Leerweg selector (BBL / BOL) ── */
+    .profile-track-select {
+      border: none; padding: 0; margin: 0 0 18px;
+    }
+    .profile-track-select legend {
+      font-size: .88rem; font-weight: 600; color: #374151; margin-bottom: 8px;
+    }
+    .track-options { display: flex; flex-direction: column; gap: 8px; }
+    .track-option {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 14px; border-radius: 10px;
+      border: 1.5px solid #e2e8f0; cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .track-option:has(input:checked) {
+      border-color: #1a7a48; background: #f0faf5;
+    }
+    .track-option input[type="radio"] {
+      margin-top: 3px; flex-shrink: 0;
+      accent-color: #1a7a48;
+    }
+    .track-title { font-size: .9rem; font-weight: 600; color: #0d1520; }
+    .track-sub { font-size: .8rem; color: #6b7280; margin-top: 2px; }
 
     /* ── Buddy opt-in toggle ── */
     .buddy-toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -459,7 +485,7 @@
 
     <div class="field">
       <label>Naam <span class="req">*</span></label>
-      <input type="text" id="naam" placeholder="Voornaam Achternaam">
+      <input type="text" id="naam" maxlength="100" placeholder="Voornaam Achternaam">
     </div>
 
     <div class="field">
@@ -479,13 +505,33 @@
     <div class="field-row">
       <div class="field">
         <label>Opleiding <span class="req">*</span></label>
-        <input type="text" id="opleiding" placeholder="Bijv. Communication Design">
+        <input type="text" id="opleiding" maxlength="100" placeholder="Bijv. Communication Design">
       </div>
       <div class="field">
         <label>School <span class="req">*</span></label>
-        <input type="text" id="school" placeholder="Bijv. HvA, Fontys">
+        <input type="text" id="school" maxlength="100" placeholder="Bijv. HvA, Fontys">
       </div>
     </div>
+    <fieldset class="profile-track-select">
+      <legend>Welke leerweg volg je? <span class="req">*</span></legend>
+      <div class="track-options">
+        <label class="track-option">
+          <input type="radio" name="learning_track" value="bol" checked>
+          <div>
+            <div class="track-title">BOL — voltijd opleiding</div>
+            <div class="track-sub">Ik zoek een stage via een vacature. <span style="color:#9ca3af;font-size:.75rem">Twijfel je? Vraag het op school.</span></div>
+          </div>
+        </label>
+        <label class="track-option">
+          <input type="radio" name="learning_track" value="bbl">
+          <div>
+            <div class="track-title">BBL — werken en leren</div>
+            <div class="track-sub">Ik heb al een leerbedrijf en beheer mijn traject.</div>
+          </div>
+        </label>
+      </div>
+    </fieldset>
+
     <div class="field-row">
       <div class="field">
         <label>Studiejaar <span class="req">*</span></label>
@@ -647,7 +693,7 @@
     </div>
     <div class="field" style="margin-top:14px">
       <label>Afbakening <span class="hint">op welke doelgroep of context richt je je?</span></label>
-      <input type="text" id="onderzoeksvraag_context" placeholder="Bijv. 'Millennials in Nederland die duurzame producten kopen'">
+      <input type="text" id="onderzoeksvraag_context" maxlength="200" placeholder="Bijv. 'Millennials in Nederland die duurzame producten kopen'">
     </div>
     <div class="form-nav">
       <button class="btn-back" onclick="prev(3)">← Terug</button>
@@ -675,7 +721,7 @@
     </div>
     <div class="sub-q">
       <label>Voor wie is dit resultaat bedoeld?</label>
-      <input type="text" id="resultaat_doelgroep" placeholder="Bijv. 'Het marketingteam van het bedrijf'">
+      <input type="text" id="resultaat_doelgroep" maxlength="200" placeholder="Bijv. 'Het marketingteam van het bedrijf'">
     </div>
     <div class="form-nav">
       <button class="btn-back" onclick="prev(4)">← Terug</button>
@@ -713,7 +759,7 @@
     </div>
     <div class="field">
       <label>Tools, frameworks of theorie <span class="hint">optioneel</span></label>
-      <input type="text" id="methode_beschrijving" placeholder="Bijv. 'SWOT, Google Analytics, Design Thinking'">
+      <input type="text" id="methode_beschrijving" maxlength="200" placeholder="Bijv. 'SWOT, Google Analytics, Design Thinking'">
     </div>
     <div class="form-nav">
       <button class="btn-back" onclick="prev(5)">← Terug</button>
@@ -750,12 +796,12 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const fd     = {};
 const skills = [];
-let currentUser = null;
-let isEditMode  = false;
+let currentUser    = null;
+let isEditMode     = false;
+let _currentBblMode = false; // tracks initial bbl_mode at form load for switch-warning
 
 function updateProgress(step) {
   for (let i = 0; i < 6; i++) {
@@ -913,11 +959,11 @@ async function triggerStudentMatching(userId, sector) {
         ref_type: 'posting',
         message:  'Een student heeft interesse in één van je vacatures',
         read:     false,
-      }).catch(() => {});
+      }).catch(e => { console.warn('[student-profile] match notificatie mislukt:', e); });
     }
     return created;
   } catch(e) {
-    console.error('Matching trigger fout:', e);
+    console.error('Matching trigger fout:', e?.message || 'onbekende fout');
     return 0;
   }
 }
@@ -1106,6 +1152,13 @@ function populateForm(data) {
     data.skills.forEach(s => addSkill(s));
   }
 
+  // Leerweg radio (BBL / BOL)
+  const isBBL = data.bbl_mode === true;
+  const trackVal = isBBL ? 'bbl' : 'bol';
+  const trackRadio = document.querySelector(`input[name="learning_track"][value="${trackVal}"]`);
+  if (trackRadio) trackRadio.checked = true;
+  _currentBblMode = isBBL;
+
   // Radio groups
   restoreRadio('opdracht_aard', data.opdracht_aard);
   restoreRadio('opdracht_eerder_onderzoek', data.opdracht_eerder_onderzoek != null ? String(data.opdracht_eerder_onderzoek) : null);
@@ -1121,6 +1174,22 @@ async function submitProfile() {
 
   // Capture edit state before we update it
   const wasEditing = isEditMode;
+
+  // Leerweg — expliciet, nooit impliciet default (build rule 2)
+  const learningTrack = document.querySelector('input[name="learning_track"]:checked')?.value || 'bol';
+  const newBblMode    = learningTrack === 'bbl';
+
+  // Waarschuw bij BOL→BBL switch: actieve sollicitaties blijven, dashboard verandert
+  if (wasEditing && _currentBblMode === false && newBblMode === true) {
+    const confirmed = confirm(
+      'Je wisselt van BOL naar BBL. Je actieve sollicitaties blijven bewaard, maar je dashboard verandert naar de BBL-hub. Doorgaan?'
+    );
+    if (!confirmed) {
+      btn.disabled = false;
+      btn.textContent = 'Wijzigingen opslaan →';
+      return;
+    }
+  }
 
   const payload = {
     profile_id:                currentUser?.id || null,
@@ -1145,12 +1214,13 @@ async function submitProfile() {
     resultaat_doelgroep:       document.getElementById('resultaat_doelgroep').value.trim() || null,
     methode_type:              fd.methode_type || null,
     methode_beschrijving:      document.getElementById('methode_beschrijving').value.trim() || null,
+    bbl_mode:                  newBblMode,
   };
 
   const { error } = await db.from('student_profiles').upsert(payload, { onConflict: 'profile_id' });
 
   if (error) {
-    console.error(error);
+    console.error('[student-profile] upsert fout:', error?.message || 'onbekende fout');
     notify(`Fout: ${error?.message || 'onbekende fout'}`);
     btn.disabled = false;
     btn.textContent = wasEditing ? 'Wijzigingen opslaan →' : 'Profiel opslaan →';
@@ -1163,23 +1233,28 @@ async function submitProfile() {
   const savedPostcode = payload.postcode;
   if (savedPostcode) localStorage.setItem('internly_student_postcode_' + currentUser.id, savedPostcode);
 
-  if (wasEditing) {
-    // Edit save: show overview + toast
+  // PRODUCT KEUZE 19 apr 2026 — afwijking van originele brief.
+  // Originele brief: redirect altijd na save.
+  // Geïmplementeerd: redirect alleen bij eerste aanmaak en bij BBL<>BOL switch.
+  // Reden: bij gewone profielbewerking (telefoonnummer, motivatie, skills)
+  // is doorsturen naar dashboard verwarrend. Track switch is wel een
+  // hub-wisselende actie, daar is redirect logisch.
+  const trackChanged = wasEditing && (_currentBblMode !== newBblMode);
+
+  if (wasEditing && !trackChanged) {
+    // Normale edit, leerweg ongewijzigd: blijf op profielpagina
     btn.disabled = false;
     btn.textContent = 'Wijzigingen opslaan →';
+    _currentBblMode = newBblMode;
     toonOverzicht(payload);
     notify('Profiel bijgewerkt');
   } else {
-    // First creation: trigger matching, then show overview
-    const sector     = document.getElementById('opdracht_domein').value;
-    const matchCount = await triggerStudentMatching(currentUser?.id, sector);
-    toonOverzicht(payload);
-    if (matchCount > 0) {
-      notify(`Profiel aangemaakt — ${matchCount} mogelijke match${matchCount !== 1 ? 'es' : ''} gevonden`);
-    } else {
-      notify('Profiel aangemaakt en zichtbaar voor bedrijven');
+    // Eerste aanmaak of leerweg-switch: trigger matching en stuur naar hub
+    if (!wasEditing) {
+      const sector = document.getElementById('opdracht_domein').value;
+      await triggerStudentMatching(currentUser?.id, sector);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    routeStudentByMode({ bbl_mode: newBblMode });
   }
 }
 
@@ -1205,9 +1280,10 @@ async function signOut() {
   try {
     await db.auth.signOut();
   } catch(e) {
-    console.error('Logout error:', e);
+    console.error('Logout error:', e?.message || 'onbekende fout');
   } finally {
     sessionStorage.removeItem('internly_role');
+    setApplying(false);
     window.location.href = 'auth.html';
   }
 }
@@ -1242,7 +1318,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Load existing profile (if any) and populate the form
   const { data: existing } = await db
     .from('student_profiles')
-    .select('*')
+    .select('profile_id, naam, opleiding, school, jaar, beschikbaar_vanaf, duur, postcode, motivatie, opdracht_domein, opdracht_aard, opdracht_aanleiding, onderzoeksvraag, onderzoeksvraag_context, onderzoeksvraag_type, resultaat_type, resultaat_doelgroep, methode_type, methode_beschrijving, skills, opdracht_eerder_onderzoek, bbl_mode, buddy_opt_in, bedrijf')
     .eq('profile_id', user.id)
     .maybeSingle();
 
@@ -1391,10 +1467,7 @@ function renderSaved() {
     return;
   }
 
-  const trustCls = { A: 'trust-sm-a', B: 'trust-sm-b', C: 'trust-sm-c' };
-
   list.innerHTML = saved.map((v, i) => {
-    const cls  = trustCls[v.trust_grade] || 'trust-sm-b';
     const date = v.saved_at
       ? new Date(v.saved_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
       : '';
@@ -1405,7 +1478,7 @@ function renderSaved() {
           <div class="saved-card-title" title="${escapeHtml(v.title || '')}">${escapeHtml(titleShort)}</div>
           <div class="saved-card-meta">${escapeHtml(v.company_name || '')} · ${escapeHtml(v.sector || '')}${date ? ' — Opgeslagen ' + date : ''}</div>
         </div>
-        <span class="trust-badge-sm ${cls}">${escapeHtml(v.trust_grade || '—')} · ${escapeHtml(String(v.trust_score ?? '—'))}</span>
+        ${renderTrustBadge(v.trust_grade, v.trust_score, false, 'trust-badge-sm')}
         <div class="saved-card-actions">
           <a class="btn-saved-view" href="vacature-detail.html?id=${encodeURIComponent(v.id)}&source=${encodeURIComponent(v.source || 'internships')}">Bekijk</a>
           <button class="btn-saved-del" onclick="removeSaved(${i})">Verwijder</button>

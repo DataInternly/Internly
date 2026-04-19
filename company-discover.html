@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     body { background: #f4f3ef; }
 
@@ -248,11 +250,11 @@
 <div class="container">
   <a href="company-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--ink3,#888);font-size:.88rem;text-decoration:none;">← Terug naar dashboard</a>
   <h1>Zoek een stagiair</h1>
-  <p class="page-sub">Studenten die zichzelf hebben aangemeld — inclusief hun opdracht en onderzoeksvraag</p>
+  <p class="page-sub">Studenten die zichzelf hebben aangemeld — inclusief hun domein en skills</p>
 
   <div class="filters">
     <input type="text" id="searchInput" class="search-bar"
-      placeholder="Zoek op naam, skill, opleiding of onderzoeksvraag…"
+      placeholder="Zoek op naam, skill of opleiding…"
       oninput="filterCards()">
 
     <select id="domeinFilter" onchange="filterCards()">
@@ -266,21 +268,6 @@
       <option>HR & Organisatie</option>
       <option>Zorg & Welzijn</option>
       <option>Techniek & Engineering</option>
-    </select>
-
-    <select id="duurFilter" onchange="filterCards()">
-      <option value="">Alle duren</option>
-      <option value="4 maanden">4 maanden</option>
-      <option value="5 maanden">5 maanden</option>
-      <option value="6 maanden">6 maanden</option>
-    </select>
-
-    <select id="methodeFilter" onchange="filterCards()">
-      <option value="">Alle methoden</option>
-      <option>Kwalitatief</option>
-      <option>Kwantitatief</option>
-      <option>Mixed methods</option>
-      <option>Ontwerpgericht</option>
     </select>
 
     <button onclick="filterCards()">Filter toepassen</button>
@@ -316,7 +303,6 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function initials(naam) {
   return naam.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
@@ -334,23 +320,12 @@ function renderCard(s) {
   const eSchool = escapeHtml(s.school          || '');
   const eJaar   = escapeHtml(String(s.jaar     ?? ''));
   const eDomein = escapeHtml(s.opdracht_domein || '');
-  const eAard   = escapeHtml(s.opdracht_aard   || '');
-  const eMeth   = escapeHtml(s.methode_type    || '');
-  const eVraag  = escapeHtml(s.onderzoeksvraag || '');
-  const eVType  = escapeHtml(s.onderzoeksvraag_type || '');
-  const eRes    = escapeHtml(s.resultaat_type  || '');
-  const eMot    = escapeHtml(s.motivatie       || '');
-  const eDuur   = escapeHtml(s.duur            || '');
   return `
     <div class="student-card"
       data-naam="${eNaam.toLowerCase()}"
       data-opleiding="${eOpl.toLowerCase()}"
       data-skills="${escapeHtml(skills.join(' ').toLowerCase())}"
-      data-domein="${eDomein.toLowerCase()}"
-      data-duur="${eDuur}"
-      data-methode="${eMeth.toLowerCase()}"
-      data-vraag="${eVraag.toLowerCase()}"
-      data-motivatie="${eMot.toLowerCase()}">
+      data-domein="${eDomein.toLowerCase()}">
 
       <div class="card-header">
         <div style="display:flex;align-items:center;gap:10px">
@@ -366,24 +341,6 @@ function renderCard(s) {
       ${s.opdracht_domein ? `
         <div style="margin-bottom:10px">
           <span class="tag domain">${eDomein}</span>
-          ${s.opdracht_aard ? `<span class="tag" style="background:#f0f4ff;color:#1756a8">${eAard}</span>` : ''}
-          ${s.methode_type ? `<span class="tag">${eMeth}</span>` : ''}
-        </div>` : ''}
-
-      ${s.onderzoeksvraag ? `
-        <div class="onderzoek-box">
-          <div class="ob-label">Onderzoeksvraag</div>
-          <div class="ob-vraag">"${eVraag}"</div>
-          <div class="ob-meta">
-            ${s.onderzoeksvraag_type ? `<span class="ob-tag">${eVType}</span>` : ''}
-            ${s.resultaat_type ? `<span class="ob-tag">${eRes}</span>` : ''}
-          </div>
-        </div>` : ''}
-
-      ${s.motivatie ? `
-        <div class="card-section">
-          <div class="cs-label">Motivatie</div>
-          <div class="cs-text">${eMot}</div>
         </div>` : ''}
 
       ${skills.length > 0 ? `
@@ -393,7 +350,6 @@ function renderCard(s) {
         </div>` : ''}
 
       <div class="card-footer">
-        <span class="duur-text">⏱ ${eDuur || '—'}</span>
         <button class="btn-contact" data-naam="${eNaam}">Neem contact op</button>
       </div>
     </div>`;
@@ -405,11 +361,11 @@ async function loadStudents() {
 
   const { data, error } = await db
     .from('student_profiles')
-    .select('profile_id, naam, opleiding, jaar, school, beschikbaar_vanaf, opdracht_domein, sector, skills, postcode')
+    .select('profile_id, naam, opleiding, jaar, school, beschikbaar_vanaf, opdracht_domein, skills')
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error('[company-discover] laden fout:', error?.message || 'onbekende fout');
     container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Studentprofielen konden niet worden geladen. Probeer de pagina te verversen.</div>`;
     return;
   }
@@ -431,18 +387,14 @@ async function loadStudents() {
 }
 
 function filterCards() {
-  const q       = document.getElementById('searchInput').value.toLowerCase().trim();
-  const domein  = document.getElementById('domeinFilter').value.toLowerCase();
-  const duur    = document.getElementById('duurFilter').value;
-  const methode = document.getElementById('methodeFilter').value.toLowerCase();
+  const q      = document.getElementById('searchInput').value.toLowerCase().trim();
+  const domein = document.getElementById('domeinFilter').value.toLowerCase();
 
   let visible = 0;
   document.querySelectorAll('.student-card').forEach(card => {
     const hit =
-      (!q       || [card.dataset.naam, card.dataset.opleiding, card.dataset.skills, card.dataset.vraag, card.dataset.motivatie].some(v => v.includes(q))) &&
-      (!domein  || card.dataset.domein.includes(domein)) &&
-      (!duur    || card.dataset.duur === duur) &&
-      (!methode || card.dataset.methode.includes(methode));
+      (!q      || [card.dataset.naam, card.dataset.opleiding, card.dataset.skills].some(v => v.includes(q))) &&
+      (!domein || card.dataset.domein.includes(domein));
     card.style.display = hit ? '' : 'none';
     if (hit) visible++;
   });
@@ -487,9 +439,10 @@ async function signOut() {
   try {
     await db.auth.signOut();
   } catch(e) {
-    console.error('Logout error:', e);
+    console.error('Logout error:', e?.message || 'onbekende fout');
   } finally {
     sessionStorage.removeItem('internly_role');
+    setApplying(false);
     window.location.href = 'auth.html';
   }
 }

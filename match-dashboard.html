@@ -15,6 +15,8 @@
   <script src="js/utils.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     /* ── Design tokens ───────────────────────────────────────────── */
     :root {
@@ -2052,7 +2054,7 @@
       <div class="sidebar-footer">
         <div class="sidebar-footer-user" id="sidebar-user-info"></div>
         <a href="privacybeleid.html" style="display:block;margin-top:8px;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:4px 0;">Privacybeleid</a>
-        <button onclick="db.auth.signOut().then(()=>window.location.href='auth.html')" style="
+        <button onclick="db.auth.signOut().then(()=>{ sessionStorage.removeItem('internly_role'); setApplying(false); window.location.href='auth.html'; })" style="
           margin-top:8px;width:100%;padding:8px 12px;
           background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
           border-radius:8px;color:rgba(255,255,255,.5);
@@ -2102,7 +2104,6 @@
 'use strict';
 
 /* ── Supabase client ─────────────────────────────────────────────────────── */
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Match ID from URL (?match=UUID) — null in demo mode
 const MATCH_ID = new URLSearchParams(window.location.search).get('match');
@@ -2469,7 +2470,7 @@ function renderMatchIndicator() {
              style="background:var(${bgVar});color:var(${colorVar});border-color:${isActive ? 'var(--orange)' : 'transparent'}">
           ${initials}
         </div>
-        <div class="party-name">${escHtml(name)}</div>
+        <div class="party-name">${escapeHtml(name)}</div>
         <div class="party-role">${label}</div>
       </div>`;
   };
@@ -2484,11 +2485,11 @@ function renderMatchIndicator() {
         ${node(match.school.name,  'school',  '--school',  '--school-bg',  'School')}
       </div>
       <div class="mi-stage-info">
-        <div class="mi-stage-name">${escHtml(match.company.vacature)}</div>
+        <div class="mi-stage-name">${escapeHtml(match.company.vacature)}</div>
         <div class="mi-stage-meta">
           <span class="mi-status-dot"></span>
           Lopend &nbsp;·&nbsp; Week ${wk.current} van ${wk.total}
-          &nbsp;·&nbsp; ${escHtml(match.company.start)} – ${escHtml(match.company.eind)}
+          &nbsp;·&nbsp; ${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}
         </div>
       </div>
       <div class="progress-stage-wrap">
@@ -2615,6 +2616,11 @@ async function loadHubFromDB() {
 }
 
 /* ── Auth boot (runs only when ?match=UUID is present) ────────────────────── */
+
+// Herlaad hub-data bij terugkeer naar tab (stale data preventie)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && MATCH_ID) loadHubFromDB();
+});
 
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
@@ -2885,9 +2891,9 @@ function updateRoleBadge() {
 function updateSidebarUser() {
   const el = document.getElementById('sidebar-user-info');
   const info = {
-    student: `${escHtml(match.student.name)}<br>${escHtml(match.student.opleiding)}`,
-    bedrijf: `${escHtml(match.company.name)}<br>${escHtml(match.company.sector)}`,
-    school:  `${escHtml(match.school.name)}<br>${escHtml(match.school.opleiding)}`
+    student: `${escapeHtml(match.student.name)}<br>${escapeHtml(match.student.opleiding)}`,
+    bedrijf: `${escapeHtml(match.company.name)}<br>${escapeHtml(match.company.sector)}`,
+    school:  `${escapeHtml(match.school.name)}<br>${escapeHtml(match.school.opleiding)}`
   };
   el.innerHTML = info[hubState.role] || '';
 }
@@ -2969,7 +2975,7 @@ function renderOverzicht() {
   const leerdoelenRows = hubState.leerdoelen.map(l => `
     <div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-        <span style="font-size:.85rem;font-weight:500;">${escHtml(l.title)}</span>
+        <span style="font-size:.85rem;font-weight:500;">${escapeHtml(l.title)}</span>
         <span style="font-size:.8rem;font-weight:700;color:var(--primary);">${l.progress}%</span>
       </div>
       <div class="progress-wrap"><div class="progress-bar" style="width:${l.progress}%"></div></div>
@@ -2984,7 +2990,7 @@ function renderOverzicht() {
     return `
       <div class="list-item">
         <div style="flex:1;min-width:0;">
-          <div style="font-size:.88rem;font-weight:600;">${escHtml(t.title)}</div>
+          <div style="font-size:.88rem;font-weight:600;">${escapeHtml(t.title)}</div>
           <div style="font-size:.75rem;color:var(--muted);">Deadline: ${formatDate(t.deadline)}</div>
         </div>
         ${statusTag}
@@ -3010,7 +3016,7 @@ function renderOverzicht() {
     <div class="page-head">
       <div>
         <div class="page-title">Overzicht</div>
-        <div class="page-sub">Stage Wetenschapscommunicatie · ${escHtml(match.company.name)}</div>
+        <div class="page-sub">Stage Wetenschapscommunicatie · ${escapeHtml(match.company.name)}</div>
       </div>
     </div>
 
@@ -3049,18 +3055,18 @@ function renderOverzicht() {
           <div class="card-head">
             <div>
               <div class="card-title">Stagegegevens</div>
-              <div class="card-sub">${escHtml(match.company.duur)} · ${escHtml(match.company.start)} – ${escHtml(match.company.eind)}</div>
+              <div class="card-sub">${escapeHtml(match.company.duur)} · ${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}</div>
             </div>
             <div class="avatar" style="background:var(--blue-bg);color:var(--blue);">${match.student.avatar}</div>
           </div>
           <div style="margin-bottom:10px;">
-            ${match.company.tags.map(t => `<span class="tag neutral" style="margin-right:4px;margin-bottom:4px;">${escHtml(t)}</span>`).join('')}
+            ${match.company.tags.map(t => `<span class="tag neutral" style="margin-right:4px;margin-bottom:4px;">${escapeHtml(t)}</span>`).join('')}
           </div>
           <div style="font-size:.82rem;color:var(--muted);">
-            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Student</span><strong style="color:var(--text);">${escHtml(match.student.name)}</strong></div>
-            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Opleiding</span><strong style="color:var(--text);">${escHtml(match.student.opleiding)}</strong></div>
-            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Bedrijf</span><strong style="color:var(--text);">${escHtml(match.company.name)}</strong></div>
-            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${escHtml(match.school.name)} · ${escHtml(match.school.opleiding)}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Student</span><strong style="color:var(--text);">${escapeHtml(match.student.name)}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Opleiding</span><strong style="color:var(--text);">${escapeHtml(match.student.opleiding)}</strong></div>
+            <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Bedrijf</span><strong style="color:var(--text);">${escapeHtml(match.company.name)}</strong></div>
+            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${escapeHtml(match.school.name)} · ${escapeHtml(match.school.opleiding)}</strong></div>
           </div>
         </div>
 
@@ -3120,8 +3126,8 @@ function renderOverzicht() {
             <div class="log-entry">
               <div class="log-dot ${l.color}"></div>
               <div>
-                <div class="log-msg">${escHtml(l.msg)}</div>
-                <div class="log-time">${escHtml(l.time)}</div>
+                <div class="log-msg">${escapeHtml(l.msg)}</div>
+                <div class="log-time">${escapeHtml(l.time)}</div>
               </div>
             </div>`).join('')}
         </div>
@@ -3164,7 +3170,7 @@ function renderPlanning() {
               <div class="dl-month">${monthStr}</div>
             </div>
             <div class="dl-body">
-              <div class="dl-title">${escHtml(d.title)}</div>
+              <div class="dl-title">${escapeHtml(d.title)}</div>
               <div class="dl-meta">${formatDate(d.date)} ${urgLabel}</div>
             </div>
             <div class="task-actions">${editBtn}</div>
@@ -3204,11 +3210,11 @@ function renderPlanning() {
         <div class="card">
           <div class="card-head"><div class="card-title">Stage info</div></div>
           <div style="font-size:.88rem;line-height:2;">
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Duur</span><strong>${escHtml(match.company.duur)}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Startdatum</span><strong>${escHtml(match.company.start)}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Einddatum</span><strong>${escHtml(match.company.eind)}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Bedrijf</span><strong>${escHtml(match.company.name)}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:120px;">Sector</span><strong>${escHtml(match.company.sector)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Duur</span><strong>${escapeHtml(match.company.duur)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Startdatum</span><strong>${escapeHtml(match.company.start)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Einddatum</span><strong>${escapeHtml(match.company.eind)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Bedrijf</span><strong>${escapeHtml(match.company.name)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:120px;">Sector</span><strong>${escapeHtml(match.company.sector)}</strong></div>
           </div>
         </div>
 
@@ -3217,7 +3223,7 @@ function renderPlanning() {
           ${next ? `
             <div style="text-align:center;padding:8px 0;">
               <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:2rem;font-weight:700;color:var(--ink);">${formatDate(next.date)}</div>
-              <div style="font-size:.9rem;color:var(--muted);margin-top:4px;">${escHtml(next.title)}</div>
+              <div style="font-size:.9rem;color:var(--muted);margin-top:4px;">${escapeHtml(next.title)}</div>
             </div>` : '<p style="color:var(--muted);font-size:.88rem;">Geen aankomende deadlines.</p>'}
         </div>
       </div>
@@ -3315,8 +3321,8 @@ function renderTaskItem(t) {
     <div class="task-item${isDone ? ' done' : ''}" id="task-${t.id}">
       ${checkHtml}
       <div class="task-body">
-        <div class="task-title">${escHtml(t.title)}</div>
-        <div class="task-desc">${t.desc ? escHtml(t.desc) : ''}</div>
+        <div class="task-title">${escapeHtml(t.title)}</div>
+        <div class="task-desc">${t.desc ? escapeHtml(t.desc) : ''}</div>
         <div class="task-meta">
           <span class="tag ${assigneeColor}">${t.assignee.charAt(0).toUpperCase()+t.assignee.slice(1)}</span>
           <span class="priority ${priority}">${prioLabel}</span>
@@ -3366,7 +3372,7 @@ async function deleteTask(id) {
     _pendingDeleteTaskId = id;
     clearTimeout(_pendingDeleteTimer);
     _pendingDeleteTimer = setTimeout(() => { _pendingDeleteTaskId = null; }, 3000);
-    toast(`Nogmaals tikken om "${escHtml(task.title)}" te verwijderen.`, 'error');
+    toast(`Nogmaals tikken om "${escapeHtml(task.title)}" te verwijderen.`, 'error');
     return;
   }
 
@@ -3419,14 +3425,14 @@ function renderVoortgang() {
     return `
       <div class="ld-card">
         <div class="leerdoel-head">
-          <div class="leerdoel-name">${escHtml(l.title)}</div>
+          <div class="leerdoel-name">${escapeHtml(l.title)}</div>
           <span class="leerdoel-pct" style="color:${pctColor(l.progress)}">${l.progress}%</span>
         </div>
         <div class="progress-wrap" style="margin-bottom:8px;">
           <div class="progress-bar" style="width:${l.progress}%;background:${pctColor(l.progress)}"></div>
         </div>
         ${pctBtns ? `<div class="ld-pct-btns">${pctBtns}</div>` : ''}
-        ${l.notes ? `<div style="font-size:.8rem;color:var(--muted);margin-top:8px;">${escHtml(l.notes)}</div>` : ''}
+        ${l.notes ? `<div style="font-size:.8rem;color:var(--muted);margin-top:8px;">${escapeHtml(l.notes)}</div>` : ''}
       </div>`;
   }).join('');
 
@@ -3457,7 +3463,7 @@ function renderVoortgang() {
           ${label}
         </div>
         ${r[key]
-          ? `<div class="starr-section-text">${escHtml(r[key])}</div>`
+          ? `<div class="starr-section-text">${escapeHtml(r[key])}</div>`
           : `<div class="starr-section-missing">Nog niet ingevuld</div>`
         }
       </div>`).join('');
@@ -3465,7 +3471,7 @@ function renderVoortgang() {
     return `
     <div class="reflectie-card">
       <div class="reflectie-head">
-        <div class="reflectie-period">${escHtml(r.period)}</div>
+        <div class="reflectie-period">${escapeHtml(r.period)}</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="reflectie-date">${formatDate(r.date)}</span>
           ${can('editReflectie') && r.editAllowed ? `
@@ -3481,7 +3487,7 @@ function renderVoortgang() {
       <div class="refl-completeness${isVolledig ? ' done' : ''}">
         ${isVolledig ? '✓ Volledig ingevuld' : `${filledCount}/5 velden ingevuld`}
       </div>
-      ${r.leerdoel ? `<div class="leerdoel-chip">📎 ${escHtml(r.leerdoel)}</div>` : ''}
+      ${r.leerdoel ? `<div class="leerdoel-chip">📎 ${escapeHtml(r.leerdoel)}</div>` : ''}
       <button class="refl-toggle-btn" onclick="toggleStarrBody('${r.id}')">Bekijk STARR-analyse ▾</button>
       <div class="starr-body" id="starr-${r.id}">
         ${starrSections}
@@ -3559,8 +3565,8 @@ function renderVoortgang() {
             <div class="log-entry">
               <div class="log-dot ${l.color}"></div>
               <div>
-                <div class="log-msg">${escHtml(l.msg)}</div>
-                <div class="log-time">${escHtml(l.time)}</div>
+                <div class="log-msg">${escapeHtml(l.msg)}</div>
+                <div class="log-time">${escapeHtml(l.time)}</div>
               </div>
             </div>`).join('')}
         </div>` : ''}
@@ -3606,11 +3612,11 @@ function openTaakModal(id) {
     <div class="modal-title">${isNew ? 'Taak toevoegen' : 'Taak bewerken'}</div>
     <div class="form-group">
       <label class="form-label">Taak omschrijving</label>
-      <input class="form-input" id="m-task-title" value="${escHtml(task?.title || '')}" placeholder="Bijv. Verslag schrijven…" />
+      <input class="form-input" id="m-task-title" value="${escapeHtml(task?.title || '')}" placeholder="Bijv. Verslag schrijven…" />
     </div>
     <div class="form-group">
       <label class="form-label">Beschrijving (optioneel)</label>
-      <textarea class="form-textarea" id="m-task-desc" placeholder="Extra context…">${escHtml(task?.desc || '')}</textarea>
+      <textarea class="form-textarea" id="m-task-desc" placeholder="Extra context…">${escapeHtml(task?.desc || '')}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Deadline</label>
@@ -3700,7 +3706,7 @@ function openDeadlineModal(id) {
     <div class="modal-title">${isNew ? 'Deadline toevoegen' : 'Deadline bewerken'}</div>
     <div class="form-group">
       <label class="form-label">Omschrijving</label>
-      <input class="form-input" id="m-dl-title" value="${escHtml(d?.title || '')}" placeholder="Bijv. Eindpresentatie…" />
+      <input class="form-input" id="m-dl-title" value="${escapeHtml(d?.title || '')}" placeholder="Bijv. Eindpresentatie…" />
     </div>
     <div class="form-group">
       <label class="form-label">Datum</label>
@@ -3759,7 +3765,7 @@ function openLeerdoelModal(id) {
     <div class="modal-title">Voortgang bijwerken</div>
     <div class="form-group">
       <label class="form-label">Leerdoel</label>
-      <input class="form-input" value="${escHtml(l.title)}" disabled />
+      <input class="form-input" value="${escapeHtml(l.title)}" disabled />
     </div>
     <div class="form-group">
       <label class="form-label">Voortgang: <span id="m-ld-pct-display">${l.progress}%</span></label>
@@ -3769,7 +3775,7 @@ function openLeerdoelModal(id) {
     </div>
     <div class="form-group">
       <label class="form-label">Notitie</label>
-      <textarea class="form-textarea" id="m-ld-notes" placeholder="Beschrijf de huidige stand…">${escHtml(l.notes || '')}</textarea>
+      <textarea class="form-textarea" id="m-ld-notes" placeholder="Beschrijf de huidige stand…">${escapeHtml(l.notes || '')}</textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
@@ -3812,7 +3818,7 @@ function openReflectieModal(id) {
   const isNew = !r;
 
   const leerdoelOptions = hubState.leerdoelen.map(l =>
-    `<option value="${escHtml(l.title)}" ${r?.leerdoel === l.title ? 'selected' : ''}>${escHtml(l.title)}</option>`
+    `<option value="${escapeHtml(l.title)}" ${r?.leerdoel === l.title ? 'selected' : ''}>${escapeHtml(l.title)}</option>`
   ).join('');
 
   openModal(`
@@ -3821,7 +3827,7 @@ function openReflectieModal(id) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="form-group" style="margin:0;">
         <label class="form-label">Periode</label>
-        <input class="form-input" id="m-r-period" value="${escHtml(r?.period || '')}" placeholder="Bijv. Week 3–4" />
+        <input class="form-input" id="m-r-period" value="${escapeHtml(r?.period || '')}" placeholder="Bijv. Week 3–4" />
       </div>
       <div class="form-group" style="margin:0;">
         <label class="form-label">Datum</label>
@@ -3840,23 +3846,23 @@ function openReflectieModal(id) {
     </div>
     <div class="form-group">
       <label class="form-label">Situatie <span class="starr-tag">S</span></label>
-      <textarea class="form-textarea" id="m-r-situatie" style="min-height:72px;" placeholder="Wat was de context of aanleiding?">${escHtml(r?.situatie || '')}</textarea>
+      <textarea class="form-textarea" id="m-r-situatie" style="min-height:72px;" placeholder="Wat was de context of aanleiding?">${escapeHtml(r?.situatie || '')}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Taak <span class="starr-tag">T</span></label>
-      <textarea class="form-textarea" id="m-r-taak" style="min-height:72px;" placeholder="Wat was jouw rol of opdracht?">${escHtml(r?.taak || '')}</textarea>
+      <textarea class="form-textarea" id="m-r-taak" style="min-height:72px;" placeholder="Wat was jouw rol of opdracht?">${escapeHtml(r?.taak || '')}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Actie <span class="starr-tag">A</span></label>
-      <textarea class="form-textarea" id="m-r-actie" style="min-height:72px;" placeholder="Wat heb je concreet gedaan?">${escHtml(r?.actie || '')}</textarea>
+      <textarea class="form-textarea" id="m-r-actie" style="min-height:72px;" placeholder="Wat heb je concreet gedaan?">${escapeHtml(r?.actie || '')}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Resultaat <span class="starr-tag">R</span></label>
-      <textarea class="form-textarea" id="m-r-resultaat" style="min-height:72px;" placeholder="Wat was het effect of de uitkomst?">${escHtml(r?.resultaat || '')}</textarea>
+      <textarea class="form-textarea" id="m-r-resultaat" style="min-height:72px;" placeholder="Wat was het effect of de uitkomst?">${escapeHtml(r?.resultaat || '')}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Reflectie / Leermoment <span class="starr-tag">R</span></label>
-      <textarea class="form-textarea" id="m-r-leermoment" style="min-height:72px;" placeholder="Wat leer je hiervan? Wat doe je de volgende keer anders?">${escHtml(r?.leermoment || r?.text || '')}</textarea>
+      <textarea class="form-textarea" id="m-r-leermoment" style="min-height:72px;" placeholder="Wat leer je hiervan? Wat doe je de volgende keer anders?">${escapeHtml(r?.leermoment || r?.text || '')}</textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
@@ -4288,15 +4294,6 @@ function stageWeekNum() {
   return { current, total };
 }
 
-function escHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
@@ -4333,18 +4330,18 @@ function renderStageplan() {
     if (readonly) {
       return `<div class="form-group">
         <label class="form-label">${label}</label>
-        <div class="sp-field-val">${escHtml(value || '—')}</div>
+        <div class="sp-field-val">${escapeHtml(value || '—')}</div>
       </div>`;
     }
     if (type === 'textarea') {
       return `<div class="form-group">
         <label class="form-label">${label}</label>
-        <textarea class="form-textarea" id="${id}" placeholder="${placeholder}" style="min-height:80px">${escHtml(value || '')}</textarea>
+        <textarea class="form-textarea" id="${id}" placeholder="${placeholder}" style="min-height:80px">${escapeHtml(value || '')}</textarea>
       </div>`;
     }
     return `<div class="form-group">
       <label class="form-label">${label}</label>
-      <input class="form-input" id="${id}" type="text" value="${escHtml(value || '')}" placeholder="${placeholder}" />
+      <input class="form-input" id="${id}" type="text" value="${escapeHtml(value || '')}" placeholder="${placeholder}" />
     </div>`;
   };
 
@@ -4354,7 +4351,7 @@ function renderStageplan() {
       const match_opt = opts.find(o => o.v === value);
       return `<div class="form-group">
         <label class="form-label">${label}</label>
-        <div class="sp-field-val">${escHtml(match_opt ? match_opt.l : value || '—')}</div>
+        <div class="sp-field-val">${escapeHtml(match_opt ? match_opt.l : value || '—')}</div>
       </div>`;
     }
     const options = opts.map(o => `<option value="${o.v}"${value === o.v ? ' selected' : ''}>${o.l}</option>`).join('');
@@ -4369,8 +4366,8 @@ function renderStageplan() {
     <div class="deelvraag-row">
       <div class="deelvraag-num">${i + 1}</div>
       ${readonly
-        ? `<div style="flex:1;font-size:.88rem;padding:6px 0;color:var(--text)">${escHtml(dv.tekst || '—')}</div>`
-        : `<input class="form-input" value="${escHtml(dv.tekst || '')}"
+        ? `<div style="flex:1;font-size:.88rem;padding:6px 0;color:var(--text)">${escapeHtml(dv.tekst || '—')}</div>`
+        : `<input class="form-input" value="${escapeHtml(dv.tekst || '')}"
              oninput="hubState.stageplan.deelvragen[${i}].tekst=this.value" />`
       }
       ${!readonly ? `<button type="button" class="deelvraag-remove btn btn-ghost btn-sm" onclick="removeDeelvraag(${i})">✕</button>` : ''}
@@ -4383,7 +4380,7 @@ function renderStageplan() {
   const schoolNote = readonly ? `
     <div class="card" style="margin-top:16px">
       <div class="card-head"><div class="card-title">Notitie schoolbegeleider</div></div>
-      <textarea class="form-textarea" id="sp-schoolnoot" placeholder="Voeg een notitie toe…">${escHtml(sp.schoolnoot || '')}</textarea>
+      <textarea class="form-textarea" id="sp-schoolnoot" placeholder="Voeg een notitie toe…">${escapeHtml(sp.schoolnoot || '')}</textarea>
       <div style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveSchoolnoot()">Notitie opslaan</button>
       </div>
@@ -4406,11 +4403,11 @@ function renderStageplan() {
         <div class="card">
           <div class="card-head"><div class="card-title">Stage info</div></div>
           <div style="font-size:.88rem;line-height:2.1;">
-            <div><span style="color:var(--muted);display:inline-block;width:110px;">Student</span><strong>${escHtml(match.student.name)}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:110px;">Opleiding</span>${escHtml(match.student.opleiding)}</div>
-            <div><span style="color:var(--muted);display:inline-block;width:110px;">Bedrijf</span><strong>${escHtml(match.company.name)}</strong></div>
-            <div><span style="color:var(--muted);display:inline-block;width:110px;">Vacature</span>${escHtml(match.company.vacature)}</div>
-            <div><span style="color:var(--muted);display:inline-block;width:110px;">Periode</span>${escHtml(match.company.start)} – ${escHtml(match.company.eind)}</div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Student</span><strong>${escapeHtml(match.student.name)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Opleiding</span>${escapeHtml(match.student.opleiding)}</div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Bedrijf</span><strong>${escapeHtml(match.company.name)}</strong></div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Vacature</span>${escapeHtml(match.company.vacature)}</div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Periode</span>${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}</div>
           </div>
         </div>
 
@@ -4724,7 +4721,7 @@ function openKalPopup(dateStr, e) {
   const items = events.map(ev => `
     <div class="kal-popup-item">
       <div class="kal-popup-dot ${ev.type}"></div>
-      <span>${escHtml(ev.label)}</span>
+      <span>${escapeHtml(ev.label)}</span>
     </div>`).join('');
   const popup = document.getElementById('kal-popup');
   if (!popup) return;
@@ -4843,8 +4840,8 @@ function renderMeetingCard(m) {
       if (pd) dateLabel = formatMeetingDate(pd.date, pd.from, pd.to);
     }
     confirmedHtml = `<div class="mcard-confirmed">
-      ✓ ${escHtml(dateLabel)}
-      <div class="mcard-contact">${typeIcon(m.type)} ${escHtml(m.contactInfo)}</div>
+      ✓ ${escapeHtml(dateLabel)}
+      <div class="mcard-contact">${typeIcon(m.type)} ${escapeHtml(m.contactInfo)}</div>
     </div>`;
   }
 
@@ -4875,9 +4872,9 @@ function renderMeetingCard(m) {
     const cp    = m.counterProposal;
     const cFrom = m.to === role ? roleDisplay(m.from) : roleDisplay(m.to);
     counterHtml = `<div class="counter-block">
-      <div class="counter-label">Tegenbod van ${escHtml(cFrom)}:</div>
+      <div class="counter-label">Tegenbod van ${escapeHtml(cFrom)}:</div>
       <div class="counter-time">${formatMeetingDate(cp.date, cp.from, cp.to)}</div>
-      ${cp.note ? `<div class="counter-note">"${escHtml(cp.note)}"</div>` : ''}
+      ${cp.note ? `<div class="counter-note">"${escapeHtml(cp.note)}"</div>` : ''}
     </div>`;
   }
 
@@ -4961,11 +4958,11 @@ function renderMeetingCard(m) {
 
   return `<div class="meeting-card ${m.status}" id="mcard-${m.id}">
     <div class="mcard-head">
-      <div class="mcard-title">📅 ${escHtml(m.subject)}</div>
+      <div class="mcard-title">📅 ${escapeHtml(m.subject)}</div>
       <span class="tag ${st.cls}">${st.label}</span>
     </div>
     <div class="mcard-meta">
-      <span>Van: ${escHtml(roleDisplay(m.from))} (${roleLabel(m.from)})</span>
+      <span>Van: ${escapeHtml(roleDisplay(m.from))} (${roleLabel(m.from)})</span>
       <span>${typeIcon(m.type)} ${typeName(m.type)}</span>
       ${m.status === 'geaccepteerd' ? '' : `<span title="contactgegevens">🔒 Zichtbaar na bevestiging</span>`}
     </div>
@@ -4973,9 +4970,9 @@ function renderMeetingCard(m) {
     ${confirmedHtml}
     ${datesHtml}
     ${counterHtml}
-    ${m.note ? `<div class="mcard-note">"${escHtml(m.note)}"</div>` : ''}
+    ${m.note ? `<div class="mcard-note">"${escapeHtml(m.note)}"</div>` : ''}
     ${actionsHtml}
-    <div style="font-size:.75rem;color:var(--muted);margin-top:10px">Aangemaakt: ${escHtml(m.createdAt)}</div>
+    <div style="font-size:.75rem;color:var(--muted);margin-top:10px">Aangemaakt: ${escapeHtml(m.createdAt)}</div>
   </div>`;
 }
 
@@ -5030,7 +5027,7 @@ function renderAfspraken() {
       <div class="card">
         <div class="card-head">
           <div>
-            <div class="card-title">🗓 ${escHtml(availLabel)}</div>
+            <div class="card-title">🗓 ${escapeHtml(availLabel)}</div>
             <div class="card-sub">Jouw beschikbaarheid per dag van de week</div>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="openAvailModal()">⚙ Bewerken</button>
@@ -5254,7 +5251,7 @@ function renderModalStep1() {
         <label class="form-label">Onderwerp</label>
         <input type="text" class="form-input" id="m-subject" maxlength="80"
           placeholder="Bijv. Voortgangsgesprek week 4"
-          value="${escHtml(newMeeting.subject || '')}"
+          value="${escapeHtml(newMeeting.subject || '')}"
           oninput="newMeeting.subject=this.value">
       </div>
       <div class="form-row">
@@ -5264,13 +5261,13 @@ function renderModalStep1() {
       <div class="form-row">
         <label class="form-label contact-label">${contactLabel(newMeeting.type)}</label>
         <input type="text" class="form-input" id="m-contact"
-          value="${escHtml(newMeeting.contactInfo || '')}"
+          value="${escapeHtml(newMeeting.contactInfo || '')}"
           oninput="newMeeting.contactInfo=this.value">
       </div>
       <div class="form-row">
         <label class="form-label">Toelichting (optioneel)</label>
         <textarea class="form-textarea" id="m-note" rows="3"
-          oninput="newMeeting.note=this.value">${escHtml(newMeeting.note || '')}</textarea>
+          oninput="newMeeting.note=this.value">${escapeHtml(newMeeting.note || '')}</textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -5337,7 +5334,7 @@ function renderModalStep2() {
             : ''}
         </div>
         <div>
-          <div class="form-label" style="margin-bottom:10px">Beschikbaarheid van ${escHtml(receiver)}</div>
+          <div class="form-label" style="margin-bottom:10px">Beschikbaarheid van ${escapeHtml(receiver)}</div>
           ${availGrid}
         </div>
       </div>
@@ -5943,7 +5940,7 @@ function renderDemoCard(p, idx) {
         <div class="grade-badge A" style="font-size:.7rem;padding:1px 6px;">A</div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;">
-        ${p.tags.map(t => `<span style="font-size:.72rem;padding:2px 8px;background:var(--bedrijf-bg,#e8f5ee);color:var(--bedrijf,#1a7a48);border-radius:20px;font-weight:500;">${escHtml(t)}</span>`).join('')}
+        ${p.tags.map(t => `<span style="font-size:.72rem;padding:2px 8px;background:var(--bedrijf-bg,#e8f5ee);color:var(--bedrijf,#1a7a48);border-radius:20px;font-weight:500;">${escapeHtml(t)}</span>`).join('')}
       </div>`;
   } else if (p.type === 'school') {
     bodyHtml = `
@@ -5966,7 +5963,7 @@ function renderDemoCard(p, idx) {
       <div style="margin-bottom:8px;">
         <div style="font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:4px;">Beschikbaarheid</div>
         <div style="display:flex;flex-wrap:wrap;gap:4px;">
-          ${p.beschikbaarheid.map(d => `<span style="font-size:.72rem;padding:2px 8px;background:var(--blue-bg,#e8f0fc);color:var(--blue,#1756a8);border-radius:20px;">${escHtml(d)}</span>`).join('')}
+          ${p.beschikbaarheid.map(d => `<span style="font-size:.72rem;padding:2px 8px;background:var(--blue-bg,#e8f0fc);color:var(--blue,#1756a8);border-radius:20px;">${escapeHtml(d)}</span>`).join('')}
         </div>
       </div>
       <div style="font-size:.72rem;color:var(--muted);">${p.talen.join(' · ')}</div>`;
@@ -5982,13 +5979,13 @@ function renderDemoCard(p, idx) {
       ${typeLabel} · Voorbeeld
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">${escHtml(p.avatar)}</div>
+      <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">${escapeHtml(p.avatar)}</div>
       <div>
-        <div style="font-size:.9rem;font-weight:600;color:var(--ink);">${escHtml(p.naam)}</div>
-        <div style="font-size:.75rem;color:var(--muted);">${escHtml(p.stad)}${p.sector ? ' · ' + escHtml(p.sector) : p.beroep ? ' · ' + escHtml(p.beroep) : p.opleiding ? ' · ' + escHtml(p.opleiding) : ''}</div>
+        <div style="font-size:.9rem;font-weight:600;color:var(--ink);">${escapeHtml(p.naam)}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${escapeHtml(p.stad)}${p.sector ? ' · ' + escapeHtml(p.sector) : p.beroep ? ' · ' + escapeHtml(p.beroep) : p.opleiding ? ' · ' + escapeHtml(p.opleiding) : ''}</div>
       </div>
     </div>
-    <div style="font-size:.78rem;color:var(--ink3,#6b7280);margin-bottom:12px;line-height:1.45;">${escHtml(p.beschrijving)}</div>
+    <div style="font-size:.78rem;color:var(--ink3,#6b7280);margin-bottom:12px;line-height:1.45;">${escapeHtml(p.beschrijving)}</div>
     ${bodyHtml}
     <div style="
       margin-top:.85rem;
@@ -6071,9 +6068,9 @@ function renderGuideStep() {
   const el = document.getElementById('guide-body');
   if (!el) return;
   el.innerHTML = `
-    <div style="font-size:.72rem;font-weight:600;padding:2px 10px;border-radius:20px;background:${typeBg};color:${typeColor};display:inline-block;margin-bottom:12px;">${escHtml(s.profileNaam)}</div>
-    <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:10px;">${escHtml(s.title)}</div>
-    <div style="font-size:.87rem;color:var(--ink2);line-height:1.55;">${escHtml(s.body)}</div>
+    <div style="font-size:.72rem;font-weight:600;padding:2px 10px;border-radius:20px;background:${typeBg};color:${typeColor};display:inline-block;margin-bottom:12px;">${escapeHtml(s.profileNaam)}</div>
+    <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:10px;">${escapeHtml(s.title)}</div>
+    <div style="font-size:.87rem;color:var(--ink2);line-height:1.55;">${escapeHtml(s.body)}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
       <button onclick="demoGuideStep(-1)" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.82rem;cursor:pointer;${_guideStep === 0 ? 'opacity:.4;pointer-events:none;' : ''}">← Vorige</button>
       <span style="font-size:.75rem;color:var(--muted);">${_guideStep + 1} / ${tot}</span>

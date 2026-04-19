@@ -175,7 +175,12 @@ function _buddySubscribeRealtime() {
       event: 'INSERT', schema: 'public', table: 'buddy_pairs',
       filter: `receiver_id=eq.${uid}`,
     }, async () => { await buddyLoadPairs(); BuddyModule.onUpdate?.(); })
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[buddy] realtime verbinding verbroken:', err?.message);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+      }
+    });
 
   window.addEventListener('beforeunload', () => {
     if (BuddyModule._realtimeSub) {

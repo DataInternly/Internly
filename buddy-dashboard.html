@@ -22,7 +22,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/buddy.js"></script>
+  <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -181,6 +183,15 @@
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── Buddy context block ── */
+    .buddy-context {
+      background: #f8f7ff; border: 1px solid rgba(109,40,217,.1);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
+    }
+    .bc-name { font-size: .82rem; font-weight: 600; color: #0d1520; margin-bottom: 3px; }
+    .bc-meta { font-size: .78rem; color: #6b7280; margin-bottom: 2px; }
+    .bc-date { font-size: .72rem; color: #9ca3af; }
+
     /* ── Pending requests ── */
     .req-card {
       border: 1px solid rgba(109,40,217,.2); border-radius: 12px;
@@ -302,7 +313,6 @@
 </div><!-- /shell -->
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──────────────────────────────────────────────────────────────────
 let currentUser    = null;
@@ -322,6 +332,8 @@ function showLoading(containerId, tekst) {
 
 async function signOut() {
   await db.auth.signOut();
+  sessionStorage.removeItem('internly_role');
+  setApplying(false);
   window.location.href = 'auth.html';
 }
 
@@ -402,8 +414,37 @@ async function loadPairs() {
   activePairs = (data || []).map(row => {
     const other = row.req?.id === uid ? row.rec : row.req;
     const isAnon = row.reveal_after && new Date(row.reveal_after) > new Date();
-    return { id: row.id, type: row.type, name: isAnon ? 'Anonieme student' : (other?.naam || 'Student'), reveal_after: row.reveal_after };
+    return {
+      id: row.id,
+      type: row.type,
+      name: isAnon ? 'Anonieme student' : (other?.naam || 'Student'),
+      reveal_after: row.reveal_after,
+      created_at: row.created_at,
+      studentId: isAnon ? null : (other?.id || null),
+      opleiding: null,
+      bedrijf: null,
+    };
   });
+
+  // Batch-fetch student_profiles voor niet-anonieme studenten (opleiding + bedrijf)
+  const revealedIds = activePairs.filter(p => p.studentId).map(p => p.studentId);
+  if (revealedIds.length > 0) {
+    const { data: spRows, error: spErr } = await db
+      .from('student_profiles')
+      .select('profile_id, opleiding, bedrijf')
+      .in('profile_id', revealedIds);
+    if (!spErr && spRows) {
+      const spMap = Object.fromEntries(spRows.map(sp => [sp.profile_id, sp]));
+      activePairs.forEach(p => {
+        if (p.studentId && spMap[p.studentId]) {
+          p.opleiding = spMap[p.studentId].opleiding || null;
+          p.bedrijf   = spMap[p.studentId].bedrijf   || null;
+        }
+      });
+    } else if (spErr) {
+      console.warn('[buddy-dash] student_profiles batch-fetch fout:', spErr.message);
+    }
+  }
 
   renderPairs();
 }
@@ -411,12 +452,16 @@ async function loadPairs() {
 function renderPairs() {
   const container = document.getElementById('pairsList');
   if (!activePairs.length) {
-    container.innerHTML = '<div class="empty">Nog geen actieve koppelingen. Zodra een student je aanvraagt en je accepteert, verschijnt de koppeling hier.</div>';
+    container.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:.5rem">💛</div>Nog geen actieve koppelingen. Zodra een student je aanvraagt en je accepteert, verschijnt de koppeling hier.</div>';
     return;
   }
   container.innerHTML = activePairs.map(p => {
-    const pairId = String(p.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
-    const init   = p.name === 'Anonieme student' ? '?' : escapeHtml(p.name[0].toUpperCase());
+    const pairId    = String(p.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
+    const init      = p.name === 'Anonieme student' ? '?' : escapeHtml(p.name[0].toUpperCase());
+    const opleiding = escapeHtml(p.opleiding || 'Onbekend');
+    const bedrijf   = escapeHtml(p.bedrijf   || 'Nog geen stage');
+    const datum     = p.created_at ? formatNLDate(p.created_at) : 'Onbekend';
+    const isAnon    = p.name === 'Anonieme student';
     return `
       <div class="pair-card">
         <div class="pair-header">
@@ -426,8 +471,14 @@ function renderPairs() {
             <div class="pair-meta">Buddy-koppeling · ${escapeHtml(p.type)}</div>
           </div>
         </div>
+        ${!isAnon ? `
+        <div class="buddy-context">
+          <div class="bc-name">${escapeHtml(p.name)}</div>
+          <div class="bc-meta">${opleiding} · ${bedrijf}</div>
+          <div class="bc-date">Gekoppeld sinds ${datum}</div>
+        </div>` : ''}
         <div class="pair-actions">
-          ${p.name !== 'Anonieme student' ? `<button class="btn-sm btn-primary" onclick="openChat('${pairId}')">Stuur bericht</button>` : ''}
+          ${!isAnon ? `<button class="btn-sm btn-primary" onclick="openChat('${pairId}')">Stuur bericht</button>` : ''}
           <button class="btn-sm btn-danger" onclick="endPair('${pairId}')">Beëindigen</button>
         </div>
       </div>`;
@@ -523,7 +574,7 @@ async function acceptRequest(reqId) {
     .select('id').maybeSingle();
   if (pErr) {
     // Roll back acceptance
-    await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId).catch(() => {});
+    await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId).catch(e => { console.warn('[buddy] rollback request mislukt:', e); });
     notify('Koppeling aanmaken mislukt — probeer opnieuw'); return;
   }
   if (!pair) {
@@ -538,7 +589,7 @@ async function acceptRequest(reqId) {
     user_id: req.requester_id, type: 'buddy_accepted',
     ref_id: pair.id, ref_type: 'buddy',
     message: 'Je buddyverzoek is geaccepteerd — je buddy staat klaar!', read: false,
-  }).catch(() => {});
+  }).catch(e => { console.warn('[buddy] buddy_accepted notificatie mislukt:', e); });
 
   notify('Koppeling geaccepteerd!');
   await loadPendingRequests();
@@ -583,7 +634,7 @@ async function saveProfile() {
 
   // Bio is stored in user metadata (no waitlist column)
   if (bio) {
-    await db.auth.updateUser({ data: { bio } }).catch(() => {});
+    await db.auth.updateUser({ data: { bio } }).catch(e => { console.warn('[buddy] bio metadata update mislukt:', e); });
   }
 
   btn.disabled = false;
@@ -679,7 +730,12 @@ function subscribeRealtime() {
       event: 'UPDATE', schema: 'public', table: 'buddy_pairs',
       filter: `receiver_id=eq.${uid}`,
     }, () => loadPairs())
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[buddy-dashboard] realtime verbinding verbroken:', err?.message);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+      }
+    });
 }
 
 window.addEventListener('beforeunload', () => {

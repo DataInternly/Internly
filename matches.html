@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Outfit', sans-serif; background: #f4f3ef; -webkit-font-smoothing: antialiased; }
@@ -274,7 +276,6 @@
 </div>
 
 <script>
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let allCards          = [];
   let currentIndex      = 0;
@@ -376,7 +377,12 @@
         showToast(payload.new.message);
         loadNotifications();
       })
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('[matches] realtime verbinding verbroken:', err?.message);
+          notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+        }
+      });
   }
 
   function showToast(message) {
@@ -419,15 +425,6 @@
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Trust badge
-  // ─────────────────────────────────────────────────────────────────────────
-
-  function trustBadge(grade, score) {
-    const cls   = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[grade] || 'trust-b';
-    const label = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '';
-    return `<span class="trust-badge ${cls}">${escapeHtml(grade ?? '—')} · ${escapeHtml(String(score ?? '—'))} <span style="opacity:.65;font-weight:400">${label}</span></span>`;
-  }
-
   // ─────────────────────────────────────────────────────────────────────────
   // localStorage — save liked vacature
   // ─────────────────────────────────────────────────────────────────────────
@@ -480,7 +477,7 @@
       <div class="card-body">
         <div class="card-top-row">
           <span class="card-company">${escapeHtml(card.name)}</span>
-          ${trustBadge(card.grade, card.trust)}
+          ${renderTrustBadge(card.grade, card.trust)}
         </div>
         <div class="card-role">${escapeHtml(card.title)}</div>
         <p class="card-desc">${escapeHtml(card.description || '')}</p>
@@ -576,13 +573,15 @@
     if (card.type === 'match') {
       if (card.matchId && currentUser) {
         // Fetch full match to determine other party
-        const { data: matchRow } = await db
+        const { data: matchRow, error: matchRowErr } = await db
           .from('matches')
           .select('party_a, party_b')
           .eq('id', card.matchId)
           .maybeSingle();
+        if (matchRowErr) { console.warn('[matches] matchRow fetch fout:', matchRowErr.message); }
 
-        await db.from('matches').update({ status: 'accepted' }).eq('id', card.matchId).or('party_a.eq.' + currentUser.id + ',party_b.eq.' + currentUser.id);
+        const { error: updErr } = await db.from('matches').update({ status: 'accepted' }).eq('id', card.matchId).or('party_a.eq.' + currentUser.id + ',party_b.eq.' + currentUser.id);
+        if (updErr) { notify('Match bevestigen mislukt — probeer opnieuw'); window._isLiking = false; return; }
 
         // Maak conversation aan (of hergebruik bestaande)
         let { data: conv } = await db.from('conversations')
@@ -602,7 +601,7 @@
         if (matchRow) {
           const otherPartyId = matchRow.party_a === currentUser.id ? matchRow.party_b : matchRow.party_a;
           const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Iemand';
-          createNotification(
+          await createNotification(
             otherPartyId,
             'new_match',
             card.matchId,
@@ -657,7 +656,7 @@
               await db.from('conversations').insert({ match_id: match.id }).select('id').maybeSingle();
               // Notify company of new match
               const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een student';
-              createNotification(
+              await createNotification(
                 posting.created_by,
                 'new_match',
                 match.id,
@@ -665,12 +664,12 @@
                 myName + ' heeft interesse in jouw vacature: ' + (card.title || 'Stageplek')
               );
               saveVacatureToLocal(card);
-              notify('🎉 Match aangemaakt — bekijk bij Matches om te chatten');
+              notify('✓ Aanvraag verstuurd — wacht op reactie van het bedrijf');
               advanceCard();
               return;
             }
           }
-        } catch(e) { console.error('Match aanmaken fout:', e); }
+        } catch(e) { console.error('Match aanmaken fout:', e?.message || 'onbekende fout'); }
       }
       saveVacatureToLocal(card);
       notify('🔖 Opgeslagen bij Mijn Stages');
@@ -804,9 +803,10 @@
     try {
       await db.auth.signOut();
     } catch(e) {
-      console.error('Logout error:', e);
+      console.error('Logout error:', e?.message || 'onbekende fout');
     } finally {
       sessionStorage.removeItem('internly_role');
+      setApplying(false);
       window.location.href = 'auth.html';
     }
   }
@@ -847,7 +847,7 @@
     if (_roleRow?.role === 'gepensioneerd') { window.location.href = 'buddy-dashboard.html'; return; }
 
     // BBL-studenten horen niet op de BOL-matches pagina
-    if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-dashboard.html'); return; }
+    if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-profile.html'); return; }
 
     const authEl = document.getElementById('topbarAuth');
     if (user) {

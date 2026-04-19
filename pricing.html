@@ -247,6 +247,8 @@ body {
 </style>
 <script src="js/utils.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/telemetry.js"></script>
 </head>
 <body>
 
@@ -484,10 +486,6 @@ body {
     'begeleider_starter','begeleider_pro'
   ));
 */
-const db = window.supabase.createClient(
-  'https://qoxgbkbnjsycodcqqmft.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg'
-);
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
 
@@ -550,7 +548,7 @@ async function startCheckout(plan) {
     }
     window.location.href = json.checkoutUrl;
   } catch (err) {
-    console.error('startCheckout error:', err);
+    console.error('startCheckout error:', err?.message || 'onbekende fout');
     notify('Netwerkfout. Probeer opnieuw.');
     if (btn) { btn.disabled = false; btn.textContent = 'Upgrade'; }
   }

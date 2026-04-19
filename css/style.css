@@ -10,6 +10,26 @@
   --white:        #ffffff;
   --border:       rgba(255,255,255,0.2);
   --radius:       16px;
+  --radius-sm:    8px;
+
+  /* Forest green diepte-tokens (index.html homepage) */
+  --forest-deep:   #0e2820;
+  --forest-warm:   #1a4435;
+  --forest-glow:   rgba(120, 200, 160, 0.08);
+  --grain-opacity: 0.035;
+
+  /* Semantische kleurvariabelen — Sprint 5: hardcoded kleuren vervangen */
+  --green:      #1a7a48;
+  --green-bg:   #e8f5ee;
+  --blue:       #1a4a7a;
+  --amber:      #b87a1a;
+  --amber-bg:   #fdf3e0;
+  --red:        #b82020;
+  --red-bg:     #fdeaea;
+  --ink:        #0d1520;
+  --ink2:       #374151;
+  --ink3:       #7a8799;
+  --bg2:        #f4f6f9;
 }
 
 body {
@@ -167,13 +187,30 @@ body {
 
 .btn {
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 8px);
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
   cursor: pointer;
   border: none;
   font-size: .9rem;
   transition: background .15s;
+}
+
+/* Knop-hiërarchie — gebruik naast .btn-primary / .btn-ghost */
+.btn-sm {
+  padding: 5px 12px;
+  font-size: .78rem;
+  border-radius: var(--radius-sm, 8px);
+}
+.btn-md {
+  padding: 8px 16px;
+  font-size: .88rem;
+  border-radius: var(--radius-sm, 8px);
+}
+.btn-lg {
+  padding: 11px 22px;
+  font-size: .95rem;
+  border-radius: var(--radius-sm, 8px);
 }
 
 .btn-primary  { background: var(--accent); color: #fff; }
@@ -236,6 +273,57 @@ body {
 .trust.b { background: #fdf3e0; color: #a06010; }
 .trust.c { background: #fdeaea; color: #b82020; }
 
+/* Geünificeerde Trust badge — gebruik met .grade-a / .grade-b / .grade-c */
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.trust-badge.grade-a {
+  background: var(--green-bg, #e8f5ee);
+  color: var(--green, #1a7a48);
+}
+.trust-badge.grade-b {
+  background: var(--amber-bg, #fdf3e0);
+  color: var(--amber, #b87a1a);
+}
+.trust-badge.grade-c {
+  background: var(--red-bg, #fdeaea);
+  color: var(--red, #b82020);
+}
+.trust-badge.trust-new {
+  background: var(--bg2, #f5f5f5);
+  color: var(--ink3, #6b7280);
+  border: 1px dashed var(--border2, #e2e8f0);
+}
+/* Compacte variant voor smalle kaartjes (student-profile.html) */
+.trust-badge-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: .7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.trust-badge-sm.grade-a { background: var(--green-bg, #e8f5ee); color: var(--green, #1a7a48); }
+.trust-badge-sm.grade-b { background: var(--amber-bg, #fdf3e0); color: var(--amber, #b87a1a); }
+.trust-badge-sm.grade-c { background: var(--red-bg, #fdeaea);   color: var(--red, #b82020); }
+.trust-hint {
+  display: block;
+  font-size: .68rem;
+  color: var(--ink3, #7a8799);
+  margin-top: 2px;
+}
+
 /* ── Status tags (gedeeld) ───────────────────────────────────────────────── */
 
 .tag {
@@ -262,18 +350,33 @@ body {
   background: #0d1520;
   color: #fff;
   padding: 12px 24px;
-  border-radius: 12px;
+  border-radius: var(--radius, 12px);
   font-size: .9rem;
   box-shadow: 0 10px 30px rgba(0,0,0,.3);
   z-index: 1000;
   opacity: 0;
-  transition: opacity .3s, transform .3s;
+  transition: opacity .3s ease,
+              transform .25s ease;
   pointer-events: none;
 }
 
 .notif.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* ── Admin-header balk ────────────────────────────────────────────────────── */
+.admin-header {
+  background: #7b1a1a;
+  color: #fff;
+  padding: 8px 1rem;
+  font-size: .78rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ── Google Translate branding suppression ───────────────────────────────── */
@@ -293,7 +396,7 @@ body                  { top: 0 !important; position: static !important; }
   display: flex;
   align-items: center;
   padding: 6px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 8px);
   transition: background .15s;
   flex-shrink: 0;
 }
@@ -439,7 +542,7 @@ body                  { top: 0 !important; position: static !important; }
 .review-form {
   background: #f8fdf9;
   border: 1.5px solid #d1fae5;
-  border-radius: 12px;
+  border-radius: var(--radius, 12px);
   padding: 16px;
   margin-top: 12px;
 }
@@ -453,7 +556,7 @@ body                  { top: 0 !important; position: static !important; }
 .review-form textarea {
   width: 100%;
   border: 1.5px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 8px);
   padding: 9px 12px;
   font-family: 'Outfit', sans-serif;
   font-size: .88rem;
@@ -503,7 +606,7 @@ body                  { top: 0 !important; position: static !important; }
 .review-error {
   background: #fdeaea;
   color: #b82020;
-  border-radius: 8px;
+  border-radius: var(--radius-sm, 8px);
   padding: 7px 12px;
   font-size: .82rem;
   margin-top: 8px;
@@ -515,7 +618,7 @@ body                  { top: 0 !important; position: static !important; }
 .review-card {
   background: #fff;
   border: 1.5px solid #f0f0ee;
-  border-radius: 12px;
+  border-radius: var(--radius, 12px);
   padding: 16px 18px;
   margin-bottom: 10px;
 }
@@ -913,6 +1016,11 @@ select:focus {
 .nav-item {
   animation: sidebarIn 0.25s ease both;
   min-height: 44px;
+  transition: background .15s, color .15s;
+}
+.nav-item:hover {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.85);
 }
 .nav-item:nth-child(1) { animation-delay: 0.03s; }
 .nav-item:nth-child(2) { animation-delay: 0.06s; }

@@ -15,10 +15,12 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6ozhZf1wVjSq6aBMhOmW1u3nfr1UsGMc&libraries=places" defer></script>
   <script src="js/reistijd.js" defer></script>
   <script src="js/push.js"></script>
   <script src="js/buddy.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     .topbar {
       background: linear-gradient(135deg, #1a7a48, #0f5c36);
@@ -592,7 +594,6 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──────────────────────────────────────────────────────────────────
 let currentUser        = null;
@@ -601,12 +602,6 @@ let notifSubscription  = null;
 let reviewsByCompany   = {};
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function trustBadge(grade, score) {
-  if (!grade) return '';
-  const cls   = { A: 'trust-a', B: 'trust-b', C: 'trust-c' }[grade] || 'trust-a';
-  const label = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '';
-  return `<span class="trust-badge ${cls}">${escapeHtml(grade)} · ${escapeHtml(String(score ?? '—'))} <span style="opacity:.65;font-weight:400">${label}</span></span>`;
-}
 
 function renderCard(row) {
   const tags     = Array.isArray(row.tags) ? row.tags : [];
@@ -656,8 +651,7 @@ function renderCard(row) {
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
           ${row._isPosting ? '<span style="font-size:.7rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 8px;border-radius:20px;white-space:nowrap">🏢 Bedrijfsposting</span>' : ''}
           <div style="display:flex;flex-direction:column;align-items:flex-end">
-            ${trustBadge(row.trust_grade, row.trust_score)}
-            <span class="trust-hint" style="font-size:.72rem;color:var(--ink3,#7a8799);display:block;margin-top:2px;">A = &lt;2 dagen · B = 2–5 dagen · C = traag</span>
+            ${renderTrustBadge(row.trust_grade, row.trust_score, true)}
           </div>
         </div>
       </div>
@@ -676,7 +670,7 @@ function renderCard(row) {
         ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
       </div>
 
-      ${(row.trust_grade === 'C') ? `<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:6px;margin-top:6px;">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>` : ''}
+      ${(row.trust_grade === 'C') ? `<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-top:6px;border-left:3px solid var(--red,#b82020);">⚠ Dit bedrijf reageert vaak laat of niet. Houd rekening met geen antwoord.</div>` : ''}
 
       <div class="card-footer">
         <div style="display:flex;flex-direction:column;gap:4px">
@@ -711,7 +705,7 @@ async function loadInternships() {
   ]);
 
   if (err1 || err2) {
-    console.error(err1 || err2);
+    console.error('[discover] laden fout:', (err1 || err2)?.message || 'onbekende fout');
     container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Vacatures konden niet worden geladen. Probeer de pagina te verversen.</div>`;
     return;
   }
@@ -746,7 +740,7 @@ async function loadInternships() {
   ].sort((a, b) => (b.trust_score || 0) - (a.trust_score || 0));
 
   if (combined.length === 0) {
-    container.innerHTML = `<div class="state-box"><span class="state-icon">📭</span>Nog geen vacatures beschikbaar.</div>`;
+    container.innerHTML = `<div class="state-box"><span class="state-icon">📭</span>Nog geen vacatures beschikbaar.<br><small style="display:block;margin-top:8px;font-size:.85rem;color:var(--ink3,#6b7280)">Ververs de pagina of pas je filters aan — er worden regelmatig nieuwe stages toegevoegd.</small></div>`;
     return;
   }
 
@@ -957,9 +951,10 @@ async function signOut() {
   try {
     await db.auth.signOut();
   } catch(e) {
-    console.error('Logout error:', e);
+    console.error('Logout error:', e?.message || 'onbekende fout');
   } finally {
     sessionStorage.removeItem('internly_role');
+    setApplying(false);
     window.location.href = 'auth.html';
   }
 }
@@ -1006,7 +1001,7 @@ async function loadNotifications() {
          data-ref-id="${escapeHtml(n.ref_id || '')}">
       ${!n.read ? '<span class="nd-dot"></span>' : ''}
       <div class="nd-body">
-        <div class="nd-msg">${getNotifText(n)}</div>
+        <div class="nd-msg">${escapeHtml(getNotifText(n))}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
@@ -1056,7 +1051,12 @@ function startNotifSubscription() {
       loadNotifications();
       showToast();
     })
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[discover] realtime verbinding verbroken:', err?.message);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+      }
+    });
 }
 
 function showToast() {
@@ -1179,7 +1179,7 @@ function renderDiscoverDemoState(enabled) {
             <h3>${escapeHtml(v.company_name)}</h3>
             <div class="company-sector">${escapeHtml(v.sector)}</div>
           </div>
-          <span class="trust-badge trust-a">${escapeHtml(v.trust_grade)} · ${v.trust_score} <span style="opacity:.65;font-weight:400">Betrouwbaar</span></span>
+          ${renderTrustBadge(v.trust_grade, v.trust_score, true)}
         </div>
         <h4>${escapeHtml(v.title)}</h4>
         <p class="description">${escapeHtml(v.description)}</p>
@@ -1225,12 +1225,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Push registration for students — safe here, no impending redirect
     const role = sessionStorage.getItem('internly_role') || '';
     if (role === 'student' || role === '') {
-      registerPushNotifications(db, user.id).catch(() => {});
+      registerPushNotifications(db, user.id).catch(e => console.warn('[discover] push registratie mislukt:', e));
     }
 
     // Verkeerde rol — stuur weg voor de rest van de pagina laadt
     if (role === 'bedrijf' || role === 'school' || role === 'gepensioneerd' || role === 'bbl') {
-      const routes = { bedrijf: 'company-dashboard.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html', bbl: 'bbl-dashboard.html' };
+      const routes = { bedrijf: 'company-dashboard.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html', bbl: 'bbl-profile.html' };
       window.location.replace(routes[role] || 'auth.html');
       return;
     }
@@ -1244,7 +1244,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         .maybeSingle();
 
       // BBL-guard: BBL-studenten horen niet op discover.html
-      if (sp?.bbl_mode) { window.location.replace('bbl-dashboard.html'); return; }
+      if (sp?.bbl_mode === true) { window.location.replace('bbl-profile.html'); return; }
 
       if (!sp) {
         const banner = document.getElementById('noprofileBanner');

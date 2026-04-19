@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     :root {
       --green:      #1a7a48;
@@ -466,6 +468,15 @@
       font-size: .95rem; font-weight: 700; color: var(--ink);
     }
     .card-sub { font-size: .78rem; color: var(--ink3); margin-top: 2px; }
+    .deadline-meter {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 10px;
+      font-size: .76rem; font-weight: 600; margin-top: 5px;
+    }
+    .deadline-meter[data-state="safe"]    { background: rgba(26,122,72,.10); color: #1a7a48; }
+    .deadline-meter[data-state="warning"] { background: rgba(160,96,16,.13); color: #a06010; }
+    .deadline-meter[data-state="urgent"]  { background: rgba(160,96,16,.18); color: #a06010; }
+    .deadline-meter[data-state="overdue"] { background: rgba(184,32,32,.12); color: #b82020; }
     .tag.green  { background: var(--green-bg); color: var(--green); border: none; }
     .tag.red    { background: var(--red-bg);   color: var(--red);   border: none; }
     .tag.neutral { background: #f0f0ee; color: var(--ink3); border: none; }
@@ -479,7 +490,6 @@
     .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
   </style>
-  <script src="js/supabase.js"></script>
 </head>
 <body>
 <div class="notif" id="notif"></div>
@@ -502,7 +512,7 @@
     <div class="modal-title">⚑ Beoordeling melden</div>
     <div class="modal-body">
       <p style="font-size:.88rem;color:var(--ink2);margin-bottom:12px">Geef een korte reden voor de melding. Het Internly-team beoordeelt deze binnen 48 uur.</p>
-      <textarea id="flagReasonInput" rows="3" placeholder="Bijv. ongepaste inhoud, nep-review…"
+      <textarea id="flagReasonInput" rows="3" maxlength="500" placeholder="Bijv. ongepaste inhoud, nep-review…"
         style="width:100%;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:.88rem;resize:vertical;outline:none;"></textarea>
       <div id="flagReasonErr" style="display:none;color:var(--red);font-size:.8rem;margin-top:4px">Vul een reden in.</div>
     </div>
@@ -751,7 +761,7 @@
         <div class="field-row">
           <div class="field">
             <label>Bedrijfsnaam <span class="req">*</span></label>
-            <input type="text" id="f-company" placeholder="Jouw bedrijfsnaam">
+            <input type="text" id="f-company" maxlength="100" placeholder="Jouw bedrijfsnaam">
           </div>
           <div class="field">
             <label>Sector <span class="req">*</span></label>
@@ -778,12 +788,12 @@
 
         <div class="field">
           <label>Vacaturetitel <span class="req">*</span></label>
-          <input type="text" id="f-title" placeholder="Bijv. Junior Data Analyst Stage">
+          <input type="text" id="f-title" maxlength="150" placeholder="Bijv. Junior Data Analyst Stage">
         </div>
 
         <div class="field">
           <label>Omschrijving <span class="req">*</span></label>
-          <textarea id="f-desc" placeholder="Wat ga je doen? Wat leer je? Wat verwacht je van de stagiair?"></textarea>
+          <textarea id="f-desc" maxlength="2000" placeholder="Wat ga je doen? Wat leer je? Wat verwacht je van de stagiair?"></textarea>
         </div>
 
         <div class="field-row">
@@ -937,26 +947,26 @@
         <div class="field-row">
           <div class="field">
             <label>Bedrijfsnaam</label>
-            <input type="text" id="p-naam" placeholder="Jouw bedrijfsnaam">
+            <input type="text" id="p-naam" maxlength="100" placeholder="Jouw bedrijfsnaam">
           </div>
           <div class="field">
             <label>Sector</label>
-            <input type="text" id="p-sector" placeholder="Bijv. IT, Finance">
+            <input type="text" id="p-sector" maxlength="100" placeholder="Bijv. IT, Finance">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
             <label>Grootte</label>
-            <input type="text" id="p-size" placeholder="Bijv. 50-100 medewerkers">
+            <input type="text" id="p-size" maxlength="50" placeholder="Bijv. 50-100 medewerkers">
           </div>
           <div class="field">
             <label>Website</label>
-            <input type="text" id="p-website" placeholder="https://...">
+            <input type="text" id="p-website" maxlength="200" placeholder="https://...">
           </div>
         </div>
         <div class="field">
           <label>Beschrijving</label>
-          <textarea id="p-desc" placeholder="Wie zijn jullie? Wat doen jullie? Waarom is een stage bij jullie waardevol?"></textarea>
+          <textarea id="p-desc" maxlength="2000" placeholder="Wie zijn jullie? Wat doen jullie? Waarom is een stage bij jullie waardevol?"></textarea>
         </div>
         <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Profiel opslaan →</button>
         <div id="profileCompleteHint" style="margin-top:10px;font-size:.82rem;color:#6b7280;display:none"></div>
@@ -987,7 +997,6 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──
 const tags = [];
@@ -1038,7 +1047,7 @@ async function loadNotifications() {
          data-ref-id="${escapeHtml(n.ref_id || '')}">
       <span class="nd-dot ${n.read ? 'read' : ''}"></span>
       <div>
-        <div class="nd-msg">${getNotifText(n)}</div>
+        <div class="nd-msg">${escapeHtml(getNotifText(n))}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
@@ -1093,7 +1102,12 @@ function startNotifSubscription() {
       showToast(payload.new.message);
       loadNotifications();
     })
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[company] realtime verbinding verbroken:', err?.message);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+      }
+    });
 }
 
 function showLoading(containerId, tekst) {
@@ -1145,9 +1159,10 @@ async function loadUser() {
 
 async function signOut() {
   try { await db.auth.signOut(); }
-  catch(e) { console.error('Logout error:', e); }
+  catch(e) { console.error('Logout error:', e?.message || 'onbekende fout'); }
   finally {
     sessionStorage.removeItem('internly_role');
+    setApplying(false);
     window.location.href = 'auth.html';
   }
 }
@@ -1157,7 +1172,7 @@ async function resetPassword() {
   const { error } = await db.auth.resetPasswordForEmail(currentUser.email, {
     redirectTo: window.location.origin + '/auth.html'
   });
-  if (error) notify('Fout: ' + (error?.message || 'onbekende fout'));
+  if (error) { console.error('[company] reset password fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); }
   else notify('✓ Resetlink verstuurd naar ' + currentUser.email);
 }
 
@@ -1221,26 +1236,7 @@ function show(id) {
   }
 }
 
-// ── Plan gates ──
-async function hasActivePlan(minPlan = 'company_starter') {
-  try {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) return false;
-    const { data: sub, error } = await db
-      .from('subscriptions')
-      .select('plan, status, current_period_end')
-      .eq('profile_id', user.id)
-      .maybeSingle();
-    if (error || !sub) return false;
-    if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
-    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
-    const tiers = ['company_starter','company_pro','company_business','school_freemium','school_premium','school_premium_monthly','begeleider_starter','begeleider_pro'];
-    return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
-  } catch (err) {
-    console.error('hasActivePlan error:', err);
-    return false;
-  }
-}
+// ── Plan gates — hasActivePlan() is defined in js/supabase.js ──
 
 function upgradeCard(requiredPlan) {
   const labels = { company_pro: 'Pro', company_business: 'Business', school_premium: 'School Premium' };
@@ -1327,7 +1323,7 @@ async function loadPostings() {
     .eq('created_by', currentUser.id)
     .order('created_at', { ascending: false });
 
-  if (error) { console.error('Load error:', error); return; }
+  if (error) { console.error('Load error:', error?.message || 'onbekende fout'); return; }
   postings = data || [];
 
   const cnt = postings.length;
@@ -1448,6 +1444,16 @@ function setTarget(val) {
 }
 
 // ── Matches screen ────────────────────────────────────────────────────────────
+function calcDeadlineState(match, posting) {
+  if (!posting?.response_days) return null;
+  const elapsed   = Math.floor((Date.now() - new Date(match.created_at)) / 86400000);
+  const remaining = posting.response_days - elapsed;
+  if (remaining > 1)  return { label: `${remaining} dagen`,               state: 'safe' };
+  if (remaining === 1) return { label: 'Nog 1 dag',                        state: 'warning' };
+  if (remaining === 0) return { label: 'Vandaag verloopt de deadline',      state: 'urgent' };
+  return              { label: `${Math.abs(remaining)}d over deadline`,    state: 'overdue' };
+}
+
 async function loadCompanyMatches() {
   const el = document.getElementById('matches-list');
   if (!currentUser) return;
@@ -1456,7 +1462,7 @@ async function loadCompanyMatches() {
   try {
     const { data: matchRows, error } = await db
       .from('matches')
-      .select('id, status, party_a, type, created_at, internship_postings(title, company_name)')
+      .select('id, status, party_a, type, created_at, internship_postings(title, company_name, response_days)')
       .eq('party_b', currentUser.id)
       .order('created_at', { ascending: false });
 
@@ -1490,18 +1496,31 @@ async function loadCompanyMatches() {
     const statusCls   = { pending: 'neutral', accepted: 'green', rejected: 'red', active: 'green' };
 
     const hasBusiness = await hasActivePlan('company_business');
-    el.innerHTML = matchRows.map(m => {
+    el.innerHTML = matchRows
+      .slice()
+      .sort((a, b) => {
+        // pending first, then accepted/active
+        const ap = a.status === 'pending' ? 0 : 1;
+        const bp = b.status === 'pending' ? 0 : 1;
+        if (ap !== bp) return ap - bp;
+        // within pending: oldest first (most urgent to act on)
+        if (a.status === 'pending') return new Date(a.created_at) - new Date(b.created_at);
+        return 0;
+      })
+      .map(m => {
       const posting = m.internship_postings || {};
       const sLabel  = statusLabel[m.status]  || m.status;
       const sCls    = statusCls[m.status]    || 'neutral';
       const hasConv = m.status === 'accepted' || m.status === 'active';
       const isPending = m.status === 'pending';
+      const dl = isPending ? calcDeadlineState(m, posting) : null;
       return `
         <div class="card" style="margin-bottom:10px">
           <div class="card-head">
             <div>
               <div class="card-title">${escapeHtml(posting.title || 'Stageplek')}</div>
               <div class="card-sub">${escapeHtml(formatNLDate(m.created_at))}</div>
+              ${dl ? `<div class="deadline-meter" data-state="${escapeHtml(dl.state)}">⏱ ${escapeHtml(dl.label)}</div>` : ''}
             </div>
             <span class="tag ${sCls}">${escapeHtml(sLabel)}</span>
           </div>
@@ -1526,20 +1545,20 @@ async function loadCompanyMatches() {
         </div>`;
     }).join('');
   } catch(e) {
-    console.error('loadCompanyMatches fout:', e);
+    console.error('loadCompanyMatches fout:', e?.message || 'onbekende fout');
     el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
   }
 }
 
 async function acceptMatch(matchId, studentId) {
   const { error } = await db.from('matches').update({ status: 'accepted' }).eq('id', matchId).eq('party_b', currentUser.id);
-  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { console.error('[company] acceptMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
 
   // Create conversation
   let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).limit(1).maybeSingle();
   if (!conv) {
     const { data: newConv, error: convErr } = await db.from('conversations').insert({ match_id: matchId }).select('id').maybeSingle();
-    if (convErr) { notify('Match geaccepteerd maar chat aanmaken mislukt: ' + convErr.message); return; }
+    if (convErr) { console.error('[company] conv aanmaken fout:', convErr.message || 'onbekende fout'); notify('Match geaccepteerd maar chat aanmaken mislukt — probeer opnieuw', false); return; }
     if (!newConv) { notify('Gesprek kon niet worden aangemaakt'); return; }
     conv = newConv;
   }
@@ -1555,7 +1574,7 @@ async function acceptMatch(matchId, studentId) {
 
 async function rejectMatch(matchId, studentId) {
   const { error } = await db.from('matches').update({ status: 'rejected' }).eq('id', matchId).eq('party_b', currentUser.id);
-  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { console.error('[company] rejectMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
 
   // Notify student
   const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een bedrijf';
@@ -1646,7 +1665,7 @@ async function loadBerichten() {
         </div>`;
     }).join('');
   } catch(e) {
-    console.error('loadBerichten fout:', e);
+    console.error('loadBerichten fout:', e?.message || 'onbekende fout');
     el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
   }
 }
@@ -1747,7 +1766,7 @@ async function loadReviews() {
     el.innerHTML = summaryHtml + `<div class="sec-title" style="margin-top:4px">Alle beoordelingen</div>` + cardsHtml;
 
   } catch(e) {
-    console.error('loadReviews fout:', e);
+    console.error('loadReviews fout:', e?.message || 'onbekende fout');
     el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
   }
 }
@@ -1832,7 +1851,7 @@ async function herberekeningTrustScore(companyUserId) {
         .eq('created_by', companyUserId);
     }
   } catch(e) {
-    console.error('Trust score berekening fout:', e);
+    console.error('Trust score berekening fout:', e?.message || 'onbekende fout');
     sessionStorage.removeItem('internly_trust_calculated_' + companyUserId);
   }
 }
@@ -1896,7 +1915,7 @@ async function triggerCompanyMatching(companyUserId, sector, postingId) {
     }
     return created;
   } catch(e) {
-    console.error('Company matching trigger fout:', e);
+    console.error('Company matching trigger fout:', e?.message || 'onbekende fout');
     return 0;
   }
 }
@@ -1966,7 +1985,7 @@ async function submitPosting() {
 // ── Status ──
 async function setStatus(id, status) {
   const { error } = await db.from('internship_postings').update({ status }).eq('id', id);
-  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { console.error('[company] setStatus fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
   notify(status === 'active' ? '✓ Vacature geactiveerd' : '⏸ Vacature gepauzeerd');
   await loadPostings();
   renderList('all-postings', postings);
@@ -1979,7 +1998,7 @@ async function delPosting(id) {
     'Weet je zeker dat je deze vacature definitief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.',
     async () => {
       const { error } = await db.from('internship_postings').delete().eq('id', id).eq('created_by', currentUser.id);
-      if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
+      if (error) { console.error('[company] delPosting fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
       notify('✓ Vacature verwijderd');
       await loadPostings();
       renderList('all-postings', postings);
@@ -2074,7 +2093,7 @@ async function saveProfile() {
   }, { onConflict: 'profile_id' });
 
   btn.disabled = false; btn.textContent = 'Profiel opslaan →';
-  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { console.error('[company] profiel opslaan fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
   notify('✓ Profiel opgeslagen');
   toonBedrijfOverzicht({
     bedrijfsnaam: document.getElementById('p-naam').value.trim()    || null,
@@ -2123,7 +2142,7 @@ async function submitFlagReview() {
   }).eq('id', _flagReviewId);
 
   closeFlagModal();
-  if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { console.error('[company] flagReview fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
   notify('Beoordeling gemeld — wordt beoordeeld door het Internly team');
   loadReviews();
 }
@@ -2517,7 +2536,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadESGData(user.id, new Date().getFullYear()).then(d => {
     const el = document.getElementById('stat-esg');
     if (el) el.textContent = d.esgPunten;
-  }).catch(() => {});
+  }).catch(e => { console.warn('[company-dash] ESG-stat achtergrond fout:', e); });
 
   if (!localStorage.getItem('internly_push_asked') && 'Notification' in window) {
     showPushPromptBanner();
@@ -2562,7 +2581,7 @@ async function loadUnreadBadge(userId) {
       badge.style.display = 'inline';
     }
   } catch(e) {
-    console.error('loadUnreadBadge fout:', e);
+    console.error('loadUnreadBadge fout:', e?.message || 'onbekende fout');
   }
 }
 
@@ -2600,11 +2619,11 @@ async function renderVestigingen() {
       <div class="field-row">
         <div class="field">
           <label>Naam vestiging <span class="req">*</span></label>
-          <input type="text" id="vest-naam" placeholder="Bijv. Hoofdkantoor Amsterdam">
+          <input type="text" id="vest-naam" maxlength="100" placeholder="Bijv. Hoofdkantoor Amsterdam">
         </div>
         <div class="field">
           <label>Stad <span class="req">*</span></label>
-          <input type="text" id="vest-stad" placeholder="Bijv. Amsterdam">
+          <input type="text" id="vest-stad" maxlength="100" placeholder="Bijv. Amsterdam">
         </div>
       </div>
       <div class="field-row">
@@ -2614,7 +2633,7 @@ async function renderVestigingen() {
         </div>
         <div class="field">
           <label>Adres <span class="hint">optioneel</span></label>
-          <input type="text" id="vest-adres" placeholder="Bijv. Damrak 1">
+          <input type="text" id="vest-adres" maxlength="200" placeholder="Bijv. Damrak 1">
         </div>
       </div>
       <button class="btn-primary" onclick="addVestiging()">Vestiging opslaan →</button>
@@ -2709,6 +2728,11 @@ function onVestigingChange() {
 
 window.addEventListener('beforeunload', () => {
   if (notifSubscription) notifSubscription.unsubscribe();
+});
+
+// Herlaad notificaties bij terugkeer naar tab (stale data preventie)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentUser) loadNotifications();
 });
 </script>
 

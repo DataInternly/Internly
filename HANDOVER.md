@@ -358,6 +358,73 @@ Testscript:
 
 ---
 
+## TABLE CONTRACTS — 19 april 2026
+
+**internships** (publieke domein, ~380 rijen)
+- Bron: bedrijven (extern aangeleverd, publiek domein)
+- Doel: inspiratie voor studenten om markt te verkennen
+- Geen Trust Score-algoritme actief, geen responsgarantie, geen sollicitatie via platform flow
+- UI scheiding: discover.html toont beide met visueel onderscheid — verifieer dat label "inspiratie" of equivalent zichtbaar is
+- Niet uitbreiden zonder onderbouwing, niet samenvoegen met internship_postings
+
+**internship_postings** (platform vacatures)
+- Bron: bedrijven via company-dashboard.html
+- Trust Score + responsgarantie van toepassing
+- Sollicitatie via applications tabel, match via matches tabel
+
+**applications** (status: te verifiëren na browser test)
+- 3 RLS policies aanwezig (select, insert, update)
+- Schrijfpaden aanwezig in vacature-detail.html (beide branches: internships + internship_postings)
+- Structureel correct: duplicate check, localStorage fallback, error logging aanwezig
+- Potentieel silent fail: success-toast wordt altijd getoond, ook als RLS insert blokkeert
+- Browser test vereist: open vacature-detail.html als student@internly.pro → solliciteer → check Supabase `SELECT * FROM applications ORDER BY created_at DESC LIMIT 5`
+- Beslissing volgt na test — nog niet gefixt
+
+**OPEN ONTWERPVRAGEN — niet vergeten**
+
+praktijkbegeleider notification chain
+- pb_naam staat op student_profiles, geen email of profile_id
+- signOff chain belofte niet vervulbaar zonder ontwerpkeuze
+- Twee opties: pb_email kolom + mail flow, of pb uit chain schrappen
+- Beslissing voor sprint 5
+
+stage_* tabellen ON DELETE NO ACTION
+- Profile delete faalt zolang stage data verwijst (created_by, done_by etc)
+- AVG verlangt persoonsgegevens verwijdering
+- Optie A: ON DELETE SET NULL op audit kolommen (anonimiseren)
+- Optie B: ON DELETE CASCADE (alles weg met student)
+- Sprint 5 beslissing met Guinan2
+
+bbl_signoff bedrijf gap
+- Wanneer school als laatste tekent in signOff chain, krijgt bedrijf geen eval_completed
+- Rest van chain werkt
+- Sprint 5 fix in bbl-hub.html
+
+---
+
+## SESSIE 19 APRIL 2026 — polish ronde
+
+**Afgerond deze sessie**
+- VALID_NOTIFICATION_TYPES constante toegevoegd aan utils.js (single source of truth)
+- Type validator toegevoegd in createNotification() — logt onbekende types
+- renderTrustBadge() bijgewerkt: Nieuw badge voor null grade/score + title tooltips per grade
+- await toegevoegd aan beide new_match createNotification calls in matches.html (P4)
+- "Match aangemaakt" → "Aanvraag verstuurd — wacht op reactie" (matches.html, Deanna2)
+- C grade waarschuwing aangescherpt in discover.html (Deanna2)
+- .trust-badge.trust-new CSS toegevoegd aan style.css
+- Console sweep: 0 console.log, 0 PII lekken gevonden — codebase schoon
+- TABLE CONTRACTS gedocumenteerd in HANDOVER.md
+- Tom Bomba's internships/internship_postings contract vastgelegd
+
+**Niet aangeraakt, expliciet uitgesteld**
+- Forest green homepage diepte — volgende sessie
+- Applications silent fail verificatie — browser test vereist (zie TABLE CONTRACTS boven)
+- Praktijkbegeleider design — sprint 5
+- AVG ON DELETE policy op stage tabellen — sprint 5
+- bbl_signoff bedrijf gap — sprint 5
+
+---
+
 ## Known limitations
 
 | # | Limitation |

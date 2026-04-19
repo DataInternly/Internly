@@ -20,6 +20,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -411,7 +413,6 @@
 </div><!-- /shell -->
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 let isEditMode  = false;
@@ -444,6 +445,7 @@ function formatDate(iso) {
 async function signOut() {
   await db.auth.signOut();
   sessionStorage.removeItem('internly_role');
+  setApplying(false);
   window.location.href = 'auth.html';
 }
 
@@ -647,7 +649,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // BBL check: BOL-studenten (bbl_mode false/null) doorsturen
-  if (sp && !sp.bbl_mode) {
+  if (sp && sp.bbl_mode !== true) {
     window.location.replace('student-profile.html');
     return;
   }

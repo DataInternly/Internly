@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     :root {
       --teal:       #0e7490;
@@ -565,7 +567,6 @@
 <footer style="text-align:center;padding:10px 0 14px;font-size:.6rem;color:rgba(0,0,0,.2);">© 2026 Sasubo Holding B.V.</footer>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Screen switching ─────────────────────────────────────────────────────────
 function show(screen) {
@@ -583,30 +584,7 @@ function show(screen) {
   if (mt) mt.classList.add('active');
 }
 
-// ── hasActivePlan ────────────────────────────────────────────────────────────
-async function hasActivePlan(minPlan = 'begeleider_starter') {
-  try {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) return false;
-    const { data: sub, error } = await db
-      .from('subscriptions')
-      .select('plan, status, current_period_end')
-      .eq('profile_id', user.id)
-      .maybeSingle();
-    if (error || !sub) return false;
-    if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
-    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
-    const tiers = [
-      'company_starter','company_pro','company_business',
-      'school_freemium','school_premium','school_premium_monthly',
-      'begeleider_starter','begeleider_pro',
-    ];
-    return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
-  } catch (err) {
-    console.error('hasActivePlan error:', err);
-    return false;
-  }
-}
+// hasActivePlan() is defined in js/supabase.js
 
 // ── initSessionTimeout ───────────────────────────────────────────────────────
 function initSessionTimeout() {
@@ -635,6 +613,8 @@ function initSessionTimeout() {
 // ── Sign out ─────────────────────────────────────────────────────────────────
 async function doSignOut() {
   await db.auth.signOut().catch(() => {});
+  sessionStorage.removeItem('internly_role');
+  setApplying(false);
   window.location.href = 'auth.html';
 }
 
@@ -756,8 +736,10 @@ async function loadStudents(userId, maxStudents) {
   if (error || !students || students.length === 0) {
     listEl.innerHTML = `
       <div class="empty">
-        <span class="empty-icon">👥</span>
+        <span class="empty-icon">🤝</span>
         Studenten kunnen jou als begeleider selecteren via hun eigen profiel. Zodra een student jou koppelt, verschijnen ze hier.
+        <br>
+        <button type="button" onclick="openKoppelingFlow()" class="btn-primary" style="margin-top:.75rem;">Koppel je eerste student →</button>
       </div>`;
     return;
   }
@@ -868,6 +850,11 @@ function initReferralBanner() {
   if (dismissed === 'true') {
     banner.style.display = 'none';
   }
+}
+
+// TODO Sprint 5: vervang stub door echte koppelingsinvite (deelbare link of profiel-ID invoer)
+function openKoppelingFlow() {
+  notify('Studenten koppelen via hun profiel: laat de student jouw naam selecteren als begeleider');
 }
 
 // ── DOMContentLoaded ──────────────────────────────────────────────────────────

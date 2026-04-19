@@ -12,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
@@ -186,7 +188,6 @@
   <div class="notif" id="notif"></div>
 
   <script>
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUserId = null;
     let notifSubscription = null;
@@ -285,7 +286,7 @@
         );
 
       } catch(e) {
-        console.error('Review submit error:', e);
+        console.error('Review submit error:', e?.message || 'onbekende fout');
         if (errEl) { errEl.textContent = 'Er ging iets mis. Probeer het opnieuw.'; errEl.style.display = 'block'; }
         if (btn) { btn.disabled = false; btn.textContent = 'Review plaatsen'; }
       }
@@ -322,7 +323,6 @@
         const grade      = vacature.trust_grade || app.trust_grade || '—';
         const score      = vacature.trust_score ?? app.trust_score ?? '—';
         const created    = app.created_at || app.date;
-        const gradeClass = grade === 'A' ? 'a' : grade === 'B' ? 'b' : 'c';
         const titleShort = title.length > 50 ? title.slice(0, 50) + '…' : title;
         const appId      = 'app-' + (app.id || idx);
 
@@ -330,9 +330,19 @@
         if (app._status === 'uitgenodigd') {
           statusTag = `<span class="tag green">✓ Uitgenodigd</span>`;
         } else if (app._status === 'wacht') {
-          statusTag = `<span class="tag neutral">⏳ In behandeling</span>`;
+          const _respDays  = vacature.response_days;
+          const _daysSince = created ? Math.floor((Date.now() - new Date(created).getTime()) / 86400000) : null;
+          const _deadlineInfo = (_respDays && _daysSince !== null)
+            ? (_daysSince > _respDays
+                ? `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Bedrijf heeft nog niet gereageerd — wij houden dit bij</div>`
+                : `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Verwachte reactie: binnen ${_respDays - _daysSince} dag${(_respDays - _daysSince) !== 1 ? 'en' : ''}</div>`)
+            : '';
+          const _bewaakt = !_respDays
+            ? `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Internly bewaakt de reactietermijn voor je. Je ontvangt een melding zodra er nieuws is.</div>`
+            : '';
+          statusTag = `<span class="tag neutral">⏳ In behandeling</span>${_deadlineInfo}${_bewaakt}`;
         } else if (app._status === 'afgewezen') {
-          statusTag = `<span class="tag red">✕ Afgewezen</span><div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Het bedrijf heeft voor een andere kandidaat gekozen. Dit zegt niets over jou als kandidaat.</div>`;
+          statusTag = `<span class="tag red">✕ Afgewezen</span><div style="background:var(--bg2,#f4f6f9);border-radius:var(--radius-sm,8px);padding:8px 12px;margin-top:6px;border-left:3px solid var(--ink3,#7a8799);font-size:.8rem;color:var(--ink2,#374151);line-height:1.55;">💙 Dit zegt niets over jou als kandidaat.</div>`;
         }
 
         const detailLink = app.internship_id
@@ -413,7 +423,7 @@
                 <div class="card-title" title="${escapeHtml(title)}">${escapeHtml(titleShort)}</div>
                 <div class="card-sub">${escapeHtml(company)}</div>
               </div>
-              <span class="trust ${gradeClass}">${escapeHtml(grade)} ${escapeHtml(String(score))}</span>
+              ${renderTrustBadge(grade, score)}
             </div>
             <div style="margin:12px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               ${statusTag}
@@ -459,7 +469,7 @@
         { data: myReviews },
       ] = await Promise.all([
         db.from('applications')
-          .select('*, internships(title, company_name, trust_score, trust_grade)')
+          .select('*, internships(title, company_name, trust_score, trust_grade, response_days)')
           .eq('student_id', userId)
           .order('created_at', { ascending: false }),
         db.from('matches')
@@ -528,7 +538,7 @@
           data-ref-id="${escapeHtml(n.ref_id || '')}">
           <div class="nd-dot ${n.read ? 'read' : ''}"></div>
           <div>
-            <div class="nd-msg">${escapeHtml(n.message)}</div>
+            <div class="nd-msg">${escapeHtml(getNotifText(n))}</div>
             <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
           </div>
         </div>`).join('');
@@ -602,7 +612,12 @@
           countEl.style.display = 'flex';
           showToast(payload.new.message);
         })
-        .subscribe();
+        .subscribe((status, err) => {
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            console.warn('[sollicitaties] realtime verbinding verbroken:', err?.message);
+            notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+          }
+        });
     }
 
     function showToast(message) {
@@ -641,9 +656,10 @@
       try {
         await db.auth.signOut();
       } catch(e) {
-        console.error('Logout error:', e);
+        console.error('Logout error:', e?.message || 'onbekende fout');
       } finally {
         sessionStorage.removeItem('internly_role');
+        setApplying(false);
         window.location.href = 'auth.html';
       }
     }
@@ -660,14 +676,11 @@
 
       section.style.display = 'block';
 
-      const gradeClass = g => g === 'A' ? 'a' : g === 'B' ? 'b' : 'c';
-
       list.innerHTML = saved.map(v => {
         const title  = v.title || 'Onbekende vacature';
         const short  = title.length > 50 ? title.slice(0, 50) + '…' : title;
-        const grade  = v.trust_grade || '—';
-        const score  = v.trust_score ?? '—';
-        const cls    = gradeClass(grade);
+        const grade  = v.trust_grade || null;
+        const score  = v.trust_score ?? null;
         const date   = v.saved_at
           ? new Date(v.saved_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
           : '';
@@ -678,7 +691,7 @@
                 <div class="card-title" title="${escapeHtml(title)}">${escapeHtml(short)}</div>
                 <div class="card-sub">${escapeHtml(v.company_name || '—')}${v.sector ? ' · ' + escapeHtml(v.sector) : ''}</div>
               </div>
-              <span class="trust ${cls}">${escapeHtml(grade)} ${escapeHtml(String(score))}</span>
+              ${renderTrustBadge(grade, score)}
             </div>
             <div style="margin:10px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <span class="tag neutral">📌 Lokaal opgeslagen</span>
@@ -704,7 +717,7 @@
       if (_roleRow?.role === 'gepensioneerd') { window.location.href = 'buddy-dashboard.html'; return; }
 
       // BBL-studenten horen niet op de sollicitaties pagina
-      if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-dashboard.html'); return; }
+      if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-profile.html'); return; }
 
       const authEl = document.getElementById('topbarAuth');
       const email  = user.email || '';
@@ -724,6 +737,11 @@
 
     window.addEventListener('beforeunload', () => {
       if (notifSubscription) notifSubscription.unsubscribe();
+    });
+
+    // Herlaad sollicitatie-statussen bij terugkeer naar tab (stale data preventie)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && currentUserId) loadApplications(currentUserId);
     });
 
     // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep

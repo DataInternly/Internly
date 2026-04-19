@@ -14,6 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     :root {
@@ -323,7 +325,6 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Sector tips ──
 const SECTOR_TIPS = {
@@ -482,8 +483,7 @@ function render(v, source) {
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           ${source === 'internship_postings' ? '<span style="font-size:.72rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 10px;border-radius:20px">🏢 Bedrijfsposting</span>' : ''}
-          <span class="trust-badge ${gradeClass}">${eGrade} · ${eScore} <span style="opacity:.65;font-weight:400">${trustTitle(v.trust_grade)}</span></span>
-          <span class="trust-hint" style="font-size:.72rem;color:var(--ink3,#7a8799);display:block;margin-top:2px;">A = &lt;2 dagen · B = 2–5 dagen · C = traag</span>
+          ${renderTrustBadge(v.trust_grade, v.trust_score, true)}
         </div>
       </div>
 
@@ -557,7 +557,7 @@ function render(v, source) {
       <p style="font-size:.9rem;color:var(--ink3);margin-bottom:18px;line-height:1.6">
         Sla de vacature op in je profiel zodat je hem later rustig kunt bekijken of vergelijken.
       </p>
-      ${v.trust_grade === 'C' ? '<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:6px;margin-bottom:12px;">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>' : ''}
+      ${v.trust_grade === 'C' ? '<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-bottom:12px;border-left:3px solid var(--red,#b82020);">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>' : ''}
       <div class="btn-row">
         <button class="btn-save" id="saveBtn"
           onclick="handleSave()"
@@ -575,9 +575,14 @@ function render(v, source) {
 }
 
 async function handleSave() {
+  if (isApplying()) {
+    notify('Je hebt al een sollicitatie in behandeling — wacht even');
+    return;
+  }
+  setApplying(true);
   const v      = window.__currentVacature;
   const source = window.__currentSource;
-  if (!v) return;
+  if (!v) { setApplying(false); return; }
 
   const btn = document.getElementById('saveBtn');
   btn.disabled    = true;
@@ -630,7 +635,7 @@ async function handleSave() {
 
         if (appErr && appErr.code !== '23505') {
           // Non-fatal — still saved to localStorage
-          console.error('Application insert fout:', appErr);
+          console.error('Application insert fout:', appErr?.message || 'onbekende fout');
         }
       }
       btn.textContent = '✓ Opgeslagen in profiel';
@@ -656,12 +661,12 @@ async function handleSave() {
             });
 
           if (appErr && appErr.code !== '23505') {
-            console.error('Application insert fout:', appErr);
+            console.error('Application insert fout:', appErr?.message || 'onbekende fout');
             // localStorage fallback already saved — non-fatal
           }
         }
       } catch (insertErr) {
-        console.error('Application insert onverwachte fout:', insertErr);
+        console.error('Application insert onverwachte fout:', insertErr?.message || 'onbekende fout');
         // localStorage fallback already saved — non-fatal
       }
 
@@ -669,9 +674,12 @@ async function handleSave() {
       notify('✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties', true);
     }
   } catch(e) {
-    console.error('handleSave error:', e);
+    console.error('handleSave error:', e?.message || 'onbekende fout');
     notify('Er is iets misgegaan — probeer het opnieuw', false);
-    btn.textContent = '✓ Opgeslagen';
+    btn.disabled    = false;
+    btn.textContent = 'Opslaan voor later';
+  } finally {
+    setApplying(false);
   }
 }
 

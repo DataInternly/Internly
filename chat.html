@@ -13,7 +13,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/dist/browser.js"></script>
+  <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -217,7 +219,7 @@
   </div>
   <a id="match-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
   <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:5px 4px;">Privacy</a>
-  <button onclick="db.auth.signOut().then(()=>window.location.href='index.html')" style="
+  <button onclick="db.auth.signOut().then(()=>{sessionStorage.removeItem('internly_role');setApplying(false);window.location.href='auth.html';})" style="
     flex-shrink:0;background:none;border:none;
     color:rgba(255,255,255,.45);font-size:.75rem;font-family:'Outfit',sans-serif;
     cursor:pointer;padding:5px 8px;border-radius:6px;
@@ -282,7 +284,6 @@
 </div>
 
 <script>
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentUser    = null;
   let convId         = null;
@@ -544,7 +545,12 @@
           appendMeetingCardRow(meeting, false);
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('[chat] meetings realtime verbinding verbroken:', err?.message);
+          notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+        }
+      });
   }
 
   async function acceptMeetingFromChat(id) {
@@ -780,7 +786,7 @@
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Berichten laden fout:', error);
+      console.error('Berichten laden fout:', error?.message || 'onbekende fout');
       const area = document.getElementById('messagesArea');
       if (area) area.innerHTML = `<div class="chat-empty"><span class="icon">⚠️</span>Berichten konden niet worden geladen. Probeer de pagina te verversen.</div>`;
       return;
@@ -820,7 +826,12 @@
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('[chat] berichten realtime verbinding verbroken:', err?.message);
+          notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+        }
+      });
   }
 
   // ── Send ──────────────────────────────────────────────────────────────────
@@ -863,7 +874,7 @@
 
     if (error) {
       notify('Fout bij verzenden: ' + (error?.message || 'onbekende fout'));
-      console.error('Send error:', error);
+      console.error('Send error:', error?.message || 'onbekende fout');
       return;
     }
 

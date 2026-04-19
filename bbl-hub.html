@@ -58,9 +58,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/buddy.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     /* ── BBL Hub pagina-specifieke stijlen ────────────────────────────────── */
     /* Basis variabelen zijn al in css/style.css. Hier ALLEEN BBL-specifiek.  */
@@ -648,7 +650,6 @@
       .topbar { padding: 0 14px; }
     }
   </style>
-  <script src="js/supabase.js"></script>
 </head>
 <body>
 
@@ -1038,7 +1039,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SUPABASE CLIENT — zelfde keys als alle andere Internly-pagina's
 // ─────────────────────────────────────────────────────────────────────────────
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // STATE
@@ -1085,6 +1085,7 @@ function formatDate(iso) {
 async function signOut() {
   await db.auth.signOut();
   sessionStorage.removeItem('internly_role');
+  setApplying(false);
   window.location.href = 'auth.html';
 }
 
@@ -1273,7 +1274,12 @@ function subscribeRealtime() {
         if (msg.sender_id !== currentUser?.id) appendMessage(msg);
       }
     )
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[bbl-hub] realtime verbinding verbroken:', err?.message);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+      }
+    });
 }
 
 async function markMessagesRead() {
@@ -1357,12 +1363,13 @@ document.getElementById('msgInput').addEventListener('keydown', function(e) {
 
 // Meeting-uitnodiging accepteren/weigeren
 async function acceptMeetingInvite(meetingId, msgId) {
-  if (!meetingId) return;
+  if (!meetingId || !currentUser) return;
   const { error } = await db
     .from('meetings')
     .update({ status: 'bevestigd' })
-    .eq('id', meetingId);
-  if (error) { notify('Acceptatie mislukt: ' + (error?.message || 'onbekende fout')); return; }
+    .eq('id', meetingId)
+    .eq('attendee_id', currentUser.id);
+  if (error) { notify('Acceptatie mislukt — probeer het opnieuw', false); return; }
   const card = document.getElementById('invite-' + msgId);
   if (card) card.querySelector('.invite-btns').innerHTML = '<span style="font-size:11px;color:#1a7a48;font-weight:500;">✓ Bevestigd</span>';
   // Notificeer organisator
@@ -1379,12 +1386,13 @@ async function acceptMeetingInvite(meetingId, msgId) {
 }
 
 async function declineMeetingInvite(meetingId, msgId) {
-  if (!meetingId) return;
+  if (!meetingId || !currentUser) return;
   const { error } = await db
     .from('meetings')
     .update({ status: 'afgewezen' })
-    .eq('id', meetingId);
-  if (error) { notify('Weigering mislukt: ' + (error?.message || 'onbekende fout')); return; }
+    .eq('id', meetingId)
+    .eq('attendee_id', currentUser.id);
+  if (error) { notify('Weigering mislukt — probeer het opnieuw', false); return; }
   const card = document.getElementById('invite-' + msgId);
   if (card) card.querySelector('.invite-btns').innerHTML = '<span style="font-size:11px;color:#b8291a;font-weight:500;">Geweigerd</span>';
   notify('Uitnodiging geweigerd');
@@ -1638,7 +1646,7 @@ async function loadEvaluatie() {
   if (!currentUser) return;
 
   // Meest recente openstaande evaluatie
-  const { data: meeting } = await db
+  const { data: meeting, error: evalErr } = await db
     .from('meetings')
     .select('*')
     .or(`organizer_id.eq.${currentUser.id},attendee_id.eq.${currentUser.id}`)
@@ -1647,6 +1655,7 @@ async function loadEvaluatie() {
     .order('proposed_date', { ascending: true })
     .limit(1)
     .maybeSingle();
+  if (evalErr) { console.error('[bbl-hub] loadEvaluatie error:', evalErr.message); }
 
   evalMeeting = meeting;
   const titleEl  = document.getElementById('evalTitle');
@@ -2266,62 +2275,73 @@ function renderSignoffStatus(status) {
   }
 }
 
+let _isSigningOff = false;
 async function signOff(party) {
+  if (_isSigningOff) return;
   if (!evalMeeting) { notify('Geen openstaande evaluatie om te tekenen'); return; }
+  _isSigningOff = true;
 
   const newStatus = { student: 'student_getekend', bedrijf: 'bedrijf_getekend', school: 'voltooid' }[party];
   const { error } = await db
     .from('meetings')
     .update({ status: newStatus })
     .eq('id', evalMeeting.id);
-  if (error) { notify('Handtekening plaatsen mislukt: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { _isSigningOff = false; notify('Handtekening plaatsen mislukt: ' + (error?.message || 'onbekende fout')); return; }
 
   evalMeeting.status = newStatus;
   renderSignoffStatus(newStatus);
 
-  // Notificaties per stap
-  if (party === 'student' && activeMatch?.praktijkbegeleider_profile_id) {
-    createNotification(
-      activeMatch.praktijkbegeleider_profile_id,
-      'eval_signed',
-      evalMeeting.id,
-      'meeting',
-      (currentUser.user_metadata?.naam || 'Student') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
-    );
-  }
-
-  if (party === 'bedrijf' && activeMatch?.roc_profile_id) {
-    createNotification(
-      activeMatch.roc_profile_id,
-      'eval_signed',
-      evalMeeting.id,
-      'meeting',
-      (currentUser.user_metadata?.naam || 'Praktijkbegeleider') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
-    );
-  }
-
-  if (party === 'school') {
-    if (activeMatch?.party_a) {
-      createNotification(
-        activeMatch.party_a,
-        'eval_completed',
-        evalMeeting.id,
-        'meeting',
-        'Je evaluatie is volledig ondertekend en afgerond.'
-      );
-    }
-    if (activeMatch?.praktijkbegeleider_profile_id) {
-      createNotification(
+  // Notificaties per stap — schakel met grootste kans op stil falen
+  try {
+    if (party === 'student' && activeMatch?.praktijkbegeleider_profile_id) {
+      await createNotification(
         activeMatch.praktijkbegeleider_profile_id,
-        'eval_completed',
+        'eval_signed',
         evalMeeting.id,
         'meeting',
-        'De evaluatie is volledig ondertekend en afgerond.'
+        (currentUser.user_metadata?.naam || 'Student') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
       );
     }
+
+    if (party === 'bedrijf' && activeMatch?.roc_profile_id) {
+      await createNotification(
+        activeMatch.roc_profile_id,
+        'eval_signed',
+        evalMeeting.id,
+        'meeting',
+        (currentUser.user_metadata?.naam || 'Praktijkbegeleider') + ' heeft de evaluatie getekend — jouw handtekening is nodig'
+      );
+    }
+
+    if (party === 'school') {
+      if (activeMatch?.party_a) {
+        await createNotification(
+          activeMatch.party_a,
+          'eval_completed',
+          evalMeeting.id,
+          'meeting',
+          'Je evaluatie is volledig ondertekend en afgerond.'
+        );
+      }
+      if (activeMatch?.praktijkbegeleider_profile_id) {
+        await createNotification(
+          activeMatch.praktijkbegeleider_profile_id,
+          'eval_completed',
+          evalMeeting.id,
+          'meeting',
+          'De evaluatie is volledig ondertekend en afgerond.'
+        );
+      }
+    }
+  } catch (e) {
+    console.error('[signOff-keten] notificatie-schakel mislukt:', e?.message || 'onbekende fout');
+    notify('Evaluatie gedeeltelijk opgeslagen — probeer het opnieuw', false);
+    _isSigningOff = false;
+    return;
   }
 
   notify('Handtekening geplaatst');
+  _isSigningOff = false;
 }
 
 async function loadEvalArchive() {
@@ -2488,7 +2508,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (spErr) console.error('[bbl-hub] student_profiles fout:', spErr.message);
 
-  if (!sp?.bbl_mode) {
+  if (sp?.bbl_mode !== true) {
     // Geen BBL-student — doorsturen naar discover
     window.location.href = 'discover.html';
     return;
@@ -2676,6 +2696,11 @@ function renderBuddyCard(pair) {
     </div>`;
   card.style.display = 'block';
 }
+
+// Herlaad berichten bij terugkeer naar tab (stale data preventie)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentUser) { loadMessages(); loadMeetings(); }
+});
 
 // Cleanup realtime op page unload
 window.addEventListener('beforeunload', () => {

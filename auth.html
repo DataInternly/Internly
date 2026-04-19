@@ -14,7 +14,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     :root {
       --green:      #1a7a48;
@@ -278,7 +280,8 @@
       <button onclick="switchAccount()" style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:50px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;color:var(--ink3);cursor:pointer;">Ander account / uitloggen</button>
     </div>
 
-    <!-- Rol kiezen -->
+    <!-- Rol kiezen — alleen zichtbaar bij registreren -->
+    <div id="role-picker-section" style="display:none">
     <div class="role-title">Kies je rol</div>
     <div class="role-cards">
       <div class="role-card" id="rc-student" onclick="selectRole('student')">
@@ -330,6 +333,7 @@
         <div class="role-check" id="check-gepensioneerd"></div>
       </div>
     </div>
+    </div><!-- /role-picker-section -->
 
     <!-- LOGIN FORM -->
     <div id="form-login">
@@ -444,10 +448,16 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ── B3+B7: Wis URL-parameters direct bij load ──
+// Sla params op vóór wissen — voorkomt logging door Google Translate.
+// ?role= is uitsluitend een UI-hint, nooit voor authenticatie-beslissingen.
+const _initParams = new URLSearchParams(window.location.search);
+if (window.location.search) {
+  window.history.replaceState({}, '', window.location.pathname);
+}
 
 // ── Sessie verlopen melding ──
-if (new URLSearchParams(window.location.search).get('expired') === '1') {
+if (_initParams.get('expired') === '1') {
   document.addEventListener('DOMContentLoaded', () => {
     const box = document.getElementById('errorBox');
     if (box) { box.textContent = 'Je sessie is verlopen. Log opnieuw in.'; box.style.display = 'block'; }
@@ -464,7 +474,7 @@ const ROUTES = {
 };
 
 // ── State ──
-let selectedRole  = null;
+var selectedRole  = null;
 let activeTab     = 'login';
 let isBBL         = false;
 
@@ -478,8 +488,9 @@ function switchTab(tab) {
   activeTab = tab;
   document.getElementById('tab-login').classList.toggle('active', tab === 'login');
   document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
-  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('form-login').style.display         = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('form-register').style.display      = tab === 'register' ? 'block' : 'none';
+  document.getElementById('role-picker-section').style.display = tab === 'register' ? 'block' : 'none';
   const logoSub = document.getElementById('logoSub');
   if (logoSub) logoSub.textContent = tab === 'login' ? 'Welkom terug.' : 'Goed dat je er bent.';
   // Toon/verberg buddy-extra velden op basis van tab + geselecteerde rol
@@ -532,8 +543,11 @@ function selectRole(role) {
 
 // ── Login ──
 async function doLogin() {
-  if (!selectedRole) { showError('Kies eerst een rol.'); return; }
-
+  if (typeof _fCtx !== 'undefined'
+      && _fCtx.blockIfFilled('login submit')) {
+    showError('Er is iets misgegaan — probeer het opnieuw.');
+    return;
+  }
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
 
@@ -575,21 +589,22 @@ async function doLogin() {
   }
   _loginAttempts = 0; // reset on success
 
-  // Haal rol op uit profiles tabel
+  // Haal rol op uit profiles tabel — DB-rol heeft altijd prioriteit
   const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', data.user.id)
     .maybeSingle();
 
-  // Gebruik opgeslagen rol of geselecteerde rol
+  // DB-rol heeft voorrang; selectedRole is fallback voor nieuwe accounts
   const role = profile?.role || selectedRole;
+  if (!role) { showError('Rol kon niet worden bepaald. Kies een rol en probeer opnieuw.'); return; }
   sessionStorage.setItem('internly_role', role);
 
   showSuccess('Inloggen gelukt! Je wordt doorgestuurd…');
 
-  // BBL check: student met bbl_mode → bbl-dashboard.html
-  let redirectUrl = ROUTES[role] || 'match-dashboard.html';
+  // Centrale student routing via utils.js routeStudent()
+  let _sp = null;
   if (role === 'student') {
     const { data: sp, error: spErr } = await db
       .from('student_profiles')
@@ -597,17 +612,26 @@ async function doLogin() {
       .eq('profile_id', data.user.id)
       .maybeSingle();
     if (spErr) console.error('[auth] student_profiles BBL check fout:', spErr.message);
-    if (sp?.bbl_mode) {
-      // Nieuw BBL-account zonder naam → eerst profiel invullen
-      redirectUrl = sp?.naam ? 'bbl-dashboard.html' : 'bbl-profile.html';
-      sessionStorage.setItem('internly_role', 'bbl');
-    }
+    if (sp?.bbl_mode === true) sessionStorage.setItem('internly_role', 'bbl');
+    _sp = sp;
   }
 
   // Push registration — fire-and-forget, never blocks redirect
   // Show browser native dialog only on first login (student role).
   // Company/school see a soft banner on their dashboard instead.
-  setTimeout(() => { window.location.href = redirectUrl; }, 1000);
+  setTimeout(() => {
+    if (role === 'student') {
+      if (_sp && typeof _sp.bbl_mode === 'boolean') {
+        // Bestaand profiel — stuur direct naar de juiste hub
+        routeStudentByMode(_sp);
+      } else {
+        // Geen profiel nog — stuur naar profielaanmaak
+        window.location.href = 'student-profile.html';
+      }
+    } else {
+      window.location.href = ROUTES[role] || 'match-dashboard.html';
+    }
+  }, 1000);
 
   // Push registration — only if permission already granted (no dialog → no race with redirect).
   // First-time permission request is handled by discover.html where there's no redirect pressure.
@@ -618,6 +642,11 @@ async function doLogin() {
 
 // ── Register ──
 async function doRegister() {
+  if (typeof _fCtx !== 'undefined'
+      && _fCtx.blockIfFilled('register submit')) {
+    showError('Er is iets misgegaan — probeer het opnieuw.');
+    return;
+  }
   const consent = document.getElementById('consentCheck');
   if (consent && !consent.checked) {
     showError('Vink het privacybeleid-akkoord aan om door te gaan.');
@@ -760,6 +789,7 @@ function clearMessages() {
 async function switchAccount() {
   await db.auth.signOut();
   sessionStorage.removeItem('internly_role');
+  setApplying(false);
   document.getElementById('alreadyLoggedIn').style.display = 'none';
   document.querySelector('.role-title').style.display = '';
   document.querySelector('.role-cards').style.display = '';
@@ -783,6 +813,11 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
+  // Honeypot: plant verborgen valkuil-veld in login-container.
+  if (typeof _fCtx !== 'undefined') {
+    _fCtx._plant(document.getElementById('form-login'));
+  }
+
   // Al ingelogd? Toon panel met optie naar dashboard of ander account.
   const { data: { user } } = await db.auth.getUser();
   if (user) {
@@ -801,7 +836,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           .select('bbl_mode, naam')
           .eq('profile_id', user.id)
           .maybeSingle();
-        if (sp?.bbl_mode) { dest = sp?.naam ? 'bbl-dashboard.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
+        if (sp?.bbl_mode === true) { dest = sp?.naam ? 'bbl-hub.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
       }
       const name = user.user_metadata?.naam || user.user_metadata?.name || user.email;
       document.getElementById('alreadyName').textContent = name;
@@ -820,7 +855,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Lees ?role= param van index.html
-  const urlRole = new URLSearchParams(window.location.search).get('role');
+  const urlRole = _initParams.get('role'); // URL al gewist — gebruik opgeslagen params
   if (urlRole) {
     const mapping = { student: 'student', bbl: 'bbl', bedrijf: 'bedrijf', school: 'school', gepensioneerd: 'gepensioneerd' };
     const mapped = mapping[urlRole];

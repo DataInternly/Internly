@@ -17,7 +17,7 @@ const InternlyCalendar = (() => {
   const DAYS  = ['Ma', 'Di', 'Wo', 'Do', 'Vr'];
   const HOURS = [8,9,10,11,12,13,14,15,16,17];
 
-  let _db = null, _userId = null, _containerId = null, _saving = false;
+  let _db = null, _userId = null, _containerId = null, _saving = false, _isSavingMeeting = false;
   let _matchId = null; // match UUID — doorgegeven vanuit renderChatButton()
   let _slots = {}; // key: "day_hour" → status string
 
@@ -128,7 +128,7 @@ const InternlyCalendar = (() => {
       _slots = {};
       (data||[]).forEach(r => { _slots[k(r.day_of_week, r.hour_start)] = r.status; });
       renderGrid();
-    } catch(e) { console.error('[cal] load:', e); }
+    } catch(e) { console.error('[cal] load:', e?.message || 'onbekende fout'); }
   }
 
   async function saveAll() {
@@ -144,7 +144,7 @@ const InternlyCalendar = (() => {
       });
       if (rows.length) { const { error } = await _db.from('availability').insert(rows); if(error) throw error; }
       calNotify('Beschikbaarheid opgeslagen ✓');
-    } catch(e) { console.error('[cal] save:', e); calNotify('Opslaan mislukt', false); }
+    } catch(e) { console.error('[cal] save:', e?.message || 'onbekende fout'); calNotify('Opslaan mislukt', false); }
     finally { _saving=false; if(btn){btn.disabled=false;btn.textContent='Opslaan';} }
   }
 
@@ -212,7 +212,7 @@ const InternlyCalendar = (() => {
           .eq('user_id', otherUserId)
           .in('status',['beschikbaar','voorkeur']);
         otherSlots = data||[];
-      } catch(_){}
+      } catch(_){ console.warn('[cal] slots laden mislukt:', _); }
     }
 
     const byDay = {};
@@ -317,6 +317,8 @@ const InternlyCalendar = (() => {
   }
 
   async function submitMeeting(otherUserId, otherEmail, otherName) {
+    if (_isSavingMeeting) return;
+    _isSavingMeeting = true;
     const subj    = document.getElementById('mf-subj')?.value.trim();
     const type    = document.getElementById('mf-type')?.value;
     const contact = document.getElementById('mf-contact')?.value.trim();
@@ -374,9 +376,11 @@ const InternlyCalendar = (() => {
       calNotify(`Afspraak verstuurd naar ${otherName} ✓`);
 
     } catch(e) {
-      console.error('[cal] submit:', e);
+      console.error('[cal] submit:', e?.message || 'onbekende fout');
       calNotify('Er ging iets mis — probeer opnieuw',false);
       if(btn){btn.disabled=false;btn.textContent='Afspraak versturen →';}
+    } finally {
+      _isSavingMeeting = false;
     }
   }
 

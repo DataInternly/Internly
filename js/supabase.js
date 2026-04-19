@@ -1,15 +1,15 @@
 // js/supabase.js
 // Laad dit bestand ALTIJD na de Supabase CDN script en vóór alle pagina-scripts.
-// Het maakt één globale `supabase` client aan die index.html kan hergebruiken.
-// Alle andere pagina's declareren hun eigen `db` client inline.
+// Maakt één globale `db` client aan — beschikbaar als window.db op alle pagina's.
 // SUPABASE_URL en SUPABASE_ANON_KEY staan uitsluitend in js/supabase.js (single source of truth).
-// De typeof-guard hieronder zorgt dat er nooit een duplicate-declaration crash kan optreden.
 
-// Globale client — beschikbaar als `supabase` op index.html
-// (gebruikt door schrijfInHero() en de waitlist-popup op index.html)
 const SUPABASE_URL      = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Beschikbaar stellen voor telemetry.js _tel.
+// Volgorde: supabase.js → utils.js → telemetry.js — key is gegarandeerd aanwezig.
+window.__SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.db = db;
 
 // Gedeelde constante voor het notification-type bij meeting-uitnodigingen.
 // Gebruik deze in alle INSERT-statements zodat typen consistent blijven.
@@ -100,7 +100,7 @@ async function hasActivePlan(minPlan = 'company_starter') {
 
     return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
   } catch (err) {
-    console.error('hasActivePlan error:', err);
+    console.error('hasActivePlan error:', err?.message || 'onbekende fout');
     return false;
   }
 }

@@ -14,7 +14,9 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/telemetry.js"></script>
   <style>
     :root {
       --blue:       #1756a8;
@@ -443,7 +445,6 @@
     .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
   </style>
-  <script src="js/supabase.js"></script>
 </head>
 <body>
 <div class="notif" id="notif"></div>
@@ -881,7 +882,6 @@
 </div>
 
 <script>
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── State ──
 const oTags = [];
@@ -932,7 +932,7 @@ async function loadNotifications() {
          data-ref-id="${escapeHtml(n.ref_id || '')}">
       <span class="nd-dot ${n.read ? 'read' : ''}"></span>
       <div>
-        <div class="nd-msg">${getNotifText(n)}</div>
+        <div class="nd-msg">${escapeHtml(getNotifText(n))}</div>
         <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
       </div>
     </div>`).join('');
@@ -983,7 +983,12 @@ function startNotifSubscription() {
       showToast(payload.new.message);
       loadNotifications();
     })
-    .subscribe();
+    .subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('[school] realtime verbinding verbroken:', err?.message);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+      }
+    });
 }
 
 function showLoading(containerId, tekst) {
@@ -1037,9 +1042,10 @@ async function loadUser() {
 
 async function signOut() {
   try { await db.auth.signOut(); }
-  catch(e) { console.error('Logout error:', e); }
+  catch(e) { console.error('Logout error:', e?.message || 'onbekende fout'); }
   finally {
     sessionStorage.removeItem('internly_role');
+    setApplying(false);
     window.location.href = 'auth.html';
   }
 }
@@ -1121,25 +1127,7 @@ function show(id) {
 let _isPremiumSchool  = false;
 let _isBundledSchool  = false;
 
-async function hasActivePlan(minPlan = 'school_freemium') {
-  try {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) return false;
-    const { data: sub, error } = await db
-      .from('subscriptions')
-      .select('plan, status, current_period_end')
-      .eq('profile_id', user.id)
-      .maybeSingle();
-    if (error || !sub) return false;
-    if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
-    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
-    const tiers = ['company_starter','company_pro','company_business','school_freemium','school_premium','school_premium_monthly','begeleider_starter','begeleider_pro'];
-    return tiers.indexOf(sub.plan) >= tiers.indexOf(minPlan);
-  } catch (err) {
-    console.error('hasActivePlan error:', err);
-    return false;
-  }
-}
+// hasActivePlan() is defined in js/supabase.js
 
 function upgradeCard(requiredPlan) {
   const labels = { company_pro: 'Pro', company_business: 'Business', school_premium: 'School Premium' };
@@ -1229,7 +1217,7 @@ async function loadStudenten() {
   const { data, error } = await q;
 
   if (error) {
-    console.error('Fout bij laden studenten:', error);
+    console.error('Fout bij laden studenten:', error?.message || 'onbekende fout');
     studenten = [];
   } else {
     // Start with base data (all zoekend / progress 0)
@@ -1353,14 +1341,14 @@ function progressColor(p) {
 function renderStudentenRows(cid, data) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
-    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">🎓</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen studenten gekoppeld</div><div style="font-size:.88rem;">Nodig studenten uit via de schoolcode of koppel ze handmatig aan jouw opleiding.</div></div>`;
+    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">🎓</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen studenten gekoppeld</div><div style="font-size:.88rem;">Nodig studenten uit via de schoolcode of koppel ze handmatig aan jouw opleiding.</div><button type="button" onclick="openStudentUitnodigen()" class="btn-primary" style="margin-top:.75rem;">Eerste student toevoegen →</button></div>`;
     return;
   }
   el.innerHTML = data.map(s => {
     const eNaam    = escapeHtml(s.naam);
     const eBedrijf = escapeHtml(s.bedrijf || '');
     const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
-    const faseLabel = { 'actief': 'Stage loopt', 'risico': 'Stage loopt', 'zoekend': 'Zoekend' }[s.status] || '';
+    const faseLabel = { 'actief': 'Stage loopt', 'risico': '⚠ Let op', 'zoekend': 'Zoekend' }[s.status] || '';
     return `
     <div class="student-row">
       <div class="avatar">${escapeHtml(initials(s.naam))}</div>
@@ -1512,8 +1500,6 @@ function renderBedrijvenList(bedrijven) {
   }
 
   el.innerHTML = bedrijven.map(b => {
-    const cls       = b.grade === 'A' ? 'trust-a' : b.grade === 'B' ? 'trust-b' : 'trust-c';
-    const gradeLabel = { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[b.grade] || '';
     const activeCount = b.actief.length;
     const activeTitles = b.actief.slice(0, 3).map(p => `<span class="tag">${escapeHtml(p.title)}</span>`).join('');
     const moreTag = b.actief.length > 3
@@ -1537,7 +1523,7 @@ function renderBedrijvenList(bedrijven) {
             <div class="cc-meta">${escapeHtml(b.sector || '—')}${activeCount > 0 ? ` · <strong style="color:var(--green)">${activeCount} actieve stage${activeCount !== 1 ? 's' : ''}</strong>` : ' · geen actieve stages'}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            ${b.grade ? `<span class="trust-badge ${cls}">${escapeHtml(b.grade)} · ${escapeHtml(String(b.score ?? '—'))} <span style="font-weight:400;opacity:.7">${gradeLabel}</span></span>` : ''}
+            ${renderTrustBadge(b.grade, b.score)}
             ${reviewStarsHtml}
           </div>
         </div>
@@ -1650,15 +1636,26 @@ async function confirmKoppel() {
   if (error) { notify('Fout bij koppelen: ' + (error?.message || 'onbekende fout')); return; }
   if (!matchRow) { notify('Er ging iets mis bij opslaan'); return; }
 
-  // Notify student of school referral
+  // Notify student én bedrijf — beide met await, geen fire-and-forget (build rule P5)
   const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw school';
-  createNotification(
-    studentId,
-    'school_referral',
-    matchRow?.id || null,
-    'match',
-    schoolName + ' heeft je gekoppeld aan een stagebedrijf — bekijk het in je Matches'
-  );
+  try {
+    await createNotification(
+      studentId,
+      'school_referral',
+      matchRow?.id || null,
+      'match',
+      schoolName + ' heeft je gekoppeld aan een stagebedrijf — bekijk het in je Matches'
+    );
+    await createNotification(
+      _koppelCompanyId,
+      'school_referral',
+      matchRow?.id || null,
+      'match',
+      schoolName + ' heeft een student naar jouw vacature doorverwezen'
+    );
+  } catch (e) {
+    console.error('[school] school_referral notificaties mislukt:', e?.message || 'onbekende fout');
+  }
 
   notify('✓ Student gekoppeld aan bedrijf');
   closeKoppelModal();
@@ -1864,7 +1861,7 @@ async function acceptPush() {
   const banner = document.getElementById('push-banner');
   if (banner) banner.remove();
   if (currentUser) {
-    try { await registerPushNotifications(db, currentUser.id); } catch(_) {}
+    try { await registerPushNotifications(db, currentUser.id); } catch(_) { console.warn('[school] push registratie mislukt:', _); }
   }
 }
 
@@ -2072,6 +2069,11 @@ function initReferralBanner() {
   if (dismissed === 'true') {
     banner.style.display = 'none';
   }
+}
+
+// TODO Sprint 5: vervang stub door echte uitnodigingsflow (schoolcode kopiëren + e-mail)
+function openStudentUitnodigen() {
+  notify('Gebruik de schoolcode om studenten uit te nodigen — zie Instellingen');
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
