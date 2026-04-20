@@ -141,6 +141,17 @@
       transition: background .12s, transform .12s;
     }
     .btn-enter:hover { background: #e05c1a; transform: translateY(-1px); }
+    .cta-secondary-orange {
+      display: block; width: 100%; max-width: 420px;
+      margin: 0 auto 12px; text-align: center;
+      color: #e05c1a; background: transparent;
+      border: 1.5px solid rgba(224,92,26,.55); border-radius: 40px;
+      padding: 10px 44px;
+      font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 500;
+      text-decoration: none; cursor: pointer;
+      transition: background .12s, color .12s, border-color .12s;
+    }
+    .cta-secondary-orange:hover { background: #e05c1a; color: #fff; border-color: #e05c1a; }
     .lp-link-explore {
       font-size: .8rem; color: rgba(255,255,255,.55);
       text-decoration: none;
@@ -800,8 +811,12 @@
 
   <!-- CTA — vervangt de oude btn-demo + btn-verken -->
   <button class="btn-enter" id="lp-enter-btn" onclick="lpGoToRole()">
-    Zoek MBO-stage als Student →
+    Maak nu een profiel aan →
   </button>
+
+  <a href="/auth.html" class="cta-secondary-orange">
+    Heb je al een account? Log dan nu in
+  </a>
 
   <a class="lp-link-explore" id="lp-explore-link" href="discover.html">
     <span class="lp-exp-dot"></span>
@@ -1528,7 +1543,7 @@ window.addEventListener('load', function() {
     } else if (lp.role === 'buddy') {
       btn.textContent = 'Word gepensioneerde buddy \u2192';
     } else if (lp.role === 'student') {
-      btn.textContent = 'Zoek ' + niveauLabel + '-stage als ' + roleLabel + ' \u2192';
+      btn.textContent = 'Maak nu een profiel aan \u2192';
     } else if (lp.role === 'bedrijf') {
       btn.textContent = 'Plaats je eerste stageplek \u2192';
     } else {
@@ -1539,7 +1554,7 @@ window.addEventListener('load', function() {
   /* ── CTA navigate ── */
   window.lpGoToRole = function () {
     var role = lp.role;
-    if      (role === 'student')  { window.location.href = 'discover.html?niveau=' + lp.niveau; }
+    if      (role === 'student')  { window.location.href = 'auth.html?mode=signup'; }
     else if (role === 'bbl')      { window.location.href = 'auth.html?role=bbl'; }
     else if (role === 'bedrijf')  { window.location.href = 'auth.html?role=bedrijf'; }
     else if (role === 'school')   { window.location.href = 'auth.html?role=school'; }
