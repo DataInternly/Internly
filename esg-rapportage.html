@@ -344,6 +344,34 @@
       transition: background .15s;
     }
     .btn-cta-secondary:hover { background: rgba(255,255,255,.14); }
+    .btn-cta-disabled {
+      opacity: .55;
+      cursor: default;
+      pointer-events: none;
+    }
+    .soon-pill {
+      display: inline-block;
+      font-size: .66rem; font-weight: 600;
+      color: #e05c1a;
+      background: rgba(224,92,26,.1);
+      border: 1px solid rgba(224,92,26,.22);
+      border-radius: 20px;
+      padding: 2px 9px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .soon-pill-dark {
+      display: inline-block;
+      font-size: .66rem; font-weight: 600;
+      color: rgba(255,255,255,.55);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 20px;
+      padding: 2px 9px;
+      vertical-align: middle;
+      white-space: nowrap;
+      margin-left: .4rem;
+    }
 
     /* ── FAQ ── */
     .esg-faq { max-width: 720px; margin: 1.5rem auto 0; }
@@ -557,7 +585,7 @@
     <div class="live-banner">
       <div class="live-banner-icon">🕐</div>
       <div class="live-banner-text">
-        <strong>Beschikbaar vanaf [LIVE-DATUM].</strong> De export-functionaliteit is in ontwikkeling. Bedrijven op het Business-abonnement krijgen als eerste toegang. <a href="/prijzen" style="color:#e05c1a;font-weight:600;">Bekijk abonnementen →</a>
+        <strong>Beschikbaar vanaf [LIVE-DATUM].</strong> De export-functionaliteit is in ontwikkeling. Bedrijven op het Business-abonnement krijgen als eerste toegang. <span style="font-weight:600;color:#e05c1a;" aria-label="Abonnementen beschikbaar vanaf Q3 2026">Bekijk abonnementen</span> <span class="soon-pill">Binnenkort beschikbaar · Q3 2026</span>
       </div>
     </div>
   </div>
@@ -641,7 +669,7 @@
     </p>
     <div class="esg-cta-btns">
       <a href="/auth.html?tier=business" class="btn-cta-primary">Start Business-proef →</a>
-      <a href="/prijzen" class="btn-cta-secondary">Bekijk alle abonnementen</a>
+      <span class="btn-cta-secondary btn-cta-disabled" role="button" aria-disabled="true" title="Abonnementenpagina beschikbaar vanaf Q3 2026">Bekijk alle abonnementen <span class="soon-pill-dark">Q3 2026</span></span>
     </div>
     <p style="margin-top:1.2rem;font-size:.75rem;color:rgba(255,255,255,.3);">
       Heeft u vragen over uw specifieke rapportagesituatie? Mail <a href="mailto:boekhouding@internly.pro" style="color:rgba(255,255,255,.45);">boekhouding@internly.pro</a>
@@ -688,7 +716,7 @@
       <details role="listitem">
         <summary>Wat kost toegang tot de ESG-export?</summary>
         <div class="esg-faq-answer">
-          <p>De ESG-export is inbegrepen in het Business-abonnement. Starter- en Pro-abonnementen hebben geen toegang tot de exportfunctie, wel tot de live ESG-statistieken in het dashboard. Bekijk de <a href="/prijzen">abonnementenpagina</a> voor de huidige tarieven.</p>
+          <p>De ESG-export is inbegrepen in het Business-abonnement. Starter- en Pro-abonnementen hebben geen toegang tot de exportfunctie, wel tot de live ESG-statistieken in het dashboard. Bekijk de <a href="/pricing.html">abonnementenpagina</a> voor de huidige tarieven.</p>
         </div>
       </details>
 
