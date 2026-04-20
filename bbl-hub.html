@@ -656,22 +656,7 @@
 <!-- Toast — exact patroon chat.html (id="notif" + class="show") -->
 <div class="notif" id="notif"></div>
 
-<!-- ── Topbar ── -->
-<div class="topbar">
-  <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="topbar-logo" style="cursor:pointer">intern<span>ly</span></a>
-  <span class="topbar-bbl-tag">BBL-traject</span>
-  <nav class="topbar-bbl-nav">
-    <a href="bbl-dashboard.html">Dashboard</a>
-    <a href="bbl-hub.html" class="active">BBL Traject Hub</a>
-    <a href="buddy-dashboard.html">Buddy</a>
-    <a href="bbl-profile.html">Profiel</a>
-  </nav>
-  <div class="topbar-right">
-    <span class="topbar-user" id="topbarUser"></span>
-    <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
-    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
-  </div>
-</div>
+<div id="student-header"></div>
 
 <div class="hub-shell">
 
@@ -2516,9 +2501,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Elke BBL-student (bbl_mode = true) mag de hub zien, ook zonder koppeling.
   // Alles hieronder is niet-blokkerend — geen redirect als er geen match is.
 
-  // 3. Topbar gebruikersnaam
-  const name = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
-  document.getElementById('topbarUser').textContent = name;
+  // 3. Shared header
+  await renderStudentHeader({ activeTab: 'discover' });
 
   // 4. Actieve BBL-match ophalen (optioneel — hub laadt altijd)
   const { data: match, error: matchErr } = await db

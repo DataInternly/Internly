@@ -246,23 +246,7 @@
 
 <div class="notif" id="notif"></div>
 
-<!-- ── Topbar ── -->
-<div class="topbar">
-  <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="topbar-logo" style="cursor:pointer">intern<span>ly</span></a>
-  <span class="topbar-bbl-tag">BBL-traject</span>
-  <nav class="topbar-bbl-nav">
-    <a href="bbl-dashboard.html" class="active">Dashboard</a>
-    <a href="bbl-hub.html">BBL Traject Hub</a>
-    <a href="buddy-dashboard.html">Buddy</a>
-    <a href="bbl-profile.html">Profiel</a>
-  </nav>
-  <div class="topbar-right">
-    <span class="topbar-user" id="topbarUser"></span>
-    <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
-    <a href="spelregels.html" class="topbar-privacy">Spelregels</a>
-    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
-  </div>
-</div>
+<div id="student-header"></div>
 
 <div class="dash-shell">
 
@@ -559,9 +543,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   sessionStorage.setItem('internly_role', 'bbl');
 
-  // 3. Gebruikersnaam
+  // 3. Shared header
   const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Student';
-  document.getElementById('topbarUser').textContent = naam;
+  await renderStudentHeader({ activeTab: 'matches' });
   setWelcome(naam);
 
   // 4. Actieve match ophalen
