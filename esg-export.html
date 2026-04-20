@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>ESG-rapport — Internly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ───────────────────────────────────────────────────────────────────
+   INTERNLY ESG RAPPORT — v3 (template)
+   - Plain Dutch bron/methode
+   - Simplified audit trail
+   - data-field spans for dynamic injection via esg-inject.js
+─────────────────────────────────────────────────────────────────── */
+
+:root {
+  --forest:    #1a7a48;
+  --forest-d:  #15603a;
+  --paper:     #f9f6ee;
+  --paper-d:   #ece7d7;
+  --ink:       #0d1520;
+  --ink2:      #2a3245;
+  --ink3:      #5a6578;
+  --ink4:      #8a95a8;
+  --accent:    #e05c1a;
+  --border:    rgba(13, 21, 32, 0.10);
+  --border2:   rgba(13, 21, 32, 0.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 22mm 16mm;
+}
+
+html { background: #d4d0c4; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  color: var(--ink);
+  font-size: 10.5pt;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sheet {
+  width: 210mm;
+  min-height: 297mm;
+  background: var(--paper);
+  margin: 14mm auto;
+  padding: 18mm 16mm 22mm;
+  position: relative;
+  box-shadow: 0 4px 18px rgba(0,0,0,.15);
+  page-break-after: always;
+  overflow: hidden;
+}
+.sheet:last-child { page-break-after: auto; }
+
+@media print {
+  html { background: #fff; }
+  .sheet {
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    width: auto;
+    min-height: auto;
+    page-break-after: always;
+  }
+  .sheet:last-child { page-break-after: auto; }
+  .no-print { display: none !important; }
+}
+
+/* ─── SHARED ELEMENTS ─── */
+.brand-mark {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: 11pt;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.brand-mark span { color: var(--accent); }
+
+.legal-spine {
+  position: absolute;
+  bottom: 14mm;
+  left: 16mm;
+  right: 16mm;
+  padding-top: 6pt;
+  border-top: 0.5pt solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 7.5pt;
+  color: var(--ink3);
+  letter-spacing: 0.02em;
+}
+.legal-spine-left { max-width: 60%; }
+.legal-spine-right { font-family: 'JetBrains Mono', monospace; font-size: 7pt; }
+
+.page-num {
+  position: absolute;
+  top: 14mm;
+  right: 16mm;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  color: var(--ink4);
+  letter-spacing: 0.1em;
+}
+
+.section-label {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4pt;
+}
+
+/* ─── PAGE 1 — COVER ─── */
+.cover {
+  display: flex;
+  flex-direction: column;
+  height: calc(297mm - 40mm);
+  padding-bottom: 18mm;
+  position: relative;
+}
+
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 8mm;
+  border-bottom: 0.5pt solid var(--border);
+  gap: 12mm;
+}
+.cover-top .brand-mark { padding-top: 3pt; }
+
+.cover-top-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4mm;
+}
+
+.cover-badge {
+  padding: 5pt 12pt;
+  background: var(--forest);
+  color: #fff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 8pt;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  border-radius: 2pt;
+  white-space: nowrap;
+}
+
+.issuer {
+  font-size: 8.5pt;
+  color: var(--ink3);
+  text-align: right;
+  line-height: 1.45;
+}
+
+.cover-spacer { flex: 1; }
+
+.cover-eyebrow {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 9pt;
+  font-weight: 600;
+  color: var(--forest);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 10pt;
+}
+
+.cover-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 44pt;
+  line-height: 1.05;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 8pt;
+  max-width: 140mm;
+}
+.cover-title em {
+  font-style: italic;
+  color: var(--forest);
+}
+
+.cover-sub {
+  font-size: 12pt;
+  line-height: 1.55;
+  color: var(--ink2);
+  max-width: 130mm;
+  margin-bottom: 16mm;
+}
+
+.cover-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8mm;
+  padding-top: 8mm;
+  border-top: 0.5pt solid var(--border);
+}
+.cover-meta-k {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 3pt;
+}
+.cover-meta-v {
+  font-size: 10.5pt;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ─── PAGE 2 — CONTEXT ─── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 6pt;
+  margin-bottom: 10mm;
+  border-bottom: 0.5pt solid var(--border);
+}
+.page-header .doc-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 8pt;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+}
+
+.h-section {
+  font-family: 'Instrument Serif', serif;
+  font-size: 24pt;
+  line-height: 1.15;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 6mm;
+  letter-spacing: -0.01em;
+}
+
+.p-body {
+  font-size: 10.5pt;
+  line-height: 1.65;
+  color: var(--ink2);
+  margin-bottom: 5mm;
+  max-width: 145mm;
+}
+.p-body strong { color: var(--ink); font-weight: 600; }
+.p-body em { font-style: italic; color: var(--forest-d); font-weight: 500; }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8mm;
+  margin-top: 6mm;
+}
+.col-head {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 9pt;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4pt;
+  padding-bottom: 4pt;
+  border-bottom: 0.5pt solid var(--border);
+}
+.col-body {
+  font-size: 10pt;
+  line-height: 1.65;
+  color: var(--ink2);
+}
+.col-body ul {
+  margin-top: 3pt;
+  padding-left: 12pt;
+  list-style: none;
+}
+.col-body li {
+  position: relative;
+  margin-bottom: 3pt;
+}
+.col-body li::before {
+  content: '→';
+  position: absolute;
+  left: -12pt;
+  color: var(--forest);
+  font-weight: 600;
+}
+
+/* ─── DATAPOINT CARDS ─── */
+.dp-block {
+  margin-bottom: 10mm;
+  padding: 7mm 8mm;
+  background: #fff;
+  border: 0.5pt solid var(--border);
+  border-left: 3pt solid var(--forest);
+  page-break-inside: avoid;
+}
+.dp-block.wide { border-left-color: var(--accent); }
+
+.dp-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3mm;
+}
+.dp-ref {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  color: var(--ink4);
+  letter-spacing: 0.06em;
+}
+.dp-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  font-size: 13pt;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 4mm;
+  max-width: 120mm;
+}
+
+.dp-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 10pt;
+  margin-bottom: 4mm;
+}
+.dp-big {
+  font-family: 'Instrument Serif', serif;
+  font-size: 36pt;
+  color: var(--ink);
+  line-height: 1;
+  font-weight: 400;
+}
+.dp-big.positive { color: var(--forest); }
+.dp-unit {
+  font-size: 11pt;
+  color: var(--ink3);
+}
+.dp-context {
+  font-size: 9.5pt;
+  color: var(--ink2);
+  line-height: 1.6;
+  margin-bottom: 4mm;
+  max-width: 140mm;
+}
+
+.dp-split {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4mm;
+  margin: 4mm 0;
+  padding: 4mm 0;
+  border-top: 0.25pt dashed var(--border);
+  border-bottom: 0.25pt dashed var(--border);
+}
+.dp-split-cell { text-align: center; }
+.dp-split-v {
+  font-family: 'Instrument Serif', serif;
+  font-size: 18pt;
+  color: var(--ink);
+}
+.dp-split-k {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 7.5pt;
+  font-weight: 500;
+  color: var(--ink4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2pt;
+}
+
+.dp-bars { margin: 3mm 0 5mm; }
+.dp-bar-row {
+  display: grid;
+  grid-template-columns: 42mm 1fr 12mm;
+  gap: 4mm;
+  align-items: center;
+  margin-bottom: 2.5mm;
+}
+.dp-bar-label { font-size: 9pt; color: var(--ink2); }
+.dp-bar-track {
+  height: 4pt;
+  background: var(--paper-d);
+  border-radius: 2pt;
+  overflow: hidden;
+}
+.dp-bar-fill {
+  height: 100%;
+  background: var(--forest);
+  border-radius: 2pt;
+}
+.dp-bar-fill.amber { background: #a06010; }
+.dp-bar-fill.red   { background: #b82020; }
+.dp-bar-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  text-align: right;
+  color: var(--ink);
+}
+
+.dp-source {
+  margin-top: 4mm;
+  padding-top: 3mm;
+  border-top: 0.5pt solid var(--border);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3mm 8mm;
+  font-size: 8.5pt;
+  line-height: 1.55;
+  color: var(--ink3);
+}
+.dp-source-k {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  color: var(--ink2);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  white-space: nowrap;
+}
+.dp-source-v {
+  font-family: 'Outfit', sans-serif;
+  font-size: 8.5pt;
+  color: var(--ink2);
+}
+
+.dp-mapping {
+  display: inline-flex;
+  gap: 4pt;
+  margin-top: 3mm;
+}
+.dp-map-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5pt;
+  padding: 2pt 6pt;
+  background: var(--paper-d);
+  color: var(--ink2);
+  border-radius: 2pt;
+}
+.dp-map-chip strong { color: var(--forest); font-weight: 600; }
+
+/* ─── SUMMARY TABLE ─── */
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4mm;
+  font-size: 9pt;
+}
+.summary-table th {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 8pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  text-align: left;
+  padding: 3mm 3mm 2mm;
+  border-bottom: 0.5pt solid var(--ink2);
+}
+.summary-table th.right { text-align: right; }
+.summary-table td {
+  padding: 2.5mm 3mm;
+  border-bottom: 0.25pt solid var(--border);
+  color: var(--ink2);
+  vertical-align: top;
+}
+.summary-table td.right {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9pt;
+  color: var(--ink);
+}
+.summary-table td.ref {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  color: var(--ink4);
+}
+.summary-table tr:last-child td { border-bottom: none; }
+.summary-table .tbl-name {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ─── LEGAL & AUDIT PAGE ─── */
+.legal-block {
+  background: #fff;
+  border: 0.5pt solid var(--border);
+  padding: 7mm 8mm;
+  margin-bottom: 6mm;
+}
+.legal-block.dark {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.legal-block h3 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 11pt;
+  font-weight: 600;
+  margin-bottom: 3mm;
+  color: var(--ink);
+}
+.legal-block.dark h3 { color: #fff; }
+
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+}
+.role-box {
+  padding: 5mm 6mm;
+  background: rgba(255, 255, 255, .05);
+  border: 0.5pt solid rgba(255, 255, 255, .12);
+  border-radius: 2pt;
+}
+.role-label {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2mm;
+}
+.role-who {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  font-size: 10.5pt;
+  color: #fff;
+  margin-bottom: 3mm;
+}
+.role-does {
+  list-style: none;
+  font-size: 8.5pt;
+  line-height: 1.7;
+}
+.role-does li {
+  padding-left: 10pt;
+  position: relative;
+  margin-bottom: 2pt;
+  color: rgba(255, 255, 255, .82);
+}
+.role-does li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.audit-grid {
+  display: grid;
+  grid-template-columns: 46mm 1fr;
+  gap: 3mm 6mm;
+}
+.audit-k {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 8pt;
+  font-weight: 600;
+  color: var(--forest);
+  letter-spacing: 0.05em;
+  padding-top: 1pt;
+}
+.audit-v {
+  font-family: 'Outfit', sans-serif;
+  font-size: 9pt;
+  color: var(--ink2);
+}
+.audit-v.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5pt;
+}
+
+.sign-off {
+  margin-top: 8mm;
+  padding: 5mm 6mm;
+  background: var(--paper-d);
+  font-size: 8.5pt;
+  line-height: 1.6;
+  color: var(--ink2);
+  border-left: 2pt solid var(--forest);
+}
+.sign-off strong { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ─── PAGE 1 — COVER ─── -->
+<div class="sheet">
+  <div class="cover">
+    <div class="cover-top">
+      <div class="brand-mark">intern<span>ly</span></div>
+      <div class="cover-top-right">
+        <div class="cover-badge">BOEKJAAR <span data-field="period.year">—</span></div>
+        <div class="issuer">
+          Uitgegeven door Internly<br>
+          Sasubo Holding B.V. · KVK 80201822
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-spacer"></div>
+
+    <div class="cover-eyebrow">ESG-rapport — sociale pijler</div>
+    <h1 class="cover-title">Uw stage- en jong-talentbeleid, <em>als bewijsvoering.</em></h1>
+    <p class="cover-sub">
+      Zes platformgemeten datapunten over uw activiteit op Internly in boekjaar <span data-field="period.year">—</span>. Bijlage bij uw VSME-rapport of bij een ESG-vraag van uw bank, uw keten of uw accountant.
+    </p>
+
+    <div class="cover-spacer"></div>
+
+    <div class="cover-meta">
+      <div>
+        <div class="cover-meta-k">Rapporterende onderneming</div>
+        <div class="cover-meta-v"><span data-field="company.naam">—</span></div>
+      </div>
+      <div>
+        <div class="cover-meta-k">Boekjaar</div>
+        <div class="cover-meta-v"><span data-field="period.text">—</span></div>
+      </div>
+      <div>
+        <div class="cover-meta-k">Geëxporteerd op</div>
+        <div class="cover-meta-v"><span data-field="export.date">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legal-spine">
+    <div class="legal-spine-left">Deze rapportage is een databron binnen uw eigen VSME- of ESRS-rapportage. U blijft de rapporterende partij.</div>
+    <div class="legal-spine-right">p. 1 / 6</div>
+  </div>
+</div>
+
+<!-- ─── PAGE 2 — CONTEXT ─── -->
+<div class="sheet">
+  <div class="page-num">p. 2 / 6</div>
+
+  <div class="page-header">
+    <div class="brand-mark">intern<span>ly</span> ESG-rapport</div>
+    <div class="doc-title"><span data-field="company.naam">—</span> · Boekjaar <span data-field="period.year">—</span></div>
+  </div>
+
+  <div class="section-label">Context</div>
+  <h2 class="h-section">Wat dit document is, en wat het niet is.</h2>
+
+  <p class="p-body">
+    Dit rapport bevat <strong>zes gedefinieerde datapunten</strong> over de activiteit van <span data-field="company.naam">—</span> op het Internly-platform in boekjaar <span data-field="period.year">—</span>. Elke waarde is afgeleid uit de onderliggende platformevents, met timestamps en herleidbare brontabellen. De datapunten sluiten aan op het workforce-blok van de <em>Voluntary Sustainability Reporting Standard for non-listed SMEs</em> en op <em>ESRS S1 Own Workforce</em>.
+  </p>
+
+  <p class="p-body">
+    Dit rapport is géén VSME-rapport op zichzelf. Het is één bijdrage aan uw eigen rapportage. Uw bedrijf blijft verantwoordelijk voor de materialiteitsbeoordeling, voor integratie van dit datablok in uw jaarverslag, en voor de assurance door uw eigen controleur. Internly is een databron, niet de rapporterende partij.
+  </p>
+
+  <div class="two-col">
+    <div>
+      <div class="col-head">Wel in dit rapport</div>
+      <div class="col-body">
+        <ul>
+          <li>Zes datapunten gedekt door platformdata</li>
+          <li>Per datapunt: bron, methode, tijdvenster</li>
+          <li>Samenvattingstabel met VSME- en ESRS-verwijzingen</li>
+          <li>Audittrail en exportmetadata</li>
+          <li>Juridische scheidslijn op de laatste pagina</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="col-head">Niet in dit rapport</div>
+      <div class="col-body">
+        <ul>
+          <li>Milieu- of governance-data van uw onderneming</li>
+          <li>Beloning, pay gap, arbo, verzuim</li>
+          <li>Mensenrechtenincidenten of juridische procedures</li>
+          <li>Accountantsassurance</li>
+          <li>Materialiteitsbeoordeling</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="legal-spine">
+    <div class="legal-spine-left">Versie 1.0 · Internly ESG-rapport</div>
+    <div class="legal-spine-right">Export ID <span data-field="export.id">—</span></div>
+  </div>
+</div>
+
+<!-- ─── PAGE 3 — DATAPUNTEN 01, 02 ─── -->
+<div class="sheet">
+  <div class="page-num">p. 3 / 6</div>
+
+  <div class="page-header">
+    <div class="brand-mark">intern<span>ly</span> ESG-rapport</div>
+    <div class="doc-title"><span data-field="company.naam">—</span> · Boekjaar <span data-field="period.year">—</span></div>
+  </div>
+
+  <div class="section-label">Datapunten 01 tot 02</div>
+  <h2 class="h-section">Workforce composition en engagement.</h2>
+
+  <div class="dp-block">
+    <div class="dp-head">
+      <span class="dp-ref">DP.01 · Stagiairs gehost</span>
+    </div>
+    <div class="dp-title">Aantal stagiairs dat in dit boekjaar een stage heeft gestart of voltooid</div>
+
+    <div class="dp-metric">
+      <span class="dp-big positive"><span data-field="dp01.value">—</span></span>
+      <span class="dp-unit">unieke stagiairs</span>
+    </div>
+
+    <p class="dp-context">
+      Stagiairs met een geaccepteerde stage in de rapportageperiode, onderverdeeld naar onderwijsniveau. Stages die nog liepen op de exportdatum zijn meegeteld.
+    </p>
+
+    <div class="dp-split">
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp01.hbo">—</span></div><div class="dp-split-k">HBO</div></div>
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp01.mbo">—</span></div><div class="dp-split-k">MBO</div></div>
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp01.wo">—</span></div><div class="dp-split-k">WO</div></div>
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp01.bbl">—</span></div><div class="dp-split-k">BBL</div></div>
+    </div>
+
+    <div class="dp-mapping">
+      <span class="dp-map-chip"><strong>VSME</strong> B7</span>
+      <span class="dp-map-chip"><strong>ESRS</strong> S1-7</span>
+    </div>
+
+    <div class="dp-source">
+      <div class="dp-source-k">Bron</div>
+      <div class="dp-source-v">Stagematches en opleidingsgegevens van stagiairs op Internly.</div>
+      <div class="dp-source-k">Methode</div>
+      <div class="dp-source-v">Uniek getelde stagiairs met geaccepteerde stage in de rapportageperiode, onderverdeeld naar onderwijsniveau.</div>
+      <div class="dp-source-k">Periode</div>
+      <div class="dp-source-v"><span data-field="period.text">—</span>.</div>
+    </div>
+  </div>
+
+  <div class="dp-block">
+    <div class="dp-head">
+      <span class="dp-ref">DP.02 · Responstijd</span>
+    </div>
+    <div class="dp-title">Gemiddelde reactietijd op sollicitaties</div>
+
+    <div class="dp-metric">
+      <span class="dp-big positive"><span data-field="dp02.value">—</span></span>
+      <span class="dp-unit">dagen</span>
+    </div>
+
+    <p class="dp-context">
+      Gemiddelde tijd tussen sollicitatie en eerste reactie van uw team, gemeten op platformniveau. Deze metriek fungeert als anti-ghosting-indicator.
+    </p>
+
+    <div class="dp-split" style="grid-template-columns: 1fr 1fr 1fr;">
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp02.total">—</span></div><div class="dp-split-k">sollicitaties</div></div>
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp02.beantwoord">—</span></div><div class="dp-split-k">beantwoord</div></div>
+      <div class="dp-split-cell"><div class="dp-split-v"><span data-field="dp02.ratio">—</span></div><div class="dp-split-k">responsratio</div></div>
+    </div>
+
+    <div class="dp-mapping">
+      <span class="dp-map-chip"><strong>VSME</strong> C5</span>
+      <span class="dp-map-chip"><strong>ESRS</strong> S1-3</span>
+    </div>
+
+    <div class="dp-source">
+      <div class="dp-source-k">Bron</div>
+      <div class="dp-source-v">Tijdstempels van binnenkomende sollicitatie en eerste bedrijfsreactie op het platform.</div>
+      <div class="dp-source-k">Methode</div>
+      <div class="dp-source-v">Gemiddelde tijd tussen sollicitatie en eerste reactie. Sollicitaties zonder reactie zijn uitgesloten van het gemiddelde, maar wel meegenomen in de responsratio.</div>
+      <div class="dp-source-k">Periode</div>
+      <div class="dp-source-v"><span data-field="period.text">—</span>.</div>
+    </div>
+  </div>
+
+  <div class="legal-spine">
+    <div class="legal-spine-left">Elke waarde is herleidbaar naar onderliggende platformevents.</div>
+    <div class="legal-spine-right"><span data-field="export.id">—</span></div>
+  </div>
+</div>
+
+<!-- ─── PAGE 4 — DATAPUNTEN 03, 04 ─── -->
+<div class="sheet">
+  <div class="page-num">p. 4 / 6</div>
+
+  <div class="page-header">
+    <div class="brand-mark">intern<span>ly</span> ESG-rapport</div>
+    <div class="doc-title"><span data-field="company.naam">—</span> · Boekjaar <span data-field="period.year">—</span></div>
+  </div>
+
+  <div class="section-label">Datapunten 03 tot 04</div>
+  <h2 class="h-section">Voltooiing en tevredenheid.</h2>
+
+  <div class="dp-block">
+    <div class="dp-head">
+      <span class="dp-ref">DP.03 · Afronding</span>
+    </div>
+    <div class="dp-title">Aandeel stages met afgetekend eindgesprek op Internly</div>
+
+    <div class="dp-metric">
+      <span class="dp-big positive"><span data-field="dp03.value">—</span></span>
+      <span class="dp-unit"><span data-field="dp03.context">—</span></span>
+    </div>
+
+    <p class="dp-context">
+      Percentage van de gestarte stages waarvoor een eindgesprek via Internly is vastgelegd. Stages waarvan het eindgesprek buiten het platform werd gevoerd, tellen niet mee.
+    </p>
+
+    <div class="dp-mapping">
+      <span class="dp-map-chip"><strong>VSME</strong> B8</span>
+      <span class="dp-map-chip"><strong>ESRS</strong> S1-6</span>
+    </div>
+
+    <div class="dp-source">
+      <div class="dp-source-k">Bron</div>
+      <div class="dp-source-v">Stagematches en op het platform vastgelegde eindgesprekken.</div>
+      <div class="dp-source-k">Methode</div>
+      <div class="dp-source-v">Aantal afgeronde stages met eindgesprek op Internly, gedeeld door het totaal aantal geaccepteerde stages in de periode.</div>
+      <div class="dp-source-k">Periode</div>
+      <div class="dp-source-v"><span data-field="period.text">—</span>.</div>
+    </div>
+  </div>
+
+  <div class="dp-block">
+    <div class="dp-head">
+      <span class="dp-ref">DP.04 · Feedbackscore</span>
+    </div>
+    <div class="dp-title">Gemiddelde beoordeling door stagiairs na afloop van de stage</div>
+
+    <div class="dp-metric">
+      <span class="dp-big positive"><span data-field="dp04.value">—</span></span>
+      <span class="dp-unit">/ 5 · <span data-field="dp04.count">—</span> beoordelingen</span>
+    </div>
+
+    <p class="dp-context">
+      Geaggregeerd over beoordelingen die stagiairs in deze rapportageperiode hebben achtergelaten. Gevlagde of ingetrokken reviews zijn uitgesloten. Minimum-N drempel van drie beoordelingen geldt voor anonimiteit.
+    </p>
+
+    <div class="dp-bars">
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Begeleidingskwaliteit</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" style="width: 92%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp04.bar1">—</span></div>
+      </div>
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Leerdoelrealisatie</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" style="width: 88%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp04.bar2">—</span></div>
+      </div>
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Werksfeer</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" style="width: 96%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp04.bar3">—</span></div>
+      </div>
+    </div>
+
+    <div class="dp-mapping">
+      <span class="dp-map-chip"><strong>VSME</strong> C6</span>
+    </div>
+
+    <div class="dp-source">
+      <div class="dp-source-k">Bron</div>
+      <div class="dp-source-v">Beoordelingen die stagiairs hebben achtergelaten na afloop van hun stage.</div>
+      <div class="dp-source-k">Methode</div>
+      <div class="dp-source-v">Gemiddelde van alle beoordelingen in de periode. Gevlagde of ingetrokken reviews uitgesloten. Weergave alleen bij drie of meer beoordelingen voor anonimiteit.</div>
+      <div class="dp-source-k">Periode</div>
+      <div class="dp-source-v"><span data-field="period.text">—</span>.</div>
+    </div>
+  </div>
+
+  <div class="legal-spine">
+    <div class="legal-spine-left">Individuele beoordelingen zijn niet herleidbaar tot personen.</div>
+    <div class="legal-spine-right"><span data-field="export.id">—</span></div>
+  </div>
+</div>
+
+<!-- ─── PAGE 5 — DATAPUNTEN 05, 06 ─── -->
+<div class="sheet">
+  <div class="page-num">p. 5 / 6</div>
+
+  <div class="page-header">
+    <div class="brand-mark">intern<span>ly</span> ESG-rapport</div>
+    <div class="doc-title"><span data-field="company.naam">—</span> · Boekjaar <span data-field="period.year">—</span></div>
+  </div>
+
+  <div class="section-label">Datapunten 05 tot 06</div>
+  <h2 class="h-section">Gedrag en ecosysteem.</h2>
+
+  <div class="dp-block">
+    <div class="dp-head">
+      <span class="dp-ref">DP.05 · Trust Score</span>
+    </div>
+    <div class="dp-title">Trust Score momentopname met vier onderliggende dimensies</div>
+
+    <div class="dp-metric">
+      <span class="dp-big positive"><span data-field="dp05.value">—</span></span>
+      <span class="dp-unit">/ 100</span>
+    </div>
+
+    <p class="dp-context">
+      Momentopname van de Trust Score op exportdatum. De Trust Score meet platformgedrag rond stages, niet zelfrapportage. Elke dimensie is onafhankelijk berekend uit platformevents.
+    </p>
+
+    <div class="dp-bars">
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Responssnelheid</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" style="width: 95%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp05.respons">—</span></div>
+      </div>
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Leerdoelopvolging</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" style="width: 89%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp05.leerdoel">—</span></div>
+      </div>
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Nakomen afspraken</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill" style="width: 93%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp05.afspraken">—</span></div>
+      </div>
+      <div class="dp-bar-row">
+        <div class="dp-bar-label">Begeleidingskwaliteit</div>
+        <div class="dp-bar-track"><div class="dp-bar-fill amber" style="width: 76%;"></div></div>
+        <div class="dp-bar-val"><span data-field="dp05.begeleiding">—</span></div>
+      </div>
+    </div>
+
+    <div class="dp-mapping">
+      <span class="dp-map-chip">Eigen standaard</span>
+    </div>
+
+    <div class="dp-source">
+      <div class="dp-source-k">Bron</div>
+      <div class="dp-source-v">Trust Score op exportmoment.</div>
+      <div class="dp-source-k">Methode</div>
+      <div class="dp-source-v">Momentopname op exportdatum. De vier dimensies zijn afgeleid uit platform-activiteit.</div>
+      <div class="dp-source-k">Periode</div>
+      <div class="dp-source-v">Momentopname op exportdatum.</div>
+    </div>
+  </div>
+
+  <div class="dp-block wide">
+    <div class="dp-head">
+      <span class="dp-ref">DP.06 · Opleidingen</span>
+    </div>
+    <div class="dp-title">Opleidingen waarmee in dit boekjaar structureel is samengewerkt</div>
+
+    <div class="dp-metric">
+      <span class="dp-big positive"><span data-field="dp06.value">—</span></span>
+      <span class="dp-unit">structurele opleidingspartners</span>
+    </div>
+
+    <p class="dp-context">
+      Opleidingen waarmee drie of meer stages zijn gerealiseerd binnen de rapportageperiode: <span data-field="dp06.list">—</span>.
+    </p>
+
+    <div class="dp-mapping">
+      <span class="dp-map-chip"><strong>VSME</strong> C4</span>
+    </div>
+
+    <div class="dp-source">
+      <div class="dp-source-k">Bron</div>
+      <div class="dp-source-v">Stagematches gekoppeld aan de opleiding van elke stagiair.</div>
+      <div class="dp-source-k">Methode</div>
+      <div class="dp-source-v">Uniek getelde opleidingen met drie of meer geaccepteerde stages in de rapportageperiode.</div>
+      <div class="dp-source-k">Periode</div>
+      <div class="dp-source-v"><span data-field="period.text">—</span>.</div>
+    </div>
+  </div>
+
+  <div class="legal-spine">
+    <div class="legal-spine-left">Trust Score-methodiek is gepubliceerd op internly.pro/esg-rapportage.</div>
+    <div class="legal-spine-right"><span data-field="export.id">—</span></div>
+  </div>
+</div>
+
+<!-- ─── PAGE 6 — SAMENVATTING + JURIDISCHE SCHEIDSLIJN + AUDITTRAIL ─── -->
+<div class="sheet">
+  <div class="page-num">p. 6 / 6</div>
+
+  <div class="page-header">
+    <div class="brand-mark">intern<span>ly</span> ESG-rapport</div>
+    <div class="doc-title"><span data-field="company.naam">—</span> · Boekjaar <span data-field="period.year">—</span></div>
+  </div>
+
+  <div class="section-label">Samenvatting</div>
+  <h2 class="h-section">Alle datapunten in één tabel.</h2>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width: 40mm">Datapunt</th>
+        <th>Omschrijving</th>
+        <th style="width: 22mm">VSME</th>
+        <th style="width: 22mm">ESRS S1</th>
+        <th class="right" style="width: 18mm">Waarde</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="ref">DP.01</td>
+        <td class="tbl-name">Stagiairs gehost per boekjaar</td>
+        <td class="ref">B7</td>
+        <td class="ref">S1-7</td>
+        <td class="right"><span data-field="dp01.value">—</span></td>
+      </tr>
+      <tr>
+        <td class="ref">DP.02</td>
+        <td class="tbl-name">Gemiddelde reactietijd (dagen)</td>
+        <td class="ref">C5</td>
+        <td class="ref">S1-3</td>
+        <td class="right"><span data-field="dp02.value">—</span></td>
+      </tr>
+      <tr>
+        <td class="ref">DP.03</td>
+        <td class="tbl-name">Aandeel stages met afgetekend eindgesprek</td>
+        <td class="ref">B8</td>
+        <td class="ref">S1-6</td>
+        <td class="right"><span data-field="dp03.value">—</span></td>
+      </tr>
+      <tr>
+        <td class="ref">DP.04</td>
+        <td class="tbl-name">Gemiddelde beoordeling door stagiairs</td>
+        <td class="ref">C6</td>
+        <td class="ref">—</td>
+        <td class="right"><span data-field="dp04.value">—</span></td>
+      </tr>
+      <tr>
+        <td class="ref">DP.05</td>
+        <td class="tbl-name">Trust Score momentopname</td>
+        <td class="ref">—</td>
+        <td class="ref">—</td>
+        <td class="right"><span data-field="dp05.value">—</span></td>
+      </tr>
+      <tr>
+        <td class="ref">DP.06</td>
+        <td class="tbl-name">Structurele opleidingspartners</td>
+        <td class="ref">C4</td>
+        <td class="ref">—</td>
+        <td class="right"><span data-field="dp06.value">—</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="legal-block dark" style="margin-top: 8mm;">
+    <h3 style="color: #fff; margin-bottom: 4mm;">De juridische scheidslijn</h3>
+    <div class="role-grid">
+      <div class="role-box">
+        <div class="role-label">Uw rol</div>
+        <div class="role-who">Het rapporterende bedrijf</div>
+        <ul class="role-does">
+          <li>Materialiteitsbeoordeling</li>
+          <li>Integratie in jaarverslag</li>
+          <li>Assurance door uw controleur</li>
+          <li>Eindverantwoordelijkheid</li>
+        </ul>
+      </div>
+      <div class="role-box">
+        <div class="role-label">Onze rol</div>
+        <div class="role-who">Databron binnen uw proces</div>
+        <ul class="role-does">
+          <li>Levering zes gedefinieerde datapunten</li>
+          <li>Herleidbaarheid naar platformevents</li>
+          <li>Tijdstempels en audittrail</li>
+          <li>Methodiek gepubliceerd en stabiel</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="legal-block" style="margin-top: 6mm;">
+    <h3>Audittrail en exportmetadata</h3>
+    <div class="audit-grid">
+      <div class="audit-k">Export-ID</div>
+      <div class="audit-v mono"><span data-field="export.id">—</span></div>
+
+      <div class="audit-k">Geëxporteerd op</div>
+      <div class="audit-v"><span data-field="export.date">—</span></div>
+
+      <div class="audit-k">Rapportageperiode</div>
+      <div class="audit-v"><span data-field="period.text">—</span></div>
+
+      <div class="audit-k">Methodiekversie</div>
+      <div class="audit-v">Versie 1.0 · internly.pro/esg-rapportage</div>
+
+      <div class="audit-k">Toezichthouder AVG</div>
+      <div class="audit-v">Autoriteit Persoonsgegevens</div>
+    </div>
+  </div>
+
+  <div class="sign-off">
+    <strong>Reproduceerbaarheid.</strong> Dit rapport is opgeslagen onder bovenstaand Export-ID. Een herhaalde export over dezelfde periode geeft dezelfde waarden terug, tenzij uw Internly-data na exportmoment is gewijzigd. In dat geval wordt op uw verzoek een nieuwe versie gegenereerd met een nieuw Export-ID.
+  </div>
+
+  <div class="legal-spine">
+    <div class="legal-spine-left">Vragen? boekhouding@internly.pro · Methodiek: internly.pro/esg-rapportage</div>
+    <div class="legal-spine-right">Einde rapport</div>
+  </div>
+</div>
+
+<script src="/js/esg-inject.js"></script>
+</body>
+</html>

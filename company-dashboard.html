@@ -2314,10 +2314,11 @@ async function renderESG() {
   if (isBusiness) {
     exportHtml = `
       <div class="sec-title" style="margin-top:28px">Exporteren</div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <button class="btn-ghost" onclick="notify('PDF-export is beschikbaar vanaf week 9 — je ontvangt een melding zodra het klaar is')">📄 Download PDF</button>
-        <button class="btn-ghost" onclick="notify('PDF-export is beschikbaar vanaf week 9 — je ontvangt een melding zodra het klaar is')">📊 Download CSV</button>
-      </div>`;
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
+        <button class="btn btn-ghost" id="btn-esg-pdf" onclick="esgExportPDF()">📄 Download PDF</button>
+        <button class="btn btn-ghost" id="btn-esg-csv" onclick="esgExportCSV()">📊 Download CSV</button>
+      </div>
+      <div id="esg-history-section"></div>`;
   } else {
     exportHtml = `
       <div class="sec-title" style="margin-top:28px">Exporteren</div>
@@ -2332,7 +2333,7 @@ async function renderESG() {
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px">
       <div>
         <div class="page-title">ESG &amp; Rapportage</div>
-        <p class="page-sub">Automatische S1-stagedata voor je CSRD-verslag</p>
+        <p class="page-sub">S1-stagedata voor je CSRD-onderbouwing</p>
       </div>
       <div style="display:flex;gap:8px">
         <button onclick="_esgYear=${new Date().getFullYear()};renderESG()"
@@ -2394,6 +2395,61 @@ async function renderESG() {
 
     ${exportHtml}
   `;
+
+  if (isBusiness) {
+    renderESGHistory();
+  }
+}
+
+async function esgExportPDF() {
+  const btn = document.getElementById('btn-esg-pdf');
+  if (btn) { btn.disabled = true; btn.textContent = '\u29d7 Bezig\u2026'; }
+  try {
+    await ESG.downloadPDF(currentUser.id, _esgYear, currentUser.id);
+    notify('PDF geopend in nieuw tabblad');
+  } catch (e) {
+    console.error('[ESG] PDF-export mislukt:', e);
+    notify('Kon PDF niet genereren. Probeer het opnieuw.', false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '\ud83d\udcc4 Download PDF'; }
+  }
+}
+
+async function esgExportCSV() {
+  const btn = document.getElementById('btn-esg-csv');
+  if (btn) { btn.disabled = true; btn.textContent = '\u29d7 Bezig\u2026'; }
+  try {
+    const exportId = await ESG.downloadCSV(currentUser.id, _esgYear, currentUser.id);
+    notify('CSV gedownload (' + exportId + ')');
+  } catch (e) {
+    console.error('[ESG] CSV-export mislukt:', e);
+    notify('Kon CSV niet downloaden. Probeer het opnieuw.', false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '\ud83d\udcca Download CSV'; }
+  }
+}
+
+async function renderESGHistory() {
+  const el = document.getElementById('esg-history-section');
+  if (!el || !currentUser) return;
+  try {
+    const rows = await ESG.loadHistory(currentUser.id);
+    if (rows.length === 0) { el.innerHTML = ''; return; }
+    const items = rows.map(r => {
+      const d = new Date(r.created_at).toLocaleDateString('nl-NL');
+      const eid = ESG.computeExportId(r.event_hash || '00000000');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <span style="font-weight:600;font-size:.88rem">${r.boekjaar}</span>
+          <span style="font-size:.75rem;color:var(--ink3);margin-left:8px">${escapeHtml(eid)}</span>
+        </div>
+        <span style="font-size:.75rem;color:var(--ink3)">${d}</span>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div class="sec-title" style="margin-top:28px">Exportgeschiedenis</div><div>${items}</div>`;
+  } catch (e) {
+    console.warn('[ESG] Kon exportgeschiedenis niet laden:', e);
+  }
 }
 
 // Offline/online listeners
@@ -2770,6 +2826,7 @@ window.addEventListener('load', function() {
 <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="js/calendar.js"></script>
 <script src="js/info.js"></script>
+<script src="js/esg-export.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>
