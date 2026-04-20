@@ -6,6 +6,52 @@
 // Supabase credentials staan uitsluitend in
 // js/supabase.js — niet hier.
 
+// ── Role routing ─────────────────────────────────────────────────────────────
+// Centrale logica voor ingelogde user landing. Enige plek waar rol → URL beslist.
+const ROLE_LANDING = {
+  student:      'discover.html',
+  bedrijf:      'company-dashboard.html',
+  school:       'school-dashboard.html',
+  gepensioneerd:'buddy-dashboard.html',
+  begeleider:   'begeleider-dashboard.html',
+  admin:        'admin.html',
+};
+
+function getRoleLanding(role, bblMode = false) {
+  if (role === 'student' && bblMode === true) return 'bbl-hub.html';
+  return ROLE_LANDING[role] || 'discover.html';
+}
+
+async function smartHomeRedirect() {
+  try {
+    const client = (typeof db !== 'undefined') ? db
+                 : (typeof supabase !== 'undefined') ? supabase
+                 : null;
+    if (!client) { window.location.href = 'index.html'; return; }
+
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) { window.location.href = 'index.html'; return; }
+
+    const { data: prof } = await client.from('profiles')
+      .select('role').eq('id', user.id).maybeSingle();
+    if (!prof?.role) { window.location.href = 'index.html'; return; }
+
+    let bblMode = false;
+    if (prof.role === 'student') {
+      const { data: sp } = await client.from('student_profiles')
+        .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+      bblMode = sp?.bbl_mode === true;
+    }
+    window.location.href = getRoleLanding(prof.role, bblMode);
+  } catch (err) {
+    console.error('[smartHomeRedirect] fout:', err?.message || err);
+    window.location.href = 'index.html';
+  }
+}
+
+window.smartHomeRedirect = smartHomeRedirect;
+window.getRoleLanding    = getRoleLanding;
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 const TOAST_TIMEOUT_MS = 3200;
 let   _toastTimer      = null;

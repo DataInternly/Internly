@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FF7E42">
+  <meta name="description" content="Veelgestelde vragen over Internly, voor studenten, bedrijven, scholen en begeleiders. Korte antwoorden, geen omslachtigheid.">
+  <meta property="og:title" content="FAQ — Internly">
+  <meta property="og:description" content="Veelgestelde vragen over Internly, voor studenten, bedrijven, scholen en begeleiders.">
+  <meta property="og:image" content="https://internly.pro/og-image.png">
+  <meta property="og:url" content="https://internly.pro/faq.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Internly">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>FAQ — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:       #1a7a48;
+      --green-dark:  #0f5c36;
+      --green-bg:    #e8f5ee;
+      --orange:      #FF7E42;
+      --orange-dark: #e05c1a;
+      --ink:         #0d1520;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
+      --ink4:        #9ca3af;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #e8e6e0;
+      --radius:      16px;
+      --radius-sm:   8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    p { line-height: 1.7; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--ink);
+      height: 60px; padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.3rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .topbar-logo span { color: var(--orange); }
+    .topbar-nav { display: flex; align-items: center; gap: 28px; }
+    .topbar-nav a {
+      color: rgba(255,255,255,.6); text-decoration: none;
+      font-size: .88rem; font-weight: 500; transition: color .15s;
+    }
+    .topbar-nav a:hover, .topbar-nav a.active { color: #fff; }
+    .topbar-cta {
+      background: var(--orange); color: #fff;
+      padding: 7px 18px; border-radius: 50px;
+      font-size: .82rem; font-weight: 600;
+      text-decoration: none; transition: background .15s;
+    }
+    .topbar-cta:hover { background: var(--orange-dark); color: #fff; }
+
+    .lang-switcher { display: flex; gap: 4px; align-items: center; }
+    .lang-btn {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.7);
+      padding: 4px 9px; border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .75rem; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .lang-btn:hover, .lang-btn.active {
+      background: rgba(255,255,255,.2);
+      color: #fff; border-color: rgba(255,255,255,.4);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 32px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem; font-weight: 700; color: #fff;
+      letter-spacing: -.02em; text-decoration: none;
+    }
+    .footer-logo span { color: var(--orange); }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a {
+      color: rgba(255,255,255,.45); text-decoration: none;
+      font-size: .82rem; transition: color .15s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,.8); }
+    .footer-copy { font-size: .78rem; color: rgba(255,255,255,.3); }
+
+    /* ── Google Translate branding suppression ── */
+    .goog-te-banner-frame { display: none !important; }
+    .skiptranslate        { display: none !important; }
+    .goog-te-gadget       { display: none !important; }
+    body                  { top: 0 !important; position: static !important; }
+
+    /* ── Animaties ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ── MAIN WRAP ── */
+    .main-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 80px 32px 120px;
+    }
+
+    /* ── FAQ HERO ── */
+    .faq-hero { padding-bottom: 56px; }
+    .faq-hero .eyebrow {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .faq-hero h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1.05;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 24px;
+    }
+    .faq-hero h1 em {
+      font-style: italic;
+      color: var(--orange);
+      font-weight: 400;
+    }
+    .faq-hero .lead {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--ink2);
+      max-width: 580px;
+    }
+
+    /* ── TABS ── */
+    .faq-tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .faq-tabs::-webkit-scrollbar { display: none; }
+    .faq-tab {
+      background: none;
+      border: none;
+      color: var(--ink3);
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px 20px;
+      cursor: pointer;
+      position: relative;
+      letter-spacing: -0.01em;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+    .faq-tab:hover { color: var(--ink); }
+    .faq-tab.active { color: var(--ink); }
+    .faq-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 20px; right: 20px; bottom: -1px;
+      height: 2px;
+      background: var(--orange);
+    }
+
+    /* ── PANELS ── */
+    .faq-panel { display: none; }
+    .faq-panel.active { display: block; }
+
+    /* ── CATEGORY HEADER ── */
+    .faq-cat-head {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-cat-num {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--orange);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .faq-cat-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .faq-cat-desc {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      color: var(--ink3);
+    }
+
+    /* ── FAQ ITEMS ── */
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--ink);
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 500;
+      text-align: left;
+      padding: 22px 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: -0.01em;
+      transition: color 0.15s;
+    }
+    .faq-q:hover { color: var(--orange); }
+    .faq-plus {
+      color: var(--ink4);
+      font-size: 24px;
+      font-weight: 300;
+      flex-shrink: 0;
+      margin-left: 24px;
+      transition: transform 0.2s;
+      line-height: 1;
+    }
+    .faq-item.open .faq-plus {
+      transform: rotate(45deg);
+      color: var(--orange);
+    }
+    .faq-a {
+      display: none;
+      padding: 0 0 24px 0;
+      max-width: 720px;
+    }
+    .faq-item.open .faq-a {
+      display: block;
+    }
+    .faq-a p {
+      font-family: 'Outfit', sans-serif;
+      color: var(--ink2);
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .faq-a p:last-child { margin-bottom: 0; }
+    .faq-a a {
+      color: var(--orange);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .faq-a a:hover { color: var(--orange-dark); }
+    .faq-a ul {
+      margin: 8px 0 12px 20px;
+      font-family: 'Outfit', sans-serif;
+      color: var(--ink2);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .faq-a ul li { margin-bottom: 4px; }
+
+    /* ── CONTACT BLOCK ── */
+    .faq-contact {
+      margin-top: 80px;
+      padding: 32px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .faq-contact h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+    .faq-contact p {
+      font-family: 'Outfit', sans-serif;
+      color: var(--ink2);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .faq-contact .btn-primary {
+      display: inline-block;
+      background: var(--orange);
+      color: var(--white);
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .faq-contact .btn-primary:hover {
+      background: var(--orange-dark);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .main-wrap { padding: 48px 16px 80px; }
+      .topbar-nav a:not(.topbar-cta) { display: none; }
+      .faq-hero h1 { font-size: clamp(32px, 8vw, 48px); }
+      .faq-cat-head { flex-direction: column; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="topbar-logo" style="cursor:pointer">intern<span>ly</span></a>
+  <div class="topbar-nav">
+    <a href="discover.html">Vacatures</a>
+    <a href="about.html">Over ons</a>
+    <a href="stagebegeleiding.html">Stagebegeleiding</a>
+    <a href="pricing.html">Prijzen</a>
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
+    </div>
+    <a href="auth.html" class="topbar-cta">Inloggen →</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- HERO -->
+  <section class="faq-hero">
+    <div class="eyebrow">FAQ</div>
+    <h1>Antwoord. <em>Altijd.</em></h1>
+    <p class="lead">Of je nu twijfelt om je aan te melden, midden in het proces zit, of net wilt weten hoe wij met je gegevens omgaan. Hier vind je het antwoord. Korte versie, geen omslachtigheid.</p>
+  </section>
+
+  <!-- TABS -->
+  <nav class="faq-tabs" role="tablist">
+    <button class="faq-tab active" data-tab="studenten" role="tab">Studenten</button>
+    <button class="faq-tab" data-tab="bedrijven" role="tab">Bedrijven</button>
+    <button class="faq-tab" data-tab="scholen" role="tab">Scholen</button>
+    <button class="faq-tab" data-tab="bbl" role="tab">BBL traject</button>
+    <button class="faq-tab" data-tab="begeleiders" role="tab">Begeleiders</button>
+    <button class="faq-tab" data-tab="privacy" role="tab">Privacy en AVG</button>
+    <button class="faq-tab" data-tab="over" role="tab">Over Internly</button>
+    <button class="faq-tab" data-tab="watals" role="tab">Wat als</button>
+  </nav>
+
+  <!-- PANELS -->
+  <div class="faq-panels">
+
+    <!-- TAB 1: Studenten -->
+    <div class="faq-panel active" data-panel="studenten">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">01</div>
+        <div>
+          <h2 class="faq-cat-title">Aan de slag</h2>
+          <p class="faq-cat-desc">Voor BOL en BBL studenten die net beginnen.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat kost Internly voor mij als student?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Niets. Studenten betalen nooit voor Internly. Geen account vereist om vacatures te bekijken, gratis om te solliciteren, gratis om je profiel te beheren.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat is het verschil tussen BOL en BBL op het platform?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>BOL studenten zoeken nog een stage en gebruiken Discover en Mijn Sollicitaties. BBL studenten hebben al een leerbedrijf en gebruiken de BBL Hub om hun traject te beheren. Bij profielaanmaak kies je welke je bent. Je kunt later wisselen.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe vind ik vacatures die echt bij mij passen?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Vul je profiel volledig in, leerdoelen, ambities, sector. Het algoritme matcht op inhoud, niet op cv keywords. Hoe specifieker je profiel, hoe beter de matches.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als een bedrijf niet reageert op mijn sollicitatie?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Bedrijven met responsgarantie zakken automatisch in hun Trust Score als ze de deadline missen. Geen reactie binnen de afgesproken tijd is publiek zichtbaar voor andere studenten. Dat is precies waarom Internly bestaat.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat is de Trust Score precies?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Een publieke score (A, B of C) per bedrijf, gebaseerd op responstijd, beoordelingen en hoe vaak ze afspraken nakomen. Voor uitleg over de berekening, zie <a href="/spelregels.html">Spelregels</a>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Kan ik anoniem solliciteren?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Nee. Je profiel is zichtbaar voor het bedrijf zodra je solliciteert. Andersom is hun Trust Score altijd vooraf zichtbaar voor jou. Wederzijdse transparantie is de basis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Bedrijven -->
+    <div class="faq-panel" data-panel="bedrijven">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">02</div>
+        <div>
+          <h2 class="faq-cat-title">Vacatures en kosten</h2>
+          <p class="faq-cat-desc">Voor bedrijven die stages aanbieden via het platform.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat kost een Internly abonnement?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Drie tarieven, Starter (gratis), Pro (~€49 per maand) en Business (~€149 per maand). Volledige prijslijst en wat in welke staat op <a href="/pricing.html">Prijzen</a>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat is responsgarantie en waarom zou ik die aanzetten?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Responsgarantie is een publieke belofte aan studenten over je reactietijd, twee, drie of vijf dagen. Bedrijven met garantie krijgen meer en betere sollicitaties. Niet nakomen verlaagt je Trust Score.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Kan ik anoniem vacatures plaatsen?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Nee. Internly bestaat omdat anonimiteit ghosting veroorzaakt. Elk bedrijfsaccount is publiek zichtbaar inclusief Trust Score.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe levert Internly ESG en CSRD data?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Per kwartaal genereren we een rapport met je activiteit, stages aangeboden, gesprekken gevoerd, doorstroom naar contract. Direct bruikbaar in je ESG verslag. Beschikbaar vanaf Pro abonnement.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als ik een student wil afwijzen?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Klik afwijzen in je dashboard. Het systeem stuurt automatisch een bericht naar de student. Een korte persoonlijke reden mag, maar afwijzen binnen de deadline is wat telt voor je Trust Score.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Scholen -->
+    <div class="faq-panel" data-panel="scholen">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">03</div>
+        <div>
+          <h2 class="faq-cat-title">Voor stagebegeleiders en opleidingen</h2>
+          <p class="faq-cat-desc">Wat scholen en ROC's kunnen met het platform.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat kost Internly voor onze school?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Freemium, basisgebruik gratis. Premium (€299 per jaar per opleiding) geeft uitgebreide rapportages, meerdere begeleiders, ATS koppeling. Eerste 100 stagebegeleiders krijgen lifetime gratis premium.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat zien we als school in het dashboard?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Per student status (zoekend, op stage, evaluatie). Per bedrijf de Trust Score van plekken waar jullie studenten lopen. Risicosignalen als een student vastloopt of niet reageert.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Kunnen we studenten doorverwijzen naar specifieke vacatures?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Ja. Vanaf het dashboard stuur je een doorverwijzing aan de student. Het bedrijf krijgt direct bericht dat je school dit aanbeveelt.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe gaan jullie om met onze studentenlijst?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Studenten registreren zelf en kiezen jullie school in hun profiel. Wij delen geen lijsten zonder hun toestemming. AVG conform.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Werkt Internly met onze SIS of ELO?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Op dit moment niet. Integraties met Onderwijs Online, Eduarte en Magister staan op de roadmap voor sprint 4. Tot die tijd is het dashboard standalone.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: BBL -->
+    <div class="faq-panel" data-panel="bbl">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">04</div>
+        <div>
+          <h2 class="faq-cat-title">Voor BBL studenten en hun praktijkbegeleiders</h2>
+          <p class="faq-cat-desc">Alles over het BBL-traject op Internly.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe werkt het BBL traject op Internly?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Bij profielaanmaak kies je BBL. Je komt direct in de BBL Hub waar je je traject beheert, deadlines bijhoudt, en gesprekken plant met je leerbedrijf en school. Geen vacatures zoeken, je hebt al een contract.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat is een driegesprek?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Het verplichte gesprek tussen jou, je praktijkbegeleider en je school begeleider. Internly plant het automatisch, registreert wat is afgesproken, en stuurt notificaties als de volgende deadline nadert.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Houdt Internly de 90 dagen verlengingsdeadline bij?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Ja. Je leerbedrijf moet 90 dagen voor het einde van je contract beslissen over verlenging. Internly notificeert jou en je werkgever automatisch.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Mijn beoordeling van mijn leerbedrijf, blijft die anoniem?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Ja, tot je contract is afgelopen. En alleen als minimaal drie BBL studenten hetzelfde bedrijf hebben beoordeeld. Voor die tijd zijn reviews vergrendeld om jou te beschermen.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Kan mijn werkgever zien wat ik schrijf in mijn reflectie?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Nee. Reflecties zijn alleen voor jou en je school begeleider zichtbaar. Je werkgever ziet alleen wat je expliciet deelt via de chat of het driegesprek.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: Begeleiders -->
+    <div class="faq-panel" data-panel="begeleiders">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">05</div>
+        <div>
+          <h2 class="faq-cat-title">Voor mentoren, gepensioneerden en peer begeleiders</h2>
+          <p class="faq-cat-desc">Alles over het buddy systeem.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat is het buddy systeem?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Een opt in koppeling tussen een student en iemand met ervaring, een gepensioneerde, een mentor uit de sector, of een mede student. Vrijwillig, gratis, en altijd met expliciete toestemming van beide kanten.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Ik ben gepensioneerd en wil studenten begeleiden, hoe?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Maak een account aan en kies de rol Buddy. Je vult je sectorervaring in, kiest met hoeveel studenten je wilt koppelen, en het systeem stelt matches voor. Pas akkoord wanneer jij wilt.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als de buddy match niet werkt?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Beide kanten kunnen op elk moment de koppeling beëindigen, zonder reden, zonder gevolg voor de Trust Score. We kijken altijd of er een betere match mogelijk is.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Krijg ik als buddy betaald?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Nee, het buddy systeem is vrijwillig. Wel onkostenvergoeding mogelijk via je werkgever of school als je dat afspreekt buiten Internly om.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: Privacy en AVG -->
+    <div class="faq-panel" data-panel="privacy">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">06</div>
+        <div>
+          <h2 class="faq-cat-title">Wat we wel en niet doen met je gegevens</h2>
+          <p class="faq-cat-desc">AVG, dataopslag en je rechten als gebruiker.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wie ziet mijn profiel?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Bedrijven zien je profiel pas als jij solliciteert. Je school ziet je voortgang als je daar staat ingeschreven. Anderen zien niets, geen Google indexering, geen profielzoeker.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Kan ik mijn account verwijderen?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Ja, op elk moment via je profielpagina. Je gegevens worden binnen 30 dagen gewist. Anonieme reviewdata blijven bewaard om de Trust Score in stand te houden.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe gaan jullie om met AVG?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>We werken volgens AVG. Verwerker is Sasubo Holding B.V. Toezichthouder is de Autoriteit Persoonsgegevens. Datapartner Supabase, met getekende DPA. Lees ons <a href="/privacybeleid.html">privacybeleid</a> voor de juridische versie.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Worden mijn gegevens verkocht?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Nee. Niet aan adverteerders, niet aan recruiters, niet aan datahandelaren. Internly verdient aan abonnementen van bedrijven en scholen, niet aan studentdata.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Waar staan jullie servers?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Supabase, region EU West (Frankfurt). Geen data verlaat de EU. Encryptie in rust en in transport.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe dien ik een AVG verzoek in?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Mail naar hallo@internly.pro met onderwerp AVG verzoek. We reageren binnen 30 dagen, conform de wet. Voor klachten kun je terecht bij de <a href="https://www.autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">Autoriteit Persoonsgegevens</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 7: Over Internly -->
+    <div class="faq-panel" data-panel="over">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">07</div>
+        <div>
+          <h2 class="faq-cat-title">Het bedrijf achter het platform</h2>
+          <p class="faq-cat-desc">Wie Internly bouwt en hoe het verdienmodel werkt.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wie zit er achter Internly?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Internly is gebouwd door Sasubo Holding B.V. Zie de <a href="/about.html">Over ons pagina</a> voor het volledige verhaal.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Hoe verdient Internly geld?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Aan abonnementen van bedrijven en scholen. Studenten betalen nooit. We hebben geen advertenties en verkopen geen data.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat zijn jullie plannen voor de komende maanden?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Livetest in week 6, daarna landing page redesign, locatie filter, Mollie betaalintegratie en uitbreiding van het buddy systeem. Lees mee in onze updates door je in te schrijven onderaan de homepage.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Is Internly een ZZP project of een bedrijf?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Een bedrijf. Sasubo Holding B.V. is de juridische entiteit. We bouwen Internly fulltime en met team uitbreiding.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Kan ik bij Internly werken?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Op dit moment geen open vacatures. Volg onze updates of mail hallo@internly.pro als je interesse hebt.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 8: Wat als -->
+    <div class="faq-panel" data-panel="watals">
+      <header class="faq-cat-head">
+        <div class="faq-cat-num">08</div>
+        <div>
+          <h2 class="faq-cat-title">Onverwachte situaties en problemen</h2>
+          <p class="faq-cat-desc">Wat er gebeurt als het niet gaat zoals verwacht.</p>
+        </div>
+      </header>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als de site eruit ligt?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>We hebben uptime monitoring. Bij langere storingen melden we het op onze status pagina (komt in sprint 4) en via mail. Mail hallo@internly.pro als je iets dringend mist.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als een bedrijf met grade C toch ghosten blijft?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Hun Trust Score blijft dalen. Bij ernstige patronen kunnen we het account schorsen. Meld het via hallo@internly.pro met de bedrijfsnaam en je sollicitatiedatum.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als ik een fout vind in mijn profiel of de Trust Score van een bedrijf?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Mail ons. Als het een data fout is corrigeren we het direct. Als het een interpretatie verschil is leggen we uit hoe de score is opgebouwd.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als ik vermoed dat een review nep is?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Klik op de drie puntjes naast de review en kies meld. Wij beoordelen elke melding handmatig. Bevestigde nepreviews worden verwijderd, herhaald gedrag leidt tot accountschorsing.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als jullie failliet gaan, wat gebeurt er met mijn data?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>We hebben afspraken voor data overdracht of vernietiging in dat scenario. Je data wordt nooit verkocht aan derden. Specifieke procedures staan in ons privacybeleid.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          <span>Wat als ik discriminatie ervaar bij een bedrijf?</span>
+          <span class="faq-plus" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">
+          <p>Meld het via hallo@internly.pro. We nemen elke melding serieus, doen onderzoek, en kunnen accounts schorsen bij bevestigde discriminatie. Voor formele meldingen verwijzen we naar het College voor de Rechten van de Mens.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /faq-panels -->
+
+  <!-- CONTACT BLOCK -->
+  <section class="faq-contact">
+    <h3>Vraag er niet bij?</h3>
+    <p>Mail ons. We antwoorden binnen 48 uur, ook in het weekend als het kan.</p>
+    <a class="btn-primary" href="mailto:hallo@internly.pro">hallo@internly.pro</a>
+  </section>
+
+</div><!-- /main-wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <a href="index.html" class="footer-logo">intern<span>ly</span></a>
+  <div class="footer-links">
+    <a href="discover.html">Vacatures</a>
+    <a href="about.html">Over ons</a>
+    <a href="pricing.html">Prijzen</a>
+    <a href="faq.html">FAQ</a>
+    <a href="https://internly.pro/blog">Blog</a>
+    <a href="mailto:hallo@internly.pro">Contact</a>
+    <a href="auth.html">Inloggen</a>
+  </div>
+  <div class="footer-copy">© 2026 Sasubo Holding B.V. — Alle rechten voorbehouden</div>
+  <p style="width:100%;text-align:center;margin-top:8px;font-size:.78rem;color:rgba(255,255,255,.3);">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+</footer>
+
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'nl',
+    includedLanguages: 'nl,en,de,fr',
+    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+function switchLang(lang) {
+  const select = document.querySelector('.goog-te-combo');
+  if (select) {
+    select.value = lang;
+    select.dispatchEvent(new Event('change'));
+  }
+  localStorage.setItem('internly_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+}
+
+window.addEventListener('load', function() {
+  const saved = localStorage.getItem('internly_lang') || 'nl';
+  document.querySelectorAll('.lang-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.lang === saved);
+  });
+  if (saved && saved !== 'nl') {
+    setTimeout(function() { switchLang(saved); }, 1500);
+  }
+});
+</script>
+<script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+// Tab switching
+document.querySelectorAll('.faq-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.faq-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.faq-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelector(`.faq-panel[data-panel="${target}"]`).classList.add('active');
+    // Sluit alle open accordeons bij tab switch
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  });
+});
+
+// Accordeon
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const isOpen = item.classList.contains('open');
+    item.classList.toggle('open');
+    q.setAttribute('aria-expanded', String(!isOpen));
+  });
+});
+</script>
+
+</body>
+</html>
