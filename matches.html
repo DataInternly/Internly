@@ -600,7 +600,7 @@
         // Notify the other party
         if (matchRow) {
           const otherPartyId = matchRow.party_a === currentUser.id ? matchRow.party_b : matchRow.party_a;
-          const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Iemand';
+          const myName = getDisplayName(currentUser);
           await createNotification(
             otherPartyId,
             'new_match',
@@ -661,7 +661,7 @@
               return;
             }
             // Notify company of new match
-            const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Een student';
+            const myName = getDisplayName(currentUser);
             await createNotification(
               posting.created_by,
               'new_match',

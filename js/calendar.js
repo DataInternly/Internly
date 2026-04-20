@@ -360,7 +360,7 @@ const InternlyCalendar = (() => {
 
       // In-app notificatie naar attendee
       if (otherUserId && mtg?.id) {
-        const userName = user?.user_metadata?.naam || user?.user_metadata?.name || orgEmail.split('@')[0] || 'Iemand';
+        const userName = getDisplayName({ email: orgEmail, user_metadata: user?.user_metadata }); // SPRINT5 NOTE: orgEmail is separate var, not user.email
         await _db.from('notifications').insert({
           user_id:  otherUserId,
           type:     (window.MEETING_NOTIFICATION_TYPE || 'new_meeting'),

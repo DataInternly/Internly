@@ -739,7 +739,7 @@
         .eq('id', otherPartyId)
         .maybeSingle();
       if (profile) {
-        otherPartyName  = profile.naam || profile.name || profile.email?.split('@')?.[0] || 'Gesprekspartner';
+        otherPartyName  = getDisplayName(profile) || 'Gesprekspartner'; // SPRINT5 NOTE: getDisplayName checkt naam en email maar niet profile.name; 'Gesprekspartner' onbereikbaar (getDisplayName geeft altijd string)
         otherPartyEmail = profile.email || '';
       }
     }
@@ -794,7 +794,7 @@
     const annotated = (messages || []).map(m => ({
       ...m,
       _senderName: m.sender_id === currentUser?.id
-        ? (currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Jij')
+        ? getDisplayName(currentUser)
         : otherPartyName,
     }));
     renderMessages(annotated);
@@ -848,10 +848,7 @@
     input.value = '';
     input.style.height = 'auto';
 
-    const myName = currentUser.user_metadata?.naam
-      || currentUser.user_metadata?.name
-      || currentUser.email?.split('@')?.[0]
-      || 'Gebruiker';
+    const myName = getDisplayName(currentUser);
 
     // Optimistic append
     const optimistic = {

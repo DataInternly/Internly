@@ -1305,8 +1305,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const email    = user.email || '';
-  const name     = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+  const name     = getDisplayName(user);
   const initials = name.slice(0, 2).toUpperCase();
   document.getElementById('topbarAuth').innerHTML = `
     <div class="topbar-user">
@@ -1356,7 +1355,7 @@ async function _initBuddyProfileSection(user, sp) {
   if (!card) return;
 
   try {
-    const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
+    const naam = getDisplayName(user);
     await buddyInit(user.id, 'student', db, naam);
   } catch(e) {
     console.warn('[student-profile] buddy init fout:', e);

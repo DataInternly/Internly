@@ -1026,7 +1026,7 @@ async function loadUser() {
   if (!user) { window.location.href = 'auth.html'; return; }
   currentUser = user;
   const email = user.email || '';
-  const name = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+  const name = getDisplayName(user);
   const initials2 = name.slice(0, 2).toUpperCase();
   document.getElementById('userAvatar').textContent = initials2;
   document.getElementById('userName').textContent = name;
@@ -1637,7 +1637,7 @@ async function confirmKoppel() {
   if (!matchRow) { notify('Er ging iets mis bij opslaan'); return; }
 
   // Notify student én bedrijf — beide met await, geen fire-and-forget (build rule P5)
-  const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Jouw school';
+  const schoolName = getDisplayName(currentUser);
   try {
     await createNotification(
       studentId,

@@ -531,7 +531,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const authEl = document.getElementById('topbarAuth');
   const email = user.email || '';
-  const name = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+  const name = getDisplayName(user);
   const initials2 = name.slice(0, 2).toUpperCase();
   authEl.innerHTML = `
     <span class="role-badge">🏢 Bedrijf</span>
