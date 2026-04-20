@@ -410,9 +410,20 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
     </header>`;
 }
 
+/**
+ * Rendert de gedeelde student-header voor BOL en BBL pagina's.
+ *
+ * @param {object} [opts={}]
+ * @param {string} [opts.containerId='student-header']  id van het div-element waar de header in rendert.
+ * @param {string|null} [opts.activeTab=null]  welke tab visueel actief is. Waarden: 'discover' | 'matches' | 'sollicitaties' | 'buddy' | null.
+ * @returns {Promise<void>}  Rendert inline, geen return-waarde.
+ */
 async function renderStudentHeader({ containerId = 'student-header', activeTab = null } = {}) {
   const el = document.getElementById(containerId);
-  if (!el) return;
+  if (!el) {
+    console.warn('[renderStudentHeader] container #' + containerId + ' not found');
+    return;
+  }
 
   const { data: { user } } = await db.auth.getUser();
 
