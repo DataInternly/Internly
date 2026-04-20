@@ -1141,3 +1141,76 @@ button {
   outline: 2px solid #1a7a48;
   outline-offset: 2px;
 }
+
+/* ── Shared student header (O1 + O2) ─────────────────────────────────────── */
+.student-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 54px;
+  background: #fff;
+  border-bottom: 1px solid rgba(13,21,32,.09);
+  position: sticky; top: 0; z-index: 100;
+}
+.student-header-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700; font-size: 1.1rem;
+  color: #0d1520; text-decoration: none; letter-spacing: -.02em;
+  flex-shrink: 0;
+}
+.student-nav { display: flex; gap: 20px; align-items: center; }
+.student-nav a {
+  color: #3d3f4a; text-decoration: none;
+  font-size: .88rem; padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: color .12s;
+}
+.student-nav a:hover { color: #0d1520; }
+.student-nav a.active { color: #1a7a48; font-weight: 500; border-bottom-color: #1a7a48; }
+.student-nav .buddy-tab { color: #e05c1a; }
+.student-nav .buddy-tab.active { color: #e05c1a; border-bottom-color: #e05c1a; }
+.student-header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.profile-chip { display: flex; align-items: center; text-decoration: none; }
+.profile-chip .avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #1a7a48; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: .85rem;
+  transition: filter .12s;
+}
+.profile-chip:hover .avatar { filter: brightness(1.15); }
+/* Logged-out variant */
+.student-header--out { justify-content: space-between; }
+.cta-create-profile {
+  font-size: .82rem; font-weight: 600; color: #e05c1a;
+  text-decoration: none; padding: 7px 16px;
+  border: 1.5px solid #e05c1a; border-radius: 8px;
+  transition: background .13s, color .13s;
+}
+.cta-create-profile:hover { background: #e05c1a; color: #fff; }
+/* Notification bell in shared header */
+.student-header .notif-bell {
+  position: relative; cursor: pointer;
+  padding: 6px; border-radius: 6px;
+  color: #3d3f4a;
+  transition: background .12s;
+}
+.student-header .notif-bell:hover { background: rgba(13,21,32,.06); }
+.student-header .bell-count {
+  position: absolute; top: 2px; right: 2px;
+  background: #e05c1a; color: #fff;
+  font-size: .6rem; font-weight: 700;
+  min-width: 16px; height: 16px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+}
+.student-header .notif-dropdown {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  width: 280px; background: #fff;
+  border: 1px solid rgba(13,21,32,.1); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(13,21,32,.12);
+  z-index: 200;
+}
+@media (max-width: 600px) {
+  .student-nav { gap: 12px; }
+  .student-nav a { font-size: .8rem; }
+  .student-header { padding: 0 14px; }
+}

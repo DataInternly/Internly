@@ -352,3 +352,101 @@ function getNotifText(n) {
     default:                        return n.message || 'Nieuwe melding';
   }
 }
+
+// ── Shared student header ─────────────────────────────────────────────────────
+// Rendert de student-header voor bol en bbl pagina's.
+// Vereist: Supabase client beschikbaar als `db` (gezet door js/supabase.js).
+
+function _renderStudentHeaderLoggedOut() {
+  return `
+    <header class="student-header student-header--out">
+      <a href="/index.html" class="student-header-logo">intern<span style="color:#e05c1a">ly</span></a>
+      <a href="/auth.html?mode=signup" class="cta-create-profile">Maak nu een profiel aan</a>
+    </header>`;
+}
+
+function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab }) {
+  const avatarInit  = (profile.naam || '?').charAt(0).toUpperCase();
+  const buddyLabel  = buddyCount > 0 ? `Buddy (${buddyCount})` : 'Vind een buddy';
+  const buddyHref   = buddyCount > 0 ? '/matches.html?filter=buddy' : '/discover.html?filter=buddy';
+  const profileHref = bblMode ? '/bbl-profile.html' : '/student-profile.html';
+  const logoHref    = bblMode ? '/bbl-hub.html' : '/discover.html';
+
+  const bolNav = `
+    <a href="/discover.html"          class="${activeTab === 'discover'      ? 'active' : ''}">Vacatures</a>
+    <a href="/matches.html"           class="${activeTab === 'matches'       ? 'active' : ''}">Mijn matches</a>
+    <a href="/mijn-sollicitaties.html" class="${activeTab === 'sollicitaties' ? 'active' : ''}">Sollicitaties</a>`;
+
+  const bblNav = `
+    <a href="/bbl-hub.html"       class="${activeTab === 'discover' ? 'active' : ''}">BBL Traject</a>
+    <a href="/bbl-dashboard.html" class="${activeTab === 'matches'  ? 'active' : ''}">Dashboard</a>`;
+
+  return `
+    <header class="student-header">
+      <a href="${logoHref}" class="student-header-logo">intern<span style="color:#e05c1a">ly</span></a>
+      <nav class="student-nav">
+        ${bblMode ? bblNav : bolNav}
+        <a href="${buddyHref}" class="buddy-tab ${activeTab === 'buddy' ? 'active' : ''}">${escapeHtml(buddyLabel)}</a>
+      </nav>
+      <div class="student-header-actions">
+        <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" style="display:none" role="button" aria-label="Meldingen" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="bell-count" id="bellCount" style="display:none">0</span>
+          <div class="notif-dropdown" id="notifDropdown" style="display:none" onclick="event.stopPropagation()">
+            <div class="nd-header">
+              <span>Meldingen</span>
+              <button class="nd-mark-all" onclick="markAllRead()">Alles gelezen</button>
+            </div>
+            <div class="nd-list" id="ndList"><div class="nd-empty">Geen meldingen</div></div>
+          </div>
+        </div>
+        <a href="${profileHref}" class="profile-chip" title="Mijn profiel" aria-label="Mijn profiel">
+          <span class="avatar">${escapeHtml(avatarInit)}</span>
+        </a>
+      </div>
+    </header>`;
+}
+
+async function renderStudentHeader({ containerId = 'student-header', activeTab = null } = {}) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const { data: { user } } = await db.auth.getUser();
+
+  if (!user) {
+    el.innerHTML = _renderStudentHeaderLoggedOut();
+    return;
+  }
+
+  const [profileRes, spRes, buddyRes] = await Promise.all([
+    db.from('profiles')
+      .select('id, naam, role, is_buddy_eligible')
+      .eq('id', user.id)
+      .maybeSingle(),
+    db.from('student_profiles')
+      .select('bbl_mode, buddy_opt_in')
+      .eq('profile_id', user.id)
+      .maybeSingle(),
+    db.from('buddy_pairs')
+      .select('id', { count: 'exact', head: true })
+      .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .eq('status', 'active'),
+  ]);
+
+  if (profileRes.error) {
+    console.error('[renderStudentHeader] profiles fout:', profileRes.error);
+    notify('Header kon niet laden', false);
+    return;
+  }
+
+  const profile    = profileRes.data || { naam: '' };
+  const bblMode    = spRes?.data?.bbl_mode === true;
+  const buddyCount = buddyRes?.count ?? 0;
+
+  el.innerHTML = _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab });
+}
+
+window.renderStudentHeader = renderStudentHeader;
