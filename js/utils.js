@@ -9,7 +9,7 @@
 // ── Role routing ─────────────────────────────────────────────────────────────
 // Centrale logica voor ingelogde user landing. Enige plek waar rol → URL beslist.
 const ROLE_LANDING = {
-  student:      'discover.html',
+  student:      'match-dashboard.html',
   bedrijf:      'company-dashboard.html',
   school:       'school-dashboard.html',
   gepensioneerd:'buddy-dashboard.html',
