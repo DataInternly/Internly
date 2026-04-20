@@ -8,7 +8,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Mijn profiel — Internly</title>
+  <title>Mijn BOL-stageprofiel — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -362,7 +362,7 @@
     <a href="discover.html">Ontdek</a>
     <a href="matches.html">Matches</a>
     <a href="mijn-sollicitaties.html">Mijn Stages</a>
-    <a href="student-profile.html" class="active">Mijn profiel</a>
+    <a href="bol-profile.html" class="active">Mijn profiel</a>
     <a href="chat.html">💬 Berichten</a>
   </nav>
   <div class="lang-switcher">
@@ -394,7 +394,7 @@
     <span class="mt-icon">📊</span>
     <span class="mt-label">Hub</span>
   </a>
-  <a href="student-profile.html" class="mt-tab active">
+  <a href="bol-profile.html" class="mt-tab active">
     <span class="mt-icon">👤</span>
     <span class="mt-label">Profiel</span>
   </a>
@@ -465,7 +465,8 @@
 
   <!-- ── Profielformulier ──────────────────────────────────────────────────── -->
   <div id="view-form">
-  <div class="page-title">Maak je profiel aan</div>
+  <div class="page-title">Maak je BOL-stageprofiel aan</div>
+  <div class="role-badge role-badge-bol" style="display:inline-block;padding:4px 12px;border-radius:20px;background:#e8f5ee;color:#1a7a48;font-size:.78rem;font-weight:600;margin-bottom:10px;">BOL-stageprofiel · beroepsopleidende leerweg</div>
   <p class="page-sub">Vul je gegevens en stageopdracht in — bedrijven zoeken op wat jij hier invult.</p>
 
   <div class="progress-bar">
@@ -513,35 +514,11 @@
       </div>
     </div>
     <div class="field">
-      <label>Onderwijsniveau <span class="hint">voor ESG-rapportage bedrijven</span></label>
-      <select id="onderwijsniveau">
-        <option value="onbekend">— niet ingevuld —</option>
-        <option value="HBO">HBO</option>
-        <option value="WO">WO</option>
-        <option value="MBO_BOL">MBO — BOL (beroeps­opleidend, fulltime school + stage)</option>
-        <option value="MBO_BBL">MBO — BBL (beroeps­begeleidend, werk-leer)</option>
-      </select>
-      <div class="track-sub" style="margin-top:4px;">Helpt bedrijven bij hun ESG-rapportage en geeft relevantere matches.</div>
+      <label>Onderwijsniveau</label>
+      <input type="hidden" id="onderwijsniveau" name="onderwijsniveau" value="MBO_BOL">
+      <div class="track-sub" style="margin-top:4px;color:#1a7a48;font-size:.8rem;font-weight:500;">MBO — BOL (beroepsopleidende leerweg)</div>
     </div>
-    <fieldset class="profile-track-select">
-      <legend>Welke leerweg volg je? <span class="req">*</span></legend>
-      <div class="track-options">
-        <label class="track-option">
-          <input type="radio" name="learning_track" value="bol" checked>
-          <div>
-            <div class="track-title">BOL — voltijd opleiding</div>
-            <div class="track-sub">Ik zoek een stage via een vacature. <span style="color:#9ca3af;font-size:.75rem">Twijfel je? Vraag het op school.</span></div>
-          </div>
-        </label>
-        <label class="track-option">
-          <input type="radio" name="learning_track" value="bbl">
-          <div>
-            <div class="track-title">BBL — werken en leren</div>
-            <div class="track-sub">Ik heb al een leerbedrijf en beheer mijn traject.</div>
-          </div>
-        </label>
-      </div>
-    </fieldset>
+    <input type="hidden" name="learning_track" id="learning_track" value="bol">
 
     <div class="field-row">
       <div class="field">
@@ -1209,7 +1186,7 @@ async function submitProfile() {
     opleiding:                 document.getElementById('opleiding').value.trim(),
     school:                    document.getElementById('school').value.trim(),
     jaar:                      parseInt(document.getElementById('jaar').value),
-    onderwijsniveau:           document.getElementById('onderwijsniveau')?.value || 'onbekend',
+    onderwijsniveau:           'MBO_BOL',
     skills,
     motivatie:                 document.getElementById('motivatie').value.trim(),
     beschikbaar_vanaf:         document.getElementById('beschikbaar_vanaf').value || null,
@@ -1226,7 +1203,7 @@ async function submitProfile() {
     resultaat_doelgroep:       document.getElementById('resultaat_doelgroep').value.trim() || null,
     methode_type:              fd.methode_type || null,
     methode_beschrijving:      document.getElementById('methode_beschrijving').value.trim() || null,
-    bbl_mode:                  newBblMode,
+    bbl_mode:                  false,
   };
 
   const { error } = await db.from('student_profiles').upsert(payload, { onConflict: 'profile_id' });
@@ -1323,15 +1300,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     .eq('profile_id', user.id)
     .maybeSingle();
 
-  // BBL-studenten hebben een eigen profielpagina
+  // BOL-profielpagina: BBL doorsturen naar eigen pagina
   if (existing?.bbl_mode === true) {
-    window.location.replace('bbl-profile.html');
+    window.location.href = 'bbl-profile.html';
     return;
   }
-
-  // BOL-studenten hebben een eigen profielpagina
-  if (existing?.onderwijsniveau === 'MBO_BOL') {
-    window.location.replace('bol-profile.html');
+  // Studenten met een ander onderwijsniveau doorsturen naar student-profile
+  if (existing && existing.onderwijsniveau !== 'MBO_BOL') {
+    window.location.href = 'student-profile.html';
     return;
   }
 

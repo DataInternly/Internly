@@ -16,6 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/roles.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     :root {
@@ -292,6 +293,19 @@
         </div>
         <div class="role-check" id="check-student"></div>
       </div>
+      <div class="student-extra" id="studentExtraFields" style="display:none;padding:0 4px 4px 4px;">
+        <div style="background:#f0faf5;border-left:3px solid #1a7a48;padding:.7rem 1rem;border-radius:0 0 8px 8px;font-size:.82rem;color:#374151;">
+          <div style="font-weight:600;color:#1a7a48;margin-bottom:6px;font-size:.78rem;">Welke stage zoek je?</div>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:5px;cursor:pointer;">
+            <input type="radio" name="student_type" value="BOL" style="accent-color:#1a7a48;" checked>
+            <span>BOL — fulltime school + stage zoeken (MBO)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="radio" name="student_type" value="HBO_WO" style="accent-color:#1a7a48;">
+            <span>HBO of WO</span>
+          </label>
+        </div>
+      </div>
       <div class="role-card bbl-role" id="rc-bbl" onclick="selectRole('bbl')">
         <div class="role-icon-wrap">🏗</div>
         <div>
@@ -493,6 +507,11 @@ function switchTab(tab) {
   document.getElementById('role-picker-section').style.display = tab === 'register' ? 'block' : 'none';
   const logoSub = document.getElementById('logoSub');
   if (logoSub) logoSub.textContent = tab === 'login' ? 'Welkom terug.' : 'Goed dat je er bent.';
+  // Toon/verberg student-extra velden op basis van tab + geselecteerde rol
+  const studentExtraTab = document.getElementById('studentExtraFields');
+  if (studentExtraTab) {
+    studentExtraTab.style.display = (tab === 'register' && selectedRole === 'student') ? 'block' : 'none';
+  }
   // Toon/verberg buddy-extra velden op basis van tab + geselecteerde rol
   const buddyExtra = document.getElementById('buddyExtraFields');
   if (buddyExtra) {
@@ -530,6 +549,12 @@ function selectRole(role) {
   const bblBlock = document.getElementById('bbl-consent-block');
   if (bblBlock) {
     bblBlock.style.display = (role === 'bbl') ? 'block' : 'none';
+  }
+
+  // Student-extra velden (BOL/HBO-WO keuze) tonen/verbergen
+  const studentExtra = document.getElementById('studentExtraFields');
+  if (studentExtra) {
+    studentExtra.style.display = (role === 'student' && activeTab === 'register') ? 'block' : 'none';
   }
 
   // Buddy-extra velden tonen/verbergen op registratie-tab
@@ -608,7 +633,7 @@ async function doLogin() {
   if (role === 'student') {
     const { data: sp, error: spErr } = await db
       .from('student_profiles')
-      .select('bbl_mode, naam')
+      .select('bbl_mode, naam, onderwijsniveau')
       .eq('profile_id', data.user.id)
       .maybeSingle();
     if (spErr) console.error('[auth] student_profiles BBL check fout:', spErr.message);
@@ -622,8 +647,13 @@ async function doLogin() {
   setTimeout(() => {
     if (role === 'student') {
       if (_sp && typeof _sp.bbl_mode === 'boolean') {
-        // Bestaand profiel — stuur direct naar de juiste hub
-        routeStudentByMode(_sp);
+        // Bestaand profiel — rol-detectie via centraal contract
+        const roleKey = Internly.detectRole({
+          role: 'student',
+          bbl_mode: _sp.bbl_mode,
+          onderwijsniveau: _sp.onderwijsniveau
+        });
+        window.location.href = Internly.routeForRole(roleKey);
       } else {
         // Geen profiel nog — stuur naar profielaanmaak
         window.location.href = 'student-profile.html';
@@ -715,11 +745,22 @@ async function doRegister() {
       );
     }
 
-    // 4. BBL-student: zet bbl_mode=true op student_profiles
+    // 4. BBL-student: zet bbl_mode=true + onderwijsniveau op student_profiles
     // Gebruik upsert — bij registratie bestaat de rij nog niet, UPDATE zou 0 rijen raken.
     if (isBBL) {
       await db.from('student_profiles')
-        .upsert({ profile_id: data.user.id, bbl_mode: true }, { onConflict: 'profile_id' });
+        .upsert({ profile_id: data.user.id, bbl_mode: true, onderwijsniveau: 'MBO_BBL' }, { onConflict: 'profile_id' });
+    }
+
+    // 4b. BOL-student of HBO/WO: student_profiles rij aanmaken met juist onderwijsniveau
+    // Zo kan auth.html bij volgende login meteen de juiste pagina kiezen.
+    if (selectedRole === 'student' && !isBBL && data.user) {
+      const studentType = document.querySelector('input[name="student_type"]:checked')?.value || 'HBO_WO';
+      await db.from('student_profiles').upsert({
+        profile_id:      data.user.id,
+        bbl_mode:        false,
+        onderwijsniveau: studentType === 'BOL' ? 'MBO_BOL' : 'onbekend',
+      }, { onConflict: 'profile_id' });
     }
 
     // 4. Gepensioneerde buddy: schrijf naar waitlist zodat studenten je kunnen vinden
@@ -833,10 +874,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (role === 'student') {
         const { data: sp } = await db
           .from('student_profiles')
-          .select('bbl_mode, naam')
+          .select('bbl_mode, naam, onderwijsniveau')
           .eq('profile_id', user.id)
           .maybeSingle();
         if (sp?.bbl_mode === true) { dest = sp?.naam ? 'bbl-hub.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
+        if (sp && sp.onderwijsniveau === 'MBO_BOL') { dest = 'bol-profile.html'; }
       }
       const name = user.user_metadata?.naam || user.user_metadata?.name || user.email;
       document.getElementById('alreadyName').textContent = name;

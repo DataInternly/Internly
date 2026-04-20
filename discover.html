@@ -1222,12 +1222,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (role !== 'bedrijf' && role !== 'school') {
       const { data: sp } = await db
         .from('student_profiles')
-        .select('profile_id, opleiding, sector, opdracht_domein, bbl_mode')
+        .select('profile_id, opleiding, sector, opdracht_domein, bbl_mode, onderwijsniveau')
         .eq('profile_id', user.id)
         .maybeSingle();
 
       // BBL-guard: BBL-studenten horen niet op discover.html
       if (sp?.bbl_mode === true) { window.location.replace('bbl-profile.html'); return; }
+      // BOL-guard: BOL-studenten hebben een eigen profielpagina
+      if (sp?.onderwijsniveau === 'MBO_BOL') { window.location.replace('bol-profile.html'); return; }
 
       if (!sp) {
         const banner = document.getElementById('noprofileBanner');

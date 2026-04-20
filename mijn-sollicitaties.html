@@ -708,8 +708,9 @@
       currentUserId = user.id;
 
       const { data: sp } = await db.from('student_profiles')
-        .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+        .select('bbl_mode, onderwijsniveau').eq('profile_id', user.id).maybeSingle();
       if (sp?.bbl_mode === true) { window.location.replace('bbl-hub.html'); return; }
+      if (sp?.onderwijsniveau === 'MBO_BOL') { window.location.replace('bol-profile.html'); return; }
 
       const authEl = document.getElementById('topbarAuth');
       const name     = getDisplayName(user);
