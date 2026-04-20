@@ -195,39 +195,7 @@
 
 <div class="notif" id="notif"></div>
 
-<div class="topbar">
-  <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="logo" style="cursor:pointer">intern<span>ly</span></a>
-  <nav class="nav">
-    <a href="discover.html">Ontdek</a>
-    <a href="matches.html" class="active">Matches</a>
-    <a href="mijn-sollicitaties.html">Mijn Stages</a>
-    <a href="match-dashboard.html">📊 Stage Hub</a>
-    <a href="chat.html">💬 Berichten</a>
-  </nav>
-  <div class="lang-switcher">
-    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
-    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
-    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
-    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
-  </div>
-  <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" aria-label="Meldingen">
-    <span class="bell-icon">🔔</span>
-    <span class="bell-count" id="bellCount" style="display:none">0</span>
-    <div class="notif-dropdown" id="notifDropdown" style="display:none">
-      <div class="nd-header">
-        <span class="nd-title">Meldingen</span>
-        <button class="nd-mark-all" onclick="markAllRead(event)">Alles gelezen</button>
-      </div>
-      <div class="nd-list" id="notifList">
-        <div class="nd-empty">Geen meldingen</div>
-      </div>
-    </div>
-  </div>
-  <a href="privacybeleid.html" style="font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;flex-shrink:0;padding:5px 4px;">Privacy</a>
-  <div id="topbarAuth">
-    <a href="auth.html" style="color:rgba(255,255,255,.7);font-size:.9rem;font-weight:500;transition:color .15s;text-decoration:none;">👤 Inloggen</a>
-  </div>
-</div>
+<div id="student-header"></div>
 
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs" aria-label="Navigatie">
@@ -275,6 +243,13 @@
   </div>
 </div>
 
+<!-- Buddy pairs sectie — zichtbaar via buddy-tab deeplink -->
+<section id="buddyMatchSection" style="display:none;max-width:600px;margin:32px auto;padding:0 16px;">
+  <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:700;color:#0d1520;margin-bottom:6px;">Mijn buddy's</h2>
+  <p style="font-size:.88rem;color:#6b7280;margin-bottom:20px;">Jouw actieve buddy-verbindingen via Internly.</p>
+  <div id="buddyPairsContainer"><p style="color:#6b7280;font-size:.88rem;">Laden…</p></div>
+</section>
+
 <script>
 
   let allCards          = [];
@@ -311,7 +286,7 @@
       countEl.style.display = unread > 0 ? 'flex' : 'none';
     }
 
-    const listEl = document.getElementById('notifList');
+    const listEl = document.getElementById('ndList');
     if (!listEl) return;
     if (items.length === 0) {
       listEl.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
@@ -838,6 +813,7 @@
     const hasValidRole = await requireRole('student');
     if (!hasValidRole) return;
 
+    await renderStudentHeader({ activeTab: 'matches' });
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;
@@ -847,24 +823,67 @@
     if (sp?.bbl_mode === true) { window.location.replace('bbl-hub.html'); return; }
     if (sp?.onderwijsniveau === 'MBO_BOL') { window.location.replace('bol-profile.html'); return; }
 
-    const authEl = document.getElementById('topbarAuth');
-    const name     = getDisplayName(user);
-    const initials = name.slice(0, 2).toUpperCase();
-    authEl.innerHTML = `
-      <div class="topbar-user">
-        <div class="topbar-avatar">${escapeHtml(initials)}</div>
-        <span>${escapeHtml(name)}</span>
-        <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
-      </div>`;
-
     await loadMatches();
+
+    const bellEl = document.getElementById('notifBell');
+    if (bellEl) bellEl.style.display = 'flex';
     await loadNotifications();
     startNotifSubscription();
+
+    // Buddy deeplink: ?filter=buddy toont buddy-pairs sectie
+    const filterParam = new URLSearchParams(window.location.search).get('filter');
+    if (filterParam === 'buddy') {
+      await loadBuddyPairs(user.id);
+      const buddySec = document.getElementById('buddyMatchSection');
+      if (buddySec) buddySec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   });
 
   window.addEventListener('beforeunload', () => {
     if (notifSubscription) notifSubscription.unsubscribe();
   });
+
+  async function loadBuddyPairs(userId) {
+    const sec = document.getElementById('buddyMatchSection');
+    const container = document.getElementById('buddyPairsContainer');
+    if (!sec || !container) return;
+    sec.style.display = 'block';
+    try {
+      const { data: pairs, error } = await db
+        .from('buddy_pairs')
+        .select('id, requester_id, receiver_id, status, created_at')
+        .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`)
+        .eq('status', 'active');
+      if (error) throw error;
+      if (!pairs || pairs.length === 0) {
+        container.innerHTML = '<p style="color:#6b7280;font-size:.88rem;">Nog geen actieve buddy-verbindingen. Ga naar <a href="/discover.html?filter=buddy" style="color:#e05c1a;font-weight:600;">Vind een buddy</a>.</p>';
+        return;
+      }
+      const otherIds = pairs.map(p => p.requester_id === userId ? p.receiver_id : p.requester_id);
+      const { data: profiles, error: pErr } = await db
+        .from('profiles')
+        .select('id, naam, role')
+        .in('id', otherIds);
+      if (pErr) throw pErr;
+      const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+      container.innerHTML = pairs.map(pair => {
+        const otherId = pair.requester_id === userId ? pair.receiver_id : pair.requester_id;
+        const other   = profileMap[otherId] || {};
+        const init    = (other.naam || '?').charAt(0).toUpperCase();
+        const name    = escapeHtml(other.naam || 'Onbekend');
+        return `<div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(13,21,32,.07);">
+          <div style="width:40px;height:40px;border-radius:50%;background:#e05c1a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;flex-shrink:0;">${escapeHtml(init)}</div>
+          <div>
+            <div style="font-weight:600;color:#0d1520;font-size:.92rem;">${name}</div>
+            <div style="font-size:.75rem;color:#6b7280;">Buddy · Verbonden via Internly</div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      console.error('[matches] loadBuddyPairs fout:', e);
+      container.innerHTML = '<p style="color:#b82020;font-size:.88rem;">Kon buddy-verbindingen niet laden.</p>';
+    }
+  }
 </script>
 
   <script src="js/translate.js"></script>
