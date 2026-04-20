@@ -50,7 +50,7 @@ css/style.css      — CSS variabelen en gedeelde stijlen
 5. js/buddy.js (alleen buddy-pagina's)
 6. js/telemetry.js (ALTIJD als laatste — snapshots utils-functies)
 
-index.html: laadt utils.js NIET — laadt js/telemetry.js wél (standalone).
+index.html: laadt utils.js + supabase.js + telemetry.js (toegevoegd 20 april — auth gate vereist db).
 Publieke info-pagina's (about, privacybeleid, spelregels, 404): laden telemetry.js NIET.
 
 ## Loop-shield regels (uitgebreid — Tarlok + Hal)
