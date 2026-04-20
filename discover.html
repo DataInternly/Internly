@@ -387,48 +387,7 @@
 <body>
 <div class="notif" id="notif"></div>
 
-<div class="topbar">
-  <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="logo" style="cursor:pointer">intern<span>ly</span></a>
-  <nav class="nav">
-    <a href="discover.html" class="active">Vacatures</a>
-    <a href="kennisbank.html">Kennisbank</a>
-    <a href="about.html">Over ons</a>
-    <a href="matches.html">Matches</a>
-    <a href="mijn-sollicitaties.html">Mijn Stages</a>
-    <a href="match-dashboard.html">📊 Stage Hub</a>
-    <a href="student-profile.html">Mijn profiel</a>
-    <a href="chat.html">💬 Berichten</a>
-  </nav>
-  <div class="lang-switcher">
-    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
-    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
-    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
-    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
-  </div>
-
-  <!-- Notification bell -->
-  <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" style="display:none" role="button" aria-label="Meldingen" tabindex="0">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-    </svg>
-    <span class="bell-count" id="bellCount" style="display:none">0</span>
-    <!-- Notification dropdown -->
-    <div class="notif-dropdown" id="notifDropdown" style="display:none" onclick="event.stopPropagation()">
-      <div class="nd-header">
-        <span>Meldingen</span>
-        <button class="nd-mark-all" onclick="markAllRead()">Alles gelezen</button>
-      </div>
-      <div class="nd-list" id="ndList">
-        <div class="nd-empty">Geen meldingen</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="topbarAuth">
-    <a href="auth.html" style="color:rgba(255,255,255,.7);text-decoration:none;font-size:.88rem;font-weight:500;">Inloggen</a>
-  </div>
-</div>
+<div id="student-header"></div>
 
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
@@ -1188,27 +1147,22 @@ function renderDiscoverDemoState(enabled) {
 window.addEventListener('DOMContentLoaded', async () => {
   initDemoDiscover();
   const { data: { user } } = await db.auth.getUser();
-  const authEl = document.getElementById('topbarAuth');
   if (user) {
     // ── Rol check nu via DB (vervangt sessionStorage check — sprint 5) ──
     const hasValidRole = await requireRole('student');
     if (!hasValidRole) return;
+  }
+  await renderStudentHeader({ activeTab: 'discover' });
+  if (user) {
     sessionStorage.setItem('internly_role', 'student'); // sync voor rest van pagina
 
     currentUser = user;
     // Laad postcode scoped op gebruiker (privacy — gedeeld apparaat)
     studentPostcode = localStorage.getItem('internly_student_postcode_' + user.id) || '';
-    const name     = getDisplayName(user);
-    const initials = name.slice(0, 2).toUpperCase();
-    authEl.innerHTML = `
-      <div class="topbar-user">
-        <div class="topbar-avatar">${escapeHtml(initials)}</div>
-        <span>${escapeHtml(name)}</span>
-        <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
-      </div>`;
 
-    // Show notification bell
-    document.getElementById('notifBell').style.display = 'flex';
+    // Toon notificatiebel (gerenderd door renderStudentHeader)
+    const bellEl = document.getElementById('notifBell');
+    if (bellEl) bellEl.style.display = 'flex';
     loadNotifications();
     startNotifSubscription();
 
@@ -1246,16 +1200,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         BuddyModule.onUpdate = () => _buddyRenderDiscover(_buddySpContext);
       }
     }
-  } else {
-    // Unauthenticated: show a subtle "log in to save" nudge in the topbar slot
-    authEl.innerHTML = `
-      <a href="auth.html" style="
-        font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;
-        color:#fff;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
-        padding:6px 14px;border-radius:20px;text-decoration:none;
-        white-space:nowrap;transition:background .15s;">
-        Inloggen / registreren →
-      </a>`;
   }
 
   loadInternships();
@@ -1432,6 +1376,19 @@ window.addEventListener('load', function() {
   if (urlNiveau) {
     const nf = document.getElementById('niveauFilter');
     if (nf) nf.value = urlNiveau.toLowerCase();
+  }
+
+  // Buddy deeplink: ?filter=buddy scrolls to buddy section and activates 'find' tab
+  const filterParam = new URLSearchParams(window.location.search).get('filter');
+  if (filterParam === 'buddy') {
+    const sec = document.getElementById('buddySection');
+    if (sec) {
+      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Activate 'find' tab (looking for a buddy, not reviewing existing pairs)
+      const findBtn = Array.from(document.querySelectorAll('.buddy-tab'))
+        .find(b => b.textContent.trim().startsWith('Vind'));
+      if (findBtn) buddySwitchTab('find', findBtn);
+    }
   }
 });
 </script>
