@@ -2622,6 +2622,25 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && MATCH_ID) loadHubFromDB();
 });
 
+async function markMatchCompleted(matchId) {
+  if (!confirm('Deze stage als afgerond markeren? Dit geeft de stagiair toegang tot de eindbeoordeling en telt mee in uw ESG-rapport.')) {
+    return;
+  }
+  try {
+    const { error } = await db
+      .from('matches')
+      .update({ completion_status: 'completed', completed_at: new Date().toISOString() })
+      .eq('id', matchId);
+    if (error) throw error;
+    match.completionStatus = 'completed';
+    toast('Stage gemarkeerd als afgerond.');
+    await loadHubFromDB();
+  } catch (e) {
+    console.error('[Internly] markMatchCompleted failed:', e);
+    toast('Kon niet markeren. Probeer het opnieuw.', 'error');
+  }
+}
+
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
@@ -2699,7 +2718,7 @@ async function loadMatchFromDB(user) {
     // 1. Load match record + vacature name via FK join
     const { data: matchRow, error: matchErr } = await db
       .from('matches')
-      .select('id, party_a, party_b, roc_profile_id, internship_postings(title)')
+      .select('id, party_a, party_b, roc_profile_id, completion_status, internship_postings(title)')
       .eq('id', MATCH_ID)
       .maybeSingle();
 
@@ -2760,6 +2779,7 @@ async function loadMatchFromDB(user) {
     if (matchRow.internship_postings?.title) {
       match.company.vacature = matchRow.internship_postings.title;
     }
+    match.completionStatus = matchRow.completion_status || 'unknown';
 
     // For school: load school name
     if (role === 'school') {
@@ -3028,6 +3048,7 @@ function renderOverzicht() {
       <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken')">💬 Afspraken</button>
       ${can('addTask') ? `<button type="button" class="btn btn-primary btn-sm" onclick="switchTab('taken');setTimeout(()=>openTaakModal(null),50)">+ Taak</button>` : ''}
       ${can('addDeadline') ? `<button type="button" class="btn btn-primary btn-sm" onclick="switchTab('planning');setTimeout(()=>openDeadlineModal(null),50)">+ Deadline</button>` : ''}
+      ${role === 'bedrijf' && match.completionStatus !== 'completed' ? `<button type="button" class="btn btn-ghost btn-sm" onclick="markMatchCompleted('${MATCH_ID}')">✓ Markeer stage als afgerond</button>` : ''}
     </div>
 
     <!-- Stats row -->

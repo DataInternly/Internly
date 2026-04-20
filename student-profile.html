@@ -512,6 +512,17 @@
         <input type="text" id="school" maxlength="100" placeholder="Bijv. HvA, Fontys">
       </div>
     </div>
+    <div class="field">
+      <label>Onderwijsniveau <span class="hint">voor ESG-rapportage bedrijven</span></label>
+      <select id="onderwijsniveau">
+        <option value="onbekend">— niet ingevuld —</option>
+        <option value="MBO">MBO</option>
+        <option value="HBO">HBO</option>
+        <option value="WO">WO</option>
+        <option value="BBL">BBL</option>
+      </select>
+      <div class="track-sub" style="margin-top:4px;">Helpt bedrijven bij hun ESG-rapportage en geeft relevantere matches.</div>
+    </div>
     <fieldset class="profile-track-select">
       <legend>Welke leerweg volg je? <span class="req">*</span></legend>
       <div class="track-options">
@@ -1118,7 +1129,7 @@ function populateForm(data) {
   });
 
   // Select fields
-  ['jaar','duur','opdracht_domein'].forEach(id => {
+  ['jaar','duur','opdracht_domein','onderwijsniveau'].forEach(id => {
     const el = document.getElementById(id);
     if (el && data[id] != null) el.value = data[id];
   });
@@ -1198,6 +1209,7 @@ async function submitProfile() {
     opleiding:                 document.getElementById('opleiding').value.trim(),
     school:                    document.getElementById('school').value.trim(),
     jaar:                      parseInt(document.getElementById('jaar').value),
+    onderwijsniveau:           document.getElementById('onderwijsniveau')?.value || 'onbekend',
     skills,
     motivatie:                 document.getElementById('motivatie').value.trim(),
     beschikbaar_vanaf:         document.getElementById('beschikbaar_vanaf').value || null,
@@ -1307,7 +1319,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Load existing profile (if any) and populate the form
   const { data: existing } = await db
     .from('student_profiles')
-    .select('profile_id, naam, opleiding, school, jaar, beschikbaar_vanaf, duur, postcode, motivatie, opdracht_domein, opdracht_aard, opdracht_aanleiding, onderzoeksvraag, onderzoeksvraag_context, onderzoeksvraag_type, resultaat_type, resultaat_doelgroep, methode_type, methode_beschrijving, skills, opdracht_eerder_onderzoek, bbl_mode, buddy_opt_in, bedrijf')
+    .select('profile_id, naam, opleiding, school, jaar, beschikbaar_vanaf, duur, postcode, motivatie, opdracht_domein, opdracht_aard, opdracht_aanleiding, onderzoeksvraag, onderzoeksvraag_context, onderzoeksvraag_type, resultaat_type, resultaat_doelgroep, methode_type, methode_beschrijving, skills, opdracht_eerder_onderzoek, bbl_mode, buddy_opt_in, bedrijf, onderwijsniveau')
     .eq('profile_id', user.id)
     .maybeSingle();
 
