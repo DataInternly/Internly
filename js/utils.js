@@ -40,7 +40,10 @@ async function smartHomeRedirect() {
     if (prof.role === 'student') {
       const { data: sp } = await client.from('student_profiles')
         .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
-      bblMode = sp?.bbl_mode === true;
+      // Geen student_profile → profiel nog niet aangemaakt (halverwege registratie).
+      // Spiegelt routeStudent() gedrag exact.
+      if (!sp) { window.location.href = 'student-profile.html'; return; }
+      bblMode = sp.bbl_mode === true;
     }
     window.location.href = getRoleLanding(prof.role, bblMode);
   } catch (err) {

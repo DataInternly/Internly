@@ -1099,19 +1099,11 @@
     if (prof.role === 'student') {
       const { data: sp } = await db.from('student_profiles')
         .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
-      bblMode = sp?.bbl_mode === true;
+      if (!sp) { window.location.replace('student-profile.html'); return; }
+      bblMode = sp.bbl_mode === true;
     }
 
-    const landing = (typeof getRoleLanding === 'function')
-      ? getRoleLanding(prof.role, bblMode)
-      : (bblMode ? 'bbl-hub.html'
-        : prof.role === 'bedrijf'      ? 'company-dashboard.html'
-        : prof.role === 'school'       ? 'school-dashboard.html'
-        : prof.role === 'gepensioneerd'? 'buddy-dashboard.html'
-        : prof.role === 'begeleider'   ? 'begeleider-dashboard.html'
-        : prof.role === 'admin'        ? 'admin.html'
-        : 'discover.html');
-    window.location.replace(landing);
+    window.location.replace(getRoleLanding(prof.role, bblMode));
   } catch (err) {
     console.error('[auth-gate] fout:', err?.message || err);
   }
