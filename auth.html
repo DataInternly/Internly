@@ -470,6 +470,13 @@ if (window.location.search) {
   window.history.replaceState({}, '', window.location.pathname);
 }
 
+// ── Registreer-tab activeren via ?mode=signup ──
+if (_initParams.get('mode') === 'signup') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof switchTab === 'function') switchTab('register');
+  });
+}
+
 // ── Sessie verlopen melding ──
 if (_initParams.get('expired') === '1') {
   document.addEventListener('DOMContentLoaded', () => {
