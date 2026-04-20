@@ -48,6 +48,23 @@ Sprint 5b: overweeg cleanup hook in performLogout of beforeunload.
 
 ---
 
+## F6 — privacybeleid.html:406 — Trust Score automatisch-claim in juridisch document
+
+`privacybeleid.html:406` — "Voor bedrijven berekenen we automatisch een betrouwbaarheidsscore, gebaseerd op meetbaar gedrag"
+Het Trust Score auto-algoritme is niet geïmplementeerd. Dit staat in een juridisch document — stil aanpassen
+zonder juridische review is riskant.
+Sprint 5b: Barry bekijkt de exacte formulering; overweeg "op basis van meetbaar gedrag" zonder "automatisch".
+
+---
+
+## F7 — faq.html:628 — BBL contract-verlengingsnotificatie niet geverifieerd
+
+`faq.html:628` — "Internly notificeert jou en je werkgever automatisch" (over verlengingsbeslissing 90 dagen voor einde contract)
+Niet geverifieerd of deze specifieke notificatie daadwerkelijk is opgezet in de BBL-flow.
+Sprint 5b: controleer of de BBL-verlengingsnotificatie actief is; zo niet, tekst aanpassen naar "kun je instellen".
+
+---
+
 ## F5 — begeleider-dashboard.html session-timeout signOut niet gemigreerd (intentioneel)
 
 `begeleider-dashboard.html:602` — `await db.auth.signOut().catch(() => {})` in session-timeout handler
