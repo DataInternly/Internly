@@ -1204,11 +1204,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
   const authEl = document.getElementById('topbarAuth');
   if (user) {
+    // ── Rol check nu via DB (vervangt sessionStorage check — sprint 5) ──
+    const hasValidRole = await requireRole('student');
+    if (!hasValidRole) return;
+    sessionStorage.setItem('internly_role', 'student'); // sync voor rest van pagina
+
     currentUser = user;
     // Laad postcode scoped op gebruiker (privacy — gedeeld apparaat)
     studentPostcode = localStorage.getItem('internly_student_postcode_' + user.id) || '';
-    const email    = user.email || '';
-    const name     = user.user_metadata?.naam || user.user_metadata?.name || email.split('@')[0];
+    const name     = getDisplayName(user);
     const initials = name.slice(0, 2).toUpperCase();
     authEl.innerHTML = `
       <div class="topbar-user">
@@ -1222,17 +1226,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadNotifications();
     startNotifSubscription();
 
-    // Push registration for students — safe here, no impending redirect
+    // Push registration for students
     const role = sessionStorage.getItem('internly_role') || '';
     if (role === 'student' || role === '') {
       registerPushNotifications(db, user.id).catch(e => console.warn('[discover] push registratie mislukt:', e));
-    }
-
-    // Verkeerde rol — stuur weg voor de rest van de pagina laadt
-    if (role === 'bedrijf' || role === 'school' || role === 'gepensioneerd' || role === 'bbl') {
-      const routes = { bedrijf: 'company-dashboard.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html', bbl: 'bbl-profile.html' };
-      window.location.replace(routes[role] || 'auth.html');
-      return;
     }
 
     // Show banner if student has no profile yet + init buddy section
