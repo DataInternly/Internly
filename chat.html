@@ -1145,13 +1145,36 @@
   // ── Init ──────────────────────────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', async () => {
+    // ── Laag 1: rol guard ──
+    const hasValidRole = await requireRole('student', 'bedrijf', 'school');
+    if (!hasValidRole) return;
+
     const { data: { user } } = await db.auth.getUser();
-    if (!user) { window.location.href = 'auth.html'; return; }
+    if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
     const buddyPairId = params.get('buddy_pair_id');
+
+    // ── Laag 2: match partij guard (alleen bij directe match URL) ──
+    if (matchId && !buddyPairId) {
+      const { data: matchRow, error: mErr } = await db.from('matches')
+        .select('party_a, party_b')
+        .eq('id', matchId)
+        .maybeSingle();
+      if (mErr || !matchRow) {
+        console.error('[chat.html] match niet gevonden:', mErr);
+        window.location.replace('index.html');
+        return;
+      }
+      if (matchRow.party_a !== user.id && matchRow.party_b !== user.id) {
+        console.warn('[chat.html] user is geen match partij');
+        notify('Je hebt geen toegang tot dit gesprek', false);
+        setTimeout(() => window.location.replace(getRoleLanding(__cachedUserRole || 'student')), 1500);
+        return;
+      }
+    }
 
     if (buddyPairId) {
       await loadBuddyConversation(buddyPairId);
