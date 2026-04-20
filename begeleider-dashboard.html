@@ -887,7 +887,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   initSessionTimeout();
 
   // 5. Populate UI
-  const naam = profile.naam || user.email?.split('@')[0] || 'Begeleider';
+  const naam = profile.naam || user.email?.split('@')?.[0] || 'Begeleider';
   document.getElementById('topbarUser').textContent = naam;
   document.getElementById('userName').textContent = naam;
   document.getElementById('userEmail').textContent = profile.email || user.email || '';

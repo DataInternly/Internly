@@ -5080,7 +5080,7 @@ async function acceptMeeting(id) {
     }).eq('id', m._dbId).catch(err => console.warn('[hub] accept DB err:', err));
     const organizerId = roleToUserId(m.from);
     if (organizerId && organizerId !== currentUser.id) {
-      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')?.[0] || 'Iemand';
       await db.from('notifications').insert({
         user_id:  organizerId,
         type:     'meeting_accepted',
@@ -5137,7 +5137,7 @@ async function declineMeeting(id) {
       .eq('id', m._dbId).catch(err => console.warn('[hub] decline DB err:', err));
     const organizerId = roleToUserId(m.from);
     if (organizerId && organizerId !== currentUser.id) {
-      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')?.[0] || 'Iemand';
       await db.from('notifications').insert({
         user_id:  organizerId,
         type:     'meeting_declined',
@@ -5171,7 +5171,7 @@ async function cancelMeeting(id) {
       .eq('id', m._dbId).catch(err => console.warn('[hub] cancel DB err:', err));
     const attendeeId = roleToUserId(m.to);
     if (attendeeId && attendeeId !== currentUser.id) {
-      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+      const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')?.[0] || 'Iemand';
       await db.from('notifications').insert({
         user_id:  attendeeId,
         type:     'meeting_cancelled',
@@ -5421,7 +5421,7 @@ async function saveMeeting() {
         const notifTargets = m.toAll
           ? [hubPartyIds.student, hubPartyIds.bedrijf, hubPartyIds.school].filter(uid => uid && uid !== currentUser.id)
           : [attendeeId].filter(Boolean);
-        const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Iemand';
+        const senderName = currentUser.user_metadata?.naam || currentUser.email?.split('@')?.[0] || 'Iemand';
         for (const uid of notifTargets) {
           await db.from('notifications').insert({
             user_id:  uid,

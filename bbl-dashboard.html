@@ -565,7 +565,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   sessionStorage.setItem('internly_role', 'bbl');
 
   // 3. Gebruikersnaam
-  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || 'Student';
+  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Student';
   document.getElementById('topbarUser').textContent = naam;
   setWelcome(naam);
 

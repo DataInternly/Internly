@@ -1564,7 +1564,7 @@ async function acceptMatch(matchId, studentId) {
   }
 
   // Notify student
-  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een bedrijf';
+  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Een bedrijf';
   createNotification(studentId, 'application_accepted', matchId, 'match', companyName + ' heeft jouw match geaccepteerd — start het gesprek!');
 
   sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
@@ -1577,7 +1577,7 @@ async function rejectMatch(matchId, studentId) {
   if (error) { console.error('[company] rejectMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
 
   // Notify student
-  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een bedrijf';
+  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Een bedrijf';
   createNotification(studentId, 'application_rejected', matchId, 'match', companyName + ' heeft de match helaas afgewezen');
 
   sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
@@ -1715,7 +1715,7 @@ async function loadReviews() {
         .select('id, naam, name, email')
         .in('id', reviewerIds);
       (profiles || []).forEach(p => {
-        reviewerMap[p.id] = p.naam || p.name || p.email?.split('@')[0] || 'Student';
+        reviewerMap[p.id] = p.naam || p.name || p.email?.split('@')?.[0] || 'Student';
       });
     }
 
@@ -2307,7 +2307,7 @@ async function renderESG() {
   const { totaalStages, gemiddeldeRating, aantalGesprekken, responsPercentage, sectoren, esgPunten } = data;
 
   // Company name for CSRD text
-  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw bedrijf';
+  const companyName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Jouw bedrijf';
   const sectorenStr = sectoren.length > 0 ? sectoren.join(', ') : 'diverse sectoren';
 
   const csrdText = `${escapeHtml(companyName)} heeft in ${_esgYear} ${totaalStages} stageplekken aangeboden aan studenten in de sectoren ${sectorenStr}. De gemiddelde beoordeling door stagiairs bedroeg ${gemiddeldeRating.toFixed(1)} op een schaal van 1 tot 5. Er werden ${aantalGesprekken} begeleidingsgesprekken gehouden. Het platform Internly registreerde een responspercentage van ${responsPercentage.toFixed(0)}% op sollicitaties. Totale ESG-score via Internly: ${esgPunten} punten.`;

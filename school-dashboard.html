@@ -1637,7 +1637,7 @@ async function confirmKoppel() {
   if (!matchRow) { notify('Er ging iets mis bij opslaan'); return; }
 
   // Notify student én bedrijf — beide met await, geen fire-and-forget (build rule P5)
-  const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Jouw school';
+  const schoolName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Jouw school';
   try {
     await createNotification(
       studentId,

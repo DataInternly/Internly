@@ -657,7 +657,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   sessionStorage.setItem('internly_role', 'bbl');
 
   // Naam tonen in topbar
-  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
   document.getElementById('topbarUser').textContent = naam;
 
   if (sp && sp.bbl_mode) {

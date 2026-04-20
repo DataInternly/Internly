@@ -413,7 +413,7 @@
       if (allIds.length > 0) {
         const { data: profiles } = await db.from('profiles').select('id, naam, name, email').in('id', allIds);
         (profiles || []).forEach(p => {
-          nameMap[p.id] = p.naam || p.name || p.email?.split('@')[0] || p.id.slice(0, 8);
+          nameMap[p.id] = p.naam || p.name || p.email?.split('@')?.[0] || p.id.slice(0, 8);
         });
       }
 

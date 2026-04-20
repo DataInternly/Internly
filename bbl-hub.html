@@ -1251,7 +1251,7 @@ async function loadMessages() {
 
   const myName = currentUser.user_metadata?.naam
     || currentUser.user_metadata?.name
-    || currentUser.email?.split('@')[0] || 'Jij';
+    || currentUser.email?.split('@')?.[0] || 'Jij';
 
   const annotated = (messages || []).map(m => ({
     ...m,
@@ -1307,7 +1307,7 @@ async function sendMessage() {
 
   const myName = currentUser.user_metadata?.naam
     || currentUser.user_metadata?.name
-    || currentUser.email?.split('@')[0] || 'Jij';
+    || currentUser.email?.split('@')?.[0] || 'Jij';
 
   // Optimistic append — exact patroon chat.html
   appendMessage({
@@ -1681,7 +1681,7 @@ async function loadEvaluatie() {
   // Naam student in handtekening
   const myName = currentUser.user_metadata?.naam
     || currentUser.user_metadata?.name
-    || currentUser.email?.split('@')[0] || 'Student';
+    || currentUser.email?.split('@')?.[0] || 'Student';
   const el = document.getElementById('spStudentName');
   if (el) el.textContent = myName;
 
@@ -1961,7 +1961,7 @@ function exportBBLReflectieverslag() {
 
   const naam = currentUser?.user_metadata?.naam
     || currentUser?.user_metadata?.name
-    || currentUser?.email?.split('@')[0] || 'BBL-student';
+    || currentUser?.email?.split('@')?.[0] || 'BBL-student';
   const dateNl = new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 
   // STARR: per-element colour (R,G,B)
@@ -2420,7 +2420,7 @@ async function studentChoice(keuze) {
   applyStudentChoiceUI(keuze);
 
   // Notificeer praktijkbegeleider en school
-  const myName = currentUser.user_metadata?.naam || currentUser.email?.split('@')[0] || 'Student';
+  const myName = currentUser.user_metadata?.naam || currentUser.email?.split('@')?.[0] || 'Student';
   const msg = { ja: 'wil het contract verlengen', nee: 'wil stoppen na contract', 'weet-niet': 'heeft nog geen beslissing over verlenging' }[keuze];
   if (activeMatch?.praktijkbegeleider_profile_id) {
     createNotification(
@@ -2522,7 +2522,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Alles hieronder is niet-blokkerend — geen redirect als er geen match is.
 
   // 3. Topbar gebruikersnaam
-  const name = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+  const name = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
   document.getElementById('topbarUser').textContent = name;
 
   // 4. Actieve BBL-match ophalen (optioneel — hub laadt altijd)

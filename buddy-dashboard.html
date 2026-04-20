@@ -781,7 +781,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 3. Welkomstgroet
-  const naam = profile.naam || user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || 'Buddy';
+  const naam = profile.naam || user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Buddy';
   const h = new Date().getHours();
   const greeting = h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
   document.getElementById('welcomeMsg').textContent = `${greeting}, ${naam}`;

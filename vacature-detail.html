@@ -624,6 +624,7 @@ async function handleSave() {
         .eq('internship_id', v.id)
         .maybeSingle();
 
+      let _dbOk = true;
       if (!existing) {
         const { error: appErr } = await db
           .from('applications')
@@ -634,14 +635,20 @@ async function handleSave() {
           });
 
         if (appErr && appErr.code !== '23505') {
-          // Non-fatal — still saved to localStorage
           console.error('Application insert fout:', appErr?.message || 'onbekende fout');
+          _dbOk = false;
         }
       }
       btn.textContent = '✓ Opgeslagen in profiel';
-      notify('✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties', true);
+      notify(
+        _dbOk
+          ? '✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties'
+          : 'Opgeslagen in profiel — neem contact op als je de aanvraag niet ziet',
+        _dbOk ? true : null
+      );
     } else {
       // internship_postings — insert into applications table (localStorage already saved above)
+      let _dbOk = true;
       try {
         const { data: existing } = await db
           .from('applications')
@@ -662,16 +669,21 @@ async function handleSave() {
 
           if (appErr && appErr.code !== '23505') {
             console.error('Application insert fout:', appErr?.message || 'onbekende fout');
-            // localStorage fallback already saved — non-fatal
+            _dbOk = false;
           }
         }
       } catch (insertErr) {
         console.error('Application insert onverwachte fout:', insertErr?.message || 'onbekende fout');
-        // localStorage fallback already saved — non-fatal
+        _dbOk = false;
       }
 
       btn.textContent = '✓ Opgeslagen in profiel';
-      notify('✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties', true);
+      notify(
+        _dbOk
+          ? '✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties'
+          : 'Aanvraag lokaal opgeslagen — mogelijk niet zichtbaar in Mijn Sollicitaties',
+        _dbOk ? true : false
+      );
     }
   } catch(e) {
     console.error('handleSave error:', e?.message || 'onbekende fout');

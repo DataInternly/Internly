@@ -1356,7 +1356,7 @@ async function _initBuddyProfileSection(user, sp) {
   if (!card) return;
 
   try {
-    const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+    const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
     await buddyInit(user.id, 'student', db, naam);
   } catch(e) {
     console.warn('[student-profile] buddy init fout:', e);

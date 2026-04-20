@@ -600,7 +600,7 @@
         // Notify the other party
         if (matchRow) {
           const otherPartyId = matchRow.party_a === currentUser.id ? matchRow.party_b : matchRow.party_a;
-          const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Iemand';
+          const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Iemand';
           await createNotification(
             otherPartyId,
             'new_match',
@@ -652,22 +652,27 @@
               roc_profile_id: rocProfileId,
             }).select('id').maybeSingle();
             if (!match) { notify('Er ging iets mis bij het aanmaken van de match — probeer opnieuw'); return; }
-            if (match) {
-              await db.from('conversations').insert({ match_id: match.id }).select('id').maybeSingle();
-              // Notify company of new match
-              const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'Een student';
-              await createNotification(
-                posting.created_by,
-                'new_match',
-                match.id,
-                'match',
-                myName + ' heeft interesse in jouw vacature: ' + (card.title || 'Stageplek')
-              );
-              saveVacatureToLocal(card);
-              notify('✓ Aanvraag verstuurd — wacht op reactie van het bedrijf');
+            const { error: convErr } = await db.from('conversations')
+              .insert({ match_id: match.id }).select('id').maybeSingle();
+            if (convErr) {
+              console.error('[matches] conversation aanmaken mislukt:', convErr.message);
+              notify('Aanvraag verstuurd maar gesprek kon niet worden gestart — ververs de pagina', false);
               advanceCard();
               return;
             }
+            // Notify company of new match
+            const myName = currentUser.user_metadata?.naam || currentUser.user_metadata?.name || currentUser.email?.split('@')?.[0] || 'Een student';
+            await createNotification(
+              posting.created_by,
+              'new_match',
+              match.id,
+              'match',
+              myName + ' heeft interesse in jouw vacature: ' + (card.title || 'Stageplek')
+            );
+            saveVacatureToLocal(card);
+            notify('✓ Aanvraag verstuurd — wacht op reactie van het bedrijf');
+            advanceCard();
+            return;
           }
         } catch(e) { console.error('Match aanmaken fout:', e?.message || 'onbekende fout'); }
       }
@@ -851,7 +856,7 @@
 
     const authEl = document.getElementById('topbarAuth');
     if (user) {
-      const name     = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')[0] || '';
+      const name     = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
       const initials = name.slice(0, 2).toUpperCase();
       authEl.innerHTML = `
         <div class="topbar-user">
