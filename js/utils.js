@@ -55,6 +55,103 @@ async function smartHomeRedirect() {
 window.smartHomeRedirect = smartHomeRedirect;
 window.getRoleLanding    = getRoleLanding;
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SPRINT 5 — GECENTRALISEERDE HELPERS
+// requireRole · getDisplayName · performLogout
+// Vervangt 16 role guards, 23 email-splits, 14 logout flows
+//
+// The Doctor — paradox note: requireRole gebruikt een in-memory cache als
+// primaire rol-bron. sessionStorage.internly_role bestaat parallel als
+// UI-cache voor pagina's die dat patroon al gebruiken. Beide zijn bronnen van
+// waarheid totdat sprint 5b sessionStorage volledig vervangt. DB-waarde wint.
+// ═══════════════════════════════════════════════════════════════════════════
+
+let __cachedUserRole = null;
+let __cachedUserId   = null;
+
+async function fetchUserRole() {
+  try {
+    const client = (typeof db !== 'undefined') ? db
+                 : (typeof supabase !== 'undefined') ? supabase
+                 : null;
+    if (!client) return null;
+    const { data: { user } } = await client.auth.getUser();
+    if (!user) { __cachedUserRole = null; __cachedUserId = null; return null; }
+    if (__cachedUserId === user.id && __cachedUserRole) return __cachedUserRole;
+    const { data, error } = await client.from('profiles')
+      .select('role').eq('id', user.id).maybeSingle();
+    if (error) { console.error('[fetchUserRole] DB error:', error.message); return null; }
+    __cachedUserRole = data?.role || null;
+    __cachedUserId   = user.id;
+    return __cachedUserRole;
+  } catch (err) {
+    console.error('[fetchUserRole] exception:', err);
+    return null;
+  }
+}
+
+async function requireRole(...allowedRoles) {
+  const validRoles = ['student', 'bedrijf', 'school'];
+  const invalid = allowedRoles.filter(r => !validRoles.includes(r));
+  if (invalid.length > 0) { console.error('[requireRole] onbekende rol(len):', invalid); return false; }
+  const role = await fetchUserRole();
+  if (!role) { window.location.replace('auth.html'); return false; }
+  if (!allowedRoles.includes(role)) {
+    console.warn('[requireRole] user rol', role, 'niet in toegestane', allowedRoles);
+    window.location.replace(getRoleLanding(role));
+    return false;
+  }
+  return true;
+}
+
+function getDisplayName(user) {
+  if (!user) return 'Gebruiker';
+  const naam = user?.user_metadata?.naam || user?.naam || user?.full_name;
+  if (naam && typeof naam === 'string' && naam.trim()) return naam.trim();
+  const email = user?.email || user?.user_metadata?.email;
+  if (email && typeof email === 'string' && email.includes('@')) return email.split('@')[0];
+  return 'Gebruiker';
+}
+
+async function performLogout() {
+  try {
+    const client = (typeof db !== 'undefined') ? db
+                 : (typeof supabase !== 'undefined') ? supabase
+                 : null;
+    if (!client) throw new Error('geen Supabase client beschikbaar');
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
+    sessionStorage.clear();
+    __cachedUserRole = null;
+    __cachedUserId   = null;
+    if (typeof setApplying === 'function') { try { setApplying(false); } catch (_) {} }
+    window.location.replace('/index.html');
+  } catch (err) {
+    console.error('[performLogout] fout bij uitloggen:', err);
+    if (typeof notify === 'function') notify('Uitloggen mislukt, probeer opnieuw', false);
+    else alert('Uitloggen mislukt, probeer opnieuw');
+  }
+}
+
+// Cache invalideren bij auth-state-change (laadt nadat alle scripts klaar zijn)
+window.addEventListener('load', () => {
+  const client = (typeof db !== 'undefined') ? db
+               : (typeof supabase !== 'undefined') ? supabase
+               : null;
+  if (client?.auth?.onAuthStateChange) {
+    client.auth.onAuthStateChange(event => {
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        __cachedUserRole = null;
+        __cachedUserId   = null;
+      }
+    });
+  }
+});
+
+window.requireRole    = requireRole;
+window.getDisplayName = getDisplayName;
+window.performLogout  = performLogout;
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 const TOAST_TIMEOUT_MS = 3200;
 let   _toastTimer      = null;
