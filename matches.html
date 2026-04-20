@@ -844,27 +844,27 @@
   window.addEventListener('DOMContentLoaded', async () => {
     setToggleUI(getToggleState());
 
+    // ── Guard: alleen BOL-studenten ──
+    const hasValidRole = await requireRole('student');
+    if (!hasValidRole) return;
+
     const { data: { user } } = await db.auth.getUser();
-    if (!user) { window.location.href = 'auth.html'; return; }
+    if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;
 
-    const { data: _roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-    if (_roleRow?.role === 'gepensioneerd') { window.location.href = 'buddy-dashboard.html'; return; }
-
-    // BBL-studenten horen niet op de BOL-matches pagina
-    if (sessionStorage.getItem('internly_role') === 'bbl') { window.location.replace('bbl-profile.html'); return; }
+    const { data: sp } = await db.from('student_profiles')
+      .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+    if (sp?.bbl_mode === true) { window.location.replace('bbl-hub.html'); return; }
 
     const authEl = document.getElementById('topbarAuth');
-    if (user) {
-      const name     = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
-      const initials = name.slice(0, 2).toUpperCase();
-      authEl.innerHTML = `
-        <div class="topbar-user">
-          <div class="topbar-avatar">${escapeHtml(initials)}</div>
-          <span>${escapeHtml(name)}</span>
-          <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
-        </div>`;
-    }
+    const name     = getDisplayName(user);
+    const initials = name.slice(0, 2).toUpperCase();
+    authEl.innerHTML = `
+      <div class="topbar-user">
+        <div class="topbar-avatar">${escapeHtml(initials)}</div>
+        <span>${escapeHtml(name)}</span>
+        <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
+      </div>`;
 
     await loadMatches();
     await loadNotifications();
