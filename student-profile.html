@@ -356,25 +356,7 @@
 <body>
 <div class="notif" id="notif"></div>
 
-<div class="topbar">
-  <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="logo" style="cursor:pointer">intern<span>ly</span></a>
-  <nav class="nav">
-    <a href="discover.html">Ontdek</a>
-    <a href="matches.html">Matches</a>
-    <a href="mijn-sollicitaties.html">Mijn Stages</a>
-    <a href="student-profile.html" class="active">Mijn profiel</a>
-    <a href="chat.html">💬 Berichten</a>
-  </nav>
-  <div class="lang-switcher">
-    <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
-    <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
-    <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
-    <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
-  </div>
-  <div id="topbarAuth">
-    <a href="auth.html" class="nav" style="gap:0;color:rgba(255,255,255,.7);font-size:.88rem;font-weight:500;text-decoration:none;">Inloggen</a>
-  </div>
-</div>
+<div id="student-header"></div>
 
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
@@ -1307,14 +1289,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const name     = getDisplayName(user);
-  const initials = name.slice(0, 2).toUpperCase();
-  document.getElementById('topbarAuth').innerHTML = `
-    <div class="topbar-user">
-      <div class="topbar-avatar">${escapeHtml(initials)}</div>
-      <span>${escapeHtml(name)}</span>
-      <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
-    </div>`;
+  await renderStudentHeader({ activeTab: null });
 
   // Load existing profile (if any) and populate the form
   const { data: existing } = await db

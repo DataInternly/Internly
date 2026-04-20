@@ -89,40 +89,7 @@
 </head>
 <body>
 
-  <div class="topbar">
-    <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="logo" style="cursor:pointer">intern<span>ly</span></a>
-    <nav class="nav">
-      <a href="discover.html">Ontdek</a>
-      <a href="matches.html">Matches</a>
-      <a href="mijn-sollicitaties.html" class="active">Mijn Stages</a>
-      <a href="match-dashboard.html">📊 Stage Hub</a>
-      <a href="chat.html">💬 Berichten</a>
-    </nav>
-    <div class="lang-switcher">
-      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
-      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
-      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
-      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
-    </div>
-    <!-- Notification bell -->
-    <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown()">
-      <span class="bell-icon">🔔</span>
-      <span class="bell-count" id="bellCount" style="display:none">0</span>
-    </div>
-    <div class="notif-dropdown" id="notifDropdown" style="display:none">
-      <div class="nd-header">
-        <span class="nd-title">Meldingen</span>
-        <button onclick="markAllRead()" class="nd-mark-all">Alles gelezen</button>
-      </div>
-      <div class="nd-list" id="notifList">
-        <div class="nd-empty">Geen nieuwe meldingen</div>
-      </div>
-    </div>
-    <a href="privacybeleid.html" style="font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;flex-shrink:0;padding:5px 4px;">Privacy</a>
-    <div id="topbarAuth">
-      <a href="auth.html" class="nav" style="gap:0;color:rgba(255,255,255,.7);font-size:.88rem;font-weight:500;text-decoration:none;">Inloggen</a>
-    </div>
-  </div>
+  <div id="student-header"></div>
 
   <!-- Mobile bottom tab bar -->
   <nav class="mobile-tabs">
@@ -526,7 +493,7 @@
       } else {
         countEl.style.display = 'none';
       }
-      const list = document.getElementById('notifList');
+      const list = document.getElementById('ndList');
       if (data.length === 0) {
         list.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
         return;
@@ -712,19 +679,12 @@
       if (sp?.bbl_mode === true) { window.location.replace('bbl-hub.html'); return; }
       if (sp?.onderwijsniveau === 'MBO_BOL') { window.location.replace('bol-profile.html'); return; }
 
-      const authEl = document.getElementById('topbarAuth');
-      const name     = getDisplayName(user);
-      const initials = name.slice(0, 2).toUpperCase();
-      authEl.innerHTML = `
-        <div class="topbar-user">
-          <div class="topbar-avatar">${escapeHtml(initials)}</div>
-          <span>${escapeHtml(name)}</span>
-          <button class="btn-topbar-logout" onclick="signOut()">Uitloggen</button>
-        </div>`;
+      await renderStudentHeader({ activeTab: 'sollicitaties' });
 
       await loadApplications(user.id);
       await loadNotifications();
       notifSubscription = startNotifSubscription(user.id);
+      document.getElementById('notifBell').style.display = 'flex';
     });
 
     window.addEventListener('beforeunload', () => {
