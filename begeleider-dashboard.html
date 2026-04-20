@@ -611,12 +611,7 @@ function initSessionTimeout() {
 }
 
 // ── Sign out ─────────────────────────────────────────────────────────────────
-async function doSignOut() {
-  await db.auth.signOut().catch(() => {});
-  sessionStorage.removeItem('internly_role');
-  setApplying(false);
-  window.location.href = 'auth.html';
-}
+function doSignOut() { performLogout(); }
 
 // ── Load subscription ─────────────────────────────────────────────────────────
 async function loadSubscription(userId) {

@@ -652,17 +652,7 @@
       el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
     }
 
-    async function signOut() {
-      try {
-        await db.auth.signOut();
-      } catch(e) {
-        console.error('Logout error:', e?.message || 'onbekende fout');
-      } finally {
-        sessionStorage.removeItem('internly_role');
-        setApplying(false);
-        window.location.href = 'auth.html';
-      }
-    }
+    function signOut() { performLogout(); }
 
     function renderLocalSaved() {
       let saved;

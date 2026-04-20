@@ -943,21 +943,7 @@ function showLoading(containerId, tekst) {
 window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
 window.addEventListener('online',  () => { notify('Verbinding hersteld — pagina wordt vernieuwd…'); location.reload(); });
 
-async function signOut() {
-  if (notifSubscription) {
-    try { await db.removeChannel(notifSubscription); } catch(e) {}
-    notifSubscription = null;
-  }
-  try {
-    await db.auth.signOut();
-  } catch(e) {
-    console.error('Logout error:', e?.message || 'onbekende fout');
-  } finally {
-    sessionStorage.removeItem('internly_role');
-    setApplying(false);
-    window.location.href = 'auth.html';
-  }
-}
+function signOut() { performLogout(); }
 
 
 function formatRelativeTime(isoString) {

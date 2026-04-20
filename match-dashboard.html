@@ -2054,7 +2054,7 @@
       <div class="sidebar-footer">
         <div class="sidebar-footer-user" id="sidebar-user-info"></div>
         <a href="privacybeleid.html" style="display:block;margin-top:8px;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:4px 0;">Privacybeleid</a>
-        <button onclick="db.auth.signOut().then(()=>{ sessionStorage.removeItem('internly_role'); setApplying(false); window.location.href='auth.html'; })" style="
+        <button onclick="performLogout()" style="
           margin-top:8px;width:100%;padding:8px 12px;
           background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
           border-radius:8px;color:rgba(255,255,255,.5);

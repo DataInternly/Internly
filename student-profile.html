@@ -1276,17 +1276,7 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 
-async function signOut() {
-  try {
-    await db.auth.signOut();
-  } catch(e) {
-    console.error('Logout error:', e?.message || 'onbekende fout');
-  } finally {
-    sessionStorage.removeItem('internly_role');
-    setApplying(false);
-    window.location.href = 'auth.html';
-  }
-}
+function signOut() { performLogout(); }
 
 window.addEventListener('DOMContentLoaded', async () => {
   // Toon opgeslagen vacatures direct vanuit localStorage — geen netwerk nodig

@@ -389,12 +389,7 @@ function formatDateShort(iso) {
   };
 }
 
-async function signOut() {
-  await db.auth.signOut();
-  sessionStorage.removeItem('internly_role');
-  setApplying(false);
-  window.location.href = 'auth.html';
-}
+function signOut() { performLogout(); }
 
 // ── Contract strip ───────────────────────────────────────────────────────────
 

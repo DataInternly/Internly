@@ -1082,12 +1082,7 @@ function formatDate(iso) {
 }
 
 // Notification helper — exact kopie patroon chat.html
-async function signOut() {
-  await db.auth.signOut();
-  sessionStorage.removeItem('internly_role');
-  setApplying(false);
-  window.location.href = 'auth.html';
-}
+function signOut() { performLogout(); }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VIEW SWITCHING
