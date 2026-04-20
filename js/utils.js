@@ -441,6 +441,12 @@ async function renderStudentHeader({ containerId = 'student-header', activeTab =
     notify('Header kon niet laden', false);
     return;
   }
+  if (spRes.error) {
+    console.error('[renderStudentHeader] student_profiles fout:', spRes.error);
+  }
+  if (buddyRes.error) {
+    console.error('[renderStudentHeader] buddy_pairs fout:', buddyRes.error);
+  }
 
   const profile    = profileRes.data || { naam: '' };
   const bblMode    = spRes?.data?.bbl_mode === true;
