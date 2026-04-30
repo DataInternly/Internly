@@ -16,6 +16,7 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/milestones.js"></script>
   <script src="js/account.js"></script>
   <script src="js/push.js"></script>
   <script src="js/toast.js"></script>
@@ -1400,7 +1401,30 @@ async function loadStudenten() {
   const badge = document.getElementById('badge-studenten');
   if (studenten.length > 0) { badge.textContent = studenten.length; badge.style.display = 'inline'; }
 
-  renderStudentenRows('dashboard-studenten', studenten.slice(0, 4));
+  // Batch milestones voor alle studenten — CC Instructie 2
+  const _matchIds = studenten.map(s => s.matchId).filter(Boolean);
+  let _milestoneMap = {};
+  if (_matchIds.length > 0) {
+    try {
+      const { data: _ms } = await db
+        .from('stage_milestones')
+        .select(
+          'id, match_id, seq, title, description,' +
+          'weight, status, confirmed_at, submitted_at'
+        )
+        .in('match_id', _matchIds);
+      (_ms || []).forEach(m => {
+        if (!_milestoneMap[m.match_id])
+          _milestoneMap[m.match_id] = [];
+        _milestoneMap[m.match_id].push(m);
+      });
+    } catch (e) {
+      console.warn('[school] milestones laden mislukt:',
+        e?.message);
+    }
+  }
+
+  renderStudentenRows('dashboard-studenten', studenten.slice(0, 4), _milestoneMap);
 
   // Freemium cap: max 25 visible students; amber banner if more exist
   let studentenForList = studenten;
@@ -1421,7 +1445,7 @@ async function loadStudenten() {
     }
   }
 
-  renderStudentenRows('studenten-list', studentenForList);
+  renderStudentenRows('studenten-list', studentenForList, _milestoneMap);
   renderSignalen();
 }
 
@@ -1433,7 +1457,7 @@ function progressColor(p) {
   return p > 60 ? 'var(--green)' : p > 30 ? 'var(--amber)' : 'var(--red)';
 }
 
-function renderStudentenRows(cid, data) {
+function renderStudentenRows(cid, data, milestoneMap = {}) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
     el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">🎓</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen studenten gekoppeld</div><div style="font-size:.88rem;">Nodig studenten uit via de schoolcode of koppel ze handmatig aan jouw opleiding.</div><button type="button" onclick="openStudentUitnodigen()" class="btn-primary" style="margin-top:.75rem;">Eerste student toevoegen →</button></div>`;
@@ -1444,6 +1468,22 @@ function renderStudentenRows(cid, data) {
     const eBedrijf = escapeHtml(s.bedrijf || '');
     const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
     const faseLabel = { 'actief': 'Stage loopt', 'risico': '⚠ Let op', 'zoekend': 'Zoekend' }[s.status] || '';
+
+    // Milestone bevestigingsbadge — CC Instructie 2
+    let pendingBtn = '';
+    if (s.matchId && s.status !== 'zoekend') {
+      const ms = milestoneMap[s.matchId] || [];
+      const pending = ms.filter(m => m.status === 'ingediend');
+      if (pending.length) {
+        pendingBtn = `<button class="btn btn-ghost btn-sm"
+          style="color:var(--accent,#e05c1a);
+            border-color:rgba(224,92,26,.25);margin-top:.4rem"
+          onclick="openMilestoneModal('${s.matchId}','${escapeHtml(s.naam || '')}')">
+          ⏳ ${pending.length} bevestiging${pending.length > 1 ? 'en' : ''} vereist
+        </button>`;
+      }
+    }
+
     return `
     <div class="student-row">
       <div class="avatar">${escapeHtml(initials(s.naam))}</div>
@@ -1467,9 +1507,109 @@ function renderStudentenRows(cid, data) {
         ${_isPremiumSchool && s.matchId ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
            style="font-size:.75rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:3px 9px;border-radius:20px;white-space:nowrap;margin-left:4px;">
            📊 Hub</a>` : ''}
+        ${pendingBtn}
       </div>
     </div>`;
   }).join('');
+}
+
+// ── Milestone bevestiging modal (CC Instructie 2) ─────────────────────────────
+async function openMilestoneModal(matchId, studentNaam) {
+  let milestones = [];
+  try {
+    milestones = await getMilestones(matchId);
+  } catch (e) {
+    console.warn('[school] milestones laden fout:', e?.message || e);
+    notify('Kon mijlpalen niet laden', false); return;
+  }
+
+  const pending = milestones.filter(m => m.status === 'ingediend');
+  if (!pending.length) {
+    notify('Geen openstaande bevestigingen.'); return;
+  }
+
+  const rows = pending.map(m => `
+    <div style="padding:.85rem 0;
+      border-bottom:1px solid rgba(13,21,32,.09)">
+      <div style="font-size:.9rem;font-weight:500;
+        margin-bottom:.2rem">
+        ${escapeHtml(m.title)}
+      </div>
+      <div style="font-size:.78rem;color:#7a8799;
+        margin-bottom:.5rem">
+        ${escapeHtml(m.description || '')}
+        ${m.submitted_at
+          ? ' · Ingediend op ' + escapeHtml(formatNLDate(m.submitted_at) || '')
+          : ''}
+      </div>
+      <button class="btn btn-green btn-sm"
+        id="ms-btn-${m.id}"
+        onclick="schoolConfirmMilestone('${m.id}', '${matchId}')">
+        Bevestigen
+      </button>
+    </div>`).join('');
+
+  const html = `
+    <div id="ms-modal-backdrop" style="
+      position:fixed;inset:0;background:rgba(13,21,32,.45);
+      z-index:9000;display:flex;align-items:center;
+      justify-content:center;padding:1rem">
+      <div style="background:#fff;border-radius:12px;
+        padding:1.5rem;max-width:440px;width:100%;
+        max-height:80vh;overflow-y:auto">
+        <div style="display:flex;align-items:center;
+          justify-content:space-between;margin-bottom:1rem">
+          <h3 style="font-size:1rem;font-weight:600">
+            Mijlpalen bevestigen
+          </h3>
+          <button class="btn btn-ghost btn-sm"
+            onclick="document.getElementById('ms-modal-backdrop').remove()">
+            Sluiten
+          </button>
+        </div>
+        <p style="font-size:.82rem;color:#7a8799;
+          margin-bottom:.75rem">
+          Student: <strong>${escapeHtml(studentNaam)}</strong>
+        </p>
+        ${rows}
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function schoolConfirmMilestone(milestoneId, matchId) {
+  const btn = document.getElementById('ms-btn-' + milestoneId);
+  if (btn) btn.disabled = true;
+
+  let studentId = null;
+  try {
+    const { data: matchRow } = await db
+      .from('matches')
+      .select('party_a')
+      .eq('id', matchId)
+      .maybeSingle();
+    studentId = matchRow?.party_a || null;
+  } catch (lookupErr) {
+    console.warn('[school] match lookup fout:', lookupErr?.message || lookupErr);
+  }
+
+  try {
+    await confirmMilestone(milestoneId,
+      currentUser?.id, studentId);
+    const row = btn?.closest('div[style]');
+    if (row) row.remove();
+    notify('Bevestigd — student ontvangt melding');
+
+    const remaining = document.querySelectorAll('#ms-modal-backdrop .btn-green');
+    if (!remaining.length) {
+      document.getElementById('ms-modal-backdrop')?.remove();
+    }
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    notify('Kon niet bevestigen', false);
+    console.warn('[school] confirm fout:', e?.message || e);
+  }
 }
 
 function renderSignalen() {
@@ -2331,8 +2471,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'school') {
-    const routes = { student: 'discover.html', bedrijf: 'company-dashboard.html', gepensioneerd: 'buddy-dashboard.html' };
-    window.location.href = routes[userRole] || 'auth.html';
+    window.location.replace(
+      typeof getRoleLanding === 'function'
+        ? getRoleLanding(userRole)
+        : 'auth.html'
+    );
     return;
   }
 

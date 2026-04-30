@@ -711,8 +711,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'bedrijf') {
-    const routes = { student: 'discover.html', school: 'school-dashboard.html' };
-    window.location.href = routes[userRole] || 'auth.html';
+    window.location.replace(
+      typeof getRoleLanding === 'function'
+        ? getRoleLanding(userRole)
+        : 'auth.html'
+    );
     return;
   }
 

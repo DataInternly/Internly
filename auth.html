@@ -396,6 +396,27 @@
       <button onclick="switchAccount()" style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--line-default);border-radius:var(--r-pill);font-family:var(--font-body);font-size:.88rem;font-weight:500;color:var(--fg-secondary);cursor:pointer;">Ander account / uitloggen</button>
     </div>
 
+    <div style="text-align:center;margin-bottom:.75rem;
+      font-size:.8rem;color:#9ca3af;display:flex;
+      align-items:center;justify-content:center;gap:.5rem">
+      <a href="hoe-het-werkt.html"
+         style="color:#1a7a48;text-decoration:underline;
+                text-underline-offset:2px">🇳🇱 Nederlands</a>
+      <span>·</span>
+      <a href="internly-worldwide.html"
+         style="color:#1a7a48;text-decoration:underline;
+                text-underline-offset:2px">🌍 English</a>
+    </div>
+
+    <p style="text-align:center;margin-bottom:1rem;
+      font-size:.82rem;color:#6b7280">
+      <a href="hoe-het-werkt.html"
+         style="color:#1a7a48;text-decoration:underline;
+                text-underline-offset:2px">
+        Hoe werkt Internly? →
+      </a>
+    </p>
+
     <!-- Tabs (pill) -->
     <div class="tabs">
       <button class="tab active" id="tab-login" onclick="switchTab('login')">Inloggen</button>
@@ -955,10 +976,10 @@ async function doLogin() {
       if (_sp && typeof _sp.bbl_mode === 'boolean') {
         // Bestaand profiel — gebruik centrale resolver (single source of truth)
         // js/roles.js gegarandeerd geladen via §Laadvolgorde
-        // OPEN VRAAG (30 apr 2026): BBL student zonder naam wordt
-        // hier naar bbl-hub gestuurd, maar het al-ingelogd panel
-        // (rond regel 1129) stuurt naar bbl-profile. Twee gedragingen
-        // voor zelfde user-state. UX-keuze post-11-mei.
+        // BBL routing — resolved 2026-04-30 CC Instruction B
+        // resolveStudentDashboard checks naam in _sp:
+        //   BBL + naam null/empty → bbl-profile.html (onboarding)
+        //   BBL + naam filled     → bbl-hub.html
         window.location.href = resolveStudentDashboard({ role: 'student' }, _sp);
       } else {
         // Onboarding-guard: student zonder profiel → profiel-form
@@ -1253,10 +1274,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           .select('bbl_mode, naam, onderwijsniveau')
           .eq('profile_id', user.id)
           .maybeSingle();
-        // OPEN VRAAG (30 apr 2026): BBL student zonder naam gaat hier
-        // naar bbl-profile, maar post-login flow (rond regel 837)
-        // stuurt naar bbl-hub. Twee gedragingen voor zelfde user-state.
-        // UX-keuze post-11-mei.
+        // BBL routing — consistent met post-login flow (resolved 2026-04-30)
         if (sp?.bbl_mode === true) { dest = sp?.naam ? 'bbl-hub.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
         else if (!sp?.naam) { dest = 'student-profile.html'; }
       }

@@ -32,6 +32,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/account.js"></script>
@@ -588,7 +589,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (role !== 'school') {
       // Not a school account — redirect (could be student, company, etc.)
-      window.location.replace('auth.html');
+      window.location.replace(
+        typeof getRoleLanding === 'function'
+          ? getRoleLanding(role)
+          : 'auth.html'
+      );
       return;
     }
 

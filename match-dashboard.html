@@ -20,6 +20,7 @@
           crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/milestones.js"></script>
   <script src="js/account.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
@@ -1614,6 +1615,53 @@
       font-size: .74rem; font-weight: 700; color: var(--ink2);
       white-space: nowrap; min-width: 32px; text-align: right;
     }
+    /* ── Milestone tracker (CC Instructie 2) ─────────────── */
+    .milestone-row {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: .75rem;
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--border, rgba(13,21,32,.09));
+    }
+    .milestone-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 600; flex-shrink: 0;
+      border: 1.5px solid var(--border, rgba(13,21,32,.09));
+      background: var(--white, #fff);
+    }
+    .milestone-bevestigd .milestone-dot {
+      background: #e8f5ee; color: #1a7a48;
+      border-color: rgba(26,122,72,.2);
+    }
+    .milestone-ingediend .milestone-dot {
+      background: #fdf0e8; color: #e05c1a;
+      border-color: rgba(224,92,26,.2);
+    }
+    .milestone-title { font-size: .9rem; font-weight: 500; }
+    .milestone-meta  { font-size: .78rem; color: var(--ink3, #7a8799); margin-top: 2px; }
+    .milestone-next-banner {
+      display: flex; align-items: center; gap: .75rem;
+      background: #e8f5ee;
+      border: 1px solid rgba(26,122,72,.15);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: .88rem;
+    }
+    .milestone-next-banner.milestone-done {
+      background: var(--bg2, #eceae4);
+      color: var(--ink2, #3a4455);
+      border-color: var(--border, rgba(13,21,32,.09));
+    }
+    .milestone-next-label {
+      font-size: .72rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: #1a7a48; flex-shrink: 0;
+    }
+    .milestone-next-title { font-weight: 500; flex: 1; }
+    .btn-sm { padding: 5px 12px; font-size: .8rem; }
     .mi-stage-info {
       margin-bottom: .65rem;
     }
@@ -2262,6 +2310,7 @@ let hubState = {
   currentTab: 'overzicht',
   schoolInvited: true,
   nextId: 20,
+  milestones: [],
 
   tasks: [
     { id: 1, title: 'Onderzoeksvoorstel schrijven', desc: 'Schrijf een voorstel van 3-5 pagina\'s over wetenschapscommunicatie voor brede doelgroepen.', deadline: '2026-03-15', status: 'done',        assignee: 'student', priority: 'hoog'   },
@@ -2488,6 +2537,16 @@ function renderMatchIndicator() {
     ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
     : 0;
 
+  // Milestone-based progress — CC Instructie 2
+  const _msPct = typeof calcProgress === 'function' &&
+    hubState.milestones?.length
+    ? calcProgress(hubState.milestones)
+    : weekPct;
+  const _msColor = typeof calcProgress === 'function' &&
+    hubState.milestones?.length
+    ? (_msPct >= 80 ? '#1a7a48' : _msPct >= 40 ? '#e05c1a' : '#7a8799')
+    : pctColor(avgPct);
+
   const node = (name, roleKey, colorVar, bgVar, label) => {
     const initials = name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
     const isActive = role === roleKey;
@@ -2521,9 +2580,9 @@ function renderMatchIndicator() {
       </div>
       <div class="progress-stage-wrap">
         <div class="progress-stage">
-          <div class="progress-stage-fill" style="width:${weekPct}%;background:${pctColor(avgPct)}"></div>
+          <div class="progress-stage-fill" style="width:${_msPct}%;background:${_msColor}"></div>
         </div>
-        <span class="progress-stage-pct">${weekPct}%</span>
+        <span class="progress-stage-pct">${_msPct}%</span>
       </div>
     </div>`;
 }
@@ -2605,6 +2664,16 @@ async function loadHubFromDB() {
         id: 'lg' + hubState.nextId++, _dbId: l.id,
         msg: l.msg, time: l.time || l.created_at, color: l.color || 'blue'
       }));
+    }
+
+    // Milestone tracker — CC Instructie 2
+    try {
+      hubState.milestones = typeof getMilestones === 'function'
+        ? await getMilestones(MATCH_ID)
+        : [];
+    } catch (e) {
+      console.warn('[hub] milestones laden mislukt:', e?.message || e);
+      hubState.milestones = [];
     }
 
     if (currentUser) {
@@ -2705,7 +2774,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const roleMap = { student: 'student', bedrijf: 'bedrijf', school: 'school' };
+      const roleMap = { student: 'student', bedrijf: 'bedrijf', school: 'school', begeleider: 'begeleider' };
       const mappedRole = roleMap[dbRole];
       if (mappedRole) {
         // Profile guard — audit fix 2026-04-30
@@ -2745,7 +2814,9 @@ async function loadMatchFromDB(user) {
     // 0. Role guard — wrong-role doorsturen via canon
     //    (replace ipv href om history schoon te houden)
     const { data: _prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-    const allowedRoles = ['student', 'begeleider'];
+    const allowedRoles = [
+      'student', 'school', 'bedrijf', 'begeleider'
+    ];
     if (_prof && !allowedRoles.includes(_prof.role)) {
       hideSpinner();
       window.location.replace(getRoleLanding(_prof.role, false));
@@ -3469,6 +3540,98 @@ async function deleteTask(id) {
   toast('Taak verwijderd.');
 }
 
+/* ── Milestone helpers (CC Instructie 2) ───────────────────────────────── */
+
+function renderMilestoneAction(milestone, role) {
+  if (!milestone) return '';
+  if (milestone.confirms_by === 'auto') return '';
+
+  if (milestone.category === 'meeting') {
+    if (role === 'school') {
+      const meetClick = typeof openMeetingModal === 'function'
+        ? 'openMeetingModal()'
+        : "switchTab('planning')";
+      return `<button class="btn btn-primary btn-sm" style="margin-top:.4rem"
+        onclick="${meetClick}">
+        Plan driegesprek
+      </button>`;
+    }
+    return '';
+  }
+
+  if (milestone.confirms_by === 'school'
+      && (milestone.category === 'deadline' || milestone.category === 'taak')
+      && role === 'student') {
+    const lower = (milestone.title || '').toLowerCase();
+    const label = lower.includes('rapport')  ? 'Rapport ingeleverd'
+                : lower.includes('verslag')  ? 'Verslag ingeleverd'
+                : 'Gereed';
+    return `<button class="btn btn-primary btn-sm" style="margin-top:.4rem"
+      onclick="handleSubmitMilestone('${milestone.id}')">
+      ${label}
+    </button>`;
+  }
+
+  if (milestone.confirms_by === 'bedrijf' && role === 'bedrijf') {
+    return `<button class="btn btn-primary btn-sm" style="margin-top:.4rem"
+      onclick="handleSubmitMilestone('${milestone.id}')">
+      Afronden
+    </button>`;
+  }
+
+  return '';
+}
+
+async function handleSubmitMilestone(milestoneId) {
+  const m = (hubState.milestones || []).find(x => x.id === milestoneId);
+  if (!m) {
+    notify('Mijlpaal niet gevonden', false);
+    return;
+  }
+  try {
+    await submitMilestone(milestoneId, currentUser?.id, MATCH_ID);
+    notify('Stap ingediend — school ontvangt bericht');
+    try {
+      hubState.milestones = await getMilestones(MATCH_ID);
+    } catch (reloadErr) {
+      console.warn('[milestones] reload na submit mislukt:', reloadErr?.message || reloadErr);
+    }
+    if (typeof switchTab === 'function') switchTab(hubState.currentTab || 'voortgang');
+  } catch (e) {
+    console.warn('[handleSubmitMilestone] fout:', e?.message || e);
+    notify('Kon stap niet indienen', false);
+  }
+}
+
+async function handleConfirmMilestone(milestoneId) {
+  const m = (hubState.milestones || []).find(x => x.id === milestoneId);
+  if (!m) {
+    notify('Mijlpaal niet gevonden', false);
+    return;
+  }
+  let studentId = null;
+  try {
+    const { data: matchRow } = await db.from('matches')
+      .select('party_a').eq('id', MATCH_ID).maybeSingle();
+    studentId = matchRow?.party_a || null;
+  } catch (lookupErr) {
+    console.warn('[handleConfirmMilestone] match lookup fout:', lookupErr?.message || lookupErr);
+  }
+  try {
+    await confirmMilestone(milestoneId, currentUser?.id, studentId);
+    notify('Mijlpaal bevestigd');
+    try {
+      hubState.milestones = await getMilestones(MATCH_ID);
+    } catch (reloadErr) {
+      console.warn('[milestones] reload na confirm mislukt:', reloadErr?.message || reloadErr);
+    }
+    if (typeof switchTab === 'function') switchTab(hubState.currentTab || 'voortgang');
+  } catch (e) {
+    console.warn('[handleConfirmMilestone] fout:', e?.message || e);
+    notify('Kon niet bevestigen', false);
+  }
+}
+
 /* ── Voortgang tab ──────────────────────────────────────────────────────── */
 
 function renderVoortgang() {
@@ -3584,6 +3747,56 @@ function renderVoortgang() {
       Je bekijkt de voortgang als schoolbegeleider. Beoordelingen zijn alleen-lezen.
     </div>` : '';
 
+  // Milestone tracker (CC Instructie 2) — boven leerdoelen
+  const _ms = Array.isArray(hubState.milestones) ? hubState.milestones : [];
+  let milestonesBlock = '';
+  if (_ms.length > 0 && typeof getNextMilestone === 'function') {
+    const next = getNextMilestone(_ms, hubState.role);
+    const nextBanner = next
+      ? `<div class="milestone-next-banner">
+           <span class="milestone-next-label">Volgende stap</span>
+           <span class="milestone-next-title">${escapeHtml(next.title)}</span>
+           ${renderMilestoneAction(next, hubState.role)}
+         </div>`
+      : `<div class="milestone-next-banner milestone-done">
+           ✓ Je bent bij — wacht op de andere partij.
+         </div>`;
+
+    const rows = _ms.map(m => `
+      <div class="milestone-row milestone-${m.status}">
+        <div class="milestone-dot">
+          ${m.status === 'bevestigd' ? '✓'
+            : m.status === 'ingediend' ? '⏳'
+            : m.seq}
+        </div>
+        <div class="milestone-body">
+          <div class="milestone-title">${escapeHtml(m.title)}</div>
+          <div class="milestone-meta">
+            ${m.status === 'bevestigd'
+              ? 'Bevestigd op ' + escapeHtml(formatNLDate(m.confirmed_at) || '')
+              : m.status === 'ingediend'
+                ? 'Ingediend — wacht op bevestiging'
+                : m.category === 'meeting'
+                  ? 'Wordt ingepland als driegesprek'
+                  : 'Nog niet gestart'}
+          </div>
+          ${m.status === 'open' ? renderMilestoneAction(m, hubState.role) : ''}
+          ${m.status === 'ingediend' && hubState.role === 'school'
+            ? `<button class="btn btn-green btn-sm" style="margin-top:.4rem"
+                 onclick="handleConfirmMilestone('${m.id}')">
+                 Bevestigen
+               </button>` : ''}
+        </div>
+      </div>`).join('');
+
+    milestonesBlock = `
+      <div class="card" style="margin-bottom:16px">
+        <div class="sec-label">Stagevoortgang — 8 mijlpalen</div>
+        ${nextBanner}
+        ${rows}
+      </div>`;
+  }
+
   return `
     <div class="page-head">
       <div>
@@ -3594,6 +3807,8 @@ function renderVoortgang() {
     </div>
 
     ${schoolReadOnly}
+
+    ${milestonesBlock}
 
     <!-- Stat strip -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">

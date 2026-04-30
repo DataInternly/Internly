@@ -956,8 +956,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (!profile || profile.role !== 'gepensioneerd') {
     // Verkeerde rol — doorsturen naar juiste dashboard
-    const redirect = { student: 'discover.html', bedrijf: 'company-dashboard.html', school: 'school-dashboard.html' };
-    window.location.href = redirect[profile?.role] || 'auth.html';
+    window.location.replace(
+      typeof getRoleLanding === 'function'
+        ? getRoleLanding(profile?.role || 'gepensioneerd')
+        : 'auth.html'
+    );
     return;
   }
 

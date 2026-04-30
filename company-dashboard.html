@@ -16,6 +16,7 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/milestones.js"></script>
   <script src="js/account.js"></script>
   <script src="js/push.js"></script>
   <script src="js/profanity.js"></script>
@@ -1622,6 +1623,12 @@ async function loadCompanyMatches() {
                         background:#fdf0e8;padding:7px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;min-height:36px">
                 📊 Stage Hub →
               </a>` : ''}
+            ${m.status === 'accepted' ? `
+              <button class="btn btn-ghost btn-sm"
+                onclick="openEindbeoordelingModal('${m.id}','${m.party_a}')"
+                title="Stage afronden en eindbeoordeling geven">
+                Stage afronden →
+              </button>` : ''}
           </div>
         </div>`;
     }).join('');
@@ -1644,6 +1651,23 @@ async function acceptMatch(matchId, studentId) {
     conv = newConv;
   }
 
+  // Seed stage milestone tracker — CC Instructie 2
+  try {
+    const { data: _sp } = await db
+      .from('student_profiles')
+      .select('naam')
+      .eq('profile_id', studentId)
+      .maybeSingle();
+    await db.rpc('seed_stage_milestones', {
+      p_match_id: matchId,
+      p_profiel_compleet: !!(_sp?.naam)
+    });
+  } catch (_e) {
+    console.warn('[acceptMatch] milestone seed fout:',
+      _e?.message || _e);
+    // non-blocking — match accept gaat door
+  }
+
   // Notify student
   const companyName = getDisplayName(currentUser);
   createNotification(studentId, 'application_accepted', matchId, 'match', companyName + ' heeft jouw match geaccepteerd — start het gesprek!');
@@ -1664,6 +1688,97 @@ async function rejectMatch(matchId, studentId) {
   sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
   notify('Match afgewezen');
   loadCompanyMatches();
+}
+
+// ── Eindbeoordeling modal (CC Instructie 2) ───────────────────────────────────
+async function openEindbeoordelingModal(matchId, studentId) {
+  let milestones = [];
+  try {
+    milestones = await getMilestones(matchId);
+  } catch (e) {
+    console.warn('[eind] milestones laden mislukt:', e?.message || e);
+    notify('Kon gegevens niet laden', false); return;
+  }
+  const m8 = milestones.find(m => m.seq === 8);
+  if (!m8 || m8.status === 'bevestigd') {
+    notify('Eindbeoordeling al afgerond.'); return;
+  }
+  if (m8.status === 'ingediend') {
+    notify('Eindbeoordeling al ingediend — wacht op bevestiging school.');
+    return;
+  }
+
+  const html = `
+    <div id="eind-modal-backdrop" style="
+      position:fixed;inset:0;background:rgba(13,21,32,.45);
+      z-index:9000;display:flex;align-items:center;
+      justify-content:center;padding:1rem">
+      <div style="background:#fff;border-radius:12px;
+        padding:1.5rem;max-width:420px;width:100%">
+        <h3 style="font-size:1rem;font-weight:600;
+          margin-bottom:1rem">Stage afronden</h3>
+        <p style="font-size:.88rem;color:#3a4455;
+          margin-bottom:1rem;line-height:1.55">
+          Geef een eindbeoordeling. School ontvangt een
+          notificatie en bevestigt de afsluiting.
+        </p>
+        <div style="margin-bottom:.75rem">
+          <label style="font-size:.82rem;font-weight:500;
+            display:block;margin-bottom:.4rem">
+            Beoordeling
+          </label>
+          <select id="eind-rating" style="width:100%;
+            padding:.5rem .75rem;border:1px solid
+            rgba(13,21,32,.12);border-radius:8px;
+            font-size:.88rem">
+            <option value="positief">Positief</option>
+            <option value="neutraal">Neutraal</option>
+            <option value="negatief">Negatief</option>
+          </select>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:.82rem;font-weight:500;
+            display:block;margin-bottom:.4rem">
+            Toelichting (optioneel)
+          </label>
+          <textarea id="eind-toelichting"
+            maxlength="300" rows="3"
+            placeholder="Bijv. sterke punten, leerpunten..."
+            style="width:100%;padding:.5rem .75rem;
+            border:1px solid rgba(13,21,32,.12);
+            border-radius:8px;font-size:.88rem;
+            resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;gap:.5rem;justify-content:flex-end">
+          <button class="btn btn-ghost"
+            onclick="document.getElementById('eind-modal-backdrop').remove()">
+            Annuleren
+          </button>
+          <button class="btn btn-primary" id="eind-confirm-btn"
+            onclick="submitEindbeoordeling('${m8.id}','${matchId}','${studentId}')">
+            Versturen →
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function submitEindbeoordeling(milestoneId, matchId, studentId) {
+  const btn = document.getElementById('eind-confirm-btn');
+  if (btn) btn.disabled = true;
+
+  try {
+    await submitMilestone(milestoneId,
+      currentUser?.id || window._currentUserId, matchId);
+    document.getElementById('eind-modal-backdrop')?.remove();
+    notify('Eindbeoordeling verstuurd — school ontvangt bericht');
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    notify('Kon eindbeoordeling niet versturen', false);
+    console.warn('[eind] submit fout:', e?.message || e);
+  }
 }
 
 // ── Berichten screen ──────────────────────────────────────────────────────────
@@ -2723,8 +2838,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'bedrijf') {
-    const routes = { student: 'discover.html', school: 'school-dashboard.html', gepensioneerd: 'buddy-dashboard.html' };
-    window.location.href = routes[userRole] || 'auth.html';
+    window.location.replace(
+      typeof getRoleLanding === 'function'
+        ? getRoleLanding(userRole)
+        : 'auth.html'
+    );
     return;
   }
 

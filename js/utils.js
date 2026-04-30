@@ -123,7 +123,10 @@ async function fetchUserRole() {
 }
 
 async function requireRole(...allowedRoles) {
-  const validRoles = ['student', 'bedrijf', 'school'];
+  const validRoles = [
+    'student', 'bedrijf', 'school',
+    'gepensioneerd', 'begeleider', 'admin'
+  ];
   const invalid = allowedRoles.filter(r => !validRoles.includes(r));
   if (invalid.length > 0) { console.error('[requireRole] onbekende rol(len):', invalid); return false; }
   const role = await fetchUserRole();
@@ -329,6 +332,8 @@ const VALID_NOTIFICATION_TYPES = [
   'begeleider_invite',
   'bundeling_approved',
   'bundeling_denied',
+  'milestone_submitted',
+  'milestone_confirmed',
 ];
 
 function getNotifText(n) {
@@ -355,6 +360,8 @@ function getNotifText(n) {
     case 'application_accepted':    return n.message || 'Goed nieuws — je sollicitatie is geaccepteerd!';
     case 'application_rejected':    return n.message || 'Je sollicitatie is helaas afgewezen.';
     case 'school_referral':         return n.message || 'Je school heeft een doorverwijzing voor je gestuurd.';
+    case 'milestone_submitted':     return 'Nieuwe stap ingediend — bevestig in je dashboard.';
+    case 'milestone_confirmed':     return 'Een mijlpaal in je stagevoortgang is bevestigd.';
     default:                        return n.message || 'Nieuwe melding';
   }
 }

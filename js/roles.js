@@ -64,7 +64,16 @@ const ROLE_DETECTION_COLUMNS = {
 function resolveStudentDashboard(profile, studentProfile) {
   if (!profile || profile.role !== 'student') return null;
   if (!studentProfile) return 'match-dashboard.html';
-  if (studentProfile.bbl_mode === true) return 'bbl-hub.html';
+  if (studentProfile?.bbl_mode === true) {
+    // Onboarding guard: only redirect to profile-setup
+    // if naam is explicitly null or empty string.
+    // undefined (no naam key = mock/partial object) → hub.
+    const naam = studentProfile?.naam;
+    if (naam === null || naam === '') {
+      return 'bbl-profile.html';
+    }
+    return 'bbl-hub.html';
+  }
   if (studentProfile.student_type === 'international') {
     return 'international-student-dashboard.html';
   }

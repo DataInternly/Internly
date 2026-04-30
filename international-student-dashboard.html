@@ -37,6 +37,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/account.js"></script>
@@ -1070,6 +1071,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.replace('auth.html'); return; }
+
+    // Role guard — CC Instruction B 2026-04-30
+    const { data: _iProf } = await db
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!_iProf || _iProf.role !== 'student') {
+      window.location.replace(
+        typeof getRoleLanding === 'function'
+          ? getRoleLanding(_iProf?.role || 'student')
+          : 'auth.html'
+      );
+      return;
+    }
+
+    // Student type guard
+    // _sp === null means new user doing onboarding — allow access.
+    // _sp present but not 'international' — redirect to correct page.
+    const { data: _iSp } = await db
+      .from('student_profiles')
+      .select('student_type, naam')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+
+    if (_iSp !== null && _iSp.student_type !== 'international') {
+      window.location.replace(
+        typeof resolveStudentDashboard === 'function'
+          ? resolveStudentDashboard({ role: 'student' }, _iSp)
+          : 'discover.html'
+      );
+      return;
+    }
+    // _iSp === null = new international student, allow through
+    // for onboarding.
+
     currentUser = user;
     document.getElementById('userEmail').textContent = user.email || '';
 

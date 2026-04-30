@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Internly Worldwide — find and manage international internships with Trust Score protection, Learning Agreement support, and three-party progress tracking for students, companies and institutions.">
+  <title>Internly Worldwide — International Internships</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ── Reset + tokens ───────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      color: #0d1520;
+      background: #faf7f3;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    section { scroll-margin-top: 72px; }
+
+    /* ── Nav ──────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      height: 56px;
+      background: rgba(250, 247, 243, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(13, 21, 32, 0.08);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem;
+      gap: 1rem;
+    }
+    .nav-logo {
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 600;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+    }
+    .nav-logo .green  { color: #1a7a48; }
+    .nav-logo .orange { color: #e05c1a; }
+    .nav-pill {
+      background: #0d1520;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      letter-spacing: 0.02em;
+    }
+    .nav-center {
+      display: none;
+      gap: 1.5rem;
+    }
+    .nav-center a {
+      font-size: 14px;
+      color: #3a4455;
+      padding: 4px 0;
+      transition: color 0.15s ease;
+    }
+    .nav-center a:hover { color: #0d1520; }
+    .nav-center a.nav-active {
+      color: #e05c1a;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: #e05c1a;
+      text-decoration-thickness: 2px;
+    }
+    .nav-right {
+      display: flex; align-items: center; gap: 0.85rem;
+    }
+    .nav-lang {
+      font-size: 13px;
+      color: #7a8799;
+      transition: color 0.15s ease;
+    }
+    .nav-lang:hover { color: #0d1520; }
+    .nav-cta {
+      display: inline-block;
+      background: #0f5c36;
+      color: #ffffff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 14px;
+      transition: background 0.15s ease;
+    }
+    .nav-cta:hover { background: #0d4d2d; }
+
+    @media (min-width: 920px) {
+      .nav-center { display: flex; }
+    }
+
+    /* ── Hero ─────────────────────────────────────────── */
+    .hero {
+      background: #0d1520;
+      padding: 5rem 1.5rem 4rem;
+      min-height: 560px;
+      color: #ffffff;
+    }
+    .hero-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    @media (min-width: 880px) {
+      .hero-inner {
+        grid-template-columns: 55% 45%;
+      }
+    }
+    .hero-left { animation: fadeUp 0.7s ease both; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255, 255, 255, 0.45);
+      margin-bottom: 1.5rem;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: #1a7a48;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(26, 122, 72, 0.5);
+    }
+    .eyebrow.dark {
+      color: #7a8799;
+    }
+    .eyebrow.dark::before {
+      background: #7a8799;
+      box-shadow: none;
+    }
+    .eyebrow.alt {
+      color: rgba(255, 255, 255, 0.45);
+    }
+    .eyebrow.alt::before {
+      background: #FF7E42;
+      box-shadow: 0 0 8px rgba(255, 126, 66, 0.5);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      line-height: 1.1;
+      color: #ffffff;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: #FF7E42;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.7;
+      max-width: 480px;
+      margin-top: 1.25rem;
+      animation: fadeUp 0.7s 0.25s ease both;
+    }
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 2rem;
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: #FF7E42;
+      color: #0d1520;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .btn-primary:hover { background: #ff8e58; }
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+      padding: 12px 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+    .stat-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2rem;
+      animation: fadeUp 0.7s 0.55s ease both;
+    }
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ── World map (hero right) ───────────────────────── */
+    .hero-right {
+      animation: fadeIn 1s 0.3s ease both;
+    }
+    .world-svg {
+      width: 100%;
+      height: auto;
+      max-width: 480px;
+      margin: 0 auto;
+      display: block;
+    }
+    .world-continent {
+      fill: rgba(255, 255, 255, 0.04);
+      stroke: rgba(255, 255, 255, 0.12);
+      stroke-width: 1;
+    }
+    .world-arc {
+      stroke: rgba(255, 133, 66, 0.4);
+      stroke-width: 1;
+      fill: none;
+      stroke-dasharray: 4 4;
+      animation: arc-flow 3s linear infinite;
+    }
+    @keyframes arc-flow {
+      from { stroke-dashoffset: 100; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .pulse-ring {
+      fill: none;
+      stroke: #FF7E42;
+      stroke-width: 1.5;
+      transform-origin: center;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { r: 4;  opacity: 0.85; }
+      100% { r: 16; opacity: 0; }
+    }
+    .pulse-ring.delay-1 { animation-delay: 0.5s; }
+    .pulse-ring.delay-2 { animation-delay: 1s; }
+    .city-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      fill: rgba(255, 255, 255, 0.55);
+      font-weight: 400;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── Section base ─────────────────────────────────── */
+    .section { padding: 4.5rem 1.5rem; }
+    .section-cream { background: #faf7f3; }
+    .section-beige { background: #f4f3ef; }
+    .section-dark  { background: #0d1520; color: #ffffff; }
+    .section-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .section h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+    .section-dark h2 { color: #ffffff; }
+    .section p.lead {
+      font-size: 1.05rem;
+      color: #3a4455;
+      max-width: 560px;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+    }
+    .section-dark p.lead { color: rgba(255, 255, 255, 0.65); }
+
+    /* ── Trust Score (Section 1) ──────────────────────── */
+    .ts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (min-width: 880px) {
+      .ts-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .ts-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 4px 24px rgba(13, 21, 32, 0.08);
+      max-width: 460px;
+    }
+    .ts-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .ts-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: #e8f5ee;
+      color: #1a7a48;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+      font-size: 0.92rem;
+      flex-shrink: 0;
+    }
+    .ts-meta { flex: 1; }
+    .ts-meta .name { font-weight: 500; font-size: 0.95rem; margin-bottom: 2px; }
+    .ts-meta .sub { font-size: 0.78rem; color: #7a8799; }
+    .ts-grade {
+      background: #e8f5ee;
+      color: #1a7a48;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+    .ts-bar-row { margin-bottom: 0.85rem; }
+    .ts-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 0.82rem; color: #1e2a38; margin-bottom: 5px;
+    }
+    .ts-bar-num { font-weight: 600; color: #0d1520; }
+    .ts-bar-track {
+      height: 6px; background: #eceae4;
+      border-radius: 3px; overflow: hidden;
+    }
+    .ts-bar-fill { height: 100%; width: 0%; border-radius: 3px; }
+    .ts-bar-fill.green  { background: #1a7a48; }
+    .ts-bar-fill.orange { background: #e05c1a; }
+    .ts-divider { height: 1px; background: #eceae4; margin: 1.25rem 0; }
+    .ts-total {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+    }
+    .ts-total-label {
+      font-size: 0.78rem; color: #7a8799;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .ts-total-num {
+      font-family: 'Bricolage Grotesque', serif;
+      font-size: 2.5rem; font-weight: 300;
+      color: #0d1520; line-height: 1;
+    }
+    .ts-total-badge {
+      background: #e8f5ee; color: #1a7a48;
+      font-weight: 500; padding: 5px 14px;
+      border-radius: 14px; font-size: 0.82rem;
+    }
+
+    .explain-stack {
+      display: grid; gap: 12px;
+    }
+    .explain-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      border-left: 3px solid #e0e0e0;
+      box-shadow: 0 1px 6px rgba(13, 21, 32, 0.04);
+    }
+    .explain-card.green  { border-left-color: #1a7a48; }
+    .explain-card.orange { border-left-color: #e05c1a; }
+    .explain-card.gray   { border-left-color: #7a8799; }
+    .explain-title {
+      font-family: 'Bricolage Grotesque', serif;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: #0d1520;
+    }
+    .explain-text {
+      font-size: 0.88rem;
+      color: #3a4455;
+      line-height: 1.6;
+    }
+    .grade-pills-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 0.75rem;
+    }
+    .grade-pill {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+    .grade-pill.green { background: #e8f5ee; color: #0f5c36; }
+    .grade-pill.amber { background: #fff8e8; color: #855700; }
+    .grade-pill.red   { background: #fde8e3; color: #92271a; }
+
+    /* ── Step flow (Section 2) ────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 3rem;
+    }
+    @media (min-width: 720px) {
+      .steps { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    }
+    @media (min-width: 1000px) {
+      .steps { grid-template-columns: repeat(6, 1fr); gap: 1rem; }
+    }
+    .step {
+      position: relative;
+      text-align: left;
+    }
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid rgba(13, 21, 32, 0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #0d1520;
+      margin-bottom: 0.85rem;
+      position: relative;
+      z-index: 2;
+    }
+    .step-icon {
+      font-size: 1.15rem;
+      margin-bottom: 0.4rem;
+    }
+    .step-title {
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 500;
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+      color: #0d1520;
+    }
+    .step-text {
+      font-size: 0.82rem;
+      color: #3a4455;
+      line-height: 1.55;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    @media (min-width: 880px) {
+      .roles-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .role-col {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(13, 21, 32, 0.05);
+      display: flex; flex-direction: column;
+    }
+    .role-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #7a8799;
+      font-weight: 500;
+      margin-bottom: 0.85rem;
+    }
+    .role-list {
+      list-style: none;
+      margin-bottom: 1.25rem;
+      flex: 1;
+    }
+    .role-list li {
+      font-size: 0.88rem;
+      color: #1e2a38;
+      padding: 0.4rem 0;
+      display: flex;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .role-list li::before {
+      content: '✓';
+      color: #1a7a48;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .role-cta {
+      display: inline-block;
+      background: #0f5c36;
+      color: #ffffff;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-align: center;
+      align-self: flex-start;
+      transition: background 0.15s ease;
+    }
+    .role-cta:hover { background: #0d4d2d; }
+
+    /* ── Learning Agreement (Section 3) ───────────────── */
+    .la-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (min-width: 880px) {
+      .la-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    }
+    .la-doc {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(13, 21, 32, 0.08);
+      max-width: 420px;
+    }
+    .la-doc-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #eceae4;
+    }
+    .la-doc-title {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    .la-doc-title .icon { font-size: 1.2rem; }
+    .la-doc-badge {
+      font-size: 0.7rem;
+      font-weight: 500;
+      background: #e8f5ee;
+      color: #0f5c36;
+      padding: 3px 10px;
+      border-radius: 10px;
+    }
+    .la-sig {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0;
+      font-size: 0.88rem;
+    }
+    .la-sig + .la-sig { border-top: 1px solid #eceae4; }
+    .la-sig-name { color: #1e2a38; }
+    .la-sig-name .icon { margin-right: 6px; }
+    .la-sig-status {
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 10px;
+    }
+    .la-sig-status.signed  { background: #e8f5ee; color: #0f5c36; }
+    .la-sig-status.pending { background: #fdf0e8; color: #b84910; }
+    .la-progress {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eceae4;
+    }
+    .la-progress-label {
+      font-size: 0.78rem;
+      color: #7a8799;
+      margin-bottom: 0.4rem;
+    }
+    .la-progress-bar {
+      height: 6px;
+      background: #eceae4;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .la-progress-fill {
+      height: 100%;
+      width: 66%;
+      background: #1a7a48;
+      border-radius: 3px;
+    }
+    .la-doc-note {
+      font-size: 0.74rem;
+      color: #7a8799;
+      margin-top: 0.85rem;
+      font-style: italic;
+    }
+
+    .la-explain h3 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 0.85rem;
+      color: #0d1520;
+    }
+    .la-bullets {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    .la-bullets li {
+      font-size: 0.92rem;
+      color: #1e2a38;
+      padding: 0.45rem 0;
+      display: flex;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .la-bullets li::before {
+      content: '•';
+      color: #1a7a48;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .callout {
+      background: #e8f0fc;
+      border-left: 3px solid #1756a8;
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .callout-title {
+      font-weight: 500;
+      color: #0c2752;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .callout-text {
+      font-size: 0.85rem;
+      color: #3a4455;
+      line-height: 1.6;
+    }
+
+    /* ── Companies dark (Section 4) ───────────────────── */
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (min-width: 720px) {
+      .benefit-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .benefit-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .benefit-icon {
+      font-size: 1.35rem;
+      margin-bottom: 0.75rem;
+    }
+    .benefit-title {
+      font-family: 'Bricolage Grotesque', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+    .benefit-text {
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.6;
+    }
+    .companies-cta-wrap {
+      text-align: center;
+    }
+    .companies-cta-note {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.45);
+      margin-top: 0.85rem;
+    }
+
+    /* ── Milestones grid (Section 5) ──────────────────── */
+    .ms-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 600px) {
+      .ms-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 880px) {
+      .ms-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .ms-card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 1px 6px rgba(13, 21, 32, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .ms-card-num {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .ms-card-num.green  { background: #e8f5ee; color: #1a7a48; }
+    .ms-card-num.orange { background: #fdf0e8; color: #b84910; }
+    .ms-card-num.blue   { background: #e8f0fc; color: #1756a8; }
+    .ms-card-title {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #0d1520;
+      line-height: 1.4;
+    }
+    .ms-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .ms-pct {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+    .ms-pct.green  { background: #e8f5ee; color: #0f5c36; }
+    .ms-pct.orange { background: #fdf0e8; color: #b84910; }
+    .ms-actor {
+      font-size: 0.7rem;
+      color: #7a8799;
+      background: #f4f3ef;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+    .ms-link {
+      font-size: 0.88rem;
+      color: #1a7a48;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 500;
+    }
+
+    /* ── Stay informed (waitlist) ─────────────────────── */
+    .ww-section {
+      background: linear-gradient(135deg, #0f5c36 0%, #1a7a48 100%);
+      color: #ffffff;
+      padding: 4.5rem 1.5rem;
+    }
+    .ww-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .ww-section h2 {
+      color: #ffffff;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+    .ww-section .eyebrow {
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1.25rem;
+    }
+    .ww-section .eyebrow::before {
+      background: rgba(255, 255, 255, 0.5);
+      box-shadow: none;
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .ww-body {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.75;
+      max-width: 520px;
+      margin-bottom: 2rem;
+    }
+    .ww-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 480px;
+    }
+    @media (min-width: 480px) {
+      .ww-form { flex-direction: row; gap: 0.65rem; }
+    }
+    .ww-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .ww-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+    .ww-input:focus {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.16);
+    }
+    .ww-submit {
+      padding: 12px 24px;
+      background: #FF7E42;
+      color: #0d1520;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .ww-submit:hover:not(:disabled) {
+      background: #e05c1a;
+      color: #ffffff;
+    }
+    .ww-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+    .ww-note {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 0.75rem;
+      max-width: 480px;
+      line-height: 1.55;
+    }
+    .ww-error {
+      display: none;
+      margin-top: 0.65rem;
+      font-size: 0.82rem;
+      color: rgba(255, 133, 66, 0.95);
+    }
+    .ww-success {
+      display: none;
+      align-items: center;
+      gap: 0.85rem;
+      max-width: 480px;
+    }
+    .ww-success-icon {
+      width: 40px; height: 40px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .ww-success-text {
+      font-size: 1rem;
+      color: #ffffff;
+      line-height: 1.5;
+    }
+
+    /* ── FAQ (Section 6) ──────────────────────────────── */
+    .faq-list { margin-top: 1.5rem; max-width: 720px; }
+    .faq-item { border-bottom: 1px solid rgba(13, 21, 32, 0.08); }
+    .faq-q {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #0d1520;
+    }
+    .faq-q:hover { color: #1a7a48; }
+    .faq-icon {
+      font-size: 1.2rem;
+      font-weight: 300;
+      color: #7a8799;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+      margin-left: 1rem;
+    }
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      color: #e05c1a;
+    }
+    .faq-a {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.2s ease;
+    }
+    .faq-item.open .faq-a {
+      max-height: 600px;
+      opacity: 1;
+    }
+    .faq-a-inner {
+      padding: 0 0 1rem;
+      font-size: 0.88rem;
+      color: #3a4455;
+      line-height: 1.7;
+    }
+
+    /* ── Footer ───────────────────────────────────────── */
+    .footer {
+      background: #0d1520;
+      color: rgba(255, 255, 255, 0.55);
+      padding: 2.5rem 1.5rem;
+    }
+    .footer-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 720px) {
+      .footer-inner { grid-template-columns: 1.4fr 1fr 1fr; }
+    }
+    .footer-col-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.3);
+      margin-bottom: 0.85rem;
+    }
+    .footer-logo-wrap {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+    .footer-logo {
+      font-family: 'Bricolage Grotesque', serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .footer-logo .green  { color: #1a7a48; }
+    .footer-logo .orange { color: #e05c1a; }
+    .footer-pill {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+    .footer-tag {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .footer-links a {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.55);
+      transition: color 0.15s ease;
+    }
+    .footer-links a:hover { color: #ffffff; }
+    .footer-note {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAV ═══ -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">
+      <span class="green">intern</span><span class="orange">ly</span>
+      <span class="nav-pill">Worldwide</span>
+    </a>
+    <div class="nav-center" id="navCenter">
+      <a href="#trust">Trust Score</a>
+      <a href="#how">How It Works</a>
+      <a href="#agreement">Learning Agreement</a>
+      <a href="#companies">For Companies</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-right">
+      <a href="hoe-het-werkt.html" class="nav-lang">🇳🇱 Nederlands</a>
+      <a href="auth.html" class="nav-cta">Sign in →</a>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="eyebrow">Global internship platform</div>
+        <h1>Find your internship,<br><em>anywhere in the world.</em></h1>
+        <p class="hero-sub">Internly Worldwide connects international students with verified employers — with the same Trust Score protection and structured progress tracking used by thousands of Dutch internships.</p>
+        <div class="hero-ctas">
+          <a href="discover.html" class="btn-primary">Find an internship →</a>
+          <a href="auth.html?role=school" class="btn-secondary">Register your institution</a>
+        </div>
+        <div class="stat-pills">
+          <span class="stat-pill">🌍 40+ countries</span>
+          <span class="stat-pill">⭐ Trust Score verified</span>
+          <span class="stat-pill">📋 Learning Agreement support</span>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <svg class="world-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="World map with active locations in Europe">
+          <!-- Continents (simplified) -->
+          <path class="world-continent" d="M40,55 Q70,40 110,48 Q140,55 138,90 Q130,128 95,130 Q60,125 50,100 Q42,80 40,55 Z"/>
+          <path class="world-continent" d="M95,140 Q120,135 128,165 Q132,200 110,225 Q88,222 92,185 Q90,160 95,140 Z"/>
+          <path class="world-continent" d="M165,60 Q200,52 232,68 Q238,90 218,108 Q188,112 170,98 Q162,80 165,60 Z"/>
+          <path class="world-continent" d="M195,118 Q228,112 235,148 Q230,188 212,205 Q188,200 185,165 Q182,135 195,118 Z"/>
+          <path class="world-continent" d="M232,52 Q300,42 355,65 Q368,108 322,138 Q260,135 238,112 Q225,82 232,52 Z"/>
+          <path class="world-continent" d="M325,178 Q352,172 372,184 Q378,200 352,208 Q325,202 325,178 Z"/>
+          <path class="world-continent" d="M50,215 Q200,210 350,215 Q360,228 200,232 Q40,228 50,215 Z"/>
+
+          <!-- Arc lines between cities -->
+          <path class="world-arc" d="M195,88 Q190,75 185,90"/>
+          <path class="world-arc" d="M195,88 Q198,72 200,85"/>
+
+          <!-- Amsterdam -->
+          <circle class="pulse-ring" cx="195" cy="88" r="4"/>
+          <circle cx="195" cy="88" r="3.5" fill="#FF7E42"/>
+          <text class="city-label" x="195" y="76" text-anchor="middle">Amsterdam</text>
+
+          <!-- London -->
+          <circle class="pulse-ring delay-1" cx="178" cy="86" r="4"/>
+          <circle cx="178" cy="86" r="3.5" fill="#FF7E42"/>
+          <text class="city-label" x="170" y="100" text-anchor="end">London</text>
+
+          <!-- Berlin -->
+          <circle class="pulse-ring delay-2" cx="208" cy="84" r="4"/>
+          <circle cx="208" cy="84" r="3.5" fill="#FF7E42"/>
+          <text class="city-label" x="218" y="80" text-anchor="start">Berlin</text>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ SECTION 1 — TRUST SCORE ═══ -->
+  <section id="trust" class="section section-cream">
+    <div class="section-inner">
+      <div class="eyebrow dark">Reputation system</div>
+      <h2>The Trust Score</h2>
+      <p class="lead">Before you apply, you already know how reliable an employer is. The Trust Score combines platform behaviour data with verified student reviews — making it resistant to manipulation.</p>
+
+      <div class="ts-grid">
+        <div class="ts-card" id="tsCard">
+          <div class="ts-head">
+            <div class="ts-avatar">VA</div>
+            <div class="ts-meta">
+              <div class="name">Vandaag Agency</div>
+              <div class="sub">Digital Marketing · Amsterdam</div>
+            </div>
+            <div class="ts-grade">A — Trusted</div>
+          </div>
+
+          <div class="ts-bar-row">
+            <div class="ts-bar-label">
+              <span>Response speed</span>
+              <span class="ts-bar-num" data-num="92">0</span>
+            </div>
+            <div class="ts-bar-track">
+              <div class="ts-bar-fill green" data-target="92"></div>
+            </div>
+          </div>
+          <div class="ts-bar-row">
+            <div class="ts-bar-label">
+              <span>Learning goal support</span>
+              <span class="ts-bar-num" data-num="85">0</span>
+            </div>
+            <div class="ts-bar-track">
+              <div class="ts-bar-fill green" data-target="85"></div>
+            </div>
+          </div>
+          <div class="ts-bar-row">
+            <div class="ts-bar-label">
+              <span>Commitment</span>
+              <span class="ts-bar-num" data-num="91">0</span>
+            </div>
+            <div class="ts-bar-track">
+              <div class="ts-bar-fill green" data-target="91"></div>
+            </div>
+          </div>
+          <div class="ts-bar-row">
+            <div class="ts-bar-label">
+              <span>Mentoring quality</span>
+              <span class="ts-bar-num" data-num="78">0</span>
+            </div>
+            <div class="ts-bar-track">
+              <div class="ts-bar-fill orange" data-target="78"></div>
+            </div>
+          </div>
+
+          <div class="ts-divider"></div>
+          <div class="ts-total">
+            <div>
+              <div class="ts-total-label">Total score</div>
+              <div class="ts-total-num" data-num="87">0</div>
+            </div>
+            <div class="ts-total-badge">A — Trusted</div>
+          </div>
+        </div>
+
+        <div class="explain-stack">
+          <div class="explain-card green">
+            <div class="explain-title">✓ Always visible before you apply</div>
+            <p class="explain-text">See the employer's Trust Score before submitting your application — not after.</p>
+          </div>
+          <div class="explain-card orange">
+            <div class="explain-title">⚡ Behaviour-based, not just reviews</div>
+            <p class="explain-text">Response times, cancellation patterns, and learning goal fulfilment feed directly into the score.</p>
+          </div>
+          <div class="explain-card gray">
+            <div class="explain-title">📊 Grade scale</div>
+            <div class="grade-pills-inline">
+              <span class="grade-pill green">A · 85–100 · Trusted</span>
+              <span class="grade-pill amber">B · 65–84 · Average</span>
+              <span class="grade-pill red">C · &lt;65 · Caution</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 2 — HOW IT WORKS ═══ -->
+  <section id="how" class="section section-beige">
+    <div class="section-inner">
+      <div class="eyebrow dark">The process</div>
+      <h2>From application to certificate</h2>
+      <p class="lead">Six steps. Three parties. Full transparency at every stage.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-icon">🔍</div>
+          <div class="step-title">Discover</div>
+          <p class="step-text">Browse verified internships filtered by sector, duration and Trust Score.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-icon">📋</div>
+          <div class="step-title">Apply</div>
+          <p class="step-text">Submit your application with a motivation and your learning goals.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-icon">💬</div>
+          <div class="step-title">Match</div>
+          <p class="step-text">The employer responds within their guaranteed window or their Trust Score drops.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-icon">📝</div>
+          <div class="step-title">Learning Agreement</div>
+          <p class="step-text">Student, institution, and employer sign the LA. Your internship is officially protected.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-icon">📊</div>
+          <div class="step-title">Track progress</div>
+          <p class="step-text">Eight milestones guide the internship. Each one confirmed by the right party.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-icon">🎓</div>
+          <div class="step-title">Certificate</div>
+          <p class="step-text">After completion, download your verified internship certificate.</p>
+        </div>
+      </div>
+
+      <div class="roles-grid">
+        <div class="role-col">
+          <div class="role-label">As a student</div>
+          <ul class="role-list">
+            <li>Browse with Trust Score</li>
+            <li>Apply in two clicks</li>
+            <li>Track your 8 milestones</li>
+            <li>Download your certificate</li>
+          </ul>
+          <a href="auth.html?role=student" class="role-cta">Register as student →</a>
+        </div>
+        <div class="role-col">
+          <div class="role-label">As an employer</div>
+          <ul class="role-list">
+            <li>Post vacancies or accept open applications</li>
+            <li>Build your Trust Score reputation</li>
+            <li>ESG-ready progress reporting</li>
+            <li>Connect to motivated candidates globally</li>
+          </ul>
+          <a href="auth.html?role=bedrijf" class="role-cta">Register your company →</a>
+        </div>
+        <div class="role-col">
+          <div class="role-label">As an institution</div>
+          <ul class="role-list">
+            <li>Monitor all students in one dashboard</li>
+            <li>Manage Learning Agreements digitally</li>
+            <li>Three-party progress confirmation</li>
+            <li>Flag issues early</li>
+          </ul>
+          <a href="auth.html?role=school" class="role-cta">Register your institution →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 3 — LEARNING AGREEMENT ═══ -->
+  <section id="agreement" class="section section-cream">
+    <div class="section-inner">
+      <div class="eyebrow dark">Your legal protection</div>
+      <h2>Learning Agreement support</h2>
+      <p class="lead">The Learning Agreement (LA) is the international equivalent of the Dutch POK — a binding document between you, your institution, and your host employer. Internly manages the entire signing flow digitally.</p>
+
+      <div class="la-grid">
+        <div class="la-doc">
+          <div class="la-doc-head">
+            <div class="la-doc-title">
+              <span class="icon">📄</span>
+              Learning Agreement
+            </div>
+            <span class="la-doc-badge">Internly Worldwide</span>
+          </div>
+
+          <div class="la-sig">
+            <span class="la-sig-name"><span class="icon">👤</span>Student — Lena de Vries</span>
+            <span class="la-sig-status signed">✓ Signed</span>
+          </div>
+          <div class="la-sig">
+            <span class="la-sig-name"><span class="icon">🏢</span>Employer — Vandaag Agency</span>
+            <span class="la-sig-status signed">✓ Signed</span>
+          </div>
+          <div class="la-sig">
+            <span class="la-sig-name"><span class="icon">🎓</span>Institution — HvA Amsterdam</span>
+            <span class="la-sig-status pending">⏳ Pending</span>
+          </div>
+
+          <div class="la-progress">
+            <div class="la-progress-label">2 of 3 signatures complete</div>
+            <div class="la-progress-bar">
+              <div class="la-progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="la-doc-note">All parties receive a signed copy by email.</div>
+        </div>
+
+        <div class="la-explain">
+          <h3>What the LA covers</h3>
+          <ul class="la-bullets">
+            <li>Internship duration and weekly hours</li>
+            <li>Learning objectives and evaluation criteria</li>
+            <li>Supervision arrangements at both sides</li>
+            <li>Credit recognition and academic integration</li>
+            <li>Erasmus+ compatibility (when applicable)</li>
+          </ul>
+
+          <div class="callout">
+            <div class="callout-title">Erasmus+ compatible — but not required</div>
+            <p class="callout-text">Whether you're on an Erasmus+ grant, a bilateral agreement, or organising your internship independently, Internly's LA flow works for all three.</p>
+          </div>
+
+          <div class="faq-list" style="margin-top:0">
+            <div class="faq-item">
+              <button class="faq-q" type="button">
+                <span>Does my institution need to be on Erasmus+?</span>
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-a"><div class="faq-a-inner">No. Any higher education institution can register and manage Learning Agreements through Internly. Erasmus+ eligibility is handled separately by your institution.</div></div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-q" type="button">
+                <span>What happens if a company is not yet registered?</span>
+                <span class="faq-icon">+</span>
+              </button>
+              <div class="faq-a"><div class="faq-a-inner">You can invite any company to join Internly. They receive a sign-up link and can complete their profile before countersigning the LA.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 4 — FOR COMPANIES ═══ -->
+  <section id="companies" class="section section-dark">
+    <div class="section-inner">
+      <div class="eyebrow alt">Hire international talent</div>
+      <h2>Why join Internly as an employer</h2>
+
+      <div class="benefit-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">🌍</div>
+          <div class="benefit-title">Global talent pipeline</div>
+          <p class="benefit-text">Connect with motivated students from universities worldwide — filtered by sector, skills, and availability.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">⭐</div>
+          <div class="benefit-title">Build your reputation</div>
+          <p class="benefit-text">Your Trust Score is visible to every student on the platform. Responsive, reliable employers attract better candidates.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📊</div>
+          <div class="benefit-title">ESG-ready reporting</div>
+          <p class="benefit-text">Every completed internship generates structured data for your Social Impact and ESG reporting — ready for CSRD and sustainability reports.</p>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon">📋</div>
+          <div class="benefit-title">Paperwork handled</div>
+          <p class="benefit-text">Learning Agreement signing, progress tracking, and final certificates — all managed through the platform.</p>
+        </div>
+      </div>
+
+      <div class="companies-cta-wrap">
+        <a href="auth.html?role=bedrijf" class="btn-primary">Register your company for free →</a>
+        <p class="companies-cta-note">Starter plan is free. No credit card.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 5 — MILESTONES ═══ -->
+  <section class="section section-beige">
+    <div class="section-inner">
+      <div class="eyebrow dark">Progress tracking</div>
+      <h2>Eight milestones. Full accountability.</h2>
+      <p class="lead">Every percentage point in your progress bar is tied to a real action confirmed by the right party.</p>
+
+      <div class="ms-grid">
+        <div class="ms-card">
+          <div class="ms-card-num green">1</div>
+          <div class="ms-card-title">Profile complete</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct green">+10%</span>
+            <span class="ms-actor">⚙️ auto</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num green">2</div>
+          <div class="ms-card-title">Learning Agreement signed</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct green">+15%</span>
+            <span class="ms-actor">🎓 institution</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num blue">3</div>
+          <div class="ms-card-title">First three-way meeting</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct green">+10%</span>
+            <span class="ms-actor">🎓 institution</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num orange">4</div>
+          <div class="ms-card-title">Mid-term goals met</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct orange">+15%</span>
+            <span class="ms-actor">🎓 institution</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num orange">5</div>
+          <div class="ms-card-title">Progress report submitted</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct orange">+15%</span>
+            <span class="ms-actor">👤 → 🎓</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num blue">6</div>
+          <div class="ms-card-title">Second three-way meeting</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct green">+10%</span>
+            <span class="ms-actor">🎓 institution</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num orange">7</div>
+          <div class="ms-card-title">Final report submitted</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct orange">+15%</span>
+            <span class="ms-actor">👤 → 🎓</span>
+          </div>
+        </div>
+        <div class="ms-card">
+          <div class="ms-card-num green">8</div>
+          <div class="ms-card-title">Final assessment</div>
+          <div class="ms-card-meta">
+            <span class="ms-pct green">+10%</span>
+            <span class="ms-actor">🏢 → 🎓</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="hoe-het-werkt.html#mijlpalen" class="ms-link">→ Read the full milestone guide</a>
+    </div>
+  </section>
+
+  <!-- ═══ STAY INFORMED — waitlist ═══ -->
+  <section class="ww-section">
+    <div class="ww-inner">
+      <div class="eyebrow">Stay informed</div>
+      <h2>Internly Worldwide<br>is growing.</h2>
+      <p class="ww-body">We're expanding our network of verified employers and partner institutions globally. Sign up to be notified when new internships are added in your region — and to get early access to platform updates.</p>
+
+      <div class="ww-form" id="ww-form">
+        <input type="email"
+               id="ww-email-input"
+               class="ww-input"
+               placeholder="Your email address"
+               autocomplete="email"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();wwSignup();}">
+        <button id="ww-submit-btn"
+                class="ww-submit"
+                type="button"
+                onclick="wwSignup()">Notify me →</button>
+      </div>
+
+      <div class="ww-error" id="ww-error" role="alert"></div>
+
+      <div class="ww-success" id="ww-success">
+        <div class="ww-success-icon">✓</div>
+        <div class="ww-success-text">You're on the list. We'll be in touch.</div>
+      </div>
+
+      <p class="ww-note">No spam. We send max one email per month. Unsubscribe any time.</p>
+    </div>
+  </section>
+
+  <!-- ═══ SECTION 6 — FAQ ═══ -->
+  <section id="faq" class="section section-cream">
+    <div class="section-inner">
+      <div class="eyebrow dark">Frequently asked questions</div>
+      <h2>FAQ</h2>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>Is Internly free for students?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Always. Students never pay — not now, not later. Costs are covered by employers using the platform to find and manage interns.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>Do I need an Erasmus+ grant to use Internly?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No. Internly is independent of Erasmus+. You can use the platform whether you have an Erasmus+ grant, a different funding scheme, or no grant at all. The Learning Agreement flow is compatible with Erasmus+ but does not require it.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>Does the host company need to be registered in a specific country?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No. Any company anywhere in the world can register as a host employer. The Trust Score system applies globally — response times, commitment, and mentoring quality are tracked regardless of location.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>What is the difference between a POK and a Learning Agreement?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">The POK (Praktijkovereenkomst) is the Dutch-specific three-party internship contract required by law for MBO students. The Learning Agreement is its international equivalent — used across Europe and worldwide for higher education internship recognition. Internly supports both.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>Can my institution manage multiple students through one account?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Yes. Your institution dashboard shows all active students, their progress milestones, and pending Learning Agreement confirmations — all in one view.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>What happens if an employer ghosts my application?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">If an employer does not respond within their stated response window, their Trust Score automatically drops. Repeated non-response leads to platform flagging and reduced visibility to students.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>Can I do a remote or hybrid internship?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Yes. Internly supports remote, hybrid, and on-site internships. The Trust Score and milestone tracking work identically for all formats.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" type="button">
+            <span>In what languages is the platform available?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">The platform interface is available in Dutch and English. All student-facing flows, templates, and documentation are available in both languages.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo-wrap">
+          <span class="footer-logo">
+            <span class="green">intern</span><span class="orange">ly</span>
+          </span>
+          <span class="footer-pill">Worldwide</span>
+        </div>
+        <div class="footer-tag">© 2026 Internly — Sasubo Holding B.V.</div>
+      </div>
+      <div>
+        <div class="footer-col-label">Platform</div>
+        <div class="footer-links">
+          <a href="hoe-het-werkt.html">How it works (NL)</a>
+          <a href="discover.html">Find an internship</a>
+          <a href="auth.html">Sign in</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-label">Legal</div>
+        <div class="footer-links">
+          <a href="privacybeleid.html">Privacy policy</a>
+          <a href="spelregels.html">Terms of use</a>
+        </div>
+        <p class="footer-note">Platform language: Nederlands / English</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    'use strict';
+
+    // ── 1. Smooth scroll on anchor links ──────────────
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        const href = link.getAttribute('href');
+        if (!href || href === '#') return;
+        const target = document.querySelector(href);
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // ── 2. Active nav highlight on scroll ─────────────
+    const navLinks = document.querySelectorAll('#navCenter a');
+    const sections = document.querySelectorAll('section[id]');
+    const linkBySection = {};
+    navLinks.forEach(a => {
+      const id = a.getAttribute('href').slice(1);
+      if (id) linkBySection[id] = a;
+    });
+    if ('IntersectionObserver' in window && sections.length) {
+      const navObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.intersectionRatio >= 0.3) {
+            const id = entry.target.id;
+            navLinks.forEach(a => a.classList.remove('nav-active'));
+            if (linkBySection[id]) linkBySection[id].classList.add('nav-active');
+          }
+        });
+      }, { threshold: [0.3] });
+      sections.forEach(s => navObserver.observe(s));
+    }
+
+    // ── 3. Trust Score animation ──────────────────────
+    const tsCard = document.getElementById('tsCard');
+    if (tsCard && 'IntersectionObserver' in window) {
+      const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+      const animateValue = (target, propSetter, duration) => {
+        const start = performance.now();
+        const tick = now => {
+          const elapsed = now - start;
+          const t = Math.min(1, elapsed / duration);
+          const eased = easeOutCubic(t);
+          propSetter(eased * target);
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      };
+
+      const tsObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+            tsCard.querySelectorAll('.ts-bar-fill').forEach(bar => {
+              const target = parseInt(bar.dataset.target, 10) || 0;
+              animateValue(target, v => {
+                bar.style.width = v.toFixed(1) + '%';
+              }, 800);
+            });
+            tsCard.querySelectorAll('[data-num]').forEach(el => {
+              const target = parseInt(el.dataset.num, 10) || 0;
+              animateValue(target, v => {
+                el.textContent = Math.round(v);
+              }, 800);
+            });
+            obs.disconnect();
+          }
+        });
+      }, { threshold: [0.3] });
+      tsObserver.observe(tsCard);
+    }
+
+    // ── 4. FAQ accordion ──────────────────────────────
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const q = item.querySelector('.faq-q');
+      if (!q) return;
+      q.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        // Close siblings within the same .faq-list group
+        const list = item.closest('.faq-list');
+        if (list) {
+          list.querySelectorAll('.faq-item.open').forEach(o => {
+            if (o !== item) o.classList.remove('open');
+          });
+        }
+        item.classList.toggle('open', !isOpen);
+      });
+    });
+  </script>
+
+  <script>
+    // ── Worldwide waitlist — inline Supabase client ────────
+    // AUDIT NOTE: Bedward P2 known pattern — fase 2 cleanup
+    // pending. Same approach as index.html + about.html.
+    // ────────────────────────────────────────────────────────
+    (function() {
+      const SUPA_URL = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
+      const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+
+      const _db = window.supabase
+        ? window.supabase.createClient(SUPA_URL, SUPA_KEY)
+        : null;
+
+      window.wwSignup = async function() {
+        const input  = document.getElementById('ww-email-input');
+        const btn    = document.getElementById('ww-submit-btn');
+        const errEl  = document.getElementById('ww-error');
+        const succEl = document.getElementById('ww-success');
+        const form   = document.getElementById('ww-form');
+
+        if (!input || !btn) return;
+
+        const email = (input.value || '').trim().toLowerCase();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          if (errEl) {
+            errEl.textContent = 'Please enter a valid email address.';
+            errEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (errEl) errEl.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'Signing up...';
+
+        if (!_db) {
+          // Fallback: show success anyway (no DB available)
+          if (form)   form.style.display   = 'none';
+          if (succEl) succEl.style.display = 'flex';
+          return;
+        }
+
+        // Schema-aware payload — waitlist columns confirmed in
+        // internly_migration.sql:293-307. 'language' column does
+        // not exist; 'source' and 'type' do.
+        const payload = {
+          email:  email,
+          source: 'worldwide_en',
+          type:   'worldwide_en'
+        };
+
+        try {
+          const { error } = await _db
+            .from('waitlist')
+            .insert(payload);
+
+          if (error && error.code === '23505') {
+            // Duplicate — treat as success (already signed up)
+            if (form)   form.style.display   = 'none';
+            if (succEl) succEl.style.display = 'flex';
+            return;
+          }
+
+          if (error) throw error;
+
+          if (form)   form.style.display   = 'none';
+          if (succEl) succEl.style.display = 'flex';
+
+        } catch (e) {
+          btn.disabled = false;
+          btn.textContent = 'Notify me →';
+          if (errEl) {
+            errEl.textContent =
+              'Something went wrong. Please try again.';
+            errEl.style.display = 'block';
+          }
+          console.warn('[ww-waitlist] signup error:', e?.message);
+        }
+      };
+    })();
+  </script>
+</body>
+</html>
