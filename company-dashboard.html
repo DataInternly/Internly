@@ -10,35 +10,43 @@
   <meta name="theme-color" content="#1a7a48">
   <title>Bedrijfsdashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/profanity.js"></script>
+  <script src="js/reviews.js"></script>
+  <script src="js/swipes.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/optimistic.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     :root {
-      --green:      #1a7a48;
-      --green-dark: #0f5c36;
-      --green-bg:   #e8f5ee;
-      --orange:     #FF7E42;
-      --orange-dark:#e05c1a;
-      --orange-bg:  #fdf0e8;
-      --ink:        #0d1520;
-      --ink2:       #374151;
-      --ink3:       #6b7280;
+      /* Pagina-aliassen → globale tokens (css/style.css) */
+      --green:      var(--c-green, #1a7a48);
+      --green-dark: var(--c-green-dark, #0f5c36);
+      --green-bg:   var(--c-green-bg, #e8f5ee);
+      --orange:     var(--c-orange, #FF7E42);
+      --orange-dark:var(--c-orange-deep, #e05c1a);
+      --orange-bg:  var(--c-orange-bg, #fdf0e8);
+      --ink:        var(--c-ink, #0d1520);
+      --ink2:       var(--c-ink2, #374151);
+      --ink3:       var(--c-ink3, #6b7280);
       --ink4:       #9ca3af;
-      --bg:         #f4f3ef;
+      --bg:         var(--c-cream-warm, #f4f3ef);
       --white:      #ffffff;
-      --border:     #f0f0ee;
+      --border:     var(--line-subtle, #f0f0ee);
       --border2:    #e2e8f0;
-      --red:        #b82020;
+      --red:        var(--c-red, #b82020);
       --red-bg:     #fdeaea;
-      --amber:      #a06010;
+      --amber:      var(--c-amber, #a06010);
       --amber-bg:   #fdf3e0;
-      --r:          16px;
-      --r-sm:       8px;
+      --r:          var(--r-md, 16px);
+      --r-sm:       var(--r-sm, 8px);
       --sidebar-w:  240px;
       --accent:     var(--orange);
     }
@@ -46,7 +54,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; }
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--font-body, 'Outfit', sans-serif);
       background: var(--bg);
       color: var(--ink);
       font-size: 15px;
@@ -55,31 +63,35 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── TOPBAR ── */
+    /* ── TOPBAR (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      background: var(--ink);
+      background: rgba(244,243,239,.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
       height: 56px; padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .topbar-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.2rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.2rem; font-weight: 700; color: var(--ink);
       letter-spacing: -.02em; text-decoration: none;
     }
-    .topbar-logo span { color: var(--orange); }
+    .topbar-logo span { color: var(--orange-dark); }
     .topbar-right { display: flex; align-items: center; gap: 16px; }
     .topbar-link {
-      color: rgba(255,255,255,.6); text-decoration: none;
+      color: var(--ink2); text-decoration: none;
       font-size: .85rem; font-weight: 500; transition: color .15s;
     }
-    .topbar-link:hover { color: #fff; }
+    .topbar-link:hover { color: var(--ink); }
     .role-pill {
-      background: rgba(255,255,255,.12);
-      color: rgba(255,255,255,.85);
-      font-size: .75rem; font-weight: 600;
+      background: rgba(13,21,32,.06);
+      color: var(--ink2);
+      font-family: var(--font-mono, 'DM Mono', monospace);
+      font-size: .72rem; font-weight: 500;
       padding: 4px 12px; border-radius: 20px;
-      letter-spacing: .02em;
+      letter-spacing: .08em; text-transform: uppercase;
     }
 
     /* ── LAYOUT ── */
@@ -272,7 +284,7 @@
     }
     .field textarea { resize: vertical; min-height: 85px; line-height: 1.55; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+    @media(max-width:480px) { .field-row { grid-template-columns: 1fr; } }
 
     /* Tags input */
     .tags-box {
@@ -403,9 +415,9 @@
     }
 
     /* ── SIDEBAR LOGOUT ── */
-    .btn-logout {
+    .btn-logout, .btn-back {
       display: flex; align-items: center; gap: 9px;
-      width: calc(100% - 24px); margin: 8px 12px;
+      width: calc(100% - 24px); margin: 4px 12px;
       padding: 8px 10px; border-radius: var(--r-sm);
       background: none; border: 1.5px solid var(--border2);
       cursor: pointer; font-family: 'Outfit', sans-serif;
@@ -413,6 +425,7 @@
       transition: all .12s;
     }
     .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
+    .btn-back:hover { background: #f3f4f6; color: var(--ink2); border-color: #d1d5db; }
 
     /* ── CONFIRM MODAL ── */
     .modal-overlay {
@@ -634,6 +647,9 @@
         <button class="nav-btn" id="nav-vestigingen" onclick="show('vestigingen')">
           <span class="nav-icon">📍</span> Vestigingen
         </button>
+        <button class="nav-btn" id="nav-international" onclick="show('international')">
+          <span class="nav-icon">🌍</span> Internationaal
+        </button>
       </div>
 
       <div class="sidebar-section">
@@ -644,12 +660,18 @@
         <button class="nav-btn" onclick="window.location.href='pricing.html'">
           <span class="nav-icon">💳</span> Abonnement
         </button>
+        <button class="nav-btn" id="nav-account" onclick="show('account')">
+          <span class="nav-icon">⚙️</span> Account
+        </button>
       </div>
 
     </div>
 
     <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <a href="spelregels.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Spelregels</a>
+    <button class="btn-back" onclick="goBack('discover.html')" title="Vorige pagina">
+      <span class="nav-icon">←</span> Vorige pagina
+    </button>
     <button class="btn-logout" onclick="signOut()" title="Uitloggen">
       <span class="nav-icon">🚪</span> Uitloggen
     </button>
@@ -729,6 +751,14 @@
           <div class="stat-note" id="stat-grade">berekenen…</div>
           <button onclick="forceTrustRecalculate()" style="margin-top:6px;font-size:.72rem;padding:3px 8px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;color:var(--ink3)">↻ Herberekenen</button>
         </div>
+      </div>
+
+      <!-- ── Interesse in jou (swipe-inbox) ── -->
+      <div id="incoming-likes-section" style="display:none;background:#fff;border:1.5px solid #f0f0ee;border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a7a48;margin-bottom:6px;">Nieuw</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:600;color:#0d1520;margin-bottom:4px;">Interesse in jou</div>
+        <p style="font-size:.82rem;color:#6b7280;margin-bottom:12px;">Studenten en buddies die jouw bedrijf een like hebben gestuurd.</p>
+        <div id="incoming-likes-list"></div>
       </div>
 
       <div class="sec-title">
@@ -919,6 +949,56 @@
       <div id="vestigingen-content"></div>
     </div>
 
+    <!-- ── INTERNATIONAAL ── -->
+    <div class="screen" id="screen-international">
+      <div class="page-title">Internationaal</div>
+      <p class="page-sub">Stel in of je open staat voor internationale stagiairs en wat je kunt aanbieden. Deze waarden gelden voor het hele bedrijfsprofiel; per vacature kun je nog fijnafstemmen.</p>
+
+      <div class="form-card">
+        <div class="form-section-title">Open voor internationals</div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 0">
+          <input type="checkbox" id="intl-accepts" style="width:18px;height:18px;accent-color:var(--green)">
+          <span>Wij accepteren internationale stagiairs</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 0">
+          <input type="checkbox" id="intl-visa" style="width:18px;height:18px;accent-color:var(--green)">
+          <span>Wij bieden visa-sponsorship aan</span>
+        </label>
+
+        <div class="field" style="margin-top:14px">
+          <label>Hulp bij huisvesting</label>
+          <select id="intl-housing">
+            <option value="none">Geen ondersteuning</option>
+            <option value="info">Informatie en contacten</option>
+            <option value="provided">Wij regelen huisvesting</option>
+          </select>
+        </div>
+
+        <div class="field" style="margin-top:14px">
+          <label>Vereiste talen op de werkvloer</label>
+          <div class="tags-box" id="intlLangsBox" onclick="document.getElementById('intlLangsInput').focus()">
+            <input type="text" id="intlLangsInput" class="tags-input" placeholder="EN, NL, DE, FR…" maxlength="20">
+          </div>
+          <div style="font-size:.78rem;color:var(--ink3);margin-top:4px">Druk Enter na elke taal. Veelgebruikt: EN, NL, DE, FR, ES, AR, ZH.</div>
+        </div>
+
+        <button class="btn-primary" id="saveIntlBtn" onclick="saveInternational()" style="margin-top:14px">Opslaan →</button>
+        <div id="intlSaveHint" style="margin-top:10px;font-size:.82rem;color:#6b7280;display:none"></div>
+      </div>
+
+      <div class="form-card" style="margin-top:16px;background:#f0faf5;border-color:rgba(26,122,72,.18)">
+        <div class="form-section-title" style="color:var(--green)">Per-vacature instellingen</div>
+        <p style="font-size:.88rem;color:var(--ink2);margin:0 0 6px 0">
+          Op vacature-niveau kun je per stage afzonderlijk instellen of de plek open is voor internationale studenten,
+          of er visa-sponsorship is, en het minimum aantal weken voorbereidingstijd (<code>min_lead_time_weeks</code>).
+        </p>
+        <p style="font-size:.85rem;color:var(--ink2);margin:0">
+          Maak of bewerk een vacature in
+          <a href="#" onclick="show('new');return false;" style="color:var(--green);font-weight:600">Nieuwe vacature</a> om die instellingen te zien.
+        </p>
+      </div>
+    </div>
+
     <!-- ── PROFIEL ── -->
     <div class="screen" id="screen-profile">
       <div class="page-title">Bedrijfsprofiel</div>
@@ -930,6 +1010,7 @@
           <div>
             <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="cpv-naam">—</div>
             <div style="font-size:.88rem;color:var(--ink3);margin-top:2px" id="cpv-sector-size">—</div>
+            <!-- href en textContent worden via JS gevuld in toonBedrijfOverzicht (~regel 2229); bij ontbrekende website wordt element verborgen via display:none -->
             <a id="cpv-website" href="#" target="_blank" rel="noopener noreferrer" style="font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none;margin-top:4px;display:none">—</a>
           </div>
           <button onclick="toonBedrijfFormulier()" class="btn-ghost">✏️ Bewerken</button>
@@ -996,6 +1077,13 @@
         </p>
         <div id="ical-container"></div>
       </div>
+    </div>
+
+    <!-- ── ACCOUNT ── -->
+    <div class="screen" id="screen-account">
+      <div class="page-title">Account</div>
+      <p class="page-sub">Beheer je contactgegevens en instellingen</p>
+      <div id="account-container"></div>
     </div>
 
   </main>
@@ -1226,10 +1314,15 @@ function show(id) {
   if (id === 'reviews')   loadReviews();
   if (id === 'esg')         renderESG();
   if (id === 'vestigingen') renderVestigingen();
+  if (id === 'international') renderInternational();
   if (id === 'new' && currentPlan === 'company_business') {
     const wrap = document.getElementById('vestiging-selector-wrap');
     if (wrap) wrap.style.display = '';
     if (_vestigingen.length === 0) loadVestigingen(); else populateVestigingSelector();
+  }
+  if (id === 'account') {
+    window._currentUserId = currentUser?.id;
+    AccountModule.renderAccountScreen('account-container', 'nl');
   }
 }
 
@@ -1249,17 +1342,8 @@ function upgradeCard(requiredPlan) {
     </div>`;
 }
 
-async function gotoBerichtenGated() {
-  if (await hasActivePlan('company_pro')) {
-    window.location.href = 'chat.html';
-  } else {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('screen-berichten').classList.add('active');
-    const nb = document.getElementById('nav-berichten');
-    if (nb) nb.classList.add('active');
-    document.getElementById('berichten-list').innerHTML = upgradeCard('company_pro');
-  }
+function gotoBerichtenGated() {
+  window.location.href = 'mijn-berichten.html';
 }
 
 async function showReviewsGated() {
@@ -1372,7 +1456,7 @@ function renderList(cid, data) {
     const hasMore = (p.description || '').length > 140;
     const locked  = isAllPostings && isStarter && idx > 0;
     return `
-    <div class="posting-card" style="position:relative;${locked ? 'pointer-events:none;' : ''}">
+    <div class="posting-card" data-posting-id="${p.id}" style="position:relative;${locked ? 'pointer-events:none;' : ''}">
       ${locked ? `
       <div style="position:absolute;inset:0;background:rgba(248,249,250,.88);border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2">
         <span style="font-size:1.4rem">🔒</span>
@@ -1465,7 +1549,7 @@ async function loadCompanyMatches() {
 
     if (error) throw error;
     if (!matchRows || matchRows.length === 0) {
-      el.innerHTML = `<div class="empty"><span class="empty-icon">🤝</span>Nog geen matches.<br>Plaats een vacature en wacht tot studenten reageren.</div>`;
+      el.innerHTML = `<div class="empty-state"><span class="es-icon">🤝</span><p class="es-primary">Nog geen aanmeldingen op je vacature.</p><p class="es-secondary">Vacatures met een actieve responsgarantie krijgen meer sollicitaties. Stel hem in bij het aanmaken of bewerken van een vacature.</p><button onclick="show('new')" class="es-cta">Nieuwe vacature plaatsen</button></div>`;
       return;
     }
 
@@ -1676,7 +1760,7 @@ async function loadReviews() {
   try {
     const { data: reviewRows, error } = await db
       .from('reviews')
-      .select('id, rating, body, created_at, reviewer_id, flagged')
+      .select('id, rating, title, body, created_at, reviewer_id, flagged, company_reply, company_reply_at')
       .eq('reviewee_id', currentUser.id)
       .order('created_at', { ascending: false });
 
@@ -1747,6 +1831,26 @@ async function loadReviews() {
       const initials = reviewerName.slice(0, 2).toUpperCase();
       const dateStr = new Date(r.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
       const flaggedNote = r.flagged ? `<span style="font-size:.72rem;color:var(--red);margin-left:8px">⚑ gemeld</span>` : '';
+      const titleHtml = r.title ? `<div style="font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:6px">${escapeHtml(r.title)}</div>` : '';
+
+      let replyHtml = '';
+      if (r.company_reply) {
+        const replyDate = r.company_reply_at ? new Date(r.company_reply_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+        replyHtml = `
+          <div style="background:var(--green-bg,#e8f5ee);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:12px">
+            <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:4px">Jouw reactie ${replyDate ? '· ' + escapeHtml(replyDate) : ''}</div>
+            <div style="font-size:.87rem;color:var(--ink2);line-height:1.6">${escapeHtml(r.company_reply)}</div>
+          </div>`;
+      } else if (!r.flagged) {
+        replyHtml = `
+          <div id="reply-area-${escapeHtml(r.id)}" style="margin-top:12px">
+            <button onclick="openReplyForm('${escapeHtml(r.id)}')"
+              style="font-size:.8rem;color:var(--green);background:none;border:1px solid var(--green);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:'Outfit',sans-serif">
+              ✏️ Reageer op deze review
+            </button>
+          </div>`;
+      }
+
       return `
         <div class="review-card">
           <div class="review-card-head">
@@ -1754,9 +1858,10 @@ async function loadReviews() {
             <div class="review-stars-display">${starsHtml(r.rating)}</div>
             <span class="review-date">${escapeHtml(dateStr)}</span>
             ${flaggedNote}
-            ${!r.flagged ? `<button onclick="flagReview('${r.id}')" title="Beoordeling melden" style="margin-left:auto;border:none;background:none;cursor:pointer;color:var(--ink4);font-size:.8rem;padding:2px 6px;border-radius:4px" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--ink4)'">⚑</button>` : ''}
           </div>
+          ${titleHtml}
           ${r.body ? `<div class="review-body">${escapeHtml(r.body)}</div>` : ''}
+          ${replyHtml}
         </div>`;
     }).join('');
 
@@ -1765,6 +1870,85 @@ async function loadReviews() {
   } catch(e) {
     console.error('loadReviews fout:', e?.message || 'onbekende fout');
     el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ── Right of reply ───────────────────────────────────────────────────────────
+function _replyOpenBtn(reviewId) {
+  const area = document.getElementById('reply-area-' + reviewId);
+  if (!area) return;
+  const btn = document.createElement('button');
+  btn.textContent = '✏️ Reageer op deze review';
+  btn.style.cssText = 'font-size:.8rem;color:var(--green);background:none;border:1px solid var(--green);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:\'Outfit\',sans-serif';
+  btn.onclick = () => openReplyForm(reviewId);
+  area.innerHTML = '';
+  area.appendChild(btn);
+}
+
+function openReplyForm(reviewId) {
+  const area = document.getElementById('reply-area-' + reviewId);
+  if (!area) return;
+
+  const wrap = document.createElement('div');
+  wrap.style.marginTop = '10px';
+
+  const ta = document.createElement('textarea');
+  ta.id          = 'reply-text-' + reviewId;
+  ta.maxLength   = 1000;
+  ta.rows        = 4;
+  ta.placeholder = 'Schrijf een professionele reactie (10–1000 tekens)…';
+  ta.style.cssText = 'width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:10px;font-family:\'Outfit\',sans-serif;font-size:.88rem;color:var(--ink);outline:none;resize:vertical;box-sizing:border-box';
+
+  const counter = document.createElement('div');
+  counter.id = 'reply-counter-' + reviewId;
+  counter.style.cssText = 'font-size:.72rem;color:var(--ink4);text-align:right;margin:2px 0 8px';
+  counter.textContent = '0 / 1000';
+  ta.addEventListener('input', () => { counter.textContent = ta.value.length + ' / 1000'; });
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:8px';
+
+  const submitBtn = document.createElement('button');
+  submitBtn.textContent = 'Reactie plaatsen';
+  submitBtn.style.cssText = 'background:var(--green);color:#fff;border:none;border-radius:20px;padding:8px 20px;font-family:\'Outfit\',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer';
+  submitBtn.onclick = () => sendReply(reviewId);
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Annuleren';
+  cancelBtn.style.cssText = 'background:none;border:1px solid var(--border2);color:var(--ink3);border-radius:20px;padding:8px 16px;font-family:\'Outfit\',sans-serif;font-size:.85rem;cursor:pointer';
+  cancelBtn.onclick = () => _replyOpenBtn(reviewId);
+
+  btnRow.appendChild(submitBtn);
+  btnRow.appendChild(cancelBtn);
+  wrap.appendChild(ta);
+  wrap.appendChild(counter);
+  wrap.appendChild(btnRow);
+  area.innerHTML = '';
+  area.appendChild(wrap);
+}
+
+async function sendReply(reviewId) {
+  const textarea = document.getElementById('reply-text-' + reviewId);
+  if (!textarea) return;
+  const text = textarea.value.trim();
+  if (text.length < 10 || text.length > 1000) {
+    notify('Reactie moet tussen 10 en 1000 tekens zijn', false);
+    return;
+  }
+  textarea.disabled = true;
+  const result = await submitCompanyReply(reviewId, text);
+  if (result.ok) {
+    const area = document.getElementById('reply-area-' + reviewId);
+    if (area) {
+      const dateStr = new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+      area.innerHTML = `
+        <div style="background:var(--green-bg,#e8f5ee);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:12px">
+          <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:4px">Jouw reactie · ${escapeHtml(dateStr)}</div>
+          <div style="font-size:.87rem;color:var(--ink2);line-height:1.6">${escapeHtml(text)}</div>
+        </div>`;
+    }
+  } else {
+    textarea.disabled = false;
   }
 }
 
@@ -1837,16 +2021,24 @@ async function herberekeningTrustScore(companyUserId) {
 
     updateTrustDisplay(score, grade, reviewCount);
 
-    await db.from('company_profiles').upsert(
-      { profile_id: companyUserId, trust_score: score, trust_grade: grade },
-      { onConflict: 'profile_id' }
-    );
+    // AUDIT FIX 2026-04-30: trust_score
+    // write disabled — score berekend client-side voor display
+    // maar NIET naar DB geschreven. Edge Function vereist.
+    // Zie PREDEPLOY_AUDIT_2026-04-30.md CHECK 18/30.
+    // await db.from('company_profiles').upsert(
+    //   { profile_id: companyUserId, trust_score: score, trust_grade: grade },
+    //   { onConflict: 'profile_id' }
+    // );
 
-    if (postingIds.length > 0) {
-      await db.from('internship_postings')
-        .update({ trust_score: score, trust_grade: grade })
-        .eq('created_by', companyUserId);
-    }
+    // AUDIT FIX 2026-04-30: trust_score
+    // write disabled — score berekend client-side voor display
+    // maar NIET naar DB geschreven. Edge Function vereist.
+    // Zie PREDEPLOY_AUDIT_2026-04-30.md CHECK 18/30.
+    // if (postingIds.length > 0) {
+    //   await db.from('internship_postings')
+    //     .update({ trust_score: score, trust_grade: grade })
+    //     .eq('created_by', companyUserId);
+    // }
   } catch(e) {
     console.error('Trust score berekening fout:', e?.message || 'onbekende fout');
     sessionStorage.removeItem('internly_trust_calculated_' + companyUserId);
@@ -1981,9 +2173,38 @@ async function submitPosting() {
 
 // ── Status ──
 async function setStatus(id, status) {
+  if (status === 'paused') {
+    // Optimistic: verberg kaart meteen, toon undo-toast
+    const cardEl   = document.querySelector(`.posting-card[data-posting-id="${id}"]`);
+    const restoreCard = optimistic.hideEl(cardEl);
+
+    const ok = await optimistic.do(
+      'Vacature gepauzeerd',
+      () => db.from('internship_postings').update({ status: 'paused' }).eq('id', id).eq('created_by', currentUser.id),
+      async () => {
+        // Undo: zet terug op active
+        const { error: reErr } = await db.from('internship_postings').update({ status: 'active' }).eq('id', id).eq('created_by', currentUser.id);
+        if (reErr) { console.error('[company] undo pauzeren fout:', reErr?.message); toast.error('Ongedaan maken mislukt'); return; }
+        await loadPostings();
+        renderList('all-postings', postings);
+        const restoredCard = document.querySelector(`.posting-card[data-posting-id="${id}"]`);
+        if (restoredCard) restoredCard.classList.add('undo-flash');
+      }
+    );
+
+    if (ok) {
+      postings = postings.map(p => p.id === id ? { ...p, status: 'paused' } : p);
+      setTimeout(() => { if (cardEl) cardEl.remove(); }, 300);
+    } else {
+      restoreCard();
+    }
+    return;
+  }
+
+  // Activeren — directe feedback (niet onderdaan-maakbaar)
   const { error } = await db.from('internship_postings').update({ status }).eq('id', id);
   if (error) { console.error('[company] setStatus fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
-  notify(status === 'active' ? '✓ Vacature geactiveerd' : '⏸ Vacature gepauzeerd');
+  notify('✓ Vacature geactiveerd');
   await loadPostings();
   renderList('all-postings', postings);
 }
@@ -2459,9 +2680,10 @@ window.addEventListener('online',  () => { notify('Verbinding hersteld'); locati
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -2531,7 +2753,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
       }, 1000);
     } else {
-      notify('Betaling mislukt of geannuleerd — probeer opnieuw');
+      notify('Betaling mislukt of geannuleerd — probeer opnieuw', false);
     }
   })();
 
@@ -2597,6 +2819,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await loadNotifications();
   startNotifSubscription();
+
+  reloadIncomingLikes();
 
   InternlyCalendar.render('ical-container', db, user.id);
   initSessionTimeout();
@@ -2786,6 +3010,137 @@ window.addEventListener('beforeunload', () => {
 // Herlaad notificaties bij terugkeer naar tab (stale data preventie)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && currentUser) loadNotifications();
+});
+
+// ── Internationaal tabblad ──────────────────────────────────────────────────
+let intlLangs = [];
+
+async function renderInternational() {
+  if (!currentUser) { notify('Niet ingelogd'); return; }
+  const accepts  = document.getElementById('intl-accepts');
+  const visa     = document.getElementById('intl-visa');
+  const housing  = document.getElementById('intl-housing');
+  const langsBox = document.getElementById('intlLangsBox');
+  const langsInp = document.getElementById('intlLangsInput');
+
+  // Reset chips uit eerdere render
+  langsBox.querySelectorAll('.tag-chip').forEach(c => c.remove());
+  intlLangs = [];
+
+  try {
+    const { data, error } = await db
+      .from('company_profiles')
+      .select('accepts_international, visa_sponsorship, housing_support, languages_required')
+      .eq('profile_id', currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[intl] company_profiles fetch fout:', error.message);
+      notify('Kon internationale instellingen niet laden', false);
+      return;
+    }
+
+    accepts.checked = !!(data && data.accepts_international);
+    visa.checked    = !!(data && data.visa_sponsorship);
+    housing.value   = (data && data.housing_support) || 'none';
+
+    const existing = (data && Array.isArray(data.languages_required)) ? data.languages_required : [];
+    existing.forEach(l => addIntlLang(l));
+  } catch (err) {
+    console.error('[intl] renderInternational exception:', err?.message || err);
+    notify('Er ging iets mis bij laden — probeer opnieuw', false);
+  }
+}
+
+async function saveInternational() {
+  if (!currentUser) { notify('Niet ingelogd'); return; }
+  const btn  = document.getElementById('saveIntlBtn');
+  const hint = document.getElementById('intlSaveHint');
+
+  // Eventuele tekst die nog in input staat als laatste tag opnemen
+  const lastInput = document.getElementById('intlLangsInput');
+  if (lastInput && lastInput.value.trim()) {
+    addIntlLang(lastInput.value.trim().replace(/,/g, ''));
+    lastInput.value = '';
+  }
+
+  btn.disabled = true; btn.textContent = 'Opslaan…';
+
+  try {
+    const { error } = await db.from('company_profiles').upsert({
+      profile_id:            currentUser.id,
+      accepts_international: document.getElementById('intl-accepts').checked,
+      visa_sponsorship:      document.getElementById('intl-visa').checked,
+      housing_support:       document.getElementById('intl-housing').value || 'none',
+      languages_required:    intlLangs.slice() // copy
+    }, { onConflict: 'profile_id' });
+
+    btn.disabled = false; btn.textContent = 'Opslaan →';
+
+    if (error) {
+      console.error('[intl] saveInternational fout:', error.message);
+      notify('Opslaan mislukt — probeer het opnieuw', false);
+      if (hint) {
+        hint.textContent = 'Fout: ' + error.message;
+        hint.style.display = 'block';
+      }
+      return;
+    }
+
+    notify('✓ Internationale instellingen opgeslagen');
+    if (hint) {
+      hint.textContent = 'Laatst opgeslagen: nu';
+      hint.style.display = 'block';
+    }
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Opslaan →';
+    console.error('[intl] saveInternational exception:', err?.message || err);
+    notify('Onverwachte fout bij opslaan', false);
+  }
+}
+
+function addIntlLang(s) {
+  if (!s) return;
+  const norm = String(s).trim();
+  if (!norm) return;
+  if (intlLangs.length >= 12) return;
+  if (intlLangs.includes(norm)) return;
+
+  intlLangs.push(norm);
+
+  const chip = document.createElement('div');
+  chip.className = 'tag-chip';
+  chip.appendChild(document.createTextNode(norm));
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', () => removeIntlLang(norm, closeBtn));
+  chip.appendChild(closeBtn);
+
+  const box = document.getElementById('intlLangsBox');
+  const input = document.getElementById('intlLangsInput');
+  if (box && input) box.insertBefore(chip, input);
+}
+
+function removeIntlLang(s, btn) {
+  const i = intlLangs.indexOf(s);
+  if (i > -1) intlLangs.splice(i, 1);
+  if (btn && btn.closest('.tag-chip')) btn.closest('.tag-chip').remove();
+}
+
+// Bind Enter / komma op de intlLangs input zodra het element bestaat
+document.addEventListener('DOMContentLoaded', () => {
+  const intlInp = document.getElementById('intlLangsInput');
+  if (intlInp) {
+    intlInp.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+        e.preventDefault();
+        addIntlLang(this.value.trim().replace(/,/g, ''));
+        this.value = '';
+      }
+    });
+  }
 });
 </script>
 

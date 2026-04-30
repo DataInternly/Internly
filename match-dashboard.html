@@ -11,11 +11,17 @@
   <title>Stage Hub — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
   <script src="js/utils.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+          integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
+          crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     /* ── Design tokens ───────────────────────────────────────────── */
@@ -66,13 +72,27 @@
       --red-bg:      #fdeaea;
     }
 
+    /* ═══════════════════════════════════════════════════════════════
+       Dashboard archetype (match-dashboard / Stage Hub) — multi-role
+       (student/bedrijf/school) shared dashboard.
+       MINIMALE rewrite per fase D-strategie: 6145 regels totaal,
+       1892 regels eigen CSS. Body+fonts via globale tokens, rest
+       behouden i.v.m. risico op regressie en sprint-restrictie
+       (eindverslag-flow + jspdf PDF-export NIET aanraken).
+       ═══════════════════════════════════════════════════════════════ */
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--bg-page, #f4f3ef);
+      color: var(--fg-primary, #1a1a1a);
       min-height: 100vh;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
     }
 
     /* ── Role picker ─────────────────────────────────────────────── */
@@ -1404,7 +1424,7 @@
 
     /* Step 2 two-column layout */
     .modal-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 600px) { .modal-2col { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .modal-2col { grid-template-columns: 1fr; } }
 
     /* Time slot rows in step 2 */
     .time-slot-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
@@ -2048,6 +2068,13 @@
         Matchpool
         <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Matchpool">ⓘ<span class="info-pop">Bekijk beschikbare bedrijven, scholen en buddy's. Zet voorbeeldprofielen aan om te zien hoe de pool eruitziet.</span></span>
       </button>
+      <button class="sidebar-item" data-tab="account" onclick="switchTab('account')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        Account
+      </button>
 
       <div class="sidebar-spacer"></div>
 
@@ -2644,9 +2671,10 @@ async function markMatchCompleted(matchId) {
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -2659,7 +2687,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     showSpinner();
     const { data: { user } } = await db.auth.getUser();
     if (!user) {
-      window.location.href = 'auth.html?redirect=' + encodeURIComponent(window.location.href);
+      window.location.href = 'auth.html';
       return;
     }
     initSessionTimeout();
@@ -2680,6 +2708,15 @@ window.addEventListener('DOMContentLoaded', async () => {
       const roleMap = { student: 'student', bedrijf: 'bedrijf', school: 'school' };
       const mappedRole = roleMap[dbRole];
       if (mappedRole) {
+        // Profile guard — audit fix 2026-04-30
+        if (mappedRole === 'student') {
+          const { data: sp } = await db.from('student_profiles')
+            .select('naam').eq('profile_id', user.id).maybeSingle();
+          if (!sp || !sp.naam) {
+            window.location.replace('student-profile.html');
+            return;
+          }
+        }
         startHub(mappedRole);
 
         // Wire back button to the right dashboard
@@ -2705,13 +2742,13 @@ async function loadMatchFromDB(user) {
   // Spinner already showing from DOMContentLoaded handler.
   // loadHubFromDB (called via startHub) will hide it when done.
   try {
-    // 0. Role guard — doorstuur rollen die hier niet thuishoren
+    // 0. Role guard — wrong-role doorsturen via canon
+    //    (replace ipv href om history schoon te houden)
     const { data: _prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
-    const WRONG_ROLE_ROUTES = { gepensioneerd: 'buddy-dashboard.html', buddy: 'buddy-dashboard.html' };
-    if (WRONG_ROLE_ROUTES[_prof?.role]) { hideSpinner(); window.location.href = WRONG_ROLE_ROUTES[_prof.role]; return; }
     const allowedRoles = ['student', 'begeleider'];
     if (_prof && !allowedRoles.includes(_prof.role)) {
-      window.location.replace('auth.html');
+      hideSpinner();
+      window.location.replace(getRoleLanding(_prof.role, false));
       return;
     }
 
@@ -2951,11 +2988,31 @@ function switchTab(tab) {
     voortgang:   renderVoortgang,
     afspraken:   renderAfspraken,
     matchpool:   renderMatchpool,
+    account:     renderAccountTab,
   };
   const tabHtml = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
-  const visibilityBar = '<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink3,#7a8799);background:var(--bg2,#eceae4);padding:5px 12px;border-radius:6px;margin-bottom:.75rem;"><span>👁</span><span>Zichtbaar voor:</span> <span style="color:var(--blue,#1756a8);">Student</span> · <span style="color:var(--green,#1a7a48);">Bedrijf</span> · <span style="color:var(--amber,#a06010);">School</span></div>';
-  mc.innerHTML = visibilityBar + renderMatchIndicator() + tabHtml;
+  // Account tab is privé — geen visibility-bar of match-indicator
+  const isAccount = tab === 'account';
+  const visibilityBar = isAccount
+    ? ''
+    : '<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink3,#7a8799);background:var(--bg2,#eceae4);padding:5px 12px;border-radius:6px;margin-bottom:.75rem;"><span>👁</span><span>Zichtbaar voor:</span> <span style="color:var(--blue,#1756a8);">Student</span> · <span style="color:var(--green,#1a7a48);">Bedrijf</span> · <span style="color:var(--amber,#a06010);">School</span></div>';
+  const indicator = isAccount ? '' : renderMatchIndicator();
+  mc.innerHTML = visibilityBar + indicator + tabHtml;
+  if (isAccount) {
+    window._currentUserId = currentUser?.id;
+    AccountModule.renderAccountScreen('account-container', 'nl');
+  }
   updateMeetingBadge();
+}
+
+function renderAccountTab() {
+  return `
+    <div class="page-head" style="margin-bottom:14px;">
+      <div class="page-title" style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:var(--ink,#0d1520);">Account</div>
+      <div class="page-sub" style="font-size:.88rem;color:var(--ink3,#7a8799);margin-top:2px;">Beheer je contactgegevens en instellingen</div>
+    </div>
+    <div id="account-container"></div>
+  `;
 }
 
 /* ── Sidebar toggle ─────────────────────────────────────────────────────── */
@@ -5325,7 +5382,7 @@ function renderModalStep2() {
 
   const slotRows = () => modalTimeSlots.map((s, i) => `
     <div class="time-slot-row" id="tsrow-${i}">
-      <input type="date" value="${s.date}" onchange="modalTimeSlots[${i}].date=this.value">
+      <input type="date" value="${s.date}" min="${new Date().toISOString().split('T')[0]}" onchange="modalTimeSlots[${i}].date=this.value">
       <span class="slot-sep">van</span>
       <input type="time" value="${s.from}" onchange="modalTimeSlots[${i}].from=this.value">
       <span class="slot-sep">tot</span>
@@ -5383,6 +5440,13 @@ async function saveMeeting() {
   try {
     const filled = modalTimeSlots.filter(s => s.date && s.from && s.to);
     if (filled.length === 0) { toast('Voeg minimaal één tijdstip toe.', 'error'); return; }
+    const _today = new Date().toISOString().split('T')[0];
+    const _invalidDates = filled.filter(s => s.date && s.date < _today);
+    if (_invalidDates.length > 0) {
+      if (typeof notify === 'function')
+        notify('Kies een datum in de toekomst.', false);
+      return;
+    }
     const now = new Date();
     const timeStr = now.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) + ', ' +
       now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
@@ -5637,7 +5701,7 @@ function exportPDF() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9.5);
       doc.setTextColor(200, 235, 215);
-      doc.text(`${match.student.name}  ·  ${match.company.name}  ·  ${dateNl}`, margin, 31);
+      doc.text(`${match?.student?.name || 'Onbekend'}  ·  ${match.company.name}  ·  ${dateNl}`, margin, 31);
       y = 46;
     } else {
       doc.setFillColor(26, 122, 72);
@@ -5649,7 +5713,7 @@ function exportPDF() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(200, 235, 215);
-      doc.text(match.student.name, pageW - margin, 9, { align: 'right' });
+      doc.text(match?.student?.name || 'Onbekend', pageW - margin, 9, { align: 'right' });
       y = 21;
     }
   }
@@ -5726,8 +5790,8 @@ function exportPDF() {
   // ── Stage info cards (2-column grid) ──────────────────────────────────────
   sectionHeader('Stagegegevens');
   const infoItems = [
-    ['Student',   match.student.name],
-    ['Opleiding', match.student.opleiding],
+    ['Student',   match?.student?.name || 'Onbekend'],
+    ['Opleiding', match?.student?.opleiding || '—'],
     ['Bedrijf',   match.company.name],
     ['Vacature',  match.company.vacature],
     ['Periode',   `${match.company.start} – ${match.company.eind}`],
@@ -5888,7 +5952,7 @@ function exportPDF() {
   }
 
   drawFooters();
-  const safeName = (match.student.name || 'student').replace(/\s+/g, '-').toLowerCase();
+  const safeName = (match?.student?.name || 'student').replace(/\s+/g, '-').toLowerCase();
   const dateSlug = new Date().toISOString().split('T')[0];
   doc.save(`stageplan-${safeName}-${dateSlug}.pdf`);
   toast('PDF gedownload');

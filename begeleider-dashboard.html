@@ -13,8 +13,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     :root {
@@ -124,9 +126,9 @@
       font-size: .72rem; color: var(--ink4);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .btn-logout {
+    .btn-logout, .btn-back {
       display: flex; align-items: center; gap: 9px;
-      width: calc(100% - 24px); margin: 8px 12px;
+      width: calc(100% - 24px); margin: 4px 12px;
       padding: 8px 10px; border-radius: var(--r-sm);
       background: none; border: 1.5px solid var(--border2);
       cursor: pointer; font-family: 'Outfit', sans-serif;
@@ -134,6 +136,7 @@
       transition: all .12s;
     }
     .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
+    .btn-back:hover { background: #f3f4f6; color: var(--ink2); border-color: #d1d5db; }
 
     /* ── MAIN ── */
     .main { flex: 1; padding: 32px 32px 80px; max-width: 900px; }
@@ -337,6 +340,74 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
     }
+
+    /* ── UITNODIG MODAL ── */
+    .ud-overlay {
+      position: fixed; inset: 0; z-index: 7000;
+      background: rgba(13,21,32,.5); backdrop-filter: blur(3px);
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .ud-modal {
+      background: var(--white); border-radius: var(--r);
+      width: 100%; max-width: 480px; max-height: 80vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .ud-header {
+      padding: 20px 20px 0; display: flex; align-items: center; justify-content: space-between;
+    }
+    .ud-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .ud-close {
+      background: none; border: none; font-size: 1.2rem; color: var(--ink3);
+      cursor: pointer; padding: 4px 8px; border-radius: 6px; line-height: 1;
+    }
+    .ud-close:hover { background: var(--bg); }
+    .ud-search-wrap { padding: 14px 20px 0; }
+    .ud-search {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm); font-family: 'Outfit', sans-serif;
+      font-size: .9rem; color: var(--ink); outline: none;
+      transition: border-color .15s; box-sizing: border-box;
+    }
+    .ud-search:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,116,144,.12); }
+    .ud-results { flex: 1; overflow-y: auto; padding: 10px 12px 16px; }
+    .ud-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 8px;
+      border-radius: var(--r-sm); transition: background .12s; cursor: default;
+    }
+    .ud-item:hover { background: var(--bg); }
+    .ud-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--teal-bg); color: var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .82rem; font-weight: 700; flex-shrink: 0;
+    }
+    .ud-info { flex: 1; min-width: 0; }
+    .ud-name { font-size: .88rem; font-weight: 600; color: var(--ink); }
+    .ud-meta { font-size: .76rem; color: var(--ink3); }
+    .ud-send {
+      background: var(--teal); color: #fff; border: none;
+      padding: 6px 14px; border-radius: 50px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; flex-shrink: 0;
+      transition: background .12s;
+    }
+    .ud-send:hover { background: var(--teal-dark); }
+    .ud-send:disabled { opacity: .4; cursor: not-allowed; }
+    .ud-hint { padding: 32px 20px; text-align: center; color: var(--ink4); font-size: .85rem; }
+    .btn-chat-sm {
+      background: var(--teal-bg); color: var(--teal); border: none;
+      padding: 6px 14px; border-radius: 50px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; text-decoration: none;
+      display: inline-block; transition: background .12s;
+    }
+    .btn-chat-sm:hover { background: #cff0f8; }
+    .ud-invite-btn {
+      background: var(--teal); color: #fff; border: none;
+      padding: 9px 20px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .88rem; font-weight: 600;
+      cursor: pointer; transition: background .15s; white-space: nowrap;
+    }
+    .ud-invite-btn:hover { background: var(--teal-dark); }
   </style>
 </head>
 <body>
@@ -402,8 +473,9 @@
         </a>
       </div>
     </div>
+    <button class="btn-back" onclick="goBack('discover.html')" title="Vorige pagina">← Vorige pagina</button>
     <button class="btn-logout" onclick="doSignOut()">
-      <span>⬅</span> Uitloggen
+      <span>🚪</span> Uitloggen
     </button>
   </aside>
 
@@ -510,8 +582,13 @@
 
     <!-- ── MIJN STUDENTEN ── -->
     <div class="screen" id="screen-studenten">
-      <div class="page-title">Mijn studenten</div>
-      <div class="page-sub">Studenten die jou als begeleider hebben gekoppeld</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
+        <div>
+          <div class="page-title" style="margin-bottom:2px;">Mijn studenten</div>
+          <div class="page-sub">Studenten die aan jou gekoppeld zijn</div>
+        </div>
+        <button class="ud-invite-btn" onclick="openUitnodigModal()">+ Nodig student uit</button>
+      </div>
 
       <div id="studentCapBanner" style="display:none" class="alert-box alert-amber">
         Je hebt je studentenlimiet bereikt. Upgrade naar Pro voor tot 100 studenten.
@@ -521,7 +598,9 @@
       <div id="studentList">
         <div class="empty">
           <span class="empty-icon">👥</span>
-          Studenten kunnen jou als begeleider selecteren via hun eigen profiel. Zodra een student jou koppelt, verschijnen ze hier.
+          Nog geen studenten gekoppeld. Stuur een uitnodiging of laat een student jou selecteren via hun profiel.
+          <br>
+          <button type="button" onclick="openUitnodigModal()" class="btn-primary" style="margin-top:.75rem;">Nodig je eerste student uit →</button>
         </div>
       </div>
     </div>
@@ -562,6 +641,14 @@
     </div>
 
   </main>
+</div>
+
+<!-- ── BESCHIKBAARHEID ──────────────────────────────────────────────────────── -->
+<div style="max-width:900px;margin:0 auto;padding:24px 24px 2.5rem">
+  <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a7a48;margin-bottom:4px;">Jouw planning</div>
+  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;color:#0d1520;margin-bottom:6px;">Beschikbaarheid</div>
+  <p style="font-size:.88rem;color:#6b7280;margin-bottom:12px;">Geef aan wanneer je beschikbaar bent voor gesprekken of afspraken met studenten en hun leerbedrijven.</p>
+  <div id="ical-container"></div>
 </div>
 
 <footer style="text-align:center;padding:10px 0 14px;font-size:.6rem;color:rgba(0,0,0,.2);">© 2026 Sasubo Holding B.V.</footer>
@@ -811,7 +898,7 @@ async function saveProfiel() {
     .eq('id', user.id);
 
   if (error) {
-    notify('Opslaan mislukt — probeer opnieuw');
+    notify('Opslaan mislukt — probeer opnieuw', false);
     console.error('[begeleider-dashboard] saveProfiel error:', error.message);
   } else {
     notify('Profiel bijgewerkt');
@@ -847,9 +934,182 @@ function initReferralBanner() {
   }
 }
 
-// TODO Sprint 5: vervang stub door echte koppelingsinvite (deelbare link of profiel-ID invoer)
-function openKoppelingFlow() {
-  notify('Studenten koppelen via hun profiel: laat de student jouw naam selecteren als begeleider');
+// ── Uitnodig student modal ────────────────────────────────────────────────────
+let _udTimer = null;
+let _udCurrentUser = null;
+
+function openUitnodigModal() {
+  document.getElementById('ud-overlay').style.display = 'flex';
+  document.getElementById('ud-search-input').value = '';
+  document.getElementById('ud-results').innerHTML = '<div class="ud-hint">Typ een naam of opleiding om studenten te zoeken.</div>';
+  setTimeout(() => document.getElementById('ud-search-input').focus(), 80);
+}
+
+function closeUitnodigModal() {
+  document.getElementById('ud-overlay').style.display = 'none';
+  clearTimeout(_udTimer);
+}
+
+function _udSearchDebounce() {
+  clearTimeout(_udTimer);
+  _udTimer = setTimeout(_runStudentSearch, 300);
+}
+
+async function _runStudentSearch() {
+  const q = (document.getElementById('ud-search-input')?.value || '').trim();
+  const resultsEl = document.getElementById('ud-results');
+  if (!q) {
+    resultsEl.innerHTML = '<div class="ud-hint">Typ een naam of opleiding om studenten te zoeken.</div>';
+    return;
+  }
+  resultsEl.innerHTML = '<div class="ud-hint">Zoeken…</div>';
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const { data: rows } = await db
+    .from('profiles')
+    .select('id, naam, student_profiles(opleiding, school)')
+    .eq('role', 'student')
+    .or(`naam.ilike.%${q}%`)
+    .limit(10);
+
+  if (!rows || rows.length === 0) {
+    resultsEl.innerHTML = '<div class="ud-hint">Geen studenten gevonden.</div>';
+    return;
+  }
+
+  resultsEl.innerHTML = rows.map(r => {
+    const initials = (r.naam || '??').slice(0, 2).toUpperCase();
+    const opleiding = r.student_profiles?.opleiding || '';
+    const school    = r.student_profiles?.school    || '';
+    const meta      = [opleiding, school].filter(Boolean).join(' · ');
+    return `
+      <div class="ud-item">
+        <div class="ud-avatar">${escapeHtml(initials)}</div>
+        <div class="ud-info">
+          <div class="ud-name">${escapeHtml(r.naam || 'Onbekend')}</div>
+          ${meta ? `<div class="ud-meta">${escapeHtml(meta)}</div>` : ''}
+        </div>
+        <button class="ud-send" id="ud-btn-${r.id}"
+          onclick="_sendBegeleiderUitnodiging('${r.id}','${escapeHtml(r.naam || '')}')">
+          Uitnodigen
+        </button>
+      </div>`;
+  }).join('');
+}
+
+async function _sendBegeleiderUitnodiging(studentId, studentNaam) {
+  const btn = document.getElementById(`ud-btn-${studentId}`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  // Check existing link
+  const { data: existing } = await db
+    .from('matches')
+    .select('id, status')
+    .eq('type', 'begeleider_link')
+    .or(`and(party_a.eq.${user.id},party_b.eq.${studentId}),and(party_a.eq.${studentId},party_b.eq.${user.id})`)
+    .maybeSingle();
+
+  if (existing) {
+    const label = existing.status === 'accepted' ? 'al gekoppeld' : 'uitnodiging al verstuurd';
+    if (btn) { btn.disabled = true; btn.textContent = label; }
+    notify(`Je bent ${label} met ${studentNaam}`);
+    return;
+  }
+
+  const { error } = await db.from('matches').insert({
+    type:         'begeleider_link',
+    match_target: 'profile',
+    party_a:      user.id,
+    party_b:      studentId,
+    status:       'pending'
+  });
+
+  if (error) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Uitnodigen'; }
+    notify('Uitnodiging mislukt — probeer opnieuw', false);
+    console.error('[begeleider-dashboard] _sendBegeleiderUitnodiging:', error.message);
+    return;
+  }
+
+  await createNotification(studentId, 'buddy_request',
+    `Een begeleider heeft je een uitnodiging gestuurd`, user.id);
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Verstuurd ✓'; }
+  notify(`Uitnodiging verstuurd naar ${studentNaam}`);
+}
+
+// ── Load begeleider_link accepted matches ──────────────────────────────────────
+async function loadBegeleiderLinks(userId) {
+  const { data: links } = await db
+    .from('matches')
+    .select('id, party_a, party_b')
+    .eq('type', 'begeleider_link')
+    .eq('status', 'accepted')
+    .or(`party_a.eq.${userId},party_b.eq.${userId}`);
+
+  if (!links || links.length === 0) return;
+
+  const studentIds = links.map(l => l.party_a === userId ? l.party_b : l.party_a);
+  const { data: profiles } = await db
+    .from('profiles')
+    .select('id, naam')
+    .in('id', studentIds);
+
+  const { data: spRows } = await db
+    .from('student_profiles')
+    .select('profile_id, opleiding, sector')
+    .in('profile_id', studentIds);
+
+  const spMap = Object.fromEntries((spRows || []).map(s => [s.profile_id, s]));
+  const profMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+
+  // Build conversation links for each match
+  const matchConvMap = {};
+  const matchIds = links.map(l => l.id);
+  const { data: convs } = await db
+    .from('conversations')
+    .select('id, match_id')
+    .in('match_id', matchIds);
+  (convs || []).forEach(c => { matchConvMap[c.match_id] = c.id; });
+
+  const listEl = document.getElementById('studentList');
+  if (!listEl) return;
+
+  const existingEmpty = listEl.querySelector('.empty');
+  if (existingEmpty) existingEmpty.remove();
+
+  const rows = links.map(link => {
+    const studentId = link.party_a === userId ? link.party_b : link.party_a;
+    const prof = profMap[studentId] || {};
+    const sp   = spMap[studentId]   || {};
+    const naam = prof.naam || 'Onbekend';
+    const initials = naam.slice(0, 2).toUpperCase();
+    const meta = [sp.opleiding, sp.sector].filter(Boolean).join(' · ');
+    const convId = matchConvMap[link.id];
+    const chatHref = convId
+      ? `chat.html?match=${link.id}`
+      : `chat.html?match=${link.id}`;
+    return `
+      <div class="student-row">
+        <div class="avatar">${escapeHtml(initials)}</div>
+        <div class="sr-info">
+          <div class="sr-name">${escapeHtml(naam)}</div>
+          ${meta ? `<div class="sr-meta">${escapeHtml(meta)}</div>` : ''}
+        </div>
+        <a href="${chatHref}" class="btn-chat-sm">Open chat</a>
+      </div>`;
+  }).join('');
+
+  if (listEl.querySelector('.student-row')) {
+    listEl.insertAdjacentHTML('beforeend', rows);
+  } else {
+    listEl.innerHTML = rows;
+  }
 }
 
 // ── DOMContentLoaded ──────────────────────────────────────────────────────────
@@ -901,7 +1161,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { maxStudents = 30 } = await loadSubscription(user.id);
 
   // 7. Load students + stats
+  _udCurrentUser = user;
   await loadStudents(user.id, maxStudents);
+  await loadBegeleiderLinks(user.id);
 
   // 8. Load activity feed
   await loadActivity(user.id);
@@ -914,9 +1176,30 @@ window.addEventListener('DOMContentLoaded', async () => {
   const statAfgerond = document.getElementById('statAfgerond');
   if (statAfgerond) statAfgerond.textContent = (completed ?? 0).toString();
   initReferralBanner();
+
+  InternlyCalendar.render('ical-container', db, user.id);
 });
 </script>
 
+<!-- ── UITNODIG STUDENT MODAL ── -->
+<div id="ud-overlay" class="ud-overlay" style="display:none" onclick="if(event.target===this)closeUitnodigModal()">
+  <div class="ud-modal" role="dialog" aria-modal="true" aria-labelledby="ud-title-label">
+    <div class="ud-header">
+      <span class="ud-title" id="ud-title-label">Student uitnodigen</span>
+      <button class="ud-close" onclick="closeUitnodigModal()" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="ud-search-wrap">
+      <input class="ud-search" id="ud-search-input" type="search"
+        placeholder="Zoek op naam of opleiding…"
+        autocomplete="off" oninput="_udSearchDebounce()">
+    </div>
+    <div class="ud-results" id="ud-results">
+      <div class="ud-hint">Typ een naam of opleiding om studenten te zoeken.</div>
+    </div>
+  </div>
+</div>
+
+<script src="js/calendar.js"></script>
 <script src="js/translate.js"></script>
 </body>
 </html>

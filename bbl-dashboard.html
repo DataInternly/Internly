@@ -17,58 +17,65 @@
   <meta name="theme-color" content="#1a7a48">
   <title>BBL Dashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Outfit', sans-serif;
-      background: #f4f3ef;
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--c-cream-warm, #f4f3ef);
+      color: var(--c-ink, #0d1520);
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
     }
 
-    /* ── Topbar ── */
+    /* ── Topbar (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
-      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      background: rgba(244,243,239,.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-subtle, #f0f0ee);
       padding: 0 24px; height: 56px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       position: sticky; top: 0; z-index: 100;
     }
     .topbar-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.2rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.2rem; font-weight: 700; color: var(--c-ink, #0d1520);
       letter-spacing: -.02em; text-decoration: none; flex-shrink: 0;
     }
-    .topbar-logo span { color: #FF7E42; }
+    .topbar-logo span { color: var(--c-orange-deep, #e05c1a); }
     .topbar-bbl-tag {
-      font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      font-family: var(--font-mono, 'DM Mono', monospace);
       padding: 3px 9px; border-radius: 20px;
-      background: rgba(255,255,255,.15); color: rgba(255,255,255,.9);
+      background: rgba(26,122,72,.10); color: var(--c-green, #1a7a48);
       flex-shrink: 0;
     }
     .topbar-bbl-nav { display: flex; gap: 16px; margin: 0 auto; }
     .topbar-bbl-nav a {
-      color: rgba(255,255,255,.55); text-decoration: none;
+      color: var(--c-ink3, #6b7280); text-decoration: none;
       font-size: .82rem; font-weight: 500; transition: color .15s;
       padding: 4px 0; border-bottom: 2px solid transparent;
     }
-    .topbar-bbl-nav a:hover { color: rgba(255,255,255,.85); }
-    .topbar-bbl-nav a.active { color: #fff; border-bottom-color: rgba(255,255,255,.5); }
+    .topbar-bbl-nav a:hover { color: var(--c-ink, #0d1520); }
+    .topbar-bbl-nav a.active { color: var(--c-green, #1a7a48); border-bottom-color: var(--c-green, #1a7a48); }
     .topbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .topbar-user { font-size: .82rem; color: rgba(255,255,255,.65); }
+    .topbar-user { font-size: .82rem; color: var(--c-ink2, #374151); }
     .topbar-signout {
-      background: none; border: none; color: rgba(255,255,255,.45);
-      font-size: .75rem; font-family: 'Outfit', sans-serif;
+      background: none; border: none; color: var(--c-ink3, #6b7280);
+      font-size: .75rem; font-family: var(--font-body, 'Outfit', sans-serif);
       cursor: pointer; padding: 5px; border-radius: 6px; transition: color .15s;
     }
-    .topbar-signout:hover { color: rgba(255,255,255,.8); }
-    .topbar-privacy { font-size: .72rem; color: rgba(255,255,255,.3); text-decoration: none; padding: 5px 4px; transition: color .15s; }
-    .topbar-privacy:hover { color: rgba(255,255,255,.6); }
+    .topbar-signout:hover { color: var(--c-ink, #0d1520); }
+    .topbar-privacy { font-size: .72rem; color: var(--c-ink3, #6b7280); text-decoration: none; padding: 5px 4px; transition: color .15s; }
+    .topbar-privacy:hover { color: var(--c-ink, #0d1520); }
 
     /* ── Page shell ── */
     .dash-shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
@@ -111,7 +118,7 @@
       gap: 12px;
       margin-bottom: 12px;
     }
-    @media (max-width: 520px) { .card-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .card-grid { grid-template-columns: 1fr; } }
 
     .dash-card {
       background: #fff; border: 1px solid rgba(15,17,23,.09);
@@ -191,7 +198,7 @@
     .quick-grid {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
     }
-    @media (max-width: 380px) { .quick-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 360px) { .quick-grid { grid-template-columns: 1fr; } }
     .qbtn {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px; border-radius: 12px;
@@ -235,7 +242,7 @@
       .dash-shell { padding: 14px 12px 80px; }
       .topbar-bbl-nav { gap: 10px; }
     }
-    @media (max-width: 400px) {
+    @media (max-width: 360px) {
       .topbar-bbl-tag { display: none; }
       .topbar-user { display: none; }
       .topbar { padding: 0 14px; }
@@ -345,6 +352,12 @@
         <div><div class="qbtn-title">Verlenging</div><div class="qbtn-sub">Jouw keuze voor volgend jaar</div></div>
       </a>
     </div>
+  </div>
+
+  <!-- Account -->
+  <div class="dash-card full" style="margin-top:18px;">
+    <div class="dc-label">⚙️ Account</div>
+    <div id="account-container"></div>
   </div>
 
 </div><!-- /dash-shell -->
@@ -500,9 +513,10 @@ function setWelcome(naam) {
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -532,7 +546,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       '<div style="position:fixed;top:0;left:0;right:0;background:#b82020;color:#fff;' +
       'padding:12px 20px;text-align:center;font-size:.88rem;z-index:9999;">' +
       'Profiel kon niet worden geladen. ' +
-      '<a href="" style="color:#fff;font-weight:700;text-decoration:underline;">Opnieuw proberen</a>' +
+      '<button type="button" onclick="location.reload()" style="background:transparent;border:none;color:#fff;font-weight:700;text-decoration:underline;cursor:pointer;font:inherit;padding:0;">Opnieuw proberen</button>' +
       '</div>');
     return;
   }
@@ -542,6 +556,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   sessionStorage.setItem('internly_role', 'bbl');
+
+  // 2b. AccountModule render — pas nu draaien, BBL-rol bevestigd
+  window._currentUserId = user.id;
+  AccountModule.renderAccountScreen('account-container', 'nl');
 
   // 3. Shared header
   const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Student';

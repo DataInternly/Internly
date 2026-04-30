@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a7a48" />
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <title>Matchpool — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <style>
+    /* ── Page layout ──────────────────────────────────────────────────────── */
+    body { background: var(--bg, #f4f3ef); }
+
+    .mp-main {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+    }
+
+    .mp-page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink, #0d1520);
+      margin: 0 0 4px;
+    }
+
+    .mp-page-sub {
+      font-size: .88rem;
+      color: var(--ink3, #6b7280);
+      margin: 0 0 20px;
+    }
+
+    /* ── Toggle pills ─────────────────────────────────────────────────────── */
+    .mp-toggles {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .mp-pill {
+      padding: 7px 16px;
+      border-radius: 50px;
+      border: 1.5px solid #d4d1cb;
+      background: #fff;
+      color: var(--ink2, #374151);
+      font-family: 'Outfit', sans-serif;
+      font-size: .84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .mp-pill:hover {
+      border-color: var(--primary, #1a7a48);
+      color: var(--primary, #1a7a48);
+    }
+
+    .mp-pill--on {
+      background: var(--primary, #1a7a48);
+      border-color: var(--primary, #1a7a48);
+      color: #fff;
+    }
+
+    .mp-pill--on:hover {
+      background: #0f5c36;
+      border-color: #0f5c36;
+      color: #fff;
+    }
+
+    /* ── Card deck ────────────────────────────────────────────────────────── */
+    .mp-deck { position: relative; }
+
+    .mp-card {
+      background: #fff;
+      border: 1.5px solid #e5e3de;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      min-height: 340px;
+      transition: opacity .28s ease, transform .28s ease;
+    }
+
+    .mp-card--in {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      animation: cardIn .25s ease;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .mp-card--out-like {
+      opacity: 0;
+      transform: translateX(110px) rotate(8deg);
+    }
+
+    .mp-card--out-pass {
+      opacity: 0;
+      transform: translateX(-110px) rotate(-8deg);
+    }
+
+    /* ── Card header (color by type) ──────────────────────────────────────── */
+    .mp-card-header {
+      padding: 24px 20px 20px;
+      color: #fff;
+      position: relative;
+    }
+
+    .mp-card-header--vacature { background: linear-gradient(135deg, #1a7a48, #0f5c36); }
+    .mp-card-header--buddy    { background: linear-gradient(135deg, #b45309, #92400e); }
+    .mp-card-header--bedrijf  { background: linear-gradient(135deg, #1d4ed8, #1e3a8a); }
+
+    .mp-type-badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,.22);
+      padding: 3px 10px;
+      border-radius: 50px;
+      margin-bottom: 12px;
+    }
+
+    .mp-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.25);
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 0 10px;
+    }
+
+    .mp-card-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0 0 4px;
+      line-height: 1.3;
+    }
+
+    .mp-card-sub {
+      font-size: .85rem;
+      opacity: .85;
+    }
+
+    /* ── Card body ────────────────────────────────────────────────────────── */
+    .mp-card-body { padding: 16px 20px 20px; }
+
+    .mp-card-label {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--ink3, #6b7280);
+      margin-bottom: 6px;
+    }
+
+    .mp-trust {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 50px;
+      margin-bottom: 10px;
+    }
+
+    .mp-trust--a  { background: #dcfce7; color: #166534; }
+    .mp-trust--b  { background: #dbeafe; color: #1e40af; }
+    .mp-trust--c  { background: #fef9c3; color: #854d0e; }
+    .mp-trust--d  { background: #fee2e2; color: #991b1b; }
+
+    .mp-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .mp-meta {
+      font-size: .78rem;
+      background: #f4f3ef;
+      color: var(--ink2, #374151);
+      padding: 3px 10px;
+      border-radius: 50px;
+    }
+
+    .mp-desc {
+      font-size: .86rem;
+      color: var(--ink2, #374151);
+      line-height: 1.55;
+      margin: 8px 0 10px;
+    }
+
+    .mp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .mp-tag {
+      font-size: .76rem;
+      font-weight: 500;
+      background: #f0efeb;
+      color: var(--ink2, #374151);
+      padding: 3px 10px;
+      border-radius: 50px;
+    }
+
+    .mp-tag--buddy {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    /* ── Action buttons ───────────────────────────────────────────────────── */
+    .mp-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    .mp-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .mp-btn--pass {
+      background: #fff;
+      color: #6b7280;
+      border: 2px solid #e5e3de;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .mp-btn--pass:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #991b1b;
+      transform: scale(1.08);
+    }
+
+    .mp-btn--like {
+      background: var(--primary, #1a7a48);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(26,122,72,.35);
+    }
+
+    .mp-btn--like:hover {
+      background: #0f5c36;
+      transform: scale(1.08);
+    }
+
+    /* ── Progress ─────────────────────────────────────────────────────────── */
+    .mp-progress {
+      text-align: center;
+      font-size: .8rem;
+      color: var(--ink3, #6b7280);
+      margin-top: 12px;
+    }
+
+    /* ── Empty state ──────────────────────────────────────────────────────── */
+    .mp-empty {
+      text-align: center;
+      padding: 40px 20px;
+      background: #fff;
+      border: 1.5px solid #e5e3de;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+
+    .mp-empty-icon { font-size: 2.2rem; margin-bottom: 12px; }
+
+    .mp-empty-body p {
+      font-size: .9rem;
+      color: var(--ink2, #374151);
+      line-height: 1.55;
+      margin: 0 0 8px;
+    }
+
+    .mp-empty-link {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--primary, #1a7a48);
+      text-decoration: none;
+    }
+
+    .mp-empty-link:hover { text-decoration: underline; }
+
+    /* ── Loading ──────────────────────────────────────────────────────────── */
+    .mp-loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--ink3, #6b7280);
+      font-size: .9rem;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app" style="display:none">
+  <div id="student-header"></div>
+
+  <main class="mp-main">
+    <h1 class="mp-page-title">Matchpool</h1>
+    <p class="mp-page-sub">Snel ontdekken wat bij jou past — swipe door vacatures, buddies en bedrijven.</p>
+
+    <div class="mp-toggles" id="mp-toggles">
+      <button type="button" class="mp-pill mp-pill--on" id="mpt-vacature"
+              onclick="mpToggle('vacature')" aria-pressed="true">Vacatures</button>
+      <button type="button" class="mp-pill mp-pill--on" id="mpt-buddy"
+              onclick="mpToggle('buddy')" aria-pressed="true">Buddies</button>
+      <button type="button" class="mp-pill mp-pill--on" id="mpt-bedrijf"
+              onclick="mpToggle('bedrijf')" aria-pressed="true">Bedrijven</button>
+    </div>
+
+    <div class="mp-deck" id="mp-deck">
+      <div class="mp-loading">Laden…</div>
+    </div>
+  </main>
+</div>
+
+<div id="notif-root"></div>
+
+<script>
+  // ── Notification support ───────────────────────────────────────────────────
+  var currentUser       = null;
+  var notifSubscription = null;
+
+  function formatRelativeTime(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1)  return 'zojuist';
+    if (mins < 60) return `${mins} min geleden`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24)  return `${hrs} uur geleden`;
+    return `${Math.floor(hrs / 24)} dagen geleden`;
+  }
+
+  async function loadNotifications() {
+    if (!currentUser) return;
+    const { data } = await db
+      .from('notifications')
+      .select('id, type, ref_id, ref_type, message, read, created_at')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    const unread  = (data || []).filter(n => !n.read).length;
+    const countEl = document.getElementById('bellCount');
+    if (countEl) {
+      countEl.textContent = unread > 9 ? '9+' : String(unread);
+      countEl.style.display = unread > 0 ? 'flex' : 'none';
+    }
+
+    const list = document.getElementById('ndList');
+    if (!list) return;
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div class="nd-empty">Geen meldingen</div>';
+      return;
+    }
+    list.innerHTML = data.map(n => `
+      <div class="nd-item${n.read ? '' : ' unread'}"
+           data-nid="${escapeHtml(n.id || '')}"
+           data-ref-type="${escapeHtml(n.ref_type || '')}"
+           data-ref-id="${escapeHtml(n.ref_id || '')}">
+        ${!n.read ? '<span class="nd-dot"></span>' : ''}
+        <div class="nd-body">
+          <div class="nd-msg">${escapeHtml(getNotifText(n))}</div>
+          <div class="nd-time">${formatRelativeTime(n.created_at)}</div>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.nd-item').forEach(el => {
+      el.addEventListener('click', () =>
+        handleNotifClick(el.dataset.nid, el.dataset.refType, el.dataset.refId));
+    });
+  }
+
+  async function markAllRead() {
+    if (!currentUser) return;
+    await db.from('notifications')
+      .update({ read: true })
+      .eq('user_id', currentUser.id)
+      .eq('read', false);
+    loadNotifications();
+  }
+
+  function toggleNotifDropdown(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    const isOpen = dd.style.display !== 'none';
+    dd.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) loadNotifications();
+  }
+
+  function handleNotifClick(notifId, refType, refId) {
+    db.from('notifications').update({ read: true }).eq('id', notifId)
+      .then(() => loadNotifications());
+    if (refType === 'message' && refId) window.location.href = 'chat.html?match=' + encodeURIComponent(refId);
+    else if (refType === 'match')       window.location.href = 'matches.html';
+    else {
+      const dd = document.getElementById('notifDropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  }
+
+  function startNotifSubscription() {
+    if (!currentUser) return;
+    notifSubscription = db
+      .channel('notif-matchpool-' + currentUser.id)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'notifications',
+        filter: 'user_id=eq.' + currentUser.id
+      }, () => loadNotifications())
+      .subscribe((status, err) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('[matchpool] realtime fout:', err?.message);
+        }
+      });
+  }
+
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('notifDropdown');
+    if (dd && !dd.contains(e.target)) dd.style.display = 'none';
+  });
+
+  window.addEventListener('beforeunload', () => {
+    try {
+      // Cleanup realtime subscription — audit fix 2026-04-30
+      if (typeof db !== 'undefined' && db.removeAllChannels) {
+        db.removeAllChannels();
+      }
+    } catch (_) {}
+  });
+</script>
+<script src="js/matchpool.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/telemetry.js"></script>
+</body>
+</html>

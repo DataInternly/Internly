@@ -10,44 +10,48 @@
   <meta name="theme-color" content="#1a7a48">
   <title>Schooldashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
   <script src="js/push.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     :root {
-      --blue:       #1756a8;
+      /* Pagina-aliassen → globale tokens (css/style.css) */
+      --blue:       var(--c-blue, #1756a8);
       --blue-dark:  #0f3f80;
       --blue-bg:    #e8f0fc;
-      --orange:     #FF7E42;
-      --orange-dark:#e05c1a;
-      --orange-bg:  #fdf0e8;
-      --green:      #1a7a48;
-      --green-bg:   #e8f5ee;
-      --ink:        #0d1520;
-      --ink2:       #374151;
-      --ink3:       #6b7280;
+      --orange:     var(--c-orange, #FF7E42);
+      --orange-dark:var(--c-orange-deep, #e05c1a);
+      --orange-bg:  var(--c-orange-bg, #fdf0e8);
+      --green:      var(--c-green, #1a7a48);
+      --green-bg:   var(--c-green-bg, #e8f5ee);
+      --ink:        var(--c-ink, #0d1520);
+      --ink2:       var(--c-ink2, #374151);
+      --ink3:       var(--c-ink3, #6b7280);
       --ink4:       #9ca3af;
-      --bg:         #f4f3ef;
+      --bg:         var(--c-cream-warm, #f4f3ef);
       --white:      #ffffff;
-      --border:     #f0f0ee;
+      --border:     var(--line-subtle, #f0f0ee);
       --border2:    #e2e8f0;
-      --red:        #b82020;
+      --red:        var(--c-red, #b82020);
       --red-bg:     #fdeaea;
-      --amber:      #a06010;
+      --amber:      var(--c-amber, #a06010);
       --amber-bg:   #fdf3e0;
-      --r:          16px;
-      --r-sm:       8px;
+      --r:          var(--r-md, 16px);
+      --r-sm:       var(--r-sm, 8px);
       --sidebar-w:  240px;
       --accent:     var(--blue);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--font-body, 'Outfit', sans-serif);
       background: var(--bg);
       color: var(--ink);
       font-size: 15px;
@@ -56,30 +60,35 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── TOPBAR ── */
+    /* ── TOPBAR (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      background: var(--blue-dark);
+      background: rgba(244,243,239,.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
       height: 56px; padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .topbar-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.2rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.2rem; font-weight: 700; color: var(--ink);
       letter-spacing: -.02em; text-decoration: none;
     }
-    .topbar-logo span { color: var(--orange); }
+    .topbar-logo span { color: var(--orange-dark); }
     .topbar-right { display: flex; align-items: center; gap: 16px; }
     .topbar-link {
-      color: rgba(255,255,255,.6); text-decoration: none;
+      color: var(--ink2); text-decoration: none;
       font-size: .85rem; font-weight: 500; transition: color .15s;
     }
-    .topbar-link:hover { color: #fff; }
+    .topbar-link:hover { color: var(--ink); }
     .role-pill {
-      background: rgba(255,255,255,.15);
-      color: rgba(255,255,255,.9);
-      font-size: .75rem; font-weight: 600;
+      background: rgba(23,86,168,.08);
+      color: var(--blue-dark);
+      font-family: var(--font-mono, 'DM Mono', monospace);
+      font-size: .72rem; font-weight: 500;
       padding: 4px 12px; border-radius: 20px;
+      letter-spacing: .08em; text-transform: uppercase;
     }
 
     /* ── LAYOUT ── */
@@ -292,7 +301,7 @@
     .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); }
     .field textarea { resize: vertical; min-height: 85px; line-height: 1.55; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+    @media(max-width:480px) { .field-row { grid-template-columns: 1fr; } }
 
     /* Tags */
     .tags-box {
@@ -395,9 +404,9 @@
     }
 
     /* ── LOGOUT ── */
-    .btn-logout {
+    .btn-logout, .btn-back {
       display: flex; align-items: center; gap: 9px;
-      width: calc(100% - 24px); margin: 8px 12px;
+      width: calc(100% - 24px); margin: 4px 12px;
       padding: 8px 10px; border-radius: var(--r-sm);
       background: none; border: 1.5px solid var(--border2);
       cursor: pointer; font-family: 'Outfit', sans-serif;
@@ -405,6 +414,7 @@
       transition: all .12s;
     }
     .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
+    .btn-back:hover { background: #f3f4f6; color: var(--ink2); border-color: #d1d5db; }
 
     /* ── CONFIRM MODAL ── */
     .modal-overlay {
@@ -444,6 +454,75 @@
     @keyframes modalOut { from{opacity:1;transform:scale(1) translateY(0);}to{opacity:0;transform:scale(.96) translateY(8px);} }
     .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
+
+    /* ── UITNODIG STUDENT MODAL ── */
+    .su-modal-box {
+      background: var(--white); border-radius: var(--r);
+      width: 100%; max-width: 480px; max-height: 80vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .su-header {
+      padding: 20px 20px 0; display: flex; align-items: center; justify-content: space-between;
+    }
+    .su-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; font-weight: 700; }
+    .su-close {
+      background: none; border: none; font-size: 1.2rem; color: var(--ink3);
+      cursor: pointer; padding: 4px 8px; border-radius: 6px; line-height: 1;
+    }
+    .su-close:hover { background: var(--bg); }
+    .su-search-wrap { padding: 14px 20px 0; }
+    .su-search {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm); font-family: 'Outfit', sans-serif;
+      font-size: .9rem; color: var(--ink); outline: none;
+      transition: border-color .15s; box-sizing: border-box;
+    }
+    .su-search:focus { border-color: var(--green); }
+    .su-results { flex: 1; overflow-y: auto; padding: 10px 12px 16px; }
+    .su-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 8px;
+      border-radius: var(--r-sm); transition: background .12s;
+    }
+    .su-item:hover { background: var(--bg); }
+    .su-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #e8f5ee; color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .82rem; font-weight: 700; flex-shrink: 0;
+    }
+    .su-info { flex: 1; min-width: 0; }
+    .su-name { font-size: .88rem; font-weight: 600; color: var(--ink); }
+    .su-meta { font-size: .76rem; color: var(--ink3); }
+    .su-send {
+      background: var(--green); color: #fff; border: none;
+      padding: 6px 14px; border-radius: 50px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; flex-shrink: 0;
+      transition: background .12s;
+    }
+    .su-send:hover { background: var(--green-dark, #145e38); }
+    .su-send:disabled { opacity: .4; cursor: not-allowed; }
+    .su-hint { padding: 32px 20px; text-align: center; color: var(--ink3); font-size: .85rem; }
+    .btn-chat-sm {
+      background: #e8f5ee; color: var(--green); border: none;
+      padding: 6px 14px; border-radius: 50px;
+      font-size: .8rem; font-weight: 600; cursor: pointer; text-decoration: none;
+      display: inline-block; transition: background .12s;
+    }
+    .btn-chat-sm:hover { background: #d1ead9; }
+    .su-invite-btn {
+      background: var(--green); color: #fff; border: none;
+      padding: 9px 20px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .88rem; font-weight: 600;
+      cursor: pointer; transition: background .15s; white-space: nowrap;
+    }
+    .su-invite-btn:hover { background: var(--green-dark, #145e38); }
+    .linked-section-title {
+      font-size: .8rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink3);
+      margin: 20px 0 8px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
@@ -591,11 +670,15 @@
         <button class="nav-btn" id="nav-bundeling" onclick="show('bundeling')">
           <span class="nav-icon">🔗</span> Opleidingen bundelen
         </button>
+        <button class="nav-btn" id="nav-account" onclick="show('account')">
+          <span class="nav-icon">⚙️</span> Account
+        </button>
       </div>
 
     </div>
     <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <a href="spelregels.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Spelregels</a>
+    <button class="btn-back" onclick="goBack('discover.html')" title="Vorige pagina">← Vorige pagina</button>
     <button class="btn-logout" onclick="signOut()">🚪 Uitloggen</button>
   </aside>
 
@@ -686,10 +769,19 @@
 
     <!-- ── STUDENTEN ── -->
     <div class="screen" id="screen-studenten">
-      <div class="page-title" style="display:flex;align-items:center;gap:6px;">Studenten<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Studenten">ⓘ<span class="info-pop">Studenten worden automatisch gekoppeld op basis van de <strong>schoolnaam</strong> in hun profiel. Klik op een student om hun Stage Hub te openen en hun voortgang te bekijken.</span></span></div>
-      <p class="page-sub">Individueel stageverloop en signalen per student</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
+        <div>
+          <div class="page-title" style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">Studenten<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Studenten">ⓘ<span class="info-pop">Studenten worden automatisch gekoppeld op basis van de <strong>schoolnaam</strong> in hun profiel. Klik op een student om hun Stage Hub te openen en hun voortgang te bekijken.</span></span></div>
+          <p class="page-sub">Individueel stageverloop en signalen per student</p>
+        </div>
+        <button class="su-invite-btn" onclick="openSuModal()">+ Nodig student uit</button>
+      </div>
       <div id="studenten-list">
         <div class="empty"><span class="empty-icon">👥</span>Nog geen studenten gekoppeld. Deel de Internly-link met je studenten om ze aan deze opleiding te koppelen.</div>
+      </div>
+      <div id="school-linked-section" style="display:none">
+        <div class="linked-section-title">Direct uitgenodigd</div>
+        <div id="school-linked-list"></div>
       </div>
     </div>
 
@@ -876,6 +968,13 @@
     <!-- ── BUNDELING ── -->
     <div class="screen" id="screen-bundeling">
       <div id="bundeling-content"></div>
+    </div>
+
+    <!-- ── ACCOUNT ── -->
+    <div class="screen" id="screen-account">
+      <div class="page-title">Account</div>
+      <p class="page-sub">Beheer je contactgegevens en instellingen</p>
+      <div id="account-container"></div>
     </div>
 
   </main>
@@ -1113,6 +1212,10 @@ function show(id) {
   if (id === 'bedrijven')  loadBedrijven();
   if (id === 'oproepen')   renderOproepen();
   if (id === 'bundeling')  renderBundeling();
+  if (id === 'account') {
+    window._currentUserId = currentUser?.id;
+    AccountModule.renderAccountScreen('account-container', 'nl');
+  }
 }
 
 // ── Plan gates ──
@@ -2029,9 +2132,10 @@ window.addEventListener('online',  () => { notify('Verbinding hersteld'); locati
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -2063,9 +2167,160 @@ function initReferralBanner() {
   }
 }
 
-// TODO Sprint 5: vervang stub door echte uitnodigingsflow (schoolcode kopiëren + e-mail)
-function openStudentUitnodigen() {
-  notify('Gebruik de schoolcode om studenten uit te nodigen — zie Instellingen');
+// ── Uitnodig student modal (school) ──────────────────────────────────────────
+let _suTimer = null;
+
+function openSuModal() {
+  const overlay = document.getElementById('su-overlay');
+  overlay.classList.add('show');
+  document.getElementById('su-search-input').value = '';
+  document.getElementById('su-results').innerHTML = '<div class="su-hint">Typ een naam of opleiding om studenten te zoeken.</div>';
+  setTimeout(() => document.getElementById('su-search-input').focus(), 80);
+}
+
+function closeSuModal() {
+  document.getElementById('su-overlay').classList.remove('show');
+  clearTimeout(_suTimer);
+}
+
+function _suSearchDebounce() {
+  clearTimeout(_suTimer);
+  _suTimer = setTimeout(_runSuSearch, 300);
+}
+
+async function _runSuSearch() {
+  const q = (document.getElementById('su-search-input')?.value || '').trim();
+  const resultsEl = document.getElementById('su-results');
+  if (!q) {
+    resultsEl.innerHTML = '<div class="su-hint">Typ een naam of opleiding om studenten te zoeken.</div>';
+    return;
+  }
+  resultsEl.innerHTML = '<div class="su-hint">Zoeken…</div>';
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const { data: rows } = await db
+    .from('profiles')
+    .select('id, naam, student_profiles(opleiding, school)')
+    .eq('role', 'student')
+    .or(`naam.ilike.%${q}%`)
+    .limit(10);
+
+  if (!rows || rows.length === 0) {
+    resultsEl.innerHTML = '<div class="su-hint">Geen studenten gevonden.</div>';
+    return;
+  }
+
+  resultsEl.innerHTML = rows.map(r => {
+    const initials = (r.naam || '??').slice(0, 2).toUpperCase();
+    const opleiding = r.student_profiles?.opleiding || '';
+    const school    = r.student_profiles?.school    || '';
+    const meta      = [opleiding, school].filter(Boolean).join(' · ');
+    return `
+      <div class="su-item">
+        <div class="su-avatar">${escapeHtml(initials)}</div>
+        <div class="su-info">
+          <div class="su-name">${escapeHtml(r.naam || 'Onbekend')}</div>
+          ${meta ? `<div class="su-meta">${escapeHtml(meta)}</div>` : ''}
+        </div>
+        <button class="su-send" id="su-btn-${r.id}"
+          onclick="_sendSchoolUitnodiging('${r.id}','${escapeHtml(r.naam || '')}')">
+          Uitnodigen
+        </button>
+      </div>`;
+  }).join('');
+}
+
+async function _sendSchoolUitnodiging(studentId, studentNaam) {
+  const btn = document.getElementById(`su-btn-${studentId}`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const { data: existing } = await db
+    .from('matches')
+    .select('id, status')
+    .eq('type', 'begeleider_link')
+    .or(`and(party_a.eq.${user.id},party_b.eq.${studentId}),and(party_a.eq.${studentId},party_b.eq.${user.id})`)
+    .maybeSingle();
+
+  if (existing) {
+    const label = existing.status === 'accepted' ? 'al gekoppeld' : 'uitnodiging al verstuurd';
+    if (btn) { btn.disabled = true; btn.textContent = label; }
+    notify(`Je bent ${label} met ${studentNaam}`);
+    return;
+  }
+
+  const { error } = await db.from('matches').insert({
+    type:         'begeleider_link',
+    match_target: 'profile',
+    party_a:      user.id,
+    party_b:      studentId,
+    status:       'pending'
+  });
+
+  if (error) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Uitnodigen'; }
+    notify('Uitnodiging mislukt — probeer opnieuw');
+    console.error('[school-dashboard] _sendSchoolUitnodiging:', error.message);
+    return;
+  }
+
+  await createNotification(studentId, 'buddy_request',
+    `Een school heeft je een uitnodiging gestuurd`, user.id);
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Verstuurd ✓'; }
+  notify(`Uitnodiging verstuurd naar ${studentNaam}`);
+}
+
+// ── Load school-initiated begeleider_link accepted matches ────────────────────
+async function loadSchoolLinkedStudents(userId) {
+  const { data: links } = await db
+    .from('matches')
+    .select('id, party_a, party_b')
+    .eq('type', 'begeleider_link')
+    .eq('status', 'accepted')
+    .or(`party_a.eq.${userId},party_b.eq.${userId}`);
+
+  if (!links || links.length === 0) return;
+
+  const studentIds = links.map(l => l.party_a === userId ? l.party_b : l.party_a);
+  const { data: profiles } = await db
+    .from('profiles')
+    .select('id, naam')
+    .in('id', studentIds);
+
+  const { data: spRows } = await db
+    .from('student_profiles')
+    .select('profile_id, opleiding')
+    .in('profile_id', studentIds);
+
+  const profMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+  const spMap   = Object.fromEntries((spRows || []).map(s => [s.profile_id, s]));
+
+  const sectionEl = document.getElementById('school-linked-section');
+  const listEl    = document.getElementById('school-linked-list');
+  if (!sectionEl || !listEl) return;
+
+  sectionEl.style.display = 'block';
+  listEl.innerHTML = links.map(link => {
+    const studentId = link.party_a === userId ? link.party_b : link.party_a;
+    const prof  = profMap[studentId] || {};
+    const sp    = spMap[studentId]   || {};
+    const naam  = prof.naam || 'Onbekend';
+    const initials = naam.slice(0, 2).toUpperCase();
+    return `
+      <div class="student-row" style="border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+        <div class="su-avatar">${escapeHtml(initials)}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.9rem;font-weight:600;color:var(--ink)">${escapeHtml(naam)}</div>
+          ${sp.opleiding ? `<div style="font-size:.78rem;color:var(--ink3)">${escapeHtml(sp.opleiding)}</div>` : ''}
+        </div>
+        <a href="chat.html?match=${link.id}" class="btn-chat-sm">Open chat</a>
+      </div>`;
+  }).join('');
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -2123,6 +2378,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   _isPremiumSchool = await hasActivePlan('school_premium');
   await loadStudenten();
+  await loadSchoolLinkedStudents(user.id);
   await loadOproepen();
 
   if (sp) {
@@ -2150,6 +2406,24 @@ window.addEventListener('beforeunload', () => {
   if (notifSubscription) notifSubscription.unsubscribe();
 });
 </script>
+
+<!-- ── UITNODIG STUDENT MODAL ── -->
+<div id="su-overlay" class="modal-overlay" onclick="if(event.target===this)closeSuModal()">
+  <div class="su-modal-box" role="dialog" aria-modal="true" aria-labelledby="su-title-label">
+    <div class="su-header">
+      <span class="su-title" id="su-title-label">Student uitnodigen</span>
+      <button class="su-close" onclick="closeSuModal()" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="su-search-wrap">
+      <input class="su-search" id="su-search-input" type="search"
+        placeholder="Zoek op naam of opleiding…"
+        autocomplete="off" oninput="_suSearchDebounce()">
+    </div>
+    <div class="su-results" id="su-results">
+      <div class="su-hint">Typ een naam of opleiding om studenten te zoeken.</div>
+    </div>
+  </div>
+</div>
 
 <!-- Google Translate Widget -->
 <div id="google_translate_element" style="display:none"></div>

@@ -35,7 +35,17 @@ self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   if (event.action === 'dismiss') return;
 
-  const url = event.notification.data?.url || '/';
+  const _rawUrl = event.notification.data?.url || '/';
+  let url = '/';
+  try {
+    const _parsed = new URL(_rawUrl, self.location.origin);
+    if (_parsed.origin === self.location.origin) {
+      url = _parsed.pathname + _parsed.search + _parsed.hash;
+    }
+    // Origin mismatch → url blijft '/' (safe fallback)
+  } catch (_) {
+    // Malformed of protocol-injection URL → url blijft '/'
+  }
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })

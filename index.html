@@ -18,682 +18,1400 @@
   <meta name="twitter:card" content="summary_large_image">
   <title>Internly — Eerlijk stages vinden</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: #f4f3ef;
-      line-height: 1.7;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .hero {
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, var(--forest-glow, rgba(120,200,160,.08)), transparent 70%),
-        linear-gradient(148deg, #1e8a52 0%, #1a7a48 42%, #145e38 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 80px 24px;
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0; z-index: 0;
-      background: radial-gradient(
-        ellipse 85% 75% at 50% 38%,
-        transparent 40%,
-        rgba(0,0,0,.18) 100%
-      );
-      pointer-events: none;
-    }
-    .hero > * { position: relative; z-index: 1; }
-
-    .logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 3.5rem;
-      font-weight: 700;
-      letter-spacing: -.03em;
-      margin-bottom: 4px;
-      animation: lp-breathe 4s ease-in-out infinite;
-    }
-    .logo span { color: #FF7E42; }
-    @keyframes lp-breathe {
-      0%, 100% { transform: scale(1); }
-      50%       { transform: scale(1.008); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .logo { animation: none; }
-    }
-    .lp-logo-desc {
-      display: block;
-      font-family: 'Outfit', sans-serif;
-      font-size: .76rem; font-weight: 400;
-      color: rgba(255,255,255,.62);
-      letter-spacing: .06em;
-      margin-bottom: 28px;
-    }
-
-    .lp-tagline {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: clamp(1rem, 2.2vw, 1.15rem);
-      font-weight: 600; font-style: italic;
-      color: rgba(255,255,255,.62);
-      letter-spacing: -.01em;
-      margin: 0 auto 20px;
-      max-width: 560px;
-    }
-    .lp-tagline em { color: #e05c1a; font-style: italic; }
-
-    /* ── Niveau pills ── */
-    .lp-niveau {
-      display: flex; gap: 6px; justify-content: center;
-      flex-wrap: wrap; width: 100%; max-width: 420px;
-      margin: 0 auto 16px;
-    }
-    .lp-np {
-      font-family: 'Outfit', sans-serif;
-      font-size: .83rem; font-weight: 600;
-      padding: 7px 16px; border-radius: 20px;
-      border: 1.5px solid rgba(255,255,255,.2);
-      background: transparent; color: rgba(255,255,255,.55);
-      cursor: pointer; transition: all .15s;
-    }
-    .lp-np:hover { background: rgba(255,255,255,.1); color: rgba(255,255,255,.9); }
-    .lp-np.lp-np-on { background: #fff; color: #0d1a10; border-color: #fff; font-weight: 700; }
-
-    /* ── Rol-beschrijvingspaneel ── */
-    .lp-role-desc {
-      width: 100%; max-width: 420px; margin: 0 auto 14px;
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.12);
-      border-left: 3px solid rgba(255,255,255,.2);
-      border-radius: 0 8px 8px 0;
-      padding: 9px 14px;
-      font-size: .84rem; color: rgba(255,255,255,.78);
-      line-height: 1.6; text-align: center;
-      transition: opacity .15s ease, border-left-color .2s ease;
-    }
-    .lp-role-desc.rc-student { border-left-color: var(--rt-student-c,#7cb8ff); }
-    .lp-role-desc.rc-bedrijf { border-left-color: var(--rt-bedrijf-c,#6ee7a0); }
-    .lp-role-desc.rc-school  { border-left-color: var(--rt-school-c,#fcd56a); }
-    .lp-micro {
-      font-size: .74rem; color: rgba(255,255,255,.48);
-      margin-bottom: 10px; text-align: center;
-    }
-    .btn-enter {
-      display: block; width: 100%; max-width: 420px;
-      margin: 0 auto 16px; text-align: center;
-      background: #FF7E42; color: #fff; border: none;
-      padding: 13px 44px; border-radius: 40px;
-      font-family: 'Outfit', sans-serif; font-size: .93rem; font-weight: 600;
-      cursor: pointer;
-      transition: background .12s, transform .12s;
-    }
-    .btn-enter:hover { background: #e05c1a; transform: translateY(-1px); }
-    .cta-secondary-orange {
-      display: block; width: 100%; max-width: 420px;
-      margin: 0 auto 12px; text-align: center;
-      color: #e05c1a; background: transparent;
-      border: 1.5px solid rgba(224,92,26,.55); border-radius: 40px;
-      padding: 10px 44px;
-      font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 500;
-      text-decoration: none; cursor: pointer;
-      transition: background .12s, color .12s, border-color .12s;
-    }
-    .cta-secondary-orange:hover { background: #e05c1a; color: #fff; border-color: #e05c1a; }
-    .lp-link-explore {
-      font-size: .8rem; color: rgba(255,255,255,.55);
-      text-decoration: none;
-      display: inline-flex; align-items: center; gap: 5px;
-      margin-bottom: 12px; transition: color .12s;
-    }
-    .lp-link-explore:hover { color: rgba(255,255,255,.85); }
-    .lp-exp-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: #e05c1a; flex-shrink: 0;
-    }
-
-    /* ── Simulator CTA ── */
-    .btn-simulator {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: #FF7E42; color: #fff; text-decoration: none;
-      padding: 16px 40px; border-radius: 50px;
-      font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700;
-      box-shadow: 0 10px 30px rgba(255,126,66,.35);
-      transition: background .15s, transform .2s, box-shadow .2s;
-    }
-    .btn-simulator:hover {
-      background: #e05c1a;
-      transform: translateY(-3px);
-      box-shadow: 0 14px 36px rgba(255,126,66,.5);
-    }
-
-    /* ── Nieuwsbrief eyebrow ── */
-    .lp-nl-eyebrow {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #fdf0e8; color: #e05c1a;
-      border: 1px solid rgba(224,92,26,.2);
-      font-size: .68rem; font-weight: 600; letter-spacing: .06em;
-      padding: 3px 9px; border-radius: 20px; margin-bottom: 10px;
-    }
-
-    /* ── Beta banner ── */
-    .beta-banner {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 200;
-      background: rgba(13, 21, 32, .92);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      font-size: .82rem;
-      color: rgba(255,255,255,.75);
-    }
-    .beta-pill {
-      background: #FF7E42;
-      color: #fff;
-      font-size: .68rem;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: 3px 9px;
-      border-radius: 50px;
-      flex-shrink: 0;
-    }
-    .beta-close {
-      position: absolute;
-      right: 16px;
-      background: none;
-      border: none;
-      color: rgba(255,255,255,.4);
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 4px 8px;
-      line-height: 1;
-      transition: color .15s;
-    }
-    .beta-close:hover { color: rgba(255,255,255,.8); }
-
-    /* ── Step 3 — hook h1 ── */
-    .hero-h1 { font-family:'Bricolage Grotesque',sans-serif; letter-spacing:-.04em; margin-bottom:18px; text-align:center; }
-    .h-intro { font-size:clamp(1.5rem,3.8vw,2.8rem); font-weight:800; color:#fff; display:block; line-height:1.1; margin-bottom:6px; }
-    .h-end   { font-size:clamp(1.9rem,4.8vw,3.6rem); font-weight:800; color:#fff; display:block; line-height:1.1; margin-top:10px; }
-    .struck  { display:inline-block; position:relative; color:rgba(255,255,255,.85); font-weight:400; font-size:clamp(3.8rem,11vw,9rem); line-height:.9; transition:color .55s .12s ease; }
-    .struck.go { color:rgba(255,255,255,.18); }
-    @keyframes lp-strike { from{width:0;opacity:0;} to{width:calc(100% + 10px);opacity:1;} }
-    .struck::after { content:''; position:absolute; left:-5px; right:unset; top:50%; height:7px; background:#e05c1a; border-radius:2px; transform:translateY(-50%) rotate(-.3deg); z-index:2; width:0; opacity:0; }
-    .struck.go::after { animation:lp-strike .65s .15s cubic-bezier(.16,1,.3,1) forwards; }
-    @media(prefers-reduced-motion:reduce) { .struck { color:rgba(255,255,255,.28) !important; } .struck::after { width:calc(100% + 10px) !important; opacity:1 !important; } }
-
-    /* ── Step 6 — role tiles ── */
-    .rt-group-labels { display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; max-width:560px; margin:0 auto 4px; }
-    .rt-gl { font-size:.65rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.32); text-align:center; }
-    .role-tiles { display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; max-width:560px; margin:0 auto 0; }
-    /* Buddy strip — v4 purple accent */
-    .rt-buddy-strip { display:flex; align-items:center; gap:10px; width:100%; max-width:560px; margin:6px auto 10px; padding:11px 16px; background:rgba(123,63,181,.08); border:1.5px dashed rgba(192,132,252,.28); border-radius:12px; cursor:pointer; transition:background .15s,border-color .15s; position:relative; overflow:hidden; box-sizing:border-box; isolation:isolate; }
-    .rt-buddy-strip::after { content:''; position:absolute; top:0; left:0; height:3px; background:var(--rt-buddy-c); width:0; opacity:0; }
-    .rt-buddy-strip.on::after { animation:lp-topbar .4s .05s ease forwards; }
-    .rt-buddy-strip:hover { background:rgba(123,63,181,.14); border-color:rgba(192,132,252,.5); }
-    .rt-buddy-strip.on { background:rgba(123,63,181,.18); border-color:rgba(192,132,252,.55); }
-    .rt-buddy-strip:focus-visible { outline:2px solid rgba(255,255,255,.75); outline-offset:3px; border-radius:12px; }
-    .rt-bs-ico { font-size:1.1rem; display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:rgba(192,132,252,.1); border:1.5px solid rgba(192,132,252,.22); flex-shrink:0; }
-    .rt-bs-info { flex:1; text-align:left; }
-    .rt-bs-name { font-family:'Bricolage Grotesque',sans-serif; font-size:.82rem; font-weight:700; color:rgba(255,255,255,.55); transition:color .15s; }
-    .rt-buddy-strip.on .rt-bs-name { color:var(--rt-buddy-c); }
-    .rt-bs-sub { font-size:.67rem; color:rgba(255,255,255,.28); margin-top:1px; }
-    .rt-bs-binnenkort { font-size:.63rem; font-weight:600; padding:2px 8px; border-radius:20px; background:rgba(192,132,252,.14); color:rgba(192,132,252,.75); }
-    /* ── v4 gradient tiles ── */
-    @keyframes lp-topbar { from{width:0;opacity:0;} to{width:100%;opacity:1;} }
-    @keyframes lp-pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
-    .rt {
-      border-radius:12px; padding:16px 10px 13px; cursor:pointer; text-align:center;
-      position:relative; overflow:hidden; isolation:isolate;
-      transition:filter .15s,border-color .15s;
-      border:1.5px solid rgba(255,255,255,.13);
-      background:linear-gradient(145deg,var(--rt-ga),var(--rt-gb));
-    }
-    /* Optie A — dither noise to kill gradient banding */
-    .rt::before {
-      content:''; position:absolute; inset:0; z-index:0;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events:none;
-    }
-    .rt .hairline { position:absolute; inset:0; z-index:1; border-radius:inherit; box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); pointer-events:none; }
-    .rt .shine    { position:absolute; top:-40%; left:-20%; width:65%; height:80%; z-index:1; background:radial-gradient(ellipse at center,rgba(255,255,255,.13) 0%,rgba(255,255,255,0) 70%); border-radius:50%; pointer-events:none; transform:rotate(-20deg); }
-    .rt::after { content:''; position:absolute; top:0; left:0; height:3px; background:var(--rt-gc); width:0; opacity:0; z-index:2; }
-    .rt.on::after { animation:lp-topbar .4s .05s ease forwards; }
-    .rt:hover { filter:brightness(1.12); border-color:rgba(255,255,255,.28); }
-    .rt.on { border-color:rgba(255,255,255,.3); filter:brightness(1.08); }
-    .rt:focus-visible { outline: 2px solid rgba(255,255,255,.75); outline-offset: 3px; border-radius: 12px; }
-    .rt.pulse { animation:lp-pulse .28s ease; }
-    /* Per-role palette */
-    .rt-s   { --rt-ga:var(--rt-student-a); --rt-gb:var(--rt-student-b); --rt-gc:var(--rt-student-c); }
-    .rt-b   { --rt-ga:var(--rt-bedrijf-a); --rt-gb:var(--rt-bedrijf-b); --rt-gc:var(--rt-bedrijf-c); }
-    .rt-bbl { --rt-ga:var(--rt-bbl-a);    --rt-gb:var(--rt-bbl-b);    --rt-gc:var(--rt-bbl-c); }
-    .rt-sc  { --rt-ga:var(--rt-school-a);  --rt-gb:var(--rt-school-b);  --rt-gc:var(--rt-school-c); }
-    .rt-buddy { --rt-ga:var(--rt-buddy-a); --rt-gb:var(--rt-buddy-b); --rt-gc:var(--rt-buddy-c); }
-    /* Selected state: name colour */
-    .rt.on.rt-s   .rt-name { color:var(--rt-student-c); }
-    .rt.on.rt-b   .rt-name { color:var(--rt-bedrijf-c); }
-    .rt.on.rt-bbl .rt-name { color:var(--rt-bbl-c); }
-    .rt.on.rt-sc  .rt-name { color:var(--rt-school-c); }
-    .rt.on.rt-buddy .rt-name { color:var(--rt-buddy-c); }
-    /* Role-desc border colours */
-    .lp-role-desc.rc-bbl   { border-left-color:var(--rt-bbl-c); }
-    .lp-role-desc.rc-buddy { border-left-color:var(--rt-buddy-c); }
-    .rt-ico { font-size:0; margin-bottom:8px; line-height:1; position:relative; z-index:2; }
-    .rt-ico-wrap { font-size:1.35rem; line-height:1; display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.18); }
-    .rt-name { font-family:'Bricolage Grotesque',sans-serif; font-size:.88rem; font-weight:700; color:#fff; margin-bottom:6px; transition:color .15s; position:relative; z-index:2; }
-    .rt-bdg { font-size:.65rem; font-weight:600; padding:2px 8px; border-radius:20px; display:inline-block; position:relative; z-index:2; }
-    .bd-g { background:rgba(110,231,160,.18); color:#6ee7a0; }
-    .bd-a { background:rgba(252,213,106,.15); color:#fcd56a; }
-    .bd-b { background:rgba(124,184,255,.15); color:#7cb8ff; }
-
-    /* ── Step 8 — divider, stats, quotes, how, ESG, prev ── */
-    .lp-divider { height:4px; background:linear-gradient(90deg,#22a85e,#e05c1a); box-shadow:0 0 18px rgba(224,92,26,.32),0 0 6px rgba(34,168,94,.2); }
-    .lp-stats { background:#0b2416; padding:24px 40px; display:grid; grid-template-columns:1fr 1px 1fr 1px 1fr; align-items:center; }
-    .lp-sd { background:rgba(255,255,255,.07); height:34px; }
-    .lp-ss { padding:0 22px; }
-    .lp-sn { font-family:'Bricolage Grotesque',sans-serif; font-size:1.9rem; font-weight:800; color:#22a85e; line-height:1; margin-bottom:3px; display:flex; align-items:baseline; gap:4px; }
-    .sl-slash { color:#e05c1a; font-size:1.2rem; }
-    .lp-sl { font-size:.8rem; color:rgba(255,255,255,.42); line-height:1.45; }
-    .lp-si { font-size:.64rem; color:rgba(255,255,255,.2); font-style:italic; margin-top:1px; }
-    .lp-quotes { background:#f4f3ef; border-top:1px solid rgba(13,26,16,.09); border-bottom:1px solid rgba(13,26,16,.09); display:grid; grid-template-columns:repeat(3,1fr); }
-    .lp-q { padding:22px 24px; border-right:1px solid rgba(13,26,16,.09); border-left:3px solid #1a7a48; margin-left:-1px; transition:border-left-color .15s; }
-    .lp-q:hover { border-left-color:#e05c1a; }
-    .lp-q:last-child { border-right:none; }
-    .lp-qt { font-size:.83rem; color:#2e4038; line-height:1.65; font-style:italic; margin-bottom:8px; }
-    .lp-qs { font-family:'DM Mono',monospace; font-size:.62rem; color:#6b8070; letter-spacing:.04em; }
-    .lp-how { padding:52px 40px; background:#f4f3ef; }
-    .lp-hi { max-width:840px; margin:0 auto; }
-    .lp-lbl { font-size:.67rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#6b8070; margin-bottom:.55rem; display:flex; align-items:center; gap:.5rem; }
-    .lp-lbl::after { content:''; flex:1; height:1px; background:rgba(13,26,16,.09); }
-    .lp-sh { font-family:'Bricolage Grotesque',sans-serif; font-size:1.5rem; font-weight:800; color:#0d1a10; letter-spacing:-.03em; line-height:1.15; margin-bottom:.2rem; }
-    .lp-sp { font-size:.83rem; color:#6b8070; margin-bottom:26px; line-height:1.6; }
-    .lp-hg { display:grid; grid-template-columns:1fr 26px 1fr 26px 1fr; gap:0; align-items:start; }
-    .lp-hc { display:flex; align-items:flex-start; justify-content:center; padding-top:24px; }
-    .lp-ha { width:16px; height:16px; border-top:2.5px solid #22a85e; border-right:2.5px solid #22a85e; transform:rotate(45deg); margin-top:8px; }
-    .lp-hcard { background:#fff; border:1px solid rgba(13,26,16,.09); border-top:3px solid #1a7a48; border-radius:12px; padding:1rem 1.1rem; position:relative; overflow:hidden; transition:border-color .15s,transform .15s; }
-    .lp-hcard:hover { border-color:rgba(13,26,16,.18); transform:translateY(-2px); }
-    .lp-hn { font-family:'Bricolage Grotesque',sans-serif; font-size:2.8rem; font-weight:800; color:rgba(26,122,72,.22); line-height:1; position:absolute; right:10px; top:4px; letter-spacing:-.04em; }
-    .lp-hh { font-family:'Bricolage Grotesque',sans-serif; font-size:.87rem; font-weight:700; color:#0d1a10; margin-bottom:4px; position:relative; z-index:1; }
-    .lp-hp { font-size:.82rem; color:#6b8070; line-height:1.65; position:relative; z-index:1; margin-bottom:8px; }
-    .lp-tg { display:inline-block; font-size:.68rem; font-weight:600; padding:3px 8px; border-radius:20px; background:#e8f5ee; color:#1a7a48; }
-    .lp-ta { display:inline-block; font-size:.68rem; font-weight:600; padding:3px 8px; border-radius:20px; background:#fdf3e0; color:#a06010; }
-    .lp-esg { background:#e8f5ee; border-top:1px solid rgba(26,122,72,.14); border-bottom:1px solid rgba(26,122,72,.14); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
-    .lp-esg-l { display:flex; align-items:center; gap:11px; }
-    .lp-esg-ico { width:36px; height:36px; border-radius:50%; background:rgba(26,122,72,.12); color:#1a7a48; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
-    .lp-esg-h { font-family:'Bricolage Grotesque',sans-serif; font-size:.87rem; font-weight:700; color:#1a7a48; margin-bottom:2px; }
-    .lp-esg-p { font-size:.79rem; color:#2e4038; line-height:1.5; max-width:450px; }
-    .btn-esg { font-family:'Outfit',sans-serif; font-size:.77rem; font-weight:600; padding:8px 14px; border-radius:8px; background:#1a7a48; color:#fff; border:none; cursor:pointer; transition:background .12s; white-space:nowrap; }
-    .btn-esg:hover { background:#0b2416; }
-    .lp-prev { background:#fdf0e8; border-bottom:1px solid rgba(224,92,26,.11); padding:10px 40px; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
-    .lp-prev-lbl { font-size:.75rem; color:#e05c1a; font-weight:500; }
-    .lp-prev-links a { font-size:.75rem; color:#e05c1a; text-decoration:none; font-weight:500; opacity:.7; }
-    .lp-prev-links a + a { margin-left:11px; }
-    .lp-prev-links a:hover { opacity:1; }
-    .lp-rev { opacity:0; transform:translateY(13px); transition:opacity .4s ease,transform .4s ease; }
-    .lp-rev.lp-rev-on { opacity:1; transform:translateY(0); }
-    .lp-d1 { transition-delay:.07s; }
-    .lp-d2 { transition-delay:.14s; }
-
-    @media(max-width:680px) {
-      .hero { padding:48px 16px 40px; }
-      .lp-stats { grid-template-columns:1fr; padding:18px 16px; gap:16px; }
-      .lp-sd { display:none; }
-      .lp-ss { padding:0; }
-      .lp-sn { justify-content:flex-start; }
-      .lp-quotes { grid-template-columns:1fr; }
-      .lp-q { border-right:none; border-bottom:1px solid rgba(13,26,16,.09); }
-      .lp-q:last-child { border-bottom:none; }
-      .lp-hg { grid-template-columns:1fr; }
-      .lp-hc { display:none; }
-      .lp-how { padding:36px 16px; }
-      .lp-esg { padding:14px 16px; flex-direction:column; align-items:flex-start; }
-      .lp-prev { padding:10px 16px; }
-      .role-tiles { max-width:100%; }
-    }
-    @media(max-width:480px) {
-      /* Prevent "0 reacties." from overflowing narrow viewports */
-      .struck { font-size: clamp(2.6rem, 13vw, 5rem); }
-    }
-    @media(max-width:420px) {
-      /* Newsletter form: stack input + button vertically on very small screens */
-      #hero-wl-form { flex-direction: column; }
-      #hero-wl-form input[type="email"],
-      #hero-wl-btn { width: 100%; box-sizing: border-box; }
-    }
-
-    /* ── Grain texture overlay (homepage only) ─────────────────────────────── */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      opacity: var(--grain-opacity, 0.035);
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
-      background-size: 200px 200px;
-      mix-blend-mode: overlay;
-    }
-    /* Content boven grain */
-    .hero > *, .beta-banner, section, .lp-divider,
-    .lp-stats, .lp-quotes, .lp-how, .anim-card { position: relative; z-index: 2; }
-
-    /* ── Hero 1px bovenkant highlight ─────────────────────────────────────── */
-    .hero::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.06), transparent);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    /* ── Card diepte (lp-hcard) ───────────────────────────────────────────── */
-    .lp-hcard {
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.55),
-        0 1px 3px rgba(0,0,0,.06),
-        0 4px 16px rgba(0,0,0,.07);
-    }
-    .lp-hcard:hover {
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.55),
-        0 2px 4px rgba(0,0,0,.08),
-        0 12px 28px rgba(0,0,0,.13);
-    }
-
-    /* ── Simulator CTA soft glow ──────────────────────────────────────────── */
-    .btn-simulator {
-      box-shadow:
-        0 10px 30px rgba(255,126,66,.35),
-        0 0 28px rgba(120,200,160,.12);
-    }
-    .btn-simulator:hover {
-      box-shadow:
-        0 14px 36px rgba(255,126,66,.5),
-        0 0 40px rgba(120,200,160,.2);
-    }
-
-    /* ── Sign-up CTA soft glow ────────────────────────────────────────────── */
-    .btn-enter {
-      box-shadow:
-        0 4px 14px rgba(0,0,0,.18),
-        0 0 20px rgba(120,200,160,.12);
-    }
-    .btn-enter:hover {
-      box-shadow:
-        0 6px 18px rgba(0,0,0,.22),
-        0 0 30px rgba(120,200,160,.2);
-    }
-
-    /* ── Reduced motion ───────────────────────────────────────────────────── */
-    @media (prefers-reduced-motion: reduce) {
-      .lp-hcard, .btn-simulator, .btn-enter { transition: none; }
-      .lp-hcard:hover, .btn-simulator:hover, .btn-enter:hover { transform: none; }
-      .rt.pulse { animation: none; }
-      .rt.on::after, .rt-buddy-strip.on::after { animation: none; width: 100%; opacity: 1; }
-      .logo { animation: none; }
-    }
-
-/* ═══════════════════════════════════════════════════════════════════
-   PHASE 1.5 — HERO NOTEPAD ANIMATION
-   Prefix: ha-* (namespaced, does not collide with production selectors)
-   Trigger: JS listens for animationend on #lp-struck → adds .ha-active
-=================================================================== */
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ha-ease:  cubic-bezier(.16, 1, .3, 1);
-  --ha-paper: #f6f2e8;
-  --ha-ink:   #2a1810;
-  /* v4 tile palette */
-  --rt-student-a:#1e5fa8; --rt-student-b:#2d87d4; --rt-student-c:#7cb8ff;
-  --rt-bedrijf-a:#0d5c2f; --rt-bedrijf-b:#1a7a48; --rt-bedrijf-c:#6ee7a0;
-  --rt-bbl-a:#0d5048;    --rt-bbl-b:#1b8474;    --rt-bbl-c:#5dcaa5;
-  --rt-school-a:#7a4d0a; --rt-school-b:#b87218; --rt-school-c:#fcd56a;
-  --rt-buddy-a:#4a1f7a;  --rt-buddy-b:#7b3fb5;  --rt-buddy-c:#c084fc;
+  --green-deep: #0f5c36;
+  --green: #1a7a48;
+  --green-soft: rgba(26,122,72,.12);
+  --orange: #FF7E42;
+  --orange-deep: #e05c1a;
+  --beige: #f4f3ef;
+  --beige-warm: #ece9e0;
+  --ink: #0d1a10;
+  --ink-soft: #2e4038;
+  --ink-muted: #6b8070;
+  --white: #ffffff;
+
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 48px;
+  --s6: 64px;
+  --s7: 96px;
+  --s8: 128px;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-pill: 999px;
 }
 
-/* Stage sits between the headline and the tagline */
-.ha-stage {
-  position: relative;
-  width: min(420px, 92%);
-  margin: 1.4rem auto 2rem;
-  min-height: 240px;
-  pointer-events: none;
-  opacity: 1;
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--beige);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Exempt the stage from .hero-stagger > * so the translateY entrance
-   does not compete with our ha-active choreography. Children still
-   animate via their own keyframes. */
-.hero-stagger > .ha-stage {
-  animation: none;
-  opacity: 1;
-  transform: none;
-}
-
-/* SVG layer: diagonals + three rules drawn into the trapezoid */
-.ha-svg {
-  position: absolute;
+/* grain */
+body::before {
+  content: "";
+  position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
   pointer-events: none;
   z-index: 1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  background-size: 200px 200px;
+  mix-blend-mode: overlay;
 }
+.beta-banner, .hero, section, footer { position: relative; z-index: 2; }
 
-.ha-diag {
-  fill: none;
-  stroke: #FF7E42;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-dasharray: 220;
-  stroke-dashoffset: 220;
-  opacity: 0;
-}
-.ha-stage.ha-active .ha-diag.l {
-  animation: ha-drawDiag 1.0s 0.15s var(--ha-ease) forwards;
-}
-.ha-stage.ha-active .ha-diag.r {
-  animation: ha-drawDiag 1.0s 0.20s var(--ha-ease) forwards;
-}
-@keyframes ha-drawDiag {
-  0%   { stroke-dashoffset: 220; opacity: 0; }
-  20%  { opacity: .85; }
-  100% { stroke-dashoffset: 0;   opacity: .55; }
-}
-
-.ha-rule {
-  stroke: rgba(255, 255, 255, .28);
-  stroke-width: 1;
-  stroke-linecap: round;
-  stroke-dasharray: 200;
-  stroke-dashoffset: 200;
-  opacity: 0;
-}
-.ha-stage.ha-active .ha-rule {
-  animation: ha-drawRule .7s var(--ha-ease) forwards;
-}
-.ha-stage.ha-active .ha-rule:nth-of-type(1) { animation-delay: 0.55s; }
-.ha-stage.ha-active .ha-rule:nth-of-type(2) { animation-delay: 0.62s; }
-.ha-stage.ha-active .ha-rule:nth-of-type(3) { animation-delay: 0.69s; }
-@keyframes ha-drawRule {
-  0%   { stroke-dashoffset: 200; opacity: 0; }
-  100% { stroke-dashoffset: 0;   opacity: .5; }
-}
-
-/* Torn-paper notepad — no orange binding. Clip-path gives the ragged top */
-.ha-sheet {
-  position: relative;
-  margin: 30px auto 0;
-  width: min(320px, 90%);
-  background: var(--ha-paper);
-  padding: 1.6rem 1.5rem 1.4rem;
-  box-shadow:
-    0 1px 0 rgba(0, 0, 0, .06),
-    0 8px 24px rgba(0, 0, 0, .22),
-    0 22px 50px rgba(0, 0, 0, .16);
-  transform: translateY(50px) scale(.94);
-  opacity: 0;
-  filter: blur(4px);
-  z-index: 2;
-  pointer-events: auto;
-  clip-path: polygon(
-    0% 8px, 4% 5px, 8% 9px, 12% 4px, 17% 7px, 22% 3px, 27% 8px,
-    32% 5px, 38% 9px, 43% 4px, 48% 7px, 53% 3px, 58% 8px,
-    63% 5px, 68% 9px, 73% 4px, 78% 7px, 83% 3px, 88% 8px,
-    93% 5px, 97% 9px, 100% 6px,
-    100% 100%, 0% 100%
-  );
-}
-
-/* Three holes punched through the paper itself */
-.ha-sheet-holes {
-  position: absolute;
-  top: 22px;
-  left: 0; right: 0;
+/* ── BETA BANNER ── */
+.beta-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  background: rgba(13, 26, 16, .94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 10px 20px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 60px;
-  pointer-events: none;
-  z-index: 3;
-  opacity: 0;
+  gap: 12px;
+  font-size: .8rem;
+  color: rgba(255,255,255,.78);
 }
-.ha-sheet-holes span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, .18);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .35);
-}
-.ha-stage.ha-active .ha-sheet-holes {
-  animation: ha-fade .4s 0.95s var(--ha-ease) forwards;
-}
-@keyframes ha-fade { to { opacity: 1; } }
-
-.ha-stage.ha-active .ha-sheet {
-  animation: ha-sheetRise 1.1s 0.35s var(--ha-ease) forwards;
-}
-@keyframes ha-sheetRise {
-  0%   { transform: translateY(50px) scale(.94); opacity: 0; filter: blur(4px); }
-  100% { transform: translateY(0)    scale(1);   opacity: 1; filter: blur(0); }
-}
-
-.ha-heading {
-  font-family: 'Caveat', cursive;
-  font-size: 1.7rem;
-  font-weight: 700;
-  color: var(--ha-ink);
-  line-height: 1.05;
-  text-align: center;
-  margin: .4rem 0 .15rem;
-  transform: rotate(-1deg);
-  opacity: 0;
-}
-.ha-sub {
-  font-family: 'Caveat', cursive;
-  font-size: 1rem;
-  color: rgba(42, 24, 16, .65);
-  text-align: center;
-  margin-bottom: 1.1rem;
-  transform: rotate(-.3deg);
-  opacity: 0;
-}
-.ha-btn {
-  display: block;
-  margin: 0 auto;
-  padding: .72rem 1.6rem;
-  background: #e05c1a;
+.beta-pill {
+  background: var(--orange);
   color: #fff;
-  font-family: 'Outfit', sans-serif;
-  font-size: .92rem;
+  font-size: .65rem;
   font-weight: 700;
-  letter-spacing: .01em;
-  border-radius: 6px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+}
+.lang-switcher { display: flex; gap: 2px; margin-left: auto; margin-right: 36px; }
+.lang-btn {
+  background: none; border: none;
+  color: rgba(255,255,255,.45);
+  font-size: .72rem; font-weight: 500;
+  letter-spacing: .04em;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color .15s, background .15s;
+}
+.lang-btn:hover { color: rgba(255,255,255,.85); }
+.lang-btn.active { color: var(--orange); background: rgba(255,126,66,.12); }
+.beta-close {
+  position: absolute;
+  right: 16px;
+  background: none; border: none;
+  color: rgba(255,255,255,.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: color .15s;
+}
+.beta-close:hover { color: rgba(255,255,255,.85); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(168deg, var(--green) 0%, var(--green-deep) 100%);
+  min-height: 100vh;
+  padding: var(--s7) var(--s4) var(--s6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+}
+.hero-inner { width: 100%; max-width: 1100px; margin: 0 auto; }
+
+.brand {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin-bottom: var(--s2);
+  color: #fff;
+}
+.brand span { color: var(--orange); }
+.brand-sub {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: .7rem;
+  font-weight: 400;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.5);
+  text-transform: uppercase;
+  margin-bottom: var(--s7);
+}
+
+.hero-h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  letter-spacing: -.045em;
+  line-height: .92;
+  margin-bottom: var(--s5);
+}
+.h-line-1 {
+  display: block;
+  font-size: clamp(2.5rem, 9vw, 6.5rem);
+  color: #fff;
+  text-align: left;
+}
+.h-line-2 {
+  display: block;
+  font-size: clamp(3rem, 13vw, 9rem);
+  color: rgba(255,255,255,.92);
+  text-align: center;
+  position: relative;
+  margin: var(--s2) 0;
+}
+.h-strike {
+  position: relative;
+  display: inline-block;
+  transition: color .55s ease;
+}
+.h-strike.go { color: rgba(255,255,255,.22); }
+.h-strike::after {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  height: 9px;
+  background: var(--orange);
+  border-radius: 3px;
+  transform: translateY(-50%) rotate(-1deg);
+  width: 0;
+  opacity: 0;
+}
+.h-strike.go::after {
+  animation: lp-strike .65s .15s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes lp-strike {
+  from { width: 0; opacity: 0; }
+  to   { width: calc(100% + 16px); opacity: 1; }
+}
+.h-line-3 {
+  display: block;
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: clamp(2.2rem, 7vw, 4.5rem);
+  color: var(--orange);
+  text-align: right;
+  letter-spacing: 0;
+  line-height: .95;
+  transform: rotate(-1deg);
+  margin-top: var(--s3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .h-strike { color: rgba(255,255,255,.22) !important; }
+  .h-strike::after { width: calc(100% + 16px) !important; opacity: 1 !important; }
+}
+
+.hero-sub {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  font-weight: 400;
+  color: rgba(255,255,255,.78);
+  max-width: 580px;
+  margin: 0 0 var(--s5);
+  line-height: 1.55;
+}
+
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--orange);
+  color: #fff;
   border: none;
+  padding: 14px 28px;
+  border-radius: var(--r-pill);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 3px 10px rgba(224, 92, 26, .4);
+  transition: background .15s, transform .15s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.22);
+}
+.btn-primary:hover { background: var(--orange-deep); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.cta-secondary {
+  font-family: 'Outfit', sans-serif;
+  font-size: .9rem;
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,.18);
+  padding-bottom: 2px;
+  transition: color .15s, border-color .15s;
+}
+.cta-secondary:hover { color: #fff; border-color: rgba(255,255,255,.6); }
+
+.cta-note {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--orange);
+  position: relative;
+  padding-left: 24px;
+  transform: rotate(-2deg);
+  white-space: nowrap;
+}
+.cta-note::before {
+  content: '↓';
+  position: absolute;
+  left: 0; top: 4px;
+  font-size: 1.2rem;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 768px) {
+  .hero { padding: var(--s6) var(--s3) var(--s5); min-height: auto; }
+  .brand-sub { margin-bottom: var(--s5); }
+  .h-line-1 { text-align: center; }
+  .h-line-3 { text-align: center; }
+  .hero-cta-row { flex-direction: column; align-items: flex-start; gap: var(--s2); }
+  .cta-note { transform: rotate(-1deg); align-self: flex-start; }
+  .btn-primary { width: 100%; justify-content: center; }
+}
+
+/* ── ROL-KEUZE SECTIE ── */
+.role-section {
+  background: var(--beige);
+  padding: var(--s7) var(--s4);
+  border-bottom: 1px solid rgba(13,26,16,.07);
+}
+.role-inner { max-width: 880px; margin: 0 auto; }
+.section-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--s2);
+}
+.section-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: var(--s2);
+}
+.section-sub {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  color: var(--ink-muted);
+  max-width: 540px;
+  margin-bottom: var(--s5);
+  line-height: 1.6;
+}
+
+.lp-niveau {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+  margin-bottom: var(--s4);
+}
+.lp-np {
+  font-family: 'Outfit', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid rgba(13,26,16,.15);
+  background: var(--white);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all .15s;
+}
+.lp-np:hover { border-color: var(--green); color: var(--green); }
+.lp-np.lp-np-on {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.role-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s2);
+  margin-bottom: var(--s2);
+}
+.rt {
+  background: var(--white);
+  border: 1.5px solid rgba(13,26,16,.1);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  cursor: pointer;
+  position: relative;
+  transition: border-color .15s, transform .15s;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  overflow: hidden;
+}
+.rt::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .25s ease;
+}
+.rt.on::before { transform: scaleX(1); }
+.rt:hover { border-color: rgba(13,26,16,.2); }
+.rt.on { border-color: var(--green); }
+.rt:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+.rt-ico {
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 44px; height: 44px;
+  background: var(--green-soft);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rt-meta { flex: 1; min-width: 0; }
+.rt-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.rt-bdg {
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .04em;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+}
+
+.rt-buddy-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  background: var(--white);
+  border: 1.5px dashed rgba(26,122,72,.3);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  margin-top: var(--s2);
+  position: relative;
+}
+.rt-buddy-strip:hover { background: var(--green-soft); border-color: var(--green); }
+.rt-buddy-strip.on {
+  background: var(--green-soft);
+  border-style: solid;
+  border-color: var(--green);
+}
+.rt-buddy-strip:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+.rt-bs-ico {
+  width: 36px; height: 36px;
+  background: var(--green-soft);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+.rt-bs-info { flex: 1; }
+.rt-bs-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .92rem;
+  font-weight: 700;
+  color: var(--green-deep);
+  margin-bottom: 2px;
+}
+.rt-bs-sub {
+  font-size: .78rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+.rt-bs-cta {
+  font-family: 'Outfit', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--green);
+  background: var(--white);
+  border: 1px solid rgba(26,122,72,.3);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.rt-bs-cta:hover { background: var(--green); color: #fff; }
+
+.lp-role-desc {
+  margin-top: var(--s3);
+  background: var(--beige-warm);
+  border-left: 3px solid var(--green);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: var(--s2) var(--s3);
+  font-size: .9rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  transition: opacity .2s;
+}
+.lp-role-desc.rc-bedrijf { border-left-color: var(--orange-deep); }
+.lp-role-desc.rc-bbl     { border-left-color: var(--green); }
+.lp-role-desc.rc-school  { border-left-color: var(--orange); }
+.lp-role-desc.rc-buddy   { border-left-color: var(--green); }
+
+.lp-micro {
+  font-size: .82rem;
+  color: var(--ink-muted);
+  margin-top: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.role-cta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+.btn-enter {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  padding: 13px 26px;
+  border-radius: var(--r-pill);
+  font-family: 'Outfit', sans-serif;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, transform .15s;
+  box-shadow: 0 3px 12px rgba(255,126,66,.28);
+}
+.btn-enter:hover { background: var(--orange-deep); transform: translateY(-1px); }
+.btn-enter:focus-visible { outline: 2px solid var(--orange-deep); outline-offset: 3px; }
+
+.lp-link-explore {
+  font-family: 'Outfit', sans-serif;
+  font-size: .85rem;
+  color: var(--ink-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color .15s;
+}
+.lp-link-explore:hover { color: var(--green); }
+.lp-exp-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+/* ── WORLDWIDE BAND ── */
+.worldwide-band {
+  background: linear-gradient(135deg, #0f5c36 0%, #1a7a48 100%);
+  border-top: 1px solid rgba(255,255,255,.08);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 20px 24px;
+}
+.worldwide-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.worldwide-flag {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+.worldwide-content {
+  flex: 1;
+  min-width: 220px;
+}
+.worldwide-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+  letter-spacing: -.01em;
+}
+.worldwide-sub {
+  font-size: .84rem;
+  color: rgba(255,255,255,.72);
+  line-height: 1.5;
+}
+.worldwide-cta {
+  display: inline-flex;
+  align-items: center;
+  background: #FF7E42;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.worldwide-cta:hover { background: #e05c1a; }
+
+@media (max-width: 768px) {
+  .worldwide-inner { gap: 14px; }
+  .worldwide-cta { width: 100%; justify-content: center; }
+}
+
+/* ── STATS ── */
+.stats-band {
+  background: var(--green-deep);
+  color: #fff;
+  padding: var(--s5) var(--s4);
+}
+.stats-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s5);
+}
+.stat-item { text-align: left; }
+.stat-num {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: var(--orange);
+  line-height: 1;
+  margin-bottom: var(--s1);
+}
+.stat-num .slash { color: rgba(255,126,66,.45); margin: 0 4px; }
+.stat-label {
+  font-size: .92rem;
+  color: rgba(255,255,255,.78);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.stat-source {
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .03em;
+}
+
+@media (max-width: 768px) {
+  .stats-inner { grid-template-columns: 1fr; gap: var(--s4); }
+}
+
+/* ── QUOTES ── */
+.quotes-section {
+  background: var(--beige);
+  padding: var(--s7) var(--s4);
+}
+.quotes-inner { max-width: 1000px; margin: 0 auto; }
+.quotes-eyebrow {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: 1.6rem;
+  color: var(--orange-deep);
+  margin-bottom: var(--s4);
+  transform: rotate(-1deg);
+  display: inline-block;
+}
+.quotes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s5);
+}
+.quote-item {
+  border-top: 2px solid var(--ink);
+  padding-top: var(--s3);
+}
+.quote-text {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.45;
+  margin-bottom: var(--s2);
+  letter-spacing: -.01em;
+}
+.quote-source {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  color: var(--ink-muted);
+  letter-spacing: .03em;
+}
+
+@media (max-width: 768px) {
+  .quotes-grid { grid-template-columns: 1fr; gap: var(--s4); }
+}
+
+/* ── NIET VOOR IEDEREEN ── */
+.not-for-section {
+  background: var(--ink);
+  color: #fff;
+  padding: var(--s7) var(--s4);
+}
+.not-for-inner { max-width: 900px; margin: 0 auto; }
+.not-for-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  color: var(--orange);
+  text-transform: uppercase;
+  margin-bottom: var(--s3);
+}
+.not-for-h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  color: #fff;
+  margin-bottom: var(--s5);
+}
+.not-for-h2 em { font-style: italic; color: var(--orange); }
+.not-for-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  margin-bottom: var(--s5);
+}
+.not-for-list li {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  font-weight: 400;
+  color: rgba(255,255,255,.85);
+  line-height: 1.45;
+  padding-left: var(--s4);
+  position: relative;
+  border-left: 2px solid rgba(255,255,255,.15);
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.not-for-list li::before {
+  content: '—';
+  position: absolute;
+  left: -10px;
+  top: 4px;
+  background: var(--ink);
+  color: var(--orange);
+  font-size: .7rem;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,126,66,.4);
+}
+.not-for-foot {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  color: rgba(255,255,255,.6);
+  line-height: 1.6;
+  max-width: 580px;
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: var(--s3);
+}
+.not-for-foot strong { color: #fff; font-weight: 500; }
+
+/* ── HOE INTERNLY WERKT ── */
+.how-section {
+  background: var(--beige);
+  padding: var(--s7) var(--s4);
+}
+.how-inner { max-width: 1000px; margin: 0 auto; }
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4);
+  margin-top: var(--s5);
+}
+.how-card {
+  background: var(--white);
+  border: 1px solid rgba(13,26,16,.08);
+  border-radius: var(--r-md);
+  padding: var(--s4);
+  position: relative;
+  transition: border-color .2s, transform .2s;
+}
+.how-card:hover { border-color: rgba(13,26,16,.18); transform: translateY(-2px); }
+.how-num {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: rgba(26,122,72,.18);
+  line-height: 1;
+  letter-spacing: -.04em;
+  margin-bottom: var(--s2);
+}
+.how-h {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--s1);
+}
+.how-p {
+  font-size: .92rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  margin-bottom: var(--s2);
+}
+.how-tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  letter-spacing: .04em;
+  background: var(--green-soft);
+  color: var(--green);
+}
+.how-tag.orange { background: rgba(255,126,66,.12); color: var(--orange-deep); }
+
+/* BBL sub-block */
+.bbl-block {
+  margin-top: var(--s6);
+  padding-top: var(--s5);
+  border-top: 1px solid rgba(13,26,16,.1);
+}
+.bbl-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: var(--s2);
+}
+.bbl-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  margin-bottom: var(--s4);
+}
+
+@media (max-width: 768px) {
+  .how-grid { grid-template-columns: 1fr; gap: var(--s3); }
+}
+
+/* ── ESG band ── */
+.esg-band {
+  background: var(--green-soft);
+  border-top: 1px solid rgba(26,122,72,.15);
+  border-bottom: 1px solid rgba(26,122,72,.15);
+  padding: var(--s4);
+}
+.esg-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+.esg-content { flex: 1; min-width: 280px; }
+.esg-h {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green-deep);
+  margin-bottom: 4px;
+}
+.esg-p {
+  font-size: .88rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  max-width: 540px;
+}
+.btn-esg {
+  font-family: 'Outfit', sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  background: var(--green);
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s;
+}
+.btn-esg:hover { background: var(--green-deep); }
+
+/* ── PREV BAND ── */
+.prev-band {
+  background: var(--beige-warm);
+  padding: var(--s2) var(--s4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  font-family: 'Outfit', sans-serif;
+  font-size: .85rem;
+}
+.prev-band-lbl { color: var(--ink-muted); }
+.prev-band a {
+  color: var(--orange-deep);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity .15s;
+}
+.prev-band a:hover { opacity: .65; }
+.prev-band a + a::before { content: '·'; color: var(--ink-muted); margin-right: var(--s2); margin-left: 0; }
+
+/* ── SIMULATOR ── */
+.sim-section {
+  background: var(--ink);
+  color: #fff;
+  padding: var(--s7) var(--s4);
+  position: relative;
+  overflow: hidden;
+}
+.sim-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(26,122,72,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,122,72,.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+.sim-inner {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+.sim-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,126,66,.14);
+  border: 1px solid rgba(255,126,66,.3);
+  border-radius: var(--r-pill);
+  padding: 5px 14px;
+  margin-bottom: var(--s3);
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: var(--orange);
+  text-transform: uppercase;
+}
+.sim-h {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1.15;
+  color: #fff;
+  margin-bottom: var(--s2);
+}
+.sim-h em { font-style: italic; color: var(--orange); }
+.sim-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,.62);
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0 auto var(--s5);
+}
+
+.sim-chat {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  max-width: 480px;
+  margin: 0 auto var(--s5);
+  text-align: left;
+}
+.sim-chat-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding-bottom: var(--s2);
+  margin-bottom: var(--s3);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sim-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-deep));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: .85rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+.sim-chat-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  color: #fff;
+}
+.sim-chat-meta {
+  font-size: .72rem;
+  color: rgba(255,255,255,.4);
+}
+.sim-bubble-in {
+  background: rgba(255,255,255,.08);
+  color: rgba(255,255,255,.9);
+  padding: 10px 14px;
+  border-radius: 14px 14px 14px 4px;
+  font-size: .9rem;
+  max-width: 78%;
+  margin-bottom: var(--s3);
+  line-height: 1.5;
+}
+.sim-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sim-opt {
+  background: rgba(255,126,66,.1);
+  border: 1px solid rgba(255,126,66,.28);
+  color: rgba(255,255,255,.92);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .88rem;
+  text-align: left;
+  cursor: default;
+  transition: background .15s;
+}
+.sim-opt:hover { background: rgba(255,126,66,.18); }
+.sim-opt-letter {
+  display: inline-block;
+  width: 22px; height: 22px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 22px;
+  font-size: .72rem;
+  font-weight: 700;
+  margin-right: 8px;
+}
+.sim-note {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--orange);
+  margin-top: var(--s2);
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+.sim-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: var(--s5);
+}
+.sim-chip {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  font-size: .78rem;
+  color: rgba(255,255,255,.65);
+}
+
+.btn-simulator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--orange);
+  color: #fff;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: var(--r-pill);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(255,126,66,.32);
+  transition: background .15s, transform .15s, box-shadow .15s;
+}
+.btn-simulator:hover {
+  background: var(--orange-deep);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(255,126,66,.42);
+}
+.sim-foot {
+  margin-top: var(--s2);
+  font-size: .78rem;
+  color: rgba(255,255,255,.32);
+}
+.sim-followup {
+  margin-top: var(--s4);
+  font-size: .88rem;
+  color: rgba(255,255,255,.52);
+  max-width: 440px;
+  margin-left: auto; margin-right: auto;
+  line-height: 1.6;
+}
+
+/* ── Newsletter ── */
+.nl-section {
+  background: var(--beige);
+  padding: var(--s7) var(--s4);
+}
+.nl-inner {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+.nl-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,126,66,.12);
+  color: var(--orange-deep);
+  border: 1px solid rgba(255,126,66,.22);
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  margin-bottom: var(--s3);
+  text-transform: uppercase;
+}
+.nl-h {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  margin-bottom: var(--s2);
+  line-height: 1.2;
+}
+.nl-p {
+  font-size: .95rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  margin-bottom: var(--s4);
+  max-width: 440px;
+  margin-left: auto; margin-right: auto;
+}
+#hero-wl-form {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+  margin: 0 auto var(--s2);
+}
+#hero-wl-email {
+  flex: 1;
+  padding: 12px 18px;
+  border: 1.5px solid rgba(13,26,16,.15);
+  border-radius: var(--r-pill);
+  font-family: 'Outfit', sans-serif;
+  font-size: .92rem;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  transition: border-color .15s;
+}
+#hero-wl-email:focus { border-color: var(--green); }
+#hero-wl-btn {
+  padding: 12px 22px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: 'Outfit', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+#hero-wl-btn:hover { background: var(--orange-deep); }
+#hero-wl-success {
+  display: none;
+  padding: var(--s2) 0;
+  font-size: .92rem;
+  font-weight: 500;
+  color: var(--green);
+}
+#hero-wl-error {
+  display: none;
+  color: #b82020;
+  font-size: .82rem;
+  margin-top: 6px;
+}
+.nl-foot {
+  font-size: .72rem;
+  color: var(--ink-muted);
+  margin-top: var(--s2);
+}
+.nl-foot a { color: var(--ink-muted); text-decoration: underline; }
+
+@media (max-width: 480px) {
+  #hero-wl-form { flex-direction: column; }
+  #hero-wl-email, #hero-wl-btn { width: 100%; }
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--green-deep);
+  color: rgba(255,255,255,.6);
+  padding: var(--s4) var(--s4) var(--s3);
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  justify-content: space-between;
+}
+.footer-brand {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .92rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.5);
+}
+.footer-brand span { color: var(--orange); }
+.footer-links {
+  display: flex;
+  list-style: none;
+  gap: var(--s3);
+  flex-wrap: wrap;
+}
+.footer-links a {
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  font-size: .76rem;
+  transition: color .15s;
+}
+.footer-links a:hover { color: var(--orange); }
+.footer-copy {
+  font-size: .68rem;
+  color: rgba(255,255,255,.3);
+}
+.footer-tagline {
+  width: 100%;
+  text-align: center;
+  margin-top: var(--s3);
+  padding-top: var(--s2);
+  border-top: 1px solid rgba(255,255,255,.05);
+  font-size: .8rem;
+  color: rgba(255,255,255,.4);
+}
+
+/* ── scroll-reveal ── */
+.lp-rev {
   opacity: 0;
-  transition: transform .15s, box-shadow .15s;
+  transform: translateY(12px);
+  transition: opacity .5s ease, transform .5s ease;
 }
-.ha-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(224, 92, 26, .5);
+.lp-rev.lp-rev-on {
+  opacity: 1;
+  transform: translateY(0);
 }
-.ha-btn:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
+.lp-d1 { transition-delay: .08s; }
+.lp-d2 { transition-delay: .16s; }
+.anim-card { opacity: 1; }
 
-.ha-stage.ha-active .ha-heading {
-  animation: ha-headIn .55s 0.95s var(--ha-ease) forwards;
-}
-@keyframes ha-headIn {
-  0%   { opacity: 0; transform: rotate(-1deg) translateY(6px); }
-  100% { opacity: 1; transform: rotate(-1deg) translateY(0); }
-}
-.ha-stage.ha-active .ha-sub {
-  animation: ha-subIn .55s 1.07s var(--ha-ease) forwards;
-}
-@keyframes ha-subIn {
-  0%   { opacity: 0; transform: rotate(-.3deg) translateY(6px); }
-  100% { opacity: 1; transform: rotate(-.3deg) translateY(0); }
-}
-.ha-stage.ha-active .ha-btn {
-  animation: ha-btnIn .55s 1.20s var(--ha-ease) forwards;
-}
-@keyframes ha-btnIn {
-  0%   { opacity: 0; transform: translateY(8px) scale(.96); }
-  100% { opacity: 1; transform: translateY(0)   scale(1); }
-}
-
-/* Reduced motion: hide the stage entirely. Strike already respects
-   the global reduced-motion rule in the existing stylesheet. */
 @media (prefers-reduced-motion: reduce) {
-  .ha-stage { display: none; }
+  .lp-rev { opacity: 1; transform: none; transition: none; }
+  .btn-primary:hover, .btn-enter:hover, .btn-simulator:hover, .how-card:hover { transform: none; }
 }
-  </style>
+
+/* ── WAITLIST POPUP ── */
+#waitlist-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(13,26,16,.55);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: var(--s3);
+}
+#waitlist-popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: var(--r-lg);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.18);
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+}
+.wl-popup-head {
+  background: linear-gradient(135deg, var(--green), var(--green-deep));
+  padding: var(--s4) var(--s4) var(--s3);
+  position: relative;
+}
+.wl-popup-close {
+  position: absolute;
+  top: 14px; right: 16px;
+  background: rgba(255,255,255,.15);
+  border: none;
+  color: #fff;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.wl-popup-brand {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.wl-popup-brand span { color: var(--orange); }
+.wl-popup-sub {
+  font-size: .8rem;
+  color: rgba(255,255,255,.7);
+}
+.wl-popup-body { padding: var(--s4); }
+.wl-popup-body p { font-size: .92rem; color: var(--ink-soft); line-height: 1.6; margin-bottom: var(--s2); }
+.wl-popup-body p.muted { font-size: .8rem; color: var(--ink-muted); margin-bottom: var(--s3); }
+#wl-email {
+  width: 100%;
+  padding: 11px 16px;
+  border: 1.5px solid rgba(13,26,16,.15);
+  border-radius: var(--r-sm);
+  font-family: 'Outfit', sans-serif;
+  font-size: .92rem;
+  color: var(--ink);
+  outline: none;
+  margin-bottom: 10px;
+}
+#wl-email:focus { border-color: var(--green); }
+#wl-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: 'Outfit', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+#wl-btn:hover { background: var(--orange-deep); }
+#wl-success {
+  display: none;
+  text-align: center;
+  padding: var(--s2) 0;
+}
+#wl-success .check { font-size: 1.8rem; margin-bottom: 8px; }
+#wl-success-h {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+#wl-success-p {
+  font-size: .8rem;
+  color: var(--ink-muted);
+}
+#wl-error {
+  display: none;
+  margin-top: 8px;
+  background: #fdeaea;
+  color: #b82020;
+  border-radius: var(--r-sm);
+  padding: 8px 14px;
+  font-size: .8rem;
+}
+.wl-popup-foot {
+  font-size: .7rem;
+  color: var(--ink-muted);
+  text-align: center;
+  margin: var(--s3) 0 0;
+}
+.wl-popup-foot a { color: var(--ink-muted); text-decoration: underline; }
+
+/* legacy guards */
+#enterBtn { display: none !important; }
+.rt-buddy { display: none !important; }
+</style>
+
 </head>
 <body>
 
-<!-- Grain fallback SVG filter — body::before CSS gebruikt de data-URI variant;
-     dit element is een referentie-definitie voor browsers die data-URI filters
-     anders renderen. Onzichtbaar (0×0), geen layout impact. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <filter id="grain-filter">
     <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
-    <feColorMatrix values="0 0 0 0 0
-                           0 0 0 0 0
-                           0 0 0 0 0
-                           0 0 0 0.5 0"/>
+    <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"/>
   </filter>
 </svg>
 
+<!-- BETA BANNER -->
 <div class="beta-banner" id="betaBanner">
   <span class="beta-pill">Beta</span>
   <span>Je gebruikt een vroege versie van Internly. Sommige functies zijn nog in ontwikkeling.</span>
-  <div class="lang-switcher" style="margin-left:auto;margin-right:36px">
+  <div class="lang-switcher">
     <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
     <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
     <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
@@ -702,428 +1420,419 @@
   <button class="beta-close" onclick="document.getElementById('betaBanner').style.display='none'" aria-label="Sluiten">×</button>
 </div>
 
-<div class="hero hero-stagger" id="hero">
-  <div class="logo">intern<span style="color:#e05c1a">ly</span></div>
-  <span class="lp-logo-desc">het stageplatform</span>
+<!-- HERO -->
+<div class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="brand">intern<span>ly</span></div>
+    <span class="brand-sub">het stageplatform</span>
 
-  <h1 class="hero-h1" aria-label="40 mails. 0 reacties. Dat kan anders.">
-    <span class="h-intro">40 mails.</span>
-    <span class="struck" id="lp-struck" aria-hidden="true">0&nbsp;reacties.</span>
-    <span class="h-end">Dat kan anders<span style="color:#e05c1a">.</span></span>
-  </h1>
+    <h1 class="hero-h1" aria-label="40 mails. 0 reacties. Dat kan anders.">
+      <span class="h-line-1">40 mails.</span>
+      <span class="h-line-2"><span class="h-strike" id="lp-struck">0&nbsp;reacties.</span></span>
+      <span class="h-line-3">Dat kan anders.</span>
+    </h1>
 
-  <!-- ═══ Phase 1.5 — hero notepad stage ═══ -->
-  <div class="ha-stage" id="haStage" aria-hidden="true">
-    <svg class="ha-svg" viewBox="0 0 420 240" preserveAspectRatio="none" aria-hidden="true">
-      <path class="ha-diag l" d="M 110 0 L 60 80" />
-      <path class="ha-diag r" d="M 310 0 L 360 80" />
-      <line class="ha-rule" x1="100" y1="40" x2="320" y2="40" />
-      <line class="ha-rule" x1="92"  y1="56" x2="328" y2="56" />
-      <line class="ha-rule" x1="84"  y1="72" x2="336" y2="72" />
-    </svg>
+    <p class="hero-sub">Op Internly zie je vooraf hoe betrouwbaar een bedrijf is. Geen ghosting meer, geen vage beloftes. Stages die kloppen.</p>
 
-    <div class="ha-sheet">
-      <div class="ha-sheet-holes" aria-hidden="true">
-        <span></span><span></span><span></span>
+    <div class="hero-cta-row">
+      <a href="auth.html?mode=signup" class="btn-primary">Maak een profiel aan →</a>
+      <a href="/auth.html" class="cta-secondary">Heb je al een account? Log in</a>
+      <span class="cta-note" aria-hidden="true">gratis voor studenten</span>
+    </div>
+  </div>
+</div>
+
+<!-- ROL-KEUZE SECTIE -->
+<section class="role-section" id="role-section">
+  <div class="role-inner">
+    <div class="section-eyebrow">Voor wie</div>
+    <h2 class="section-title">Wie ben jij?</h2>
+    <p class="section-sub">Internly werkt voor vier groepen. Begin door te zeggen wie jij bent — de rest volgt.</p>
+
+    <div class="lp-niveau" role="group" aria-label="Onderwijsniveau">
+      <button class="lp-np" onclick="lpSetNiveau(this,'bbl')">BBL</button>
+      <button class="lp-np lp-np-on" onclick="lpSetNiveau(this,'mbo')">MBO</button>
+      <button class="lp-np" onclick="lpSetNiveau(this,'hbo')">HBO</button>
+      <button class="lp-np" onclick="lpSetNiveau(this,'wo')">WO</button>
+    </div>
+
+    <div class="role-tiles">
+      <div class="rt rt-s on" data-role="student" onclick="pickRole(this,'student')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'student');}" tabindex="0" role="button" aria-pressed="true">
+        <div class="rt-ico">👤</div>
+        <div class="rt-meta">
+          <div class="rt-name">Student</div>
+          <div class="rt-bdg">Gratis</div>
+        </div>
       </div>
-      <div class="ha-heading">Schrijf je nu in</div>
-      <div class="ha-sub">gratis voor studenten</div>
-      <a href="#" class="ha-btn" data-role="waitlist-cta">Meld je aan</a>
+      <div class="rt rt-b" data-role="bedrijf" onclick="pickRole(this,'bedrijf')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'bedrijf');}" tabindex="0" role="button" aria-pressed="false">
+        <div class="rt-ico">🏢</div>
+        <div class="rt-meta">
+          <div class="rt-name">Bedrijf</div>
+          <div class="rt-bdg">Abonnement</div>
+        </div>
+      </div>
+      <div class="rt rt-bbl" data-role="bbl" onclick="pickRole(this,'bbl')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'bbl');}" tabindex="0" role="button" aria-pressed="false">
+        <div class="rt-ico">🛠</div>
+        <div class="rt-meta">
+          <div class="rt-name">BBL</div>
+          <div class="rt-bdg">Gratis</div>
+        </div>
+      </div>
+      <div class="rt rt-sc" data-role="school" onclick="pickRole(this,'school')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'school');}" tabindex="0" role="button" aria-pressed="false">
+        <div class="rt-ico">🎓</div>
+        <div class="rt-meta">
+          <div class="rt-name">School</div>
+          <div class="rt-bdg">Freemium</div>
+        </div>
+      </div>
     </div>
+
+    <!-- legacy hidden buddy tile, JS-target -->
+    <div class="rt rt-buddy" data-role="buddy" aria-hidden="true" tabindex="-1"></div>
+
+    <div class="rt-buddy-strip" id="rt-buddy-strip" role="button" tabindex="0" aria-pressed="false"
+         onclick="pickRole(document.querySelector('.rt-buddy'),'buddy')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(document.querySelector('.rt-buddy'),'buddy');}">
+      <div class="rt-bs-ico">🤝</div>
+      <div class="rt-bs-info">
+        <div class="rt-bs-name">Buddy systeem</div>
+        <div class="rt-bs-sub">Krijg begeleiding van een gepensioneerde mentor of ervaringsdeskundige.</div>
+      </div>
+      <a href="buddy-dashboard.html" onclick="event.stopPropagation()" class="rt-bs-cta">Ga naar Buddy →</a>
+    </div>
+
+    <div class="lp-role-desc rc-student" id="lp-role-desc">
+      Ik wil een stage vinden die écht bij mij past — op basis van mijn leerdoelen en ambities.
+    </div>
+
+    <div class="lp-micro" id="lp-micro">
+      ✓ Gratis voor studenten &nbsp;·&nbsp; Geen account vereist &nbsp;·&nbsp; Nu zoeken
+    </div>
+
+    <div class="role-cta-row">
+      <button class="btn-enter" id="lp-enter-btn" onclick="lpGoToRole()">Maak nu een profiel aan →</button>
+      <a class="lp-link-explore" id="lp-explore-link" href="discover.html">
+        <span class="lp-exp-dot"></span>
+        <span id="lp-explore-text">Verken beschikbare stageopdrachten</span>
+      </a>
+    </div>
+
+    <!-- legacy verborgen enter-knop (anti-crash guard) -->
+    <button id="enterBtn" onclick="enterApp()" aria-hidden="true"></button>
   </div>
+</section>
 
-  <div class="lp-tagline">Weet vooraf hoe betrouwbaar een bedrijf is. Geen ghosting, geen vage beloftes — gewoon stages die kloppen.</div>
-
-  <!-- Niveau pills -->
-  <div class="lp-niveau">
-    <button class="lp-np" onclick="lpSetNiveau(this,'bbl')">BBL</button>
-    <button class="lp-np lp-np-on" onclick="lpSetNiveau(this,'mbo')">MBO</button>
-    <button class="lp-np" onclick="lpSetNiveau(this,'hbo')">HBO</button>
-    <button class="lp-np" onclick="lpSetNiveau(this,'wo')">WO</button>
-  </div>
-
-  <!-- Group labels: Studenten | Organisaties -->
-  <div class="rt-group-labels" aria-hidden="true">
-    <div class="rt-gl">Studenten</div>
-    <div class="rt-gl">Organisaties</div>
-  </div>
-
-  <!-- Role tiles — 2×2 grid: Student · Bedrijf / BBL · School -->
-  <div class="role-tiles">
-    <div class="rt rt-s on" data-role="student" onclick="pickRole(this,'student')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'student');}" tabindex="0" role="button" aria-pressed="true">
-      <div class="hairline"></div><div class="shine"></div>
-      <div class="rt-ico"><span class="rt-ico-wrap">👤</span></div>
-      <div class="rt-name">Student</div>
-      <span class="rt-bdg bd-g">Gratis</span>
+<!-- WORLDWIDE BAND — entry point voor international students -->
+<section class="worldwide-band" id="worldwide-band">
+  <div class="worldwide-inner">
+    <div class="worldwide-flag">🌍</div>
+    <div class="worldwide-content">
+      <div class="worldwide-title">Internly Worldwide</div>
+      <div class="worldwide-sub">
+        Looking for an internship in the Netherlands from abroad?
+        Find host companies, manage your visa timeline and Learning Agreement
+        — in English.
+      </div>
     </div>
-    <div class="rt rt-b" data-role="bedrijf" onclick="pickRole(this,'bedrijf')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'bedrijf');}" tabindex="0" role="button" aria-pressed="false">
-      <div class="hairline"></div><div class="shine"></div>
-      <div class="rt-ico"><span class="rt-ico-wrap">🏢</span></div>
-      <div class="rt-name">Bedrijf</div>
-      <span class="rt-bdg bd-a">Abonnement</span>
-    </div>
-    <div class="rt rt-bbl" data-role="bbl" onclick="pickRole(this,'bbl')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'bbl');}" tabindex="0" role="button" aria-pressed="false">
-      <div class="hairline"></div><div class="shine"></div>
-      <div class="rt-ico"><span class="rt-ico-wrap">🏗</span></div>
-      <div class="rt-name">BBL</div>
-      <span class="rt-bdg bd-g">Gratis</span>
-    </div>
-    <div class="rt rt-sc" data-role="school" onclick="pickRole(this,'school')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(this,'school');}" tabindex="0" role="button" aria-pressed="false">
-      <div class="hairline"></div><div class="shine"></div>
-      <div class="rt-ico"><span class="rt-ico-wrap">🎓</span></div>
-      <div class="rt-name">School</div>
-      <span class="rt-bdg bd-b">Freemium</span>
-    </div>
-  </div>
-
-  <!-- Hidden buddy tile — JS target for pickRole(); do not remove -->
-  <div class="rt rt-buddy" data-role="buddy" style="display:none;" aria-hidden="true" tabindex="-1"></div>
-
-  <!-- Buddy strip — live feature, links to buddy-dashboard -->
-  <div class="rt-buddy-strip" id="rt-buddy-strip" role="button" tabindex="0" aria-pressed="false"
-       onclick="pickRole(document.querySelector('.rt-buddy'),'buddy')"
-       onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickRole(document.querySelector('.rt-buddy'),'buddy');}">
-    <div class="rt-bs-ico">🤝</div>
-    <div class="rt-bs-info">
-      <div class="rt-bs-name">Buddy systeem</div>
-      <div class="rt-bs-sub">Krijg begeleiding van een mentor of ervaringsdeskundige tijdens je stage.</div>
-    </div>
-    <a href="buddy-dashboard.html" onclick="event.stopPropagation()"
-       style="font-size:.72rem;font-weight:700;color:#fac775;
-              background:rgba(250,199,117,.14);border:1px solid rgba(250,199,117,.32);
-              border-radius:20px;padding:5px 13px;text-decoration:none;
-              white-space:nowrap;flex-shrink:0;transition:background .15s;"
-       onmouseover="this.style.background='rgba(250,199,117,.24)'"
-       onmouseout="this.style.background='rgba(250,199,117,.14)'">
-      Ga naar Buddy →
+    <a href="auth.html?role=student_international" class="worldwide-cta">
+      Get started →
     </a>
   </div>
+</section>
 
-  <!-- Beschrijvingspaneel -->
-  <div class="lp-role-desc rc-student" id="lp-role-desc">
-    Ik wil een stage vinden die écht bij mij past — op basis van mijn leerdoelen en ambities.
-  </div>
-
-  <!-- Microcopy -->
-  <div class="lp-micro" id="lp-micro">
-    ✓ Gratis voor studenten &nbsp;·&nbsp; Geen account vereist &nbsp;·&nbsp; Nu zoeken
-  </div>
-
-  <!-- CTA — vervangt de oude btn-demo + btn-verken -->
-  <button class="btn-enter" id="lp-enter-btn" onclick="lpGoToRole()">
-    Maak nu een profiel aan →
-  </button>
-
-  <a href="/auth.html" class="cta-secondary-orange">
-    Heb je al een account? Log dan nu in
-  </a>
-
-  <a class="lp-link-explore" id="lp-explore-link" href="discover.html">
-    <span class="lp-exp-dot"></span>
-    <span id="lp-explore-text">Verken beschikbare stageopdrachten</span>
-  </a>
-
-  <!-- Verborgen enterBtn bewaren zodat enterApp() niet crasht -->
-  <button id="enterBtn" onclick="enterApp()" style="display:none" aria-hidden="true"></button>
-
-</div>
-
-<!-- ── DIVIDER ─────────────────────────────────────────────────────────────── -->
-<div class="lp-divider"></div>
-
-<!-- ── STAT STRIP ─────────────────────────────────────────────────────────── -->
-<div class="lp-stats">
-  <div class="lp-ss">
-    <div class="lp-sn">1 op 10</div>
-    <div class="lp-sl">MBO-studenten ervaart discriminatie bij stage</div>
-    <div class="lp-si">Bron: CBS, december 2025</div>
-  </div>
-  <div class="lp-sd"></div>
-  <div class="lp-ss">
-    <div class="lp-sn">77%</div>
-    <div class="lp-sl">van de sollicitanten wordt geghost door werkgevers</div>
-    <div class="lp-si">indicatief — op basis van marktonderzoek</div>
-  </div>
-  <div class="lp-sd"></div>
-  <div class="lp-ss">
-    <div class="lp-sn">40 <span class="sl-slash">/</span> 0</div>
-    <div class="lp-sl">mails verstuurd / reacties ontvangen</div>
-    <div class="lp-si">gemiddeld beeld — JOB MBO Onderzoek</div>
-  </div>
-</div>
-
-<!-- ── QUOTES ─────────────────────────────────────────────────────────────── -->
-<div class="lp-quotes" role="region" aria-label="Ervaringen van studenten">
-  <blockquote class="lp-q lp-rev">
-    <p class="lp-qt">"Op meerdere brieven kreeg ik nooit reactie. Je weet gewoon niet waar je aan toe bent."</p>
-    <cite class="lp-qs">— HBO-student · Vox Magazine 2024</cite>
-  </blockquote>
-  <blockquote class="lp-q lp-rev lp-d1">
-    <p class="lp-qt">"40 emails gestuurd. 2 uitnodigingen. De rest: radiostilte."</p>
-    <cite class="lp-qs">— MBO-student · JOB MBO Onderzoek 2025</cite>
-  </blockquote>
-  <blockquote class="lp-q lp-rev lp-d2">
-    <p class="lp-qt">"In spanning wacht je af. Uiteindelijk neem je maar aan dat je het niet geworden bent."</p>
-    <cite class="lp-qs">— HBO Communicatie · Saxion Hogeschool, april 2024</cite>
-  </blockquote>
-</div>
-
-<!-- ── WAAROM NÚ ───────────────────────────────────────────────────────── -->
-<section class="lp-how" style="border-top:1px solid rgba(13,26,16,.07);">
-  <div class="lp-hi">
-    <div class="lp-lbl">De timing</div>
-    <div class="lp-sh">Waarom nú</div>
-    <div class="lp-sp">Drie ontwikkelingen maken dit het juiste moment voor een eerlijk stageplatform.</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
-
-      <div class="lp-hcard lp-rev">
-        <div class="lp-hh">CSRD-wetgeving</div>
-        <div class="lp-hp">Grote bedrijven zijn verplicht sociaal beleid te rapporteren. Internly levert harde data over investering in jong talent — bruikbaar als onderbouwing in het ESG-verslag.</div>
-      </div>
-
-      <div class="lp-hcard lp-rev lp-d1">
-        <div class="lp-hh">Personeelstekort</div>
-        <div class="lp-hp">De strijd om talent begint eerder dan ooit. Bedrijven die studenten vroeg aan zich binden, winnen op de arbeidsmarkt van morgen.</div>
-      </div>
-
-      <div class="lp-hcard lp-rev lp-d2">
-        <div class="lp-hh">Stagepact 2025</div>
-        <div class="lp-hp">Sinds december 2025 vraagt het Stagepact bedrijven tot aantoonbaar kwalitatief stagebeleid. Internly registreert automatisch wat je nodig hebt om te laten zien dat je je beloften nakomt.</div>
-      </div>
-
+<!-- STAT STRIP -->
+<section class="stats-band">
+  <div class="stats-inner">
+    <div class="stat-item lp-rev">
+      <div class="stat-num">1 op 10</div>
+      <div class="stat-label">MBO-studenten ervaart discriminatie bij stage</div>
+      <div class="stat-source">Bron: CBS, december 2025</div>
+    </div>
+    <div class="stat-item lp-rev lp-d1">
+      <div class="stat-num">77%</div>
+      <div class="stat-label">van de sollicitanten wordt geghost door werkgevers</div>
+      <div class="stat-source">indicatief — op basis van marktonderzoek</div>
+    </div>
+    <div class="stat-item lp-rev lp-d2">
+      <div class="stat-num">40<span class="slash">/</span>0</div>
+      <div class="stat-label">mails verstuurd / reacties ontvangen</div>
+      <div class="stat-source">gemiddeld beeld — JOB MBO Onderzoek</div>
     </div>
   </div>
 </section>
 
-<!-- ── HOW IT WORKS ──────────────────────────────────────────────────────── -->
-<section class="lp-how">
-  <div class="lp-hi">
-    <div class="lp-lbl">Hoe het werkt</div>
-    <div class="lp-sh">Bedrijven die niet reageren, vallen af.</div>
-    <div class="lp-sp">Niet met tips — met een systeem dat ghosting zichtbaar maakt en aanspreekbaar houdt.</div>
-    <div class="lp-hg">
-      <div class="lp-hcard lp-rev">
-        <div class="lp-hn">01</div>
-        <div class="lp-hh">Jij solliciteert</div>
-        <div class="lp-hp">Zoek op niveau (BBL/MBO/HBO/WO), regio of sector. Zie de publieke Trust Score van elk bedrijf vóórdat je solliciteert.</div>
-        <span class="lp-tg">Gratis voor studenten</span>
+<!-- QUOTES -->
+<section class="quotes-section" aria-label="Ervaringen van studenten">
+  <div class="quotes-inner">
+    <div class="quotes-eyebrow">echte stemmen, geen marketing</div>
+    <div class="quotes-grid">
+      <blockquote class="quote-item lp-rev">
+        <p class="quote-text">"Op meerdere brieven kreeg ik nooit reactie. Je weet gewoon niet waar je aan toe bent."</p>
+        <cite class="quote-source">— HBO-student · Vox Magazine 2024</cite>
+      </blockquote>
+      <blockquote class="quote-item lp-rev lp-d1">
+        <p class="quote-text">"40 emails gestuurd. 2 uitnodigingen. De rest: radiostilte."</p>
+        <cite class="quote-source">— MBO-student · JOB MBO Onderzoek 2025</cite>
+      </blockquote>
+      <blockquote class="quote-item lp-rev lp-d2">
+        <p class="quote-text">"In spanning wacht je af. Uiteindelijk neem je maar aan dat je het niet geworden bent."</p>
+        <cite class="quote-source">— HBO Communicatie · Saxion Hogeschool 2024</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- NIET VOOR IEDEREEN -->
+<section class="not-for-section">
+  <div class="not-for-inner">
+    <div class="not-for-eyebrow">eerlijk gezegd</div>
+    <h2 class="not-for-h2">Internly is <em>niet</em> voor iedereen.</h2>
+    <ul class="not-for-list">
+      <li class="lp-rev">Ben je een bedrijf dat radiostilte normaal vindt? Dan ga je Internly haten.</li>
+      <li class="lp-rev lp-d1">Ben je een school die signalen liever niet ziet? Dan zit je hier verkeerd.</li>
+      <li class="lp-rev lp-d2">Ben je een student die ghosting al heeft geaccepteerd? Dan hebben wij niets te bieden.</li>
+    </ul>
+    <p class="not-for-foot">
+      <strong>Internly is wel voor de rest.</strong> Voor mensen die geloven dat het anders kan, en die bereid zijn om dat zichtbaar te maken — voor iedereen.
+    </p>
+  </div>
+</section>
+
+<!-- WAAROM NÚ -->
+<section class="how-section" style="border-bottom:1px solid rgba(13,26,16,.07);">
+  <div class="how-inner">
+    <div class="section-eyebrow">De timing</div>
+    <h2 class="section-title">Waarom nú</h2>
+    <p class="section-sub">Drie ontwikkelingen maken dit het juiste moment voor een eerlijk stageplatform.</p>
+
+    <div class="how-grid">
+      <div class="how-card lp-rev">
+        <div class="how-h">CSRD-wetgeving</div>
+        <p class="how-p">Grote bedrijven zijn verplicht sociaal beleid te rapporteren. Internly levert harde data over investering in jong talent — bruikbaar als onderbouwing in het ESG-verslag.</p>
+        <span class="how-tag">Verplicht 2025</span>
       </div>
-      <div class="lp-hc"><div class="lp-ha"></div></div>
-      <div class="lp-hcard lp-rev lp-d1">
-        <div class="lp-hn">02</div>
-        <div class="lp-hh">Zij reageren — altijd.</div>
-        <div class="lp-hp">Bedrijven hebben een responsverplichting. Geen reactie = lagere Trust Score. Geen uitzonderingen.</div>
-        <span class="lp-tg">⚡ Responsgarantie</span>
+      <div class="how-card lp-rev lp-d1">
+        <div class="how-h">Personeelstekort</div>
+        <p class="how-p">De strijd om talent begint eerder dan ooit. Bedrijven die studenten vroeg aan zich binden, winnen op de arbeidsmarkt van morgen.</p>
+        <span class="how-tag orange">Talentmarkt</span>
       </div>
-      <div class="lp-hc"><div class="lp-ha"></div></div>
-      <div class="lp-hcard lp-rev lp-d2">
-        <div class="lp-hn">03</div>
-        <div class="lp-hh">De markt corrigeert</div>
-        <div class="lp-hp">Slechte bedrijven worden zichtbaar. Goede bedrijven bouwen reputatie. De cyclus verandert.</div>
-        <span class="lp-ta">⭐ Trust Score</span>
+      <div class="how-card lp-rev lp-d2">
+        <div class="how-h">Stagepact 2025</div>
+        <p class="how-p">Sinds december 2025 vraagt het Stagepact bedrijven tot aantoonbaar kwalitatief stagebeleid. Internly registreert automatisch wat je nodig hebt om te laten zien dat je je beloften nakomt.</p>
+        <span class="how-tag">Stagepact</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOE INTERNLY WERKT -->
+<section class="how-section">
+  <div class="how-inner">
+    <div class="section-eyebrow">Hoe het werkt</div>
+    <h2 class="section-title">Bedrijven die niet reageren, vallen af.</h2>
+    <p class="section-sub">Geen tips, geen hoop. Een systeem dat ghosting zichtbaar maakt en aanspreekbaar houdt.</p>
+
+    <div class="how-grid">
+      <div class="how-card lp-rev">
+        <div class="how-num">01</div>
+        <div class="how-h">Jij solliciteert</div>
+        <p class="how-p">Zoek op niveau, regio of sector. Zie de Trust Score van elk bedrijf vóórdat je solliciteert.</p>
+        <span class="how-tag">Gratis voor studenten</span>
+      </div>
+      <div class="how-card lp-rev lp-d1">
+        <div class="how-num">02</div>
+        <div class="how-h">Zij reageren — altijd.</div>
+        <p class="how-p">Bedrijven hebben een responsverplichting. Geen reactie = lagere Trust Score. Geen uitzonderingen.</p>
+        <span class="how-tag">⚡ Responsgarantie</span>
+      </div>
+      <div class="how-card lp-rev lp-d2">
+        <div class="how-num">03</div>
+        <div class="how-h">De markt corrigeert</div>
+        <p class="how-p">Slechte bedrijven worden zichtbaar. Goede bedrijven bouwen reputatie. De cyclus verandert.</p>
+        <span class="how-tag orange">⭐ Trust Score</span>
       </div>
     </div>
 
-    <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(13,26,16,.08);">
-      <div class="lp-lbl" style="margin-bottom:8px;">BBL-traject — anders dan een gewone stage</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
-
-        <div class="lp-hcard lp-rev" style="border-top-color:#5dcaa5;">
-          <div class="lp-hn" style="color:rgba(93,202,165,.22);">01</div>
-          <div class="lp-hh">Je werkt al</div>
-          <div class="lp-hp">Je hebt een contract bij je leerbedrijf. Je zoekt geen stage — je beheert je traject.</div>
-          <span class="lp-tg" style="background:rgba(93,202,165,.15);color:#0f6e56;">BBL</span>
+    <!-- BBL sub-block -->
+    <div class="bbl-block">
+      <div class="bbl-eyebrow">BBL-traject</div>
+      <h3 class="bbl-title">Werk je al? Dan beheer je je traject — niet je sollicitatie.</h3>
+      <div class="how-grid">
+        <div class="how-card lp-rev">
+          <div class="how-num" style="color: rgba(26,122,72,.18);">01</div>
+          <div class="how-h">Je werkt al</div>
+          <p class="how-p">Je hebt een contract bij je leerbedrijf. Je zoekt geen stage — je beheert je traject.</p>
+          <span class="how-tag">BBL</span>
         </div>
-
-        <div class="lp-hcard lp-rev lp-d1" style="border-top-color:#5dcaa5;">
-          <div class="lp-hn" style="color:rgba(93,202,165,.22);">02</div>
-          <div class="lp-hh">Jouw rechten</div>
-          <div class="lp-hp">Je leerbedrijf moet 90 dagen vóór het einde beslissen over verlenging. Internly houdt die deadline bij.</div>
-          <span class="lp-tg" style="background:rgba(93,202,165,.15);color:#0f6e56;">Wettelijk recht</span>
+        <div class="how-card lp-rev lp-d1">
+          <div class="how-num" style="color: rgba(26,122,72,.18);">02</div>
+          <div class="how-h">Jouw rechten</div>
+          <p class="how-p">Je leerbedrijf moet 90 dagen vóór het einde beslissen over verlenging. Internly bewaakt die deadline.</p>
+          <span class="how-tag">Wettelijk recht</span>
         </div>
-
-        <div class="lp-hcard lp-rev lp-d2" style="border-top-color:#5dcaa5;">
-          <div class="lp-hn" style="color:rgba(93,202,165,.22);">03</div>
-          <div class="lp-hh">Jouw beoordeling</div>
-          <div class="lp-hp">Je beoordeling van je leerbedrijf blijft anoniem tot na je contract. Zodat jij eerlijk kunt zijn.</div>
-          <span class="lp-tg" style="background:rgba(93,202,165,.15);color:#0f6e56;">Privé &amp; beschermd</span>
+        <div class="how-card lp-rev lp-d2">
+          <div class="how-num" style="color: rgba(26,122,72,.18);">03</div>
+          <div class="how-h">Jouw beoordeling</div>
+          <p class="how-p">Je beoordeling van je leerbedrijf blijft anoniem tot na je contract. Zodat jij eerlijk kunt zijn.</p>
+          <span class="how-tag">Privé &amp; beschermd</span>
         </div>
-
       </div>
     </div>
-
   </div>
 </section>
 
-<!-- ── ESG BAND ──────────────────────────────────────────────────────────── -->
-<div class="lp-esg lp-rev">
-  <div class="lp-esg-l">
-    <div class="lp-esg-ico">📊</div>
-    <div>
-      <div class="lp-esg-h">Voor bedrijven: ESG-data die stand houdt</div>
-      <div class="lp-esg-p">Grote bedrijven zijn verplicht sociaal beleid te rapporteren (CSRD). Internly levert traceerbare data over investering in jong talent — bruikbaar als onderbouwing in het ESG-verslag.</div>
+<!-- ESG band -->
+<section class="esg-band">
+  <div class="esg-inner">
+    <div class="esg-content">
+      <div class="esg-h">Voor bedrijven: ESG-data die stand houdt</div>
+      <div class="esg-p">Grote bedrijven zijn verplicht sociaal beleid te rapporteren (CSRD). Internly levert traceerbare data over investering in jong talent — bruikbaar als onderbouwing in het ESG-verslag.</div>
     </div>
+    <a class="btn-esg" href="/esg-rapportage.html">Lees wat wij leveren →</a>
   </div>
-  <a class="btn-esg" href="/esg-rapportage.html">Lees wat wij leveren →</a>
+</section>
+
+<!-- AL EERDER GESOLLICITEERD -->
+<div class="prev-band">
+  <span class="prev-band-lbl">Al eerder gesolliciteerd?</span>
+  <a href="mijn-sollicitaties.html">Bekijk je sollicitaties →</a>
+  <a href="matches.html">Mijn matches →</a>
 </div>
 
-<!-- ── PREV USER ─────────────────────────────────────────────────────────── -->
-<div class="lp-prev">
-  <span class="lp-prev-lbl">Al eerder gesolliciteerd?</span>
-  <div class="lp-prev-links">
-    <a href="mijn-sollicitaties.html">Bekijk je sollicitaties →</a>
-    <a href="matches.html">Mijn matches →</a>
+<!-- SIMULATOR -->
+<section class="sim-section anim-card">
+  <div class="sim-inner">
+    <div class="sim-eyebrow">🎮 Interactieve simulator</div>
+    <h2 class="sim-h">Overleef jij je <em>eerste stageweek?</em></h2>
+    <p class="sim-sub">Maandag 08:47. Je loopt voor het eerst het kantoor van Vandaag Agency binnen. Elke keuze telt — van je eerste standup tot hoe laat je thuiskomt op woensdag.</p>
+
+    <div class="sim-chat" aria-hidden="true">
+      <div class="sim-chat-head">
+        <div class="sim-avatar">M</div>
+        <div>
+          <div class="sim-chat-name">Mara · Mentor</div>
+          <div class="sim-chat-meta">Dag 1 — Maandag</div>
+        </div>
+      </div>
+      <div class="sim-bubble-in">Hoi! Heb je de briefing al gelezen?</div>
+      <div class="sim-options">
+        <div class="sim-opt"><span class="sim-opt-letter">A</span>"Ja, helemaal."</div>
+        <div class="sim-opt"><span class="sim-opt-letter">B</span>"Ik ben er net mee bezig."</div>
+        <div class="sim-opt"><span class="sim-opt-letter">C</span>"Welke briefing?"</div>
+      </div>
+      <div class="sim-note">jouw keuze bepaalt je eindscore</div>
+    </div>
+
+    <div class="sim-chips">
+      <span class="sim-chip">📅 5 stagedagen</span>
+      <span class="sim-chip">🎯 65+ keuze-scènes</span>
+      <span class="sim-chip">🏁 3 einduitslagen</span>
+      <span class="sim-chip">⚡ Geen account nodig</span>
+    </div>
+
+    <a href="internly_simulator.html" class="btn-simulator">🎮 Speel de stage-simulator →</a>
+    <p class="sim-foot">Gratis · Speelt in je browser · ~10 minuten</p>
+    <p class="sim-followup">Na de simulator zie je meteen wat Internly voor jou kan betekenen — als student, bedrijf of school.</p>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="nl-section anim-card">
+  <div class="nl-inner">
+    <div class="nl-eyebrow">123 Go — vroege toegang</div>
+    <h2 class="nl-h">Wil je weten wanneer Internly live gaat?</h2>
+    <p class="nl-p">Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal één mail per maand.</p>
+
+    <div id="hero-wl-form">
+      <input type="email" id="hero-wl-email" placeholder="jouw@email.nl"
+             onkeydown="if(event.key==='Enter')schrijfInHero()">
+      <button onclick="schrijfInHero()" id="hero-wl-btn">Schrijf je in →</button>
+    </div>
+
+    <div id="hero-wl-success">Je staat op de lijst! We houden je op de hoogte.</div>
+    <div id="hero-wl-error"></div>
+
+    <p class="nl-foot">
+      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html">privacybeleid</a>. Altijd makkelijk uitschrijven.
+    </p>
+  </div>
+</section>
+
+<!-- WAITLIST POPUP -->
+<div id="waitlist-overlay"></div>
+<div id="waitlist-popup">
+  <div class="wl-popup-head">
+    <button class="wl-popup-close" onclick="sluitPopup()" aria-label="Sluiten">×</button>
+    <div class="wl-popup-brand">intern<span>ly</span></div>
+    <div class="wl-popup-sub">Blijf op de hoogte van de ontwikkeling</div>
+  </div>
+  <div class="wl-popup-body">
+    <p>Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.</p>
+    <p class="muted">Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.</p>
+
+    <div id="wl-form">
+      <input type="email" id="wl-email" placeholder="jouw@email.nl"
+             onkeydown="if(event.key==='Enter')schrijfIn()">
+      <button onclick="schrijfIn()" id="wl-btn">Houd me op de hoogte →</button>
+    </div>
+
+    <div id="wl-success">
+      <div class="check">🎉</div>
+      <div id="wl-success-h">Je staat op de lijst!</div>
+      <div id="wl-success-p">We houden je op de hoogte van alle ontwikkelingen.</div>
+    </div>
+    <div id="wl-error"></div>
+
+    <p class="wl-popup-foot">
+      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html">privacybeleid</a>.
+    </p>
   </div>
 </div>
 
-<!-- ── STAGE SIMULATOR ────────────────────────────────────────────────────── -->
-<section class="anim-card" style="background:#0d1520;padding:80px 24px;overflow:hidden;position:relative;">
-
-  <!-- achtergrond grid-sfeer -->
-  <div aria-hidden="true" style="
-    position:absolute;inset:0;
-    background-image:
-      linear-gradient(rgba(26,122,72,.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(26,122,72,.08) 1px, transparent 1px);
-    background-size:40px 40px;
-    pointer-events:none;">
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">intern<span>ly</span></div>
+    <ul class="footer-links">
+      <li><a href="about.html">Over ons</a></li>
+      <li><a href="kennisbank.html">Kennisbank</a></li>
+      <li><a href="pricing.html">Prijzen</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="privacybeleid.html">Privacybeleid</a></li>
+      <li><a href="spelregels.html">Spelregels</a></li>
+      <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
+      <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
   </div>
+</footer>
 
-  <div style="max-width:760px;margin:0 auto;text-align:center;position:relative;z-index:1;">
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none"></div>
 
-    <!-- label -->
-    <div style="
-      display:inline-flex;align-items:center;gap:7px;
-      background:rgba(255,126,66,.12);border:1px solid rgba(255,126,66,.3);
-      border-radius:50px;padding:5px 14px;margin-bottom:24px;">
-      <span style="font-size:.85rem;">🎮</span>
-      <span style="font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;
-        letter-spacing:.1em;text-transform:uppercase;color:#FF7E42;">
-        Interactieve simulator
-      </span>
-    </div>
-
-    <!-- kop -->
-    <h2 style="
-      font-family:'Bricolage Grotesque',sans-serif;
-      font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;
-      color:#fff;line-height:1.15;margin:0 0 18px;letter-spacing:-.02em;">
-      Overleef jij je<br><em style="font-style:italic;color:#FF7E42;">eerste stageweek?</em>
-    </h2>
-
-    <p style="font-family:'Outfit',sans-serif;font-size:1rem;color:rgba(255,255,255,.6);
-      line-height:1.7;max-width:520px;margin:0 auto 36px;">
-      Maandag 08:47. Je loopt voor het eerst het kantoor van Vandaag Agency binnen.
-      Elke keuze telt — van je eerste standup tot hoe laat je thuiskomt op woensdag.
-    </p>
-
-    <!-- terminal-preview -->
-    <div style="
-      background:#111927;border:1px solid rgba(255,255,255,.1);border-radius:14px;
-      padding:20px 24px;margin:0 auto 36px;max-width:520px;text-align:left;
-      font-family:'Courier New',monospace;font-size:.85rem;line-height:1.8;
-      color:rgba(255,255,255,.55);">
-      <div style="display:flex;gap:6px;margin-bottom:14px;">
-        <span style="width:11px;height:11px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
-        <span style="width:11px;height:11px;border-radius:50%;background:#febc2e;display:inline-block;"></span>
-        <span style="width:11px;height:11px;border-radius:50%;background:#28c840;display:inline-block;"></span>
-      </div>
-      <div><span style="color:#1a7a48;">›</span> <span style="color:#fff;">Dag 1 — Maandag</span></div>
-      <div style="margin-top:6px;color:rgba(255,255,255,.45);">
-        Je mentor Mara kijkt je aan. "Heb je de briefing al gelezen?"
-      </div>
-      <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
-        <span style="color:#FF7E42;">[ A ]</span> <span>"Ja, helemaal."</span>
-        <span style="color:#FF7E42;">[ B ]</span> <span>"Ik ben er net mee bezig."</span>
-        <span style="color:#FF7E42;">[ C ]</span> <span>"Welke briefing?"</span>
-      </div>
-      <div style="margin-top:12px;color:#1a7a48;font-size:.75rem;">▋ jouw keuze bepaalt je eindscore</div>
-    </div>
-
-    <!-- chips -->
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:36px;">
-      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
-        font-size:.8rem;color:rgba(255,255,255,.6);">📅 5 stagedagen</span>
-      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
-        font-size:.8rem;color:rgba(255,255,255,.6);">🌿 65+ keuze-scènes</span>
-      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
-        font-size:.8rem;color:rgba(255,255,255,.6);">🏆 3 einduitslagen</span>
-      <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-        border-radius:50px;padding:6px 16px;font-family:'Outfit',sans-serif;
-        font-size:.8rem;color:rgba(255,255,255,.6);">⚡ Geen account nodig</span>
-    </div>
-
-    <!-- CTA -->
-    <a href="internly_simulator.html" class="btn-simulator">
-      🎮 Speel de stage-simulator →
-    </a>
-
-    <p style="margin-top:14px;font-family:'Outfit',sans-serif;font-size:.78rem;
-      color:rgba(255,255,255,.3);">
-      Gratis · Speelt in je browser · ~10 minuten
-    </p>
-    <p class="sim-followup" style="margin-top:20px;font-family:'Outfit',sans-serif;font-size:.85rem;
-      color:rgba(255,255,255,.55);max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6;">
-      Na de simulator zie je meteen wat Internly voor jou kan betekenen — als student, bedrijf of school.
-    </p>
-
-  </div>
-</section>
-<!-- ── EINDE STAGE SIMULATOR ──────────────────────────────────────────────── -->
-
-<!-- ── BLIJF OP DE HOOGTE ──────────────────────────────────────────────────── -->
-<section class="anim-card" style="background:#f4f3ef;padding:80px 24px;">
-  <div style="max-width:560px;margin:0 auto;text-align:center;">
-    <div class="lp-nl-eyebrow">🚀 123 Go — vroege toegang voor stagebegeleiders</div>
-    <p style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#1a7a48;margin-bottom:14px;">Geen spam, beloofd</p>
-    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.6rem,3vw,2.1rem);font-weight:700;color:#0d1520;line-height:1.2;margin-bottom:14px;">
-      Wil je weten wanneer Internly live gaat?
-    </h2>
-    <p style="font-size:.95rem;color:#6b7280;line-height:1.65;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;">
-      Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal één mail per maand.
-    </p>
-
-    <div id="hero-wl-form" style="display:flex;gap:8px;max-width:440px;margin:0 auto 12px;">
-      <input type="email" id="hero-wl-email" placeholder="jouw@email.nl" style="
-        flex:1;padding:12px 18px;
-        border:1.5px solid #e2e8f0;border-radius:50px;
-        font-family:'Outfit',sans-serif;font-size:.95rem;
-        color:#0d1520;outline:none;box-sizing:border-box;
-        transition:border-color .15s;"
-        onfocus="this.style.borderColor='#1a7a48'"
-        onblur="this.style.borderColor='#e2e8f0'"
-        onkeydown="if(event.key==='Enter')schrijfInHero()">
-      <button onclick="schrijfInHero()" id="hero-wl-btn" style="
-        padding:12px 22px;
-        background:#FF7E42;color:#fff;border:none;border-radius:50px;
-        font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;
-        cursor:pointer;white-space:nowrap;flex-shrink:0;
-        transition:background .15s;">
-        Schrijf je in →
-      </button>
-    </div>
-
-    <div id="hero-wl-success" style="display:none;padding:14px 0;">
-      <span style="font-size:.95rem;font-weight:600;color:#1a7a48;">Je staat op de lijst! We houden je op de hoogte.</span>
-    </div>
-
-    <div id="hero-wl-error" style="display:none;color:#b82020;font-size:.85rem;margin-top:6px;"></div>
-
-    <p style="font-size:.72rem;color:#b0b7c3;margin-top:10px;">
-      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html" style="color:#b0b7c3;text-decoration:underline;">privacybeleid</a>. Altijd makkelijk uitschrijven.
-    </p>
-  </div>
-</section>
-<!-- ── EINDE BLIJF OP DE HOOGTE ───────────────────────────────────────────── -->
-
+<!-- Scripts -->
 <script src="js/utils.js"></script>
+<script src="js/roles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
-<script src="js/telemetry.js"></script>
+<script src="js/toast.js"></script>
 <script>
-// ── AUTH GATE ── ingelogde users → rol pagina, niet-ingelogd → marketing ──
+  // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+  window._fCtx = {
+    _init: function(p) {
+      console.warn('[telemetry] js/telemetry.js niet geladen, ' +
+                   'bescherming inactief op pagina: ' + p);
+    },
+    _plant: function() {},
+    _guard: function() { return true; },
+    blockIfFilled: function() { return false; }
+  };
+</script>
+<script src="js/telemetry.js"></script>
+
+<script>
+// ── AUTH GATE ── ingelogde users → rol-pagina, niet-ingelogd → marketing ──
 (async () => {
   try {
     const { data: { user } } = await db.auth.getUser();
@@ -1147,6 +1856,7 @@
   }
 })();
 
+// ── ROLE PICKER ──
 let selectedRole = null;
 
 function selectRole(role) {
@@ -1163,11 +1873,11 @@ const _roleDesc = {
 };
 
 const _roleMicro = {
-  student: '✓ Gratis voor studenten \u00a0·\u00a0 Geen account vereist \u00a0·\u00a0 Nu zoeken',
-  bedrijf: '✓ Abonnement \u00a0·\u00a0 Publiceer opdrachten \u00a0·\u00a0 Vind stagiairs',
-  school:  '✓ Freemium \u00a0·\u00a0 Monitor studenten \u00a0·\u00a0 Direct inzicht',
-  bbl:     '✓ Gratis voor BBL-studenten \u00a0·\u00a0 Beheer je traject \u00a0·\u00a0 Ken je rechten',
-  buddy:   '✓ Volledig vrijwillig \u00a0·\u00a0 Jij bepaalt je beschikbaarheid \u00a0·\u00a0 Anoniem tot jij bevestigt'
+  student: '✓ Gratis voor studenten  ·  Geen account vereist  ·  Nu zoeken',
+  bedrijf: '✓ Abonnement  ·  Publiceer opdrachten  ·  Vind stagiairs',
+  school:  '✓ Freemium  ·  Monitor studenten  ·  Direct inzicht',
+  bbl:     '✓ Gratis voor BBL-studenten  ·  Beheer je traject  ·  Ken je rechten',
+  buddy:   '✓ Volledig vrijwillig  ·  Jij bepaalt je beschikbaarheid  ·  Anoniem tot jij bevestigt'
 };
 
 const _roleExplore = {
@@ -1183,10 +1893,10 @@ function pickRole(el, role) {
     t.classList.remove('on');
     t.setAttribute('aria-pressed','false');
   });
-  el.classList.add('on');
-  el.classList.add('pulse');
-  el.setAttribute('aria-pressed','true');
-  el.addEventListener('animationend', function() { el.classList.remove('pulse'); }, { once: true });
+  if (el) {
+    el.classList.add('on');
+    el.setAttribute('aria-pressed','true');
+  }
 
   var buddyStrip = document.getElementById('rt-buddy-strip');
   if (buddyStrip) {
@@ -1225,7 +1935,7 @@ function enterApp() {
 }
 
 async function schrijfInHero() {
-  if (typeof _fCtx !== 'undefined' && _fCtx.blockIfFilled('hero-waitlist')) return;
+  if (_fCtx.blockIfFilled('hero-waitlist')) return;
   const email = document.getElementById('hero-wl-email').value.trim();
   const btn   = document.getElementById('hero-wl-btn');
   const err   = document.getElementById('hero-wl-error');
@@ -1273,88 +1983,11 @@ async function schrijfInHero() {
     err.style.display = 'block';
   }
 }
-</script>
 
-<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
-<div id="waitlist-overlay" style="
-  display:none; position:fixed; inset:0; z-index:9998;
-  background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
-  align-items:center; justify-content:center; padding:24px;">
-</div>
-
-<div id="waitlist-popup" style="
-  display:none; position:fixed; z-index:9999;
-  top:50%; left:50%; transform:translate(-50%,-50%);
-  background:#fff; border-radius:20px;
-  width:100%; max-width:440px;
-  box-shadow:0 24px 60px rgba(0,0,0,.18);
-  overflow:hidden; font-family:'Outfit',sans-serif;">
-
-  <!-- Header -->
-  <div style="background:linear-gradient(135deg,#1a7a48,#0f5c36);padding:28px 32px 24px;position:relative;">
-    <button onclick="sluitPopup()" style="
-      position:absolute;top:14px;right:16px;
-      background:rgba(255,255,255,.15);border:none;
-      color:#fff;width:28px;height:28px;border-radius:50%;
-      font-size:1rem;cursor:pointer;line-height:1;
-      display:flex;align-items:center;justify-content:center;">×</button>
-    <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
-      intern<span style="color:#FF7E42;">ly</span>
-    </div>
-    <div style="font-size:.82rem;color:rgba(255,255,255,.65);">
-      Blijf op de hoogte van de ontwikkeling
-    </div>
-  </div>
-
-  <!-- Body -->
-  <div style="padding:28px 32px 32px;">
-    <p style="font-size:.95rem;color:#374151;line-height:1.7;margin:0 0 8px;">
-      Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
-    </p>
-    <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
-      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
-    </p>
-
-    <div id="wl-form">
-      <input type="email" id="wl-email" placeholder="jouw@email.nl" style="
-        width:100%;padding:11px 16px;
-        border:1.5px solid #e2e8f0;border-radius:10px;
-        font-family:'Outfit',sans-serif;font-size:.95rem;
-        color:#0d1520;outline:none;box-sizing:border-box;
-        transition:border-color .15s;margin-bottom:10px;"
-        onfocus="this.style.borderColor='#1a7a48'"
-        onblur="this.style.borderColor='#e2e8f0'"
-        onkeydown="if(event.key==='Enter')schrijfIn()">
-      <button onclick="schrijfIn()" id="wl-btn" style="
-        width:100%;padding:12px;
-        background:#FF7E42;color:#fff;border:none;
-        border-radius:50px;font-family:'Outfit',sans-serif;
-        font-size:.95rem;font-weight:700;cursor:pointer;
-        transition:background .15s;">
-        Houd me op de hoogte →
-      </button>
-    </div>
-
-    <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
-      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
-      <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
-      <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
-    </div>
-
-    <div id="wl-error" style="display:none;margin-top:8px;
-      background:#fdeaea;color:#b82020;border-radius:8px;
-      padding:8px 14px;font-size:.82rem;"></div>
-
-    <p style="font-size:.72rem;color:#9ca3af;text-align:center;margin:16px 0 0;">
-      Door je in te schrijven ga je akkoord met ons <a href="privacybeleid.html" style="color:#9ca3af;text-decoration:underline;">privacybeleid</a>.
-    </p>
-  </div>
-</div>
-
-<script>
+// ── WAITLIST POPUP ──
 (function() {
   if (!localStorage.getItem('internly_waitlist_seen')) {
-    setTimeout(function() { toonPopup(); }, 8000);
+    setTimeout(function() { toonPopup(); }, 12000);
   }
 
   function toonPopup() {
@@ -1363,17 +1996,17 @@ async function schrijfInHero() {
     localStorage.setItem('internly_waitlist_seen', '1');
   }
 
-  if (typeof _fCtx !== 'undefined') _fCtx._plant(document.getElementById('hero-wl-form'));
+  _fCtx._plant(document.getElementById('hero-wl-form'));
   window.sluitPopup = function() {
     document.getElementById('waitlist-overlay').style.display = 'none';
     document.getElementById('waitlist-popup').style.display  = 'none';
   };
 
   document.getElementById('waitlist-overlay').addEventListener('click', sluitPopup);
-  if (typeof _fCtx !== 'undefined') _fCtx._plant(document.getElementById('wl-form'));
+  _fCtx._plant(document.getElementById('wl-form'));
 
   window.schrijfIn = async function() {
-    if (typeof _fCtx !== 'undefined' && _fCtx.blockIfFilled('popup-waitlist')) return;
+    if (_fCtx.blockIfFilled('popup-waitlist')) return;
     const email = document.getElementById('wl-email').value.trim();
     const btn   = document.getElementById('wl-btn');
     const err   = document.getElementById('wl-error');
@@ -1423,12 +2056,8 @@ async function schrijfInHero() {
     }
   };
 })();
-</script>
-<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
 
-<!-- Google Translate Widget -->
-<div id="google_translate_element" style="display:none"></div>
-<script>
+// ── Google Translate widget ──
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
     pageLanguage: 'nl',
@@ -1437,7 +2066,6 @@ function googleTranslateElementInit() {
     autoDisplay: false
   }, 'google_translate_element');
 }
-
 function switchLang(lang) {
   const select = document.querySelector('.goog-te-combo');
   if (select) {
@@ -1449,8 +2077,10 @@ function switchLang(lang) {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
 }
-
 window.addEventListener('load', function() {
+  // Telemetry init — zie CLAUDE.md voor codenames
+  _fCtx._init('index');
+
   const saved = localStorage.getItem('internly_lang') || 'nl';
   document.querySelectorAll('.lang-btn').forEach(function(b) {
     b.classList.toggle('active', b.dataset.lang === saved);
@@ -1463,30 +2093,10 @@ window.addEventListener('load', function() {
 <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script>
-// ── Scroll-triggered animations (IntersectionObserver) ──────────────────────
-(function() {
-  if (!('IntersectionObserver' in window)) {
-    // Fallback: just show everything
-    document.querySelectorAll('.anim-card').forEach(el => el.classList.add('visible'));
-    return;
-  }
-  const obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.08 });
-  document.querySelectorAll('.anim-card').forEach(el => obs.observe(el));
-})();
-</script>
-<script>
-/* lp-landing.js — Step 10 */
+// ── Scroll-triggered animations + niveau/role state + strikethrough ──
 (function () {
   'use strict';
 
-  /* ── state ── */
   var lp = { role: 'student', niveau: 'mbo' };
 
   /* ── niveau pills ── */
@@ -1501,14 +2111,13 @@ window.addEventListener('load', function() {
     lpUpdateBtn();
   };
 
-  /* ── role tiles (fallback — primary path goes through pickRole) ── */
+  /* ── role tiles fallback (primary path = pickRole) ── */
   window.lpPickTile = function (role) {
     lp.role = role;
     document.querySelectorAll('.rt').forEach(function (t) { t.classList.remove('on'); });
     var active = document.querySelector('.rt[data-role="' + role + '"]');
     if (active) active.classList.add('on');
 
-    /* update description */
     var descs = {
       student: 'Ik wil een stage vinden die écht bij mij past — op basis van mijn leerdoelen en ambities.',
       bedrijf: 'Ik wil gemotiveerde stagiairs vinden en laten zien dat mijn bedrijf investeert in jongeren.',
@@ -1518,105 +2127,61 @@ window.addEventListener('load', function() {
     };
     var descEl = document.getElementById('lp-role-desc');
     if (descEl) descEl.innerHTML = descs[role] || '';
-
-    /* swap rc- class */
     if (descEl) {
       descEl.className = descEl.className.replace(/rc-\w+/g, '');
       descEl.classList.add('rc-' + role);
     }
 
-    /* also call existing selectRole if tiles are used alongside legacy picker */
     if (typeof selectRole === 'function') selectRole(role);
     lpUpdateBtn();
   };
 
-  /* ── update CTA button label ── */
+  /* ── CTA label ── */
   window.lpUpdateBtn = function () {
     var btn = document.getElementById('lp-enter-btn');
     if (!btn) return;
-
-    var niveauLabel = { bbl: 'BBL', mbo: 'MBO', hbo: 'HBO', wo: 'WO' }[lp.niveau] || lp.niveau.toUpperCase();
-    var roleLabel   = { student: 'Student', bedrijf: 'Bedrijf', school: 'School', bbl: 'BBL-student', buddy: 'Buddy' }[lp.role] || lp.role;
-
-    if (lp.role === 'bbl') {
-      btn.textContent = 'Maak BBL-profiel aan \u2192';
-    } else if (lp.role === 'buddy') {
-      btn.textContent = 'Word gepensioneerde buddy \u2192';
-    } else if (lp.role === 'student') {
-      btn.textContent = 'Maak nu een profiel aan \u2192';
-    } else if (lp.role === 'bedrijf') {
-      btn.textContent = 'Plaats je eerste stageplek \u2192';
-    } else {
-      btn.textContent = 'Beheer stages als ' + roleLabel + ' \u2192';
-    }
+    if (lp.role === 'bbl')        btn.textContent = 'Maak BBL-profiel aan →';
+    else if (lp.role === 'buddy') btn.textContent = 'Word gepensioneerde buddy →';
+    else if (lp.role === 'student') btn.textContent = 'Maak nu een profiel aan →';
+    else if (lp.role === 'bedrijf') btn.textContent = 'Plaats je eerste stageplek →';
+    else if (lp.role === 'school')  btn.textContent = 'Beheer stages als school →';
   };
 
   /* ── CTA navigate ── */
   window.lpGoToRole = function () {
     var role = lp.role;
-    if      (role === 'student')  { window.location.href = 'auth.html?mode=signup'; }
-    else if (role === 'bbl')      { window.location.href = 'auth.html?role=bbl'; }
-    else if (role === 'bedrijf')  { window.location.href = 'auth.html?role=bedrijf'; }
-    else if (role === 'school')   { window.location.href = 'auth.html?role=school'; }
-    else if (role === 'buddy')    { window.location.href = 'auth.html?role=gepensioneerd'; }
+    if      (role === 'student') window.location.href = 'auth.html?mode=signup';
+    else if (role === 'bbl')     window.location.href = 'auth.html?role=bbl';
+    else if (role === 'bedrijf') window.location.href = 'auth.html?role=bedrijf';
+    else if (role === 'school')  window.location.href = 'auth.html?role=school';
+    else if (role === 'buddy')   window.location.href = 'auth.html?role=gepensioneerd';
   };
 
-  /* ── expose lpSetRole so pickRole() can sync lp state ── */
   window.lpSetRole = function (role) { lp.role = role; lpUpdateBtn(); };
 
-  /* ── strikethrough animation — observe #hero, add .go to .struck ── */
-  var struckEl = document.getElementById('lp-struck') || document.querySelector('.struck');
+  /* ── strikethrough trigger ── */
+  var struckEl = document.getElementById('lp-struck');
   var heroEl   = document.getElementById('hero');
   if (struckEl && heroEl && 'IntersectionObserver' in window) {
     var strikeObs = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          setTimeout(function () { struckEl.classList.add('go'); }, 1000);
+          setTimeout(function () { struckEl.classList.add('go'); }, 800);
           strikeObs.disconnect();
         }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.3 });
     strikeObs.observe(heroEl);
   }
 
-  /* ═══ Phase 1.5 — notepad trigger ═══
-     Fires exactly when the strike's lp-strike animation ends.
-     No timers, no drift, no magic numbers. */
-  (function () {
-    const struck = document.getElementById('lp-struck');
-    const stage  = document.getElementById('haStage');
-    if (!struck || !stage) return;
-
-    struck.addEventListener('animationend', function onStrikeEnd(e) {
-      if (e.animationName === 'lp-strike') {
-        stage.classList.add('ha-active');
-        struck.removeEventListener('animationend', onStrikeEnd);
-      }
-    });
-
-    /* Waitlist CTA — opens the existing signup path.
-       If Barry has a named handler (e.g. toonPopup, openWaitlist),
-       replace the window.location line with the handler call. */
-    const cta = stage.querySelector('.ha-btn');
-    if (cta) {
-      cta.addEventListener('click', function (e) {
-        if (typeof window.toonPopup === 'function') {
-          e.preventDefault();
-          window.toonPopup();
-        }
-        /* else the href="#" stays. Barry to confirm destination
-           (auth.html? waitlist modal? #inschrijven anchor?). */
-      });
-    }
-  })();
-
-  /* ── scroll-reveal for .lp-rev elements ── */
-  var revEls = document.querySelectorAll('.lp-rev');
+  /* ── scroll-reveal voor .lp-rev en .anim-card ── */
+  var revEls = document.querySelectorAll('.lp-rev, .anim-card');
   if (revEls.length && 'IntersectionObserver' in window) {
     var revObs = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('lp-rev-on');
+          entry.target.classList.add('visible');
           revObs.unobserve(entry.target);
         }
       });
@@ -1624,38 +2189,10 @@ window.addEventListener('load', function() {
     revEls.forEach(function (el) { revObs.observe(el); });
   }
 
-  /* ── newsletter extra validation (Step 9 eyebrow) ── */
-  var nlForm = document.querySelector('.newsletter-form, form[id*="nl"], form[id*="newsletter"]');
-  if (nlForm) {
-    nlForm.addEventListener('submit', function (e) {
-      var emailInput = nlForm.querySelector('input[type="email"]');
-      if (emailInput && !emailInput.value.trim()) {
-        e.preventDefault();
-        emailInput.focus();
-      }
-    });
-  }
-
   /* init */
   lpUpdateBtn();
 })();
 </script>
 
-<!-- ── FOOTER ─────────────────────────────────────────────────────────────── -->
-<footer style="background:#0d1a10;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,.06);">
-  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.88rem;font-weight:700;color:rgba(255,255,255,.45);">intern<span style="color:#e05c1a;">ly</span></div>
-  <ul style="display:flex;gap:14px;list-style:none;margin:0;padding:0;">
-    <li><a href="about.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Over ons</a></li>
-    <li><a href="kennisbank.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Kennisbank</a></li>
-    <li><a href="pricing.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Prijzen</a></li>
-    <li><a href="faq.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">FAQ</a></li>
-    <li><a href="privacybeleid.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Privacybeleid</a></li>
-    <li><a href="spelregels.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Spelregels</a></li>
-    <li><a href="/esg-rapportage.html" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">ESG &amp; rapportage</a></li>
-    <li><a href="mailto:hallo@internly.pro" style="font-size:.71rem;color:rgba(255,255,255,.3);text-decoration:none;">Contact</a></li>
-  </ul>
-  <div style="font-size:.65rem;color:rgba(255,255,255,.18);">© 2026 Sasubo Holding B.V.</div>
-  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
-</footer>
 </body>
 </html>

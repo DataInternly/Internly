@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Over ons — Internly (voorbeeld)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-green-deep: #0f5c36; --c-green: #1a7a48; --c-green-glow: #22a85e;
+  --c-orange: #FF7E42; --c-orange-deep: #e05c1a;
+  --c-cream: #f4f3ef; --c-cream-warm: #fdfaf6; --c-ink: #0d1520;
+  --fg-primary: #0d1520; --fg-secondary: #2e4038; --fg-tertiary: #6b8070;
+  --line-subtle: rgba(13,26,16,.09); --line-default: rgba(13,26,16,.14);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 20px; --r-pill: 999px;
+  --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-script: 'Caveat', cursive;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body); color: var(--fg-primary);
+  background: var(--c-cream);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Topbar ── */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(244,243,239,.92);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-subtle);
+  padding: var(--s4) var(--s6);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.4rem;
+  letter-spacing: -.03em; color: var(--c-green-deep);
+  text-decoration: none;
+}
+.logo span { color: var(--c-orange-deep); }
+.topbar-nav { display: flex; gap: var(--s5); align-items: center; }
+.topbar-nav a {
+  font-size: .88rem; font-weight: 500;
+  color: var(--fg-secondary); text-decoration: none;
+  transition: color 120ms;
+}
+.topbar-nav a:hover { color: var(--c-orange-deep); }
+.topbar-cta {
+  font-family: var(--font-body); font-size: .85rem; font-weight: 600;
+  background: var(--c-orange-deep); color: #fff;
+  padding: 8px 18px; border-radius: var(--r-pill);
+  text-decoration: none;
+  transition: background 120ms;
+}
+.topbar-cta:hover { background: #b94613; }
+
+/* ── Mini hero ── */
+.mini-hero {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
+    linear-gradient(148deg, #1e8a52 0%, #1a7a48 42%, #145e38 100%);
+  color: #fff;
+  padding: var(--s8) var(--s5) var(--s7);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.mini-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  background-size: 200px 200px; opacity: .035;
+  mix-blend-mode: overlay; pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: var(--font-script);
+  font-size: 1.2rem; color: rgba(255,126,66,.95);
+  display: inline-block; transform: rotate(-1deg);
+  margin-bottom: 6px;
+}
+.hero-title {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(2rem, 4.4vw, 3.4rem);
+  letter-spacing: -.03em; line-height: 1.1;
+  max-width: 760px; margin: 0 auto 10px;
+}
+.hero-title em { font-style: italic; color: #FF7E42; }
+.hero-sub {
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  color: rgba(255,255,255,.78);
+  max-width: 580px; margin: 0 auto;
+}
+
+/* ── Breadcrumb / quick links ── */
+.breadcrumb {
+  background: var(--c-cream-warm);
+  border-bottom: 1px solid var(--line-subtle);
+  padding: var(--s3) var(--s6);
+  font-family: var(--font-mono); font-size: .76rem;
+  color: var(--fg-tertiary);
+}
+.breadcrumb a {
+  color: var(--fg-tertiary); text-decoration: none;
+  transition: color 120ms;
+}
+.breadcrumb a:hover { color: var(--c-orange-deep); }
+.breadcrumb .sep { margin: 0 var(--s2); color: var(--line-default); }
+
+/* ── Reading column ── */
+.reading-frame {
+  max-width: 760px; margin: 0 auto;
+  padding: var(--s8) var(--s5);
+}
+.reading-frame h2 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  letter-spacing: -.02em; line-height: 1.2;
+  margin: var(--s7) 0 var(--s4);
+}
+.reading-frame h2:first-child { margin-top: 0; }
+.reading-frame h3 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 1.2rem;
+  margin: var(--s6) 0 var(--s3);
+}
+.reading-frame p {
+  font-size: 1.02rem;
+  color: var(--fg-secondary);
+  margin-bottom: var(--s4);
+  max-width: 64ch;
+}
+.reading-frame strong { color: var(--fg-primary); font-weight: 600; }
+.reading-frame a {
+  color: var(--c-orange-deep);
+  text-decoration: underline; text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.lead {
+  font-size: 1.18rem !important;
+  color: var(--fg-primary) !important;
+  font-weight: 400;
+  line-height: 1.6;
+  border-left: 3px solid var(--c-orange-deep);
+  padding-left: var(--s5);
+  font-style: italic;
+}
+
+/* Pull-quote */
+.pull-quote {
+  margin: var(--s7) 0;
+  padding: var(--s5);
+  background: var(--c-cream-warm);
+  border-radius: var(--r-md);
+  border-left: 4px solid var(--c-green);
+}
+.pull-quote p {
+  font-family: var(--font-display);
+  font-size: 1.4rem; font-weight: 600;
+  font-style: italic; color: var(--c-green-deep);
+  letter-spacing: -.01em;
+  margin-bottom: var(--s2) !important;
+  line-height: 1.4;
+}
+.pull-quote cite {
+  font-family: var(--font-mono); font-size: .76rem;
+  color: var(--fg-tertiary); font-style: normal;
+  letter-spacing: .04em;
+}
+
+/* Inline three-up */
+.three-up {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4); margin: var(--s6) 0;
+}
+.three-up-card {
+  background: #fff;
+  border: 1px solid var(--line-subtle);
+  border-top: 3px solid var(--c-green);
+  border-radius: var(--r-md);
+  padding: var(--s5);
+  transition: transform 120ms, box-shadow 120ms;
+}
+.three-up-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+.three-up-card h4 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: .98rem; margin-bottom: 6px;
+}
+.three-up-card p {
+  font-size: .88rem !important;
+  color: var(--fg-tertiary) !important;
+  margin-bottom: 0 !important;
+  line-height: 1.6;
+}
+
+/* CTA band */
+.cta-band {
+  background: var(--c-ink); color: #fff;
+  padding: var(--s7) var(--s5);
+  text-align: center;
+}
+.cta-band h2 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  margin-bottom: var(--s3);
+  letter-spacing: -.02em;
+}
+.cta-band p {
+  color: rgba(255,255,255,.72);
+  max-width: 460px; margin: 0 auto var(--s5);
+}
+.btn-primary {
+  display: inline-block;
+  font-family: var(--font-body); font-size: 1rem; font-weight: 600;
+  background: var(--c-orange-deep); color: #fff;
+  padding: 14px 32px; border-radius: var(--r-pill);
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(255,126,66,.32);
+  transition: background 120ms, transform 120ms;
+}
+.btn-primary:hover { background: #b94613; transform: translateY(-1px); }
+
+/* Footer (gedeeld met homepage) */
+.site-footer {
+  background: #0d1a10;
+  padding: var(--s4) var(--s6);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: var(--s2);
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.footer-logo {
+  font-family: var(--font-display); font-weight: 700; font-size: .88rem;
+  color: rgba(255,255,255,.45);
+}
+.footer-logo span { color: var(--c-orange-deep); }
+.footer-links {
+  display: flex; gap: var(--s4); list-style: none;
+}
+.footer-links a {
+  font-size: .72rem; color: rgba(255,255,255,.3);
+  text-decoration: none;
+}
+.footer-links a:hover { color: rgba(255,255,255,.7); }
+.footer-meta { font-size: .65rem; color: rgba(255,255,255,.18); }
+
+@media (max-width: 720px) {
+  .topbar { padding: var(--s3) var(--s4); }
+  .topbar-nav { display: none; }
+  .three-up { grid-template-columns: 1fr; }
+  .reading-frame { padding: var(--s6) var(--s4); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<header class="topbar">
+  <a href="/" class="logo">intern<span>ly</span></a>
+  <nav class="topbar-nav">
+    <a href="/about.html">Over ons</a>
+    <a href="/kennisbank.html">Kennisbank</a>
+    <a href="/pricing.html">Prijzen</a>
+    <a href="/faq.html">FAQ</a>
+    <a href="/auth.html" class="topbar-cta">Inloggen</a>
+  </nav>
+</header>
+
+<!-- ── Mini hero ── -->
+<section class="mini-hero">
+  <span class="hero-eyebrow">over Internly</span>
+  <h1 class="hero-title">
+    Stages zonder <em>ghosting</em>.
+  </h1>
+  <p class="hero-sub">
+    We bouwen aan een eerlijker stagemarkt. Voor studenten, voor bedrijven die het goed doen, voor scholen die mee willen kijken.
+  </p>
+</section>
+
+<!-- ── Breadcrumb ── -->
+<div class="breadcrumb">
+  <a href="/">home</a>
+  <span class="sep">/</span>
+  <a href="/about.html">over ons</a>
+</div>
+
+<!-- ── Reading column ── -->
+<main class="reading-frame">
+
+  <p class="lead">
+    77 procent van de stagiairs wordt geghost. Eén op de tien MBO-studenten ervaart discriminatie. Internly bestaat omdat dat anders kan, en omdat een Trust Score systeem dat publiek is meer doet dan honderd intentieverklaringen.
+  </p>
+
+  <h2>Waarom we begonnen</h2>
+  <p>
+    Een stage is een moment van vertrouwen. De student investeert tijd, hoop en eigen geld. Het bedrijf belooft iets terug — begeleiding, een echte plek, een eerlijke beoordeling. Dat contract werd jaren stilzwijgend verbroken zonder dat iemand het zag, omdat geen enkel platform de weigering of het zwijgen zichtbaar maakte. Internly maakt dat zichtbaar.
+  </p>
+
+  <p>
+    Sinds december 2025 is het Stagepact wet. Bedrijven moeten kwalitatief stagebeleid kunnen aantonen. Wij registreren automatisch wat scholen, studenten en de wetgever willen weten — geen extra werk voor het bedrijf dat zich gewoon aan de afspraken houdt.
+  </p>
+
+  <h2>Hoe het werkt</h2>
+
+  <div class="three-up">
+    <article class="three-up-card">
+      <h4>Trust Score</h4>
+      <p>Bedrijven krijgen een publiek cijfer op basis van hun reactietijd, follow-through, en hoe studenten ze beoordelen na afloop.</p>
+    </article>
+    <article class="three-up-card">
+      <h4>Responsverplichting</h4>
+      <p>Reactie verplicht binnen 14 dagen — anders daalt de Trust Score automatisch. Geen excuses.</p>
+    </article>
+    <article class="three-up-card">
+      <h4>Markt corrigeert</h4>
+      <p>Goede bedrijven bouwen reputatie. Slechte bedrijven worden zichtbaar. De cyclus verandert.</p>
+    </article>
+  </div>
+
+  <h2>Wat we niet zijn</h2>
+  <p>
+    We zijn geen vacaturebank en geen jobboard. Een stage is geen baan, dus we behandelen het ook niet zo. We zijn ook geen review-platform met beoordelingen die alle kanten op vallen — Trust Score is gebonden aan meetbare gedragingen, niet aan emoties van één boze student of bedrijf.
+  </p>
+
+  <div class="pull-quote">
+    <p>"40 mails. 0 reacties. Dat zou nergens normaal moeten zijn — en op Internly is het dat ook niet."</p>
+    <cite>— Internly missieverklaring, 2026</cite>
+  </div>
+
+  <h2>Wie we zijn</h2>
+  <p>
+    Internly is gebouwd door <strong>Sasubo Holding B.V.</strong> in Lienden. We zijn een klein team dat groot denkt over een specifiek probleem. We werken transparant — onze <a href="/spelregels.html">spelregels</a> zijn publiek, onze <a href="/privacybeleid.html">privacyvoorwaarden</a> zijn helder geschreven, en onze methodologie staat in de <a href="/kennisbank.html">kennisbank</a>.
+  </p>
+
+  <h3>Contact</h3>
+  <p>
+    Voor de pers, partners, of als je gewoon vragen hebt — schrijf naar <a href="mailto:hallo@internly.pro">hallo@internly.pro</a>. We lezen elke mail. Sterker nog: we beantwoorden ze ook. Anders zou het niet kloppen.
+  </p>
+
+</main>
+
+<!-- ── CTA-band ── -->
+<section class="cta-band">
+  <h2>Klaar om mee te doen?</h2>
+  <p>Studenten zijn altijd gratis. Bedrijven en scholen krijgen een eerlijk plan.</p>
+  <a href="/auth.html?mode=signup" class="btn-primary">Maak een profiel aan →</a>
+</section>
+
+<!-- ── Footer ── -->
+<footer class="site-footer">
+  <div class="footer-logo">intern<span>ly</span></div>
+  <ul class="footer-links">
+    <li><a href="/about.html">Over ons</a></li>
+    <li><a href="/kennisbank.html">Kennisbank</a></li>
+    <li><a href="/pricing.html">Prijzen</a></li>
+    <li><a href="/faq.html">FAQ</a></li>
+    <li><a href="/privacybeleid.html">Privacybeleid</a></li>
+    <li><a href="/spelregels.html">Spelregels</a></li>
+    <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
+    <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+  </ul>
+  <div class="footer-meta">© 2026 Sasubo Holding B.V.</div>
+</footer>
+
+<!--
+  NOTITIE VOOR CLAUDE CODE — bij toepassing op productie sub-pagina's:
+  · BEHOUD: alle bestaande content (paragraphs, headings) — vervang ALLEEN de wrapping/styling
+  · BEHOUD: alle linkstructuur, alle nav-items, alle footer-links
+  · BEHOUD: eventuele JS (form-handlers, accordions op FAQ, content-loaders)
+  · VERVANG: alleen de visuele schil — topbar, mini-hero, reading-frame, footer
+  · KRITIEK: per pagina past de hero-eyebrow, hero-title, hero-sub aan op de pagina-context
+    (about.html: "over Internly" / "Stages zonder ghosting", faq.html: "veelgestelde vragen" / "Korte antwoorden", etc.)
+  · KRITIEK: NIET de homepage hero kopiëren — mini-hero is bewust kleiner
+
+  PER PAGINA:
+  · about.html:          deze blueprint (mission, hoe-het-werkt, contact)
+  · kennisbank.html:     reading-frame met meerdere h2-secties, three-up vervalt
+  · pricing.html:        mini-hero + drie pricing-cards + FAQ-strip
+  · faq.html:            mini-hero + accordion-lijst (vragen + uitklapbare antwoorden)
+  · privacybeleid.html:  reading-frame, geen pull-quote, geen three-up, vooral lange tekst
+  · spelregels.html:     idem
+  · esg-rapportage.html: mini-hero + datapunten-grid + downloadable PDF link
+-->
+
+</body>
+</html>

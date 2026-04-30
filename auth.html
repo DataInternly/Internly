@@ -11,126 +11,225 @@
   <meta name="description" content="Log in op Internly of maak een account aan als student, bedrijf of school.">
   <title>Inloggen — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/push.js"></script>
-  <script src="js/roles.js"></script>
+  <script src="js/toast.js"></script>
+  <script>
+    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    // Als telemetry.js 404't of geblokkeerd wordt, blijft deze stub staan
+    // en geeft _init één luide warn (geen silent failure).
+    window._fCtx = {
+      _init: function(p) {
+        console.warn('[telemetry] js/telemetry.js niet geladen, ' +
+                     'bescherming inactief op pagina: ' + p);
+      },
+      _plant: function() {},
+      _guard: function() { return true; },
+      blockIfFilled: function() { return false; }
+    };
+  </script>
   <script src="js/telemetry.js"></script>
   <style>
+    /* Pagina-specifieke vars — globale tokens komen uit css/style.css */
     :root {
-      --green:      #1a7a48;
-      --green-dark: #0f5c36;
+      --green:      var(--c-green);
+      --green-dark: var(--c-green-deep);
+      --orange:     var(--c-orange);
+      --orange-dark:var(--c-orange-deep);
+      --ink:        var(--c-ink);
+      --ink2:       var(--fg-secondary);
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --border:     #e2e8f0;
       --green-bg:   #e8f5ee;
       --blue:       #1756a8;
       --blue-bg:    #e8f0fc;
-      --orange:     #FF7E42;
-      --orange-dark:#e05c1a;
       --amber:      #a06010;
       --amber-bg:   #fdf3e0;
-      --ink:        #0d1520;
-      --ink2:       #374151;
-      --ink3:       #6b7280;
-      --ink4:       #9ca3af;
-      --bg:         #f4f3ef;
-      --white:      #ffffff;
-      --border:     #e2e8f0;
       --red:        #b82020;
       --red-bg:     #fdeaea;
-      --r:          14px;
-      --r-sm:       8px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: 'Outfit', sans-serif;
-      background: linear-gradient(135deg, #1a7a48, #0f5c36);
+      font-family: var(--font-body);
+      color: var(--fg-primary);
+      background-color: var(--c-cream-warm);
+      background-image:
+        /* subtiele dotted hoek (auth-pagina = focus + warmte) */
+        radial-gradient(circle, rgba(224, 92, 26, 0.05) 1px, transparent 1px),
+        /* zachte oranje glow rechtsboven */
+        radial-gradient(ellipse 60% 60% at 100% 0%, rgba(255, 126, 66, 0.10), transparent 60%),
+        /* zachte groene glow linksonder */
+        radial-gradient(ellipse 60% 60% at 0% 100%, rgba(26, 122, 72, 0.06), transparent 60%);
+      background-size: 24px 24px, 100% 100%, 100% 100%;
+      background-attachment: fixed;
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
+      display: flex; flex-direction: column;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── CARD ── */
+    /* ── Topbar ── */
+    .auth-topbar {
+      padding: var(--s5);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--s4); flex-wrap: wrap;
+    }
+    .auth-topbar .logo {
+      font-family: var(--font-display);
+      font-weight: 700; font-size: 1.4rem;
+      letter-spacing: -.03em; color: var(--c-green-deep);
+      text-decoration: none;
+    }
+    .auth-topbar .logo span { color: var(--c-orange-deep); }
+    .topbar-right {
+      display: flex; align-items: center; gap: var(--s3);
+      flex-wrap: wrap;
+    }
+    .topbar-link {
+      font-family: var(--font-body);
+      font-size: .88rem; color: var(--fg-tertiary);
+      text-decoration: none; padding: 8px 14px; border-radius: var(--r-pill);
+      transition: background var(--t-fast), color var(--t-fast);
+    }
+    .topbar-link:hover { background: var(--c-cream); color: var(--fg-primary); }
+
+    /* Lang switcher op warme topbar */
+    .lang-switcher { display: flex; gap: 2px; }
+    .lang-btn {
+      background: transparent; border: 1px solid transparent;
+      color: var(--fg-tertiary);
+      font-family: var(--font-body);
+      font-size: .76rem; font-weight: 600;
+      padding: 5px 10px; border-radius: var(--r-pill);
+      cursor: pointer;
+      transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast);
+    }
+    .lang-btn:hover { color: var(--fg-primary); background: var(--c-cream); }
+    .lang-btn.active {
+      color: var(--c-orange-deep); background: rgba(255,126,66,.10);
+      border-color: rgba(255,126,66,.25);
+    }
+
+    /* ── Frame ── */
+    .auth-frame {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--s5);
+    }
+
+    /* ── Auth card ── */
     .auth-card {
-      background: var(--white);
-      border-radius: 20px;
-      width: 100%; max-width: 440px;
-      box-shadow: 0 24px 60px rgba(0,0,0,.18);
-      overflow: hidden;
+      width: 100%; max-width: 480px;
+      background: #fff;
+      border: 1px solid var(--line-subtle);
+      border-radius: var(--r-lg);
+      padding: var(--s7) var(--s6) var(--s5);
+      box-shadow: 0 18px 40px rgba(0,0,0,.10);
+      position: relative;
+    }
+    .caveat-corner {
+      position: absolute; top: 18px; right: 24px;
+      font-family: var(--font-script); font-size: 1.05rem;
+      color: var(--c-orange-deep); transform: rotate(4deg);
+      opacity: .85; line-height: 1;
+    }
+    .auth-eyebrow {
+      font-family: var(--font-script);
+      font-size: 1.1rem; color: var(--c-orange-deep);
+      margin-bottom: 6px; transform: rotate(-1deg);
+      display: inline-block;
+    }
+    .auth-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.7rem, 3vw, 2.1rem);
+      color: var(--fg-primary);
+      letter-spacing: -.02em; line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .auth-sub {
+      color: var(--fg-tertiary); font-size: .92rem;
+      line-height: 1.6; margin-bottom: var(--s5);
     }
 
-    /* ── HEADER ── */
-    .card-header {
-      background: var(--ink);
-      padding: 28px 32px 24px;
-      text-align: center;
-    }
-    .logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.8rem; font-weight: 700; color: #fff;
-      letter-spacing: -.03em; margin-bottom: 4px;
-    }
-    .logo span { color: var(--orange); }
-    .logo-sub { font-size: .82rem; color: rgba(255,255,255,.45); }
-
-    /* ── TABS ── */
+    /* ── Tabs (pill) ── */
     .tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: #f4f3ef;
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--c-cream);
+      border-radius: var(--r-pill);
+      padding: 4px;
+      margin-bottom: var(--s5);
     }
     .tab {
-      flex: 1; padding: 13px;
-      text-align: center; cursor: pointer;
+      font-family: var(--font-body);
       font-size: .88rem; font-weight: 600;
-      color: var(--ink3);
-      border-bottom: 2px solid transparent;
-      transition: all .15s;
+      padding: 9px;
+      border: none; background: transparent;
+      color: var(--fg-tertiary);
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      text-align: center;
+      transition: background var(--t-fast), color var(--t-fast);
     }
     .tab.active {
-      color: var(--green);
-      border-bottom-color: var(--green);
-      background: var(--white);
+      background: #fff; color: var(--fg-primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
     }
 
-    /* ── BODY ── */
-    .card-body { padding: 28px 32px 32px; }
-
-    /* ── ROLE PICKER ── */
+    /* ── ROLE PICKER ──
+       NB: .card-body heeft geen eigen CSS-regel — class staat alleen op
+       het HTML-element zodat JS '.card-body input' querySelector werkt
+       voor de shake-animatie bij invoerfouten. ── */
     .role-title {
-      font-size: .78rem; font-weight: 700; letter-spacing: .08em;
-      text-transform: uppercase; color: var(--ink4); margin-bottom: 10px;
+      font-family: var(--font-mono);
+      font-size: .72rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--fg-tertiary); margin-bottom: var(--s3);
     }
     .role-cards {
-      display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;
+      display: flex; flex-direction: column; gap: var(--s2);
+      margin-bottom: var(--s5);
     }
     .role-card {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border: 1.5px solid var(--border);
-      border-radius: var(--r-sm); cursor: pointer;
-      transition: all .15s; background: var(--white);
+      display: flex; align-items: center; gap: var(--s3);
+      padding: var(--s3) var(--s4);
+      border: 1.5px solid var(--line-default);
+      border-radius: var(--r-md);
+      cursor: pointer;
+      transition: border-color var(--t-fast), background var(--t-fast);
+      background: #fff;
     }
-    .role-card:hover { border-color: var(--green); background: #f8fdf9; }
-    .role-card.selected { border-color: var(--green); background: var(--green-bg); }
+    .role-card:hover { border-color: var(--c-green); background: #f8fdf9; }
+    .role-card.selected { border-color: var(--c-green); background: var(--green-bg); }
     .role-card.selected.blue-role { border-color: var(--blue); background: var(--blue-bg); }
     .role-card.selected.amber-role { border-color: var(--amber); background: var(--amber-bg); }
     .role-icon-wrap {
       width: 36px; height: 36px; border-radius: 50%;
-      background: var(--bg); display: flex; align-items: center;
+      background: var(--c-cream); display: flex; align-items: center;
       justify-content: center; font-size: 1rem; flex-shrink: 0;
     }
-    .role-name { font-size: .9rem; font-weight: 600; color: var(--ink); }
-    .role-desc { font-size: .75rem; color: var(--ink3); }
+    .role-name {
+      font-family: var(--font-display);
+      font-size: .92rem; font-weight: 700; color: var(--fg-primary);
+      margin-bottom: 2px;
+    }
+    .role-desc { font-size: .78rem; color: var(--fg-tertiary); line-height: 1.4; }
     .role-check {
       margin-left: auto; width: 18px; height: 18px;
-      border-radius: 50%; border: 1.5px solid var(--border);
+      border-radius: 50%; border: 1.5px solid var(--line-default);
       display: flex; align-items: center; justify-content: center;
-      font-size: .7rem; flex-shrink: 0; transition: all .15s;
+      font-size: .7rem; flex-shrink: 0;
+      transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
     }
     .role-card.selected .role-check {
-      background: var(--green); border-color: var(--green); color: #fff;
+      background: var(--c-green); border-color: var(--c-green); color: #fff;
     }
     .role-card.selected.blue-role .role-check { background: var(--blue); border-color: var(--blue); }
     .role-card.selected.amber-role .role-check { background: var(--amber); border-color: var(--amber); }
@@ -143,72 +242,81 @@
     .role-card.selected.begeleider-role { border-color: #0e7490; background: #ecfeff; }
     .role-card.selected.begeleider-role .role-check { background: #0e7490; border-color: #0e7490; }
 
-    /* Buddy extra velden in registratieformulier */
     .buddy-extra { display: none; margin-top: 4px; }
     .buddy-extra.show { display: block; }
 
     /* ── FORM ── */
-    .field { margin-bottom: 14px; }
+    .field { margin-bottom: var(--s4); }
     .field label {
       display: block; font-size: .82rem; font-weight: 600;
-      color: var(--ink2); margin-bottom: 5px;
+      color: var(--fg-secondary); margin-bottom: 6px;
     }
-    .field input {
-      width: 100%; padding: 11px 14px;
-      border: 1.5px solid var(--border); border-radius: var(--r-sm);
-      font-family: 'Outfit', sans-serif; font-size: .92rem;
-      color: var(--ink); background: var(--white);
-      outline: none; transition: border-color .15s; box-sizing: border-box;
+    .field input,
+    .field select {
+      width: 100%; padding: 12px 18px;
+      border: 1.5px solid var(--border); border-radius: var(--r-pill);
+      font-family: var(--font-body); font-size: .95rem;
+      color: var(--fg-primary); background: var(--white);
+      outline: none; transition: border-color var(--t-fast); box-sizing: border-box;
     }
-    .field input:focus { border-color: var(--green); }
+    .field input:focus,
+    .field select:focus { border-color: var(--c-green); }
 
     /* ── SUBMIT ── */
     .btn-submit {
       width: 100%; padding: 13px;
-      background: var(--green); color: #fff; border: none;
-      border-radius: 50px; font-family: 'Outfit', sans-serif;
-      font-size: .95rem; font-weight: 700; cursor: pointer;
-      transition: background .15s; margin-top: 4px;
+      background: var(--c-orange-deep); color: #fff; border: none;
+      border-radius: var(--r-pill);
+      font-family: var(--font-body);
+      font-size: .98rem; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(255,126,66,.32);
+      transition: background var(--t-fast), transform var(--t-fast);
+      margin-top: var(--s2);
     }
-    .btn-submit:hover { background: var(--green-dark); }
-    .btn-submit:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-submit:hover { background: #b94613; transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* ── ERROR ── */
+    /* ── ERROR / SUCCESS ── */
     .error-box {
       background: var(--red-bg); color: var(--red);
-      border: 1px solid rgba(184,32,32,.2); border-radius: var(--r-sm);
-      padding: 10px 14px; font-size: .82rem;
-      margin-bottom: 14px; display: none; line-height: 1.5;
+      border: 1px solid rgba(184,32,32,.2); border-radius: var(--r-md);
+      padding: 10px 14px; font-size: .85rem;
+      margin-bottom: var(--s4); display: none; line-height: 1.5;
     }
     .error-box.show { display: block; }
-
-    /* ── SUCCESS ── */
     .success-box {
-      background: var(--green-bg); color: var(--green);
-      border: 1px solid rgba(26,122,72,.2); border-radius: var(--r-sm);
-      padding: 10px 14px; font-size: .82rem;
-      margin-bottom: 14px; display: none; line-height: 1.5;
+      background: var(--green-bg); color: var(--c-green);
+      border: 1px solid rgba(26,122,72,.2); border-radius: var(--r-md);
+      padding: 10px 14px; font-size: .85rem;
+      margin-bottom: var(--s4); display: none; line-height: 1.5;
     }
     .success-box.show { display: block; }
 
-    /* ── DIVIDER ── */
-    .divider {
-      display: flex; align-items: center; gap: 10px;
-      margin: 18px 0; font-size: .78rem; color: var(--ink4);
+    /* ── Footer note in card ── */
+    .auth-footer-note {
+      margin-top: var(--s5); font-size: .8rem; color: var(--fg-tertiary);
+      text-align: center; line-height: 1.6;
     }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
+    .auth-footer-note a {
+      color: var(--c-green); text-decoration: underline;
+      text-underline-offset: 2px;
     }
+    .auth-footer-note a:hover { color: var(--c-green-deep); }
 
-    /* ── FOOTER ── */
-    .card-footer {
-      padding: 16px 32px;
-      background: #f4f3ef;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      font-size: .78rem; color: var(--ink4);
+    /* ── Trust strip ── */
+    .trust-strip {
+      display: flex; justify-content: center; gap: var(--s5);
+      padding: var(--s4) var(--s5) var(--s5);
+      font-size: .76rem; color: var(--fg-tertiary);
+      flex-wrap: wrap;
     }
-    .card-footer a { color: var(--green); text-decoration: none; font-weight: 600; }
+    .trust-item { display: flex; align-items: center; gap: 6px; }
+    .trust-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--c-green-deep);
+    }
 
     /* ── LOADING ── */
     .spinner {
@@ -216,16 +324,11 @@
       border: 2px solid rgba(255,255,255,.4);
       border-top-color: #fff; border-radius: 50%;
       animation: spin .6s linear infinite; margin-right: 6px;
+      vertical-align: -2px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── ANIMATIES ── */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
     @keyframes authIn {
       from { opacity: 0; transform: translateY(24px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0)    scale(1);    }
@@ -237,36 +340,48 @@
       60%      { transform: translateX(-4px);}
       80%      { transform: translateX(4px); }
     }
-    .auth-card { animation: authIn 0.4s ease both; }
-    .shake     { animation: shakeInput 0.35s ease !important; border-color: var(--red) !important; }
+    .auth-card { animation: authIn 0.4s var(--ease) both; }
+    .shake { animation: shakeInput 0.35s ease !important; border-color: var(--red) !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-topbar { padding: var(--s4); }
+      .auth-card { padding: var(--s6) var(--s5) var(--s4); border-radius: var(--r-md); }
+      .caveat-corner { top: 14px; right: 18px; font-size: .95rem; }
+      .trust-strip { gap: var(--s3); padding: var(--s3) var(--s4) var(--s4); }
+    }
   </style>
 </head>
 <body>
 
-<div class="auth-card">
-
-  <!-- Header -->
-  <div class="card-header">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-      <div class="lang-switcher">
-        <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
-        <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
-        <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
-        <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
-      </div>
+<header class="auth-topbar">
+  <a href="index.html" class="logo">intern<span>ly</span></a>
+  <div class="topbar-right">
+    <div class="lang-switcher">
+      <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
+      <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
+      <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
+      <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
     </div>
-    <div class="logo">intern<span>ly</span></div>
-    <div class="logo-sub" id="logoSub">Welkom terug.</div>
+    <a href="index.html" class="topbar-link">← terug naar home</a>
   </div>
+</header>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" id="tab-login" onclick="switchTab('login')">Inloggen</div>
-    <div class="tab" id="tab-register" onclick="switchTab('register')">Registreren</div>
-  </div>
+<main class="auth-frame">
 
-  <!-- Body -->
-  <div class="card-body">
+  <div class="auth-card">
+
+    <span class="caveat-corner" id="logoSub">welkom terug</span>
+
+    <span class="auth-eyebrow">eerlijk stages</span>
+    <h1 class="auth-title">Welkom op Internly</h1>
+    <p class="auth-sub">Log in of maak een profiel aan. Studenten blijven gratis — altijd.</p>
 
     <!-- Error / success -->
     <div class="error-box" id="errorBox"></div>
@@ -275,191 +390,260 @@
     <!-- Al ingelogd panel (verborgen tenzij actieve sessie) -->
     <div id="alreadyLoggedIn" style="display:none;text-align:center;padding:4px 0 16px;">
       <div style="font-size:2rem;margin-bottom:12px;">👤</div>
-      <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:3px;" id="alreadyName"></div>
-      <div style="font-size:.8rem;color:var(--ink3);margin-bottom:22px;" id="alreadyRole"></div>
-      <a id="alreadyDashBtn" href="#" style="display:block;width:100%;padding:13px;background:var(--green);color:#fff;border-radius:50px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none;box-sizing:border-box;margin-bottom:10px;text-align:center;">Ga naar dashboard →</a>
-      <button onclick="switchAccount()" style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:50px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;color:var(--ink3);cursor:pointer;">Ander account / uitloggen</button>
+      <div style="font-size:1rem;font-weight:700;color:var(--fg-primary);margin-bottom:3px;" id="alreadyName"></div>
+      <div style="font-size:.82rem;color:var(--fg-tertiary);margin-bottom:22px;" id="alreadyRole"></div>
+      <a id="alreadyDashBtn" href="#" style="display:block;width:100%;padding:13px;background:var(--c-orange-deep);color:#fff;border-radius:var(--r-pill);font-family:var(--font-body);font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box;margin-bottom:10px;text-align:center;box-shadow:0 10px 30px rgba(255,126,66,.32);">Ga naar dashboard →</a>
+      <button onclick="switchAccount()" style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--line-default);border-radius:var(--r-pill);font-family:var(--font-body);font-size:.88rem;font-weight:500;color:var(--fg-secondary);cursor:pointer;">Ander account / uitloggen</button>
     </div>
 
-    <!-- Rol kiezen — alleen zichtbaar bij registreren -->
-    <div id="role-picker-section" style="display:none">
-    <div class="role-title">Kies je rol</div>
-    <div class="role-cards">
-      <div class="role-card" id="rc-student" onclick="selectRole('student')">
-        <div class="role-icon-wrap">👤</div>
-        <div>
-          <div class="role-name">Student</div>
-          <div class="role-desc">Zoek een stage op basis van jouw leerdoelen en ambitie.</div>
-        </div>
-        <div class="role-check" id="check-student"></div>
-      </div>
-      <div class="student-extra" id="studentExtraFields" style="display:none;padding:0 4px 4px 4px;">
-        <div style="background:#f0faf5;border-left:3px solid #1a7a48;padding:.7rem 1rem;border-radius:0 0 8px 8px;font-size:.82rem;color:#374151;">
-          <div style="font-weight:600;color:#1a7a48;margin-bottom:6px;font-size:.78rem;">Welke stage zoek je?</div>
-          <label style="display:flex;align-items:center;gap:8px;margin-bottom:5px;cursor:pointer;">
-            <input type="radio" name="student_type" value="BOL" style="accent-color:#1a7a48;" checked>
-            <span>BOL — fulltime school + stage zoeken (MBO)</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="radio" name="student_type" value="HBO_WO" style="accent-color:#1a7a48;">
-            <span>HBO of WO</span>
-          </label>
-        </div>
-      </div>
-      <div class="role-card bbl-role" id="rc-bbl" onclick="selectRole('bbl')">
-        <div class="role-icon-wrap">🏗</div>
-        <div>
-          <div class="role-name">Student — BBL</div>
-          <div class="role-desc">Beheer je BBL-traject en bescherm je rechten als leerling-werknemer.</div>
-        </div>
-        <div class="role-check" id="check-bbl"></div>
-      </div>
-      <div class="role-card blue-role" id="rc-bedrijf" onclick="selectRole('bedrijf')">
-        <div class="role-icon-wrap">🏢</div>
-        <div>
-          <div class="role-name">Bedrijf</div>
-          <div class="role-desc">Vind gemotiveerde stagiairs en bouw je reputatie op.</div>
-        </div>
-        <div class="role-check" id="check-bedrijf"></div>
-      </div>
-      <div class="role-card amber-role" id="rc-school" onclick="selectRole('school')">
-        <div class="role-icon-wrap">🎓</div>
-        <div>
-          <div class="role-name">School</div>
-          <div class="role-desc">Monitor je studenten en verifieer welke bedrijven betrouwbaar zijn.</div>
-        </div>
-        <div class="role-check" id="check-school"></div>
-      </div>
-      <div class="role-card begeleider-role" id="rc-begeleider" onclick="selectRole('begeleider')">
-        <div class="role-icon-wrap">📋</div>
-        <div>
-          <div class="role-name">Ik ben stagebegeleider</div>
-          <div class="role-desc">Begeleid studenten bij hun stagetraject, per sessie.</div>
-        </div>
-        <div class="role-check" id="check-begeleider"></div>
-      </div>
-      <div class="role-card buddy-role" id="rc-gepensioneerd" onclick="selectRole('gepensioneerd')">
-        <div class="role-icon-wrap">🤝</div>
-        <div>
-          <div class="role-name">Gepensioneerde buddy</div>
-          <div class="role-desc">Deel je ervaring als buddy met een student die dat nodig heeft.</div>
-        </div>
-        <div class="role-check" id="check-gepensioneerd"></div>
-      </div>
-    </div>
-    </div><!-- /role-picker-section -->
-
-    <!-- LOGIN FORM -->
-    <div id="form-login">
-      <div class="field">
-        <label>E-mailadres</label>
-        <input type="email" id="login-email" placeholder="jouw@email.nl" autocomplete="email">
-      </div>
-      <div class="field">
-        <label>Wachtwoord</label>
-        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <button class="btn-submit" id="loginBtn" onclick="doLogin()">
-        Inloggen →
-      </button>
+    <!-- Tabs (pill) -->
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Inloggen</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')">Account aanmaken</button>
     </div>
 
-    <!-- REGISTER FORM -->
-    <div id="form-register" style="display:none">
-      <div class="field">
-        <label>Naam</label>
-        <input type="text" id="reg-naam" placeholder="Jouw naam">
-      </div>
-      <div class="field">
-        <label>E-mailadres</label>
-        <input type="email" id="reg-email" placeholder="jouw@email.nl" autocomplete="email">
-      </div>
-      <div class="field">
-        <label>Wachtwoord</label>
-        <input type="password" id="reg-pass" placeholder="Min. 6 tekens" autocomplete="new-password">
-      </div>
+    <!-- Body — JS queries '.card-body input' -->
+    <div class="card-body">
 
-      <!-- Extra velden voor gepensioneerde buddy (verborgen tenzij die rol geselecteerd) -->
-      <div class="buddy-extra" id="buddyExtraFields">
+      <!-- Rol kiezen — alleen zichtbaar bij registreren -->
+      <div id="role-picker-section" style="display:none">
+      <div class="role-title">Kies je rol</div>
+      <div class="role-cards">
+        <div class="role-card" id="rc-student" onclick="selectRole('student')">
+          <div class="role-icon-wrap">👤</div>
+          <div>
+            <div class="role-name">Student</div>
+            <div class="role-desc">Zoek een stage op basis van jouw leerdoelen en ambitie.</div>
+          </div>
+          <div class="role-check" id="check-student"></div>
+        </div>
+        <div class="student-extra" id="studentExtraFields" style="display:none;padding:0 4px 4px 4px;">
+          <div style="background:#f0faf5;border-left:3px solid var(--c-green);padding:.7rem 1rem;border-radius:0 0 8px 8px;font-size:.82rem;color:var(--fg-secondary);">
+            <div style="font-weight:600;color:var(--c-green);margin-bottom:6px;font-size:.78rem;">Welke stage zoek je?</div>
+            <label style="display:flex;align-items:center;gap:8px;margin-bottom:5px;cursor:pointer;">
+              <input type="radio" name="student_type" value="BOL" style="accent-color:var(--c-green);" checked>
+              <span>BOL — fulltime school + stage zoeken (MBO)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="radio" name="student_type" value="HBO_WO" style="accent-color:var(--c-green);">
+              <span>HBO of WO</span>
+            </label>
+          </div>
+        </div>
+        <div class="role-card bbl-role" id="rc-bbl" onclick="selectRole('bbl')">
+          <div class="role-icon-wrap">🏗</div>
+          <div>
+            <div class="role-name">Student — BBL</div>
+            <div class="role-desc">Beheer je BBL-traject en bescherm je rechten als leerling-werknemer.</div>
+          </div>
+          <div class="role-check" id="check-bbl"></div>
+        </div>
+        <div class="role-card blue-role" id="rc-bedrijf" onclick="selectRole('bedrijf')">
+          <div class="role-icon-wrap">🏢</div>
+          <div>
+            <div class="role-name">Bedrijf</div>
+            <div class="role-desc">Vind gemotiveerde stagiairs en bouw je reputatie op.</div>
+          </div>
+          <div class="role-check" id="check-bedrijf"></div>
+        </div>
+        <div class="role-card amber-role" id="rc-school" onclick="selectRole('school')">
+          <div class="role-icon-wrap">🎓</div>
+          <div>
+            <div class="role-name">School</div>
+            <div class="role-desc">Monitor je studenten en verifieer welke bedrijven betrouwbaar zijn.</div>
+          </div>
+          <div class="role-check" id="check-school"></div>
+        </div>
+        <div class="role-card begeleider-role" id="rc-begeleider" onclick="selectRole('begeleider')">
+          <div class="role-icon-wrap">📋</div>
+          <div>
+            <div class="role-name">Ik ben stagebegeleider</div>
+            <div class="role-desc">Begeleid studenten bij hun stagetraject, per sessie.</div>
+          </div>
+          <div class="role-check" id="check-begeleider"></div>
+        </div>
+        <div class="role-card buddy-role" id="rc-gepensioneerd" onclick="selectRole('gepensioneerd')">
+          <div class="role-icon-wrap">🤝</div>
+          <div>
+            <div class="role-name">Gepensioneerde buddy</div>
+            <div class="role-desc">Deel je ervaring als buddy met een student die dat nodig heeft.</div>
+          </div>
+          <div class="role-check" id="check-gepensioneerd"></div>
+        </div>
+        <div class="role-card blue-role" id="rc-student-international" onclick="selectRole('student-international')">
+          <div class="role-icon-wrap">✈️</div>
+          <div>
+            <div class="role-name">International Student</div>
+            <div class="role-desc">Find an internship in the Netherlands from abroad.</div>
+          </div>
+          <div class="role-check" id="check-student-international"></div>
+        </div>
+        <div class="role-card amber-role" id="rc-school-international" onclick="selectRole('school-international')">
+          <div class="role-icon-wrap">🌐</div>
+          <div>
+            <div class="role-name">University / School (International)</div>
+            <div class="role-desc">Monitor your students' international internships.</div>
+          </div>
+          <div class="role-check" id="check-school-international"></div>
+        </div>
+      </div>
+      </div><!-- /role-picker-section -->
+
+      <!-- LOGIN FORM -->
+      <div id="form-login">
         <div class="field">
-          <label>Sector <span style="color:#6d28d9;margin-left:2px">*</span></label>
-          <select id="reg-sector">
-            <option value="">Kies je sector</option>
-            <option value="IT">IT &amp; Software</option>
-            <option value="Marketing">Marketing &amp; Communicatie</option>
-            <option value="Finance">Finance &amp; Economie</option>
-            <option value="HR">HR &amp; Organisatie</option>
-            <option value="Duurzaamheid">Duurzaamheid &amp; ESG</option>
-            <option value="Gezondheid">Zorg &amp; Welzijn</option>
-            <option value="Engineering">Techniek &amp; Engineering</option>
-            <option value="Design">Design &amp; UX</option>
-            <option value="Niche">Niche / Overig</option>
-          </select>
+          <label>E-mailadres</label>
+          <input type="email" id="login-email" placeholder="jouw@email.nl" autocomplete="email">
         </div>
         <div class="field">
-          <label>Expertisegebieden</label>
-          <input type="text" id="reg-expertise" placeholder="Bijv. leiderschap, agile, strategie (komma-gescheiden)">
+          <label>Wachtwoord</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
         </div>
-        <div class="field">
-          <label>Korte bio <span style="font-weight:400;color:#9ca3af;font-size:.78rem">optioneel</span></label>
-          <input type="text" id="reg-bio" placeholder="Bijv. 30 jaar in de IT, nu klaar om te delen">
-        </div>
-        <p style="font-size:.74rem;color:#6b7280;line-height:1.5;margin-bottom:10px;padding:8px 10px;background:#f5f3ff;border-radius:8px;border-left:3px solid #6d28d9;">
-          Je profiel wordt alleen getoond aan studenten die actief een buddy zoeken. Deelname is altijd vrijwillig en anoniem tot jij bevestigt.
+        <button class="btn-submit" id="loginBtn" onclick="doLogin()">
+          Inloggen →
+        </button>
+        <p style="text-align:center;margin-top:.75rem">
+          <a href="#" onclick="showForgotPassword();return false;"
+             style="font-size:.82rem;color:var(--fg-secondary,#6b7280);
+                    text-decoration:underline;text-underline-offset:2px">
+            Wachtwoord vergeten?
+          </a>
         </p>
       </div>
 
-      <div id="bbl-consent-block" style="display:none;
-        background:rgba(93,202,165,.1);
-        border:1px solid rgba(93,202,165,.25);
-        border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;">
-        <p style="font-size:.78rem;font-weight:600;
-          color:#0f6e56;margin-bottom:.5rem;">
-          Wat ziet jouw leerbedrijf op Internly?
-        </p>
-        <div style="font-size:.75rem;color:#2e5c4a;line-height:1.6;">
-          ✓ Je voortgang op leerdoelen<br>
-          ✓ Geplande afspraken en evaluaties<br>
-          ✗ <strong>Jouw beoordeling van hen — die blijft anoniem</strong><br>
-          ✗ Berichten met je buddy
+      <!-- REGISTER FORM -->
+      <div id="form-register" style="display:none">
+        <p class="form-req-note">Velden met <strong>*</strong> zijn verplicht</p>
+        <div class="field">
+          <label class="req">Naam</label>
+          <input type="text" id="reg-naam" placeholder="Jouw naam"
+                 required aria-required="true" maxlength="100">
         </div>
-      </div>
-      <label class="consent-label" style="
-        display:flex;align-items:flex-start;gap:.6rem;
-        font-size:.82rem;color:var(--ink2);line-height:1.5;
-        margin-bottom:1rem;cursor:pointer;
-      ">
-        <input type="checkbox" id="consentCheck" required style="
-          margin-top:2px;flex-shrink:0;
-          accent-color:var(--green);
-          width:15px;height:15px;cursor:pointer;
+        <div class="field">
+          <label class="req">E-mailadres</label>
+          <input type="email" id="reg-email" placeholder="jouw@email.nl"
+                 autocomplete="email" required aria-required="true">
+        </div>
+        <div class="field">
+          <label class="req">Wachtwoord</label>
+          <input type="password" id="reg-pass" placeholder="Min. 8 tekens"
+                 autocomplete="new-password" required aria-required="true"
+                 oninput="onRegPassInput(this.value)">
+          <div style="height:4px;background:var(--bg2,#eceae4);border-radius:2px;
+                      margin-top:.4rem;overflow:hidden">
+            <div id="reg-pw-bar" style="height:100%;border-radius:2px;width:0%;
+                 transition:width .25s,background .25s"></div>
+          </div>
+          <ul style="list-style:none;padding:0;margin:.4rem 0 0;
+                     display:flex;flex-direction:column;gap:.15rem">
+            <li id="req-length"  style="font-size:.78rem;
+                color:var(--fg-tertiary,#7a8799)">✗ Minimaal 8 tekens</li>
+            <li id="req-upper"   style="font-size:.78rem;
+                color:var(--fg-tertiary,#7a8799)">✗ Minimaal 1 hoofdletter</li>
+            <li id="req-number"  style="font-size:.78rem;
+                color:var(--fg-tertiary,#7a8799)">✗ Minimaal 1 cijfer</li>
+          </ul>
+        </div>
+
+        <!-- Extra velden voor gepensioneerde buddy (verborgen tenzij die rol geselecteerd) -->
+        <div class="buddy-extra" id="buddyExtraFields">
+          <div class="field">
+            <label>Sector <span style="color:var(--accent,#e05c1a);margin-left:2px">*</span></label>
+            <select id="reg-sector">
+              <option value="">Kies je sector</option>
+              <option value="IT">IT &amp; Software</option>
+              <option value="Marketing">Marketing &amp; Communicatie</option>
+              <option value="Finance">Finance &amp; Economie</option>
+              <option value="HR">HR &amp; Organisatie</option>
+              <option value="Duurzaamheid">Duurzaamheid &amp; ESG</option>
+              <option value="Gezondheid">Zorg &amp; Welzijn</option>
+              <option value="Engineering">Techniek &amp; Engineering</option>
+              <option value="Design">Design &amp; UX</option>
+              <option value="Niche">Niche / Overig</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Expertisegebieden</label>
+            <input type="text" id="reg-expertise" placeholder="Bijv. leiderschap, agile, strategie (komma-gescheiden)">
+          </div>
+          <div class="field">
+            <label>Korte bio <span style="font-weight:400;color:var(--fg-tertiary);font-size:.78rem">optioneel</span></label>
+            <input type="text" id="reg-bio" placeholder="Bijv. 30 jaar in de IT, nu klaar om te delen">
+          </div>
+          <p style="font-size:.76rem;color:var(--fg-tertiary);line-height:1.5;margin-bottom:14px;padding:10px 12px;background:#f5f3ff;border-radius:var(--r-md);border-left:3px solid #6d28d9;">
+            Je profiel wordt alleen getoond aan studenten die actief een buddy zoeken. Deelname is altijd vrijwillig en anoniem tot jij bevestigt.
+          </p>
+        </div>
+
+        <div id="bbl-consent-block" style="display:none;
+          background:rgba(93,202,165,.1);
+          border:1px solid rgba(93,202,165,.25);
+          border-radius:var(--r-md);padding:.85rem 1rem;margin-bottom:var(--s4);">
+          <p style="font-size:.78rem;font-weight:600;
+            color:#0f6e56;margin-bottom:.5rem;">
+            Wat ziet jouw leerbedrijf op Internly?
+          </p>
+          <div style="font-size:.75rem;color:#2e5c4a;line-height:1.6;">
+            ✓ Je voortgang op leerdoelen<br>
+            ✓ Geplande afspraken en evaluaties<br>
+            ✗ <strong>Jouw beoordeling van hen — die blijft anoniem</strong><br>
+            ✗ Berichten met je buddy
+          </div>
+        </div>
+
+        <label class="consent-label" style="
+          display:flex;align-items:flex-start;gap:.6rem;
+          font-size:.82rem;color:var(--fg-secondary);line-height:1.5;
+          margin-bottom:var(--s4);cursor:pointer;
         ">
-        <span>Ik heb het
-          <a href="privacybeleid.html" target="_blank" rel="noopener noreferrer"
-             style="color:var(--green);text-decoration:none;">privacybeleid</a>
-          gelezen en ga akkoord met de verwerking van mijn gegevens door
-          Sasubo Holding B.V.
-          <span style="display:block;margin-top:4px;color:var(--ink3);">Jouw stagegegevens worden anoniem gebruikt voor ESG-rapportages van bedrijven.</span>
-        </span>
-      </label>
-      <button class="btn-submit" id="registerBtn" onclick="doRegister()">
-        Account aanmaken →
-      </button>
-    </div>
+          <input type="checkbox" id="consentCheck" required style="
+            margin-top:2px;flex-shrink:0;
+            accent-color:var(--c-green);
+            width:15px;height:15px;cursor:pointer;
+          ">
+          <span>Ik heb het
+            <a href="privacybeleid.html" target="_blank" rel="noopener noreferrer"
+               style="color:var(--c-green);text-decoration:underline;text-underline-offset:2px;">privacybeleid</a>
+            gelezen en ga akkoord met de verwerking van mijn gegevens door
+            Sasubo Holding B.V.
+            <span style="display:block;margin-top:4px;color:var(--fg-tertiary);">Jouw stagegegevens worden anoniem gebruikt voor ESG-rapportages van bedrijven.</span>
+          </span>
+        </label>
+
+        <button class="btn-submit" id="registerBtn" onclick="doRegister()">
+          Account aanmaken →
+        </button>
+      </div>
+
+    </div><!-- /.card-body -->
+
+    <!-- Footer-note in card -->
+    <p class="auth-footer-note">
+      <a href="spelregels.html">Spelregels</a>
+      &nbsp;·&nbsp;
+      <a href="kennisbank.html">Kennisbank</a>
+      &nbsp;·&nbsp;
+      <a href="privacybeleid.html">Privacybeleid</a>
+    </p>
 
   </div>
 
-  <!-- Footer -->
-  <div class="card-footer">
-    <a href="index.html">← Terug naar homepagina</a>
-    &nbsp;·&nbsp;
-    <a href="spelregels.html">Spelregels</a>
-    &nbsp;·&nbsp;
-    <a href="kennisbank.html">Kennisbank</a>
-    <div style="margin-top:8px;font-size:.7rem;color:var(--ink4);">© 2026 Sasubo Holding B.V.</div>
-  </div>
+</main>
 
-</div>
+<footer class="trust-strip">
+  <div class="trust-item">
+    <span class="trust-dot"></span>
+    DPA Supabase getekend
+  </div>
+  <div class="trust-item">
+    <span class="trust-dot"></span>
+    GDPR conform
+  </div>
+  <div class="trust-item">
+    <span class="trust-dot"></span>
+    © 2026 Sasubo Holding B.V.
+  </div>
+</footer>
 
 <script>
 // ── B3+B7: Wis URL-parameters direct bij load ──
@@ -485,19 +669,46 @@ if (_initParams.get('expired') === '1') {
   });
 }
 
-// ── Routing per rol ──
-const ROUTES = {
-  student:       'match-dashboard.html',
-  bedrijf:       'company-dashboard.html',
-  school:        'school-dashboard.html',
-  begeleider:    'begeleider-dashboard.html',
-  gepensioneerd: 'buddy-dashboard.html',
-};
+// ── Wachtwoord-reset landing (?type=recovery) ──
+if (_initParams.get('type') === 'recovery') {
+  const accessToken = window.location.hash.match(/access_token=([^&]+)/)?.[1];
+  if (accessToken) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const resetHtml = `
+        <div id="reset-password-form" style="
+          background:var(--card-bg,#fff);border-radius:var(--r-lg,12px);
+          padding:1.5rem;margin-bottom:1rem">
+          <h3 style="font-size:1rem;font-weight:600;margin-bottom:1rem">
+            Nieuw wachtwoord instellen
+          </h3>
+          <div class="field">
+            <label class="req">Nieuw wachtwoord</label>
+            <input type="password" id="new-pass" placeholder="Min. 8 tekens"
+                   autocomplete="new-password" required
+                   oninput="onRegPassInput(this.value)">
+          </div>
+          <button class="btn-submit" onclick="doSetNewPassword()">
+            Wachtwoord opslaan →
+          </button>
+        </div>`;
+      const container = document.querySelector('.card-body') ||
+                        document.getElementById('form-login')?.parentElement;
+      if (container) {
+        container.insertAdjacentHTML('afterbegin', resetHtml);
+      }
+      document.querySelector('.tabs')?.style.setProperty('display','none');
+      document.getElementById('form-login')?.style.setProperty('display','none');
+      document.getElementById('form-register')?.style.setProperty('display','none');
+      document.getElementById('role-picker-section')?.style.setProperty('display','none');
+    });
+  }
+}
 
 // ── State ──
-var selectedRole  = null;
-let activeTab     = 'login';
-let isBBL         = false;
+var selectedRole    = null;
+let activeTab       = 'login';
+let isBBL           = false;
+let isInternational = false;
 
 // ── Rate limiting ──
 let _loginAttempts = 0;
@@ -513,7 +724,7 @@ function switchTab(tab) {
   document.getElementById('form-register').style.display      = tab === 'register' ? 'block' : 'none';
   document.getElementById('role-picker-section').style.display = tab === 'register' ? 'block' : 'none';
   const logoSub = document.getElementById('logoSub');
-  if (logoSub) logoSub.textContent = tab === 'login' ? 'Welkom terug.' : 'Goed dat je er bent.';
+  if (logoSub) logoSub.textContent = tab === 'login' ? 'welkom terug' : 'fijn dat je er bent';
   // Toon/verberg student-extra velden op basis van tab + geselecteerde rol
   const studentExtraTab = document.getElementById('studentExtraFields');
   if (studentExtraTab) {
@@ -530,16 +741,28 @@ function switchTab(tab) {
 // ── Role select ──
 function selectRole(role) {
   // BBL is een student met bbl_mode=true — niet een aparte DB-rol
+  // 'student-international' / 'school-international' mappen op DB-rol student/school
+  // met flag isInternational=true (parallel patroon aan isBBL)
   if (role === 'bbl') {
-    selectedRole = 'student';
-    isBBL = true;
+    selectedRole   = 'student';
+    isBBL          = true;
+    isInternational = false;
+  } else if (role === 'student-international') {
+    selectedRole   = 'student';
+    isBBL          = false;
+    isInternational = true;
+  } else if (role === 'school-international') {
+    selectedRole   = 'school';
+    isBBL          = false;
+    isInternational = true;
   } else {
-    selectedRole = role;
-    isBBL = false;
+    selectedRole   = role;
+    isBBL          = false;
+    isInternational = false;
   }
 
   // Reset alle kaarten
-  ['student','bbl','bedrijf','school','begeleider','gepensioneerd'].forEach(r => {
+  ['student','bbl','bedrijf','school','begeleider','gepensioneerd','student-international','school-international'].forEach(r => {
     const card  = document.getElementById('rc-' + r);
     const check = document.getElementById('check-' + r);
     if (card)  card.classList.remove('selected');
@@ -558,7 +781,7 @@ function selectRole(role) {
     bblBlock.style.display = (role === 'bbl') ? 'block' : 'none';
   }
 
-  // Student-extra velden (BOL/HBO-WO keuze) tonen/verbergen
+  // Student-extra velden (BOL/HBO-WO keuze) tonen/verbergen — alleen bij rol 'student' (NL)
   const studentExtra = document.getElementById('studentExtraFields');
   if (studentExtra) {
     studentExtra.style.display = (role === 'student' && activeTab === 'register') ? 'block' : 'none';
@@ -573,10 +796,68 @@ function selectRole(role) {
   clearMessages();
 }
 
+function onRegPassInput(val) {
+  const r     = validatePassword(val);
+  const score = [r.length, r.uppercase, r.number].filter(Boolean).length;
+  const bar   = document.getElementById('reg-pw-bar');
+  if (!bar) return;
+  bar.style.width      = ['0%','33%','66%','100%'][score];
+  bar.style.background = ['','#e05c1a','#e6a817','var(--c-green,#1a7a48)'][score];
+  _setReq('req-length',  r.length,    'Minimaal 8 tekens');
+  _setReq('req-upper',   r.uppercase, 'Minimaal 1 hoofdletter');
+  _setReq('req-number',  r.number,    'Minimaal 1 cijfer');
+}
+function _setReq(id, ok, label) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = (ok ? '✓ ' : '✗ ') + label;
+  el.style.color = ok
+    ? 'var(--c-green,#1a7a48)'
+    : 'var(--fg-tertiary,#7a8799)';
+}
+
+// ── Wachtwoord vergeten ──
+async function showForgotPassword() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) {
+    showError('Vul eerst je e-mailadres in.');
+    document.getElementById('login-email').focus();
+    return;
+  }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/auth.html?type=recovery'
+  });
+  btn.disabled = false;
+  if (error) {
+    showError('Kon geen reset-link versturen. Controleer het e-mailadres.');
+  } else {
+    showSuccess('Reset-link verstuurd. Controleer je e-mail (check ook je spam).');
+  }
+}
+
+async function doSetNewPassword() {
+  const pass = document.getElementById('new-pass')?.value || '';
+  if (!validatePassword(pass).valid) {
+    showError('Wachtwoord moet minimaal 8 tekens hebben, één hoofdletter en één cijfer.');
+    return;
+  }
+  const btn = document.querySelector('#reset-password-form .btn-submit');
+  if (btn) btn.disabled = true;
+  const { error } = await db.auth.updateUser({ password: pass });
+  if (btn) btn.disabled = false;
+  if (error) {
+    showError('Kon wachtwoord niet opslaan: ' + error.message);
+  } else {
+    showSuccess('Wachtwoord opgeslagen. Je wordt doorgestuurd...');
+    setTimeout(() => window.location.replace('auth.html'), 2000);
+  }
+}
+
 // ── Login ──
 async function doLogin() {
-  if (typeof _fCtx !== 'undefined'
-      && _fCtx.blockIfFilled('login submit')) {
+  if (_fCtx.blockIfFilled('login submit')) {
     showError('Er is iets misgegaan — probeer het opnieuw.');
     return;
   }
@@ -635,17 +916,35 @@ async function doLogin() {
 
   showSuccess('Inloggen gelukt! Je wordt doorgestuurd…');
 
-  // Centrale student routing via utils.js routeStudent()
+  // Centrale student routing — student_type bepaalt international vs nl
   let _sp = null;
+  let _intlSchool = null;
   if (role === 'student') {
-    const { data: sp, error: spErr } = await db
-      .from('student_profiles')
-      .select('bbl_mode, naam, onderwijsniveau')
-      .eq('profile_id', data.user.id)
-      .maybeSingle();
-    if (spErr) console.error('[auth] student_profiles BBL check fout:', spErr.message);
-    if (sp?.bbl_mode === true) sessionStorage.setItem('internly_role', 'bbl');
-    _sp = sp;
+    try {
+      const { data: sp, error: spErr } = await db
+        .from('student_profiles')
+        .select('bbl_mode, naam, onderwijsniveau, student_type')
+        .eq('profile_id', data.user.id)
+        .maybeSingle();
+      if (spErr) console.error('[auth] student_profiles check fout:', spErr.message);
+      if (sp?.bbl_mode === true) sessionStorage.setItem('internly_role', 'bbl');
+      if (sp?.student_type === 'international') sessionStorage.setItem('internly_role', 'student_international');
+      _sp = sp;
+    } catch (err) {
+      console.error('[auth] student_profiles fetch failed:', err?.message || err);
+    }
+  } else if (role === 'school') {
+    try {
+      const { data: intl, error: intlErr } = await db
+        .from('international_school_profiles')
+        .select('profile_id')
+        .eq('profile_id', data.user.id)
+        .maybeSingle();
+      if (intlErr) console.error('[auth] intl school check fout:', intlErr.message);
+      _intlSchool = intl;
+    } catch (err) {
+      console.error('[auth] intl school fetch failed:', err?.message || err);
+    }
   }
 
   // Push registration — fire-and-forget, never blocks redirect
@@ -654,19 +953,24 @@ async function doLogin() {
   setTimeout(() => {
     if (role === 'student') {
       if (_sp && typeof _sp.bbl_mode === 'boolean') {
-        // Bestaand profiel — rol-detectie via centraal contract
-        const roleKey = Internly.detectRole({
-          role: 'student',
-          bbl_mode: _sp.bbl_mode,
-          onderwijsniveau: _sp.onderwijsniveau
-        });
-        window.location.href = Internly.routeForRole(roleKey);
+        // Bestaand profiel — gebruik centrale resolver (single source of truth)
+        // js/roles.js gegarandeerd geladen via §Laadvolgorde
+        // OPEN VRAAG (30 apr 2026): BBL student zonder naam wordt
+        // hier naar bbl-hub gestuurd, maar het al-ingelogd panel
+        // (rond regel 1129) stuurt naar bbl-profile. Twee gedragingen
+        // voor zelfde user-state. UX-keuze post-11-mei.
+        window.location.href = resolveStudentDashboard({ role: 'student' }, _sp);
       } else {
-        // Geen profiel nog — stuur naar profielaanmaak
+        // Onboarding-guard: student zonder profiel → profiel-form
+        // OPEN VRAAG (30 apr 2026): mogelijk conflict met canon B2 —
+        // zie stap 4 deliverable. Identiek patroon als discover.html:1406.
         window.location.href = 'student-profile.html';
       }
+    } else if (role === 'school' && _intlSchool) {
+      // International school → eigen dashboard
+      window.location.href = 'international-school-dashboard.html';
     } else {
-      window.location.href = ROUTES[role] || 'match-dashboard.html';
+      window.location.href = getRoleLanding(role, false);
     }
   }, 1000);
 
@@ -679,8 +983,7 @@ async function doLogin() {
 
 // ── Register ──
 async function doRegister() {
-  if (typeof _fCtx !== 'undefined'
-      && _fCtx.blockIfFilled('register submit')) {
+  if (_fCtx.blockIfFilled('register submit')) {
     showError('Er is iets misgegaan — probeer het opnieuw.');
     return;
   }
@@ -691,12 +994,17 @@ async function doRegister() {
   }
   if (!selectedRole) { showError('Kies eerst een rol.'); return; }
 
-  const naam  = document.getElementById('reg-naam').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
+  const naam  = sanitizeNaam(document.getElementById('reg-naam').value);
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass  = document.getElementById('reg-pass').value;
 
-  if (!naam || !email || !pass) { showError('Vul alle velden in.'); return; }
-  if (pass.length < 6) { showError('Wachtwoord moet minimaal 6 tekens zijn.'); return; }
+  if (naam.length < 2) { showError('Vul je naam in (minimaal 2 tekens).'); return; }
+  if (!validateEmail(email)) { showError('Vul een geldig e-mailadres in.'); return; }
+  if (!pass) { showError('Vul een wachtwoord in.'); return; }
+  if (!validatePassword(pass).valid) {
+    showError('Wachtwoord moet minimaal 8 tekens hebben, één hoofdletter en één cijfer.');
+    return;
+  }
   if (selectedRole === 'gepensioneerd') {
     const sector = document.getElementById('reg-sector')?.value;
     if (!sector) { showError('Kies je sector — studenten zoeken op dit gebied.'); return; }
@@ -717,7 +1025,16 @@ async function doRegister() {
   btn.textContent = 'Account aanmaken →';
 
   if (error) {
-    showError('Aanmelden mislukt — probeer het nog eens, of mail ons op hallo@internly.pro');
+    const msg = error.message || '';
+    if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('user_already_exists') || error.code === 'user_already_exists') {
+      showError('Dit e-mailadres is al in gebruik. Probeer in te loggen.');
+    } else if (msg.toLowerCase().includes('password') && (msg.toLowerCase().includes('short') || msg.toLowerCase().includes('least') || msg.toLowerCase().includes('weak') || error.code === 'weak_password')) {
+      showError('Wachtwoord is te kort. Gebruik minstens 8 tekens.');
+    } else if (msg.toLowerCase().includes('email') && (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('format') || error.code === 'invalid_email')) {
+      showError('Dit lijkt geen geldig e-mailadres.');
+    } else {
+      showError('Aanmelden mislukt — probeer het nog eens, of mail ons op hallo@internly.pro');
+    }
     return;
   }
 
@@ -755,19 +1072,70 @@ async function doRegister() {
     // 4. BBL-student: zet bbl_mode=true + onderwijsniveau op student_profiles
     // Gebruik upsert — bij registratie bestaat de rij nog niet, UPDATE zou 0 rijen raken.
     if (isBBL) {
-      await db.from('student_profiles')
-        .upsert({ profile_id: data.user.id, bbl_mode: true, onderwijsniveau: 'MBO_BBL' }, { onConflict: 'profile_id' });
+      try {
+        const { error: bblErr } = await db.from('student_profiles')
+          .upsert({ profile_id: data.user.id, bbl_mode: true, onderwijsniveau: 'MBO_BBL' }, { onConflict: 'profile_id' });
+        if (bblErr) {
+          console.error('[auth] BBL student_profile upsert fout:', bblErr.message);
+          notify('Profiel deels opgeslagen — probeer later te bewerken', false);
+        }
+      } catch (err) {
+        console.error('[auth] BBL upsert exception:', err?.message || err);
+      }
     }
 
-    // 4b. BOL-student of HBO/WO: student_profiles rij aanmaken met juist onderwijsniveau
+    // 4b. International student: student_profiles rij met student_type='international'
+    if (selectedRole === 'student' && isInternational && data.user) {
+      try {
+        const { error: intlErr } = await db.from('student_profiles').upsert({
+          profile_id:    data.user.id,
+          bbl_mode:      false,
+          student_type:  'international'
+        }, { onConflict: 'profile_id' });
+        if (intlErr) {
+          console.error('[auth] intl student_profile upsert fout:', intlErr.message);
+          notify('Profile partially saved — please try editing later', false);
+        }
+      } catch (err) {
+        console.error('[auth] intl student upsert exception:', err?.message || err);
+      }
+    }
+
+    // 4c. BOL-student of HBO/WO (NL): student_profiles rij aanmaken met juist onderwijsniveau
     // Zo kan auth.html bij volgende login meteen de juiste pagina kiezen.
-    if (selectedRole === 'student' && !isBBL && data.user) {
+    if (selectedRole === 'student' && !isBBL && !isInternational && data.user) {
       const studentType = document.querySelector('input[name="student_type"]:checked')?.value || 'HBO_WO';
-      await db.from('student_profiles').upsert({
-        profile_id:      data.user.id,
-        bbl_mode:        false,
-        onderwijsniveau: studentType === 'BOL' ? 'MBO_BOL' : 'onbekend',
-      }, { onConflict: 'profile_id' });
+      try {
+        const { error: nlErr } = await db.from('student_profiles').upsert({
+          profile_id:      data.user.id,
+          bbl_mode:        false,
+          student_type:    'nl',
+          onderwijsniveau: studentType === 'BOL' ? 'MBO_BOL' : 'onbekend',
+        }, { onConflict: 'profile_id' });
+        if (nlErr) {
+          console.error('[auth] NL student_profile upsert fout:', nlErr.message);
+          notify('Profiel deels opgeslagen — probeer later te bewerken', false);
+        }
+      } catch (err) {
+        console.error('[auth] NL student upsert exception:', err?.message || err);
+      }
+    }
+
+    // 4d. International school: international_school_profiles rij aanmaken
+    if (selectedRole === 'school' && isInternational && data.user) {
+      try {
+        const { error: intlSchErr } = await db.from('international_school_profiles').upsert({
+          profile_id:       data.user.id,
+          institution_name: naam,
+          country:          ''
+        }, { onConflict: 'profile_id' });
+        if (intlSchErr) {
+          console.error('[auth] intl school profile upsert fout:', intlSchErr.message);
+          notify('Account created — please complete your school details after login', false);
+        }
+      } catch (err) {
+        console.error('[auth] intl school upsert exception:', err?.message || err);
+      }
     }
 
     // 4. Gepensioneerde buddy: schrijf naar waitlist zodat studenten je kunnen vinden
@@ -845,7 +1213,7 @@ async function switchAccount() {
   document.getElementById('form-login').style.display = 'block';
   document.getElementById('form-register').style.display = 'none';
   const logoSub = document.getElementById('logoSub');
-  if (logoSub) logoSub.textContent = 'Welkom terug.';
+  if (logoSub) logoSub.textContent = 'welkom terug';
 }
 
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
@@ -861,10 +1229,11 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
+  // Telemetry init — zie CLAUDE.md voor codenames
+  _fCtx._init('auth');
+
   // Honeypot: plant verborgen valkuil-veld in login-container.
-  if (typeof _fCtx !== 'undefined') {
-    _fCtx._plant(document.getElementById('form-login'));
-  }
+  _fCtx._plant(document.getElementById('form-login'));
 
   // Al ingelogd? Toon panel met optie naar dashboard of ander account.
   const { data: { user } } = await db.auth.getUser();
@@ -875,8 +1244,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       .eq('id', user.id)
       .maybeSingle();
     const role = profile?.role || sessionStorage.getItem('internly_role');
-    if (role && ROUTES[role]) {
-      let dest = ROUTES[role];
+    if (role && isValidRole(role)) {
+      let dest = getRoleLanding(role, false);
       let roleLabel = { student: 'Student (BOL)', bedrijf: 'Bedrijf', school: 'School', begeleider: 'Stagebegeleider', gepensioneerd: 'Gepensioneerde buddy' }[role] || role;
       if (role === 'student') {
         const { data: sp } = await db
@@ -884,8 +1253,12 @@ window.addEventListener('DOMContentLoaded', async () => {
           .select('bbl_mode, naam, onderwijsniveau')
           .eq('profile_id', user.id)
           .maybeSingle();
+        // OPEN VRAAG (30 apr 2026): BBL student zonder naam gaat hier
+        // naar bbl-profile, maar post-login flow (rond regel 837)
+        // stuurt naar bbl-hub. Twee gedragingen voor zelfde user-state.
+        // UX-keuze post-11-mei.
         if (sp?.bbl_mode === true) { dest = sp?.naam ? 'bbl-hub.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
-        if (sp && sp.onderwijsniveau === 'MBO_BOL') { dest = 'bol-profile.html'; }
+        else if (!sp?.naam) { dest = 'student-profile.html'; }
       }
       const name = user.user_metadata?.naam || user.user_metadata?.name || user.email;
       document.getElementById('alreadyName').textContent = name;
@@ -898,7 +1271,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('form-login').style.display = 'none';
       document.getElementById('form-register').style.display = 'none';
       const logoSub = document.getElementById('logoSub');
-      if (logoSub) logoSub.textContent = 'Je bent al ingelogd.';
+      if (logoSub) logoSub.textContent = 'je bent al ingelogd';
     }
     return;
   }

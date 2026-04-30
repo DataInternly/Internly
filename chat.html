@@ -10,18 +10,41 @@
   <link rel="manifest" href="/manifest.json">
   <title>Berichten — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/dist/browser.js"></script>
+  <script src="js/profanity.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/dist/browser.js"
+          integrity="sha384-gGElBOlmyIGNVOeetC2Q0EHG2IzuLtq7wBSnFgnkDTB/yzjOi6HwHkyt8xjsy7SU"
+          crossorigin="anonymous"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: #f4f3ef;
+
+    /* ═══════════════════════════════════════════════════════════════
+       DOTTED JOURNAL ACHTERGROND — Barry's verzoek (KRITIEK)
+       Achtergrond zit op <body class="page-chat">, NIET op .chat-wrap
+       of bubbles. background-attachment: fixed zorgt dat het patroon
+       niet meescroll. Bubbles blijven semi-transparant zodat het
+       journal-effect doorschemert.
+       ═══════════════════════════════════════════════════════════════ */
+    body.page-chat {
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      color: var(--fg-primary, #0d1520);
+      background-color: var(--c-cream-warm, #fdfaf6);
+      background-image:
+        /* dot grid op 22px ritme */
+        radial-gradient(circle, rgba(13, 26, 16, 0.07) 1px, transparent 1px),
+        /* warme oranje light-source rechtsboven */
+        radial-gradient(ellipse 80% 60% at 90% 8%, rgba(255, 126, 66, 0.10), transparent 60%),
+        /* diepere warm-pool linksonder */
+        radial-gradient(ellipse 70% 50% at 8% 92%, rgba(224, 92, 26, 0.05), transparent 60%);
+      background-size: 22px 22px, 100% 100%, 100% 100%;
+      background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
       display: flex; flex-direction: column;
       /* iOS Safari fallback, then dvh for modern browsers */
@@ -31,60 +54,110 @@
       overflow: hidden;
     }
 
-    /* ── Topbar ── */
+    /* ── Topbar — translucent zodat journal doorschemert ── */
     .topbar {
-      background: linear-gradient(135deg, #1a7a48, #0f5c36);
-      padding: 0 24px; height: 56px; flex-shrink: 0;
-      display: flex; align-items: center; gap: 14px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-subtle, rgba(13,26,16,.09));
+      padding: 0 var(--s5, 24px); height: 56px; flex-shrink: 0;
+      display: flex; align-items: center; gap: var(--s3, 14px);
     }
     .topbar-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.2rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--c-green-deep, #0f5c36);
       letter-spacing: -.02em; text-decoration: none;
     }
-    .topbar-logo span { color: #FF7E42; }
+    .topbar-logo span { color: var(--c-orange-deep, #e05c1a); }
     .back-btn {
-      background: rgba(255,255,255,.15); border: none; color: #fff;
-      padding: 5px 12px; border-radius: 20px; font-family: 'Outfit', sans-serif;
+      background: transparent;
+      border: 1.5px solid var(--line-default, rgba(13,26,16,.14));
+      color: var(--fg-secondary, #2e4038);
+      padding: 5px 12px; border-radius: var(--r-pill, 999px);
+      font-family: var(--font-body, 'Outfit', sans-serif);
       font-size: .82rem; font-weight: 500; cursor: pointer;
-      transition: background .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+      transition: background var(--t-fast, .15s), border-color var(--t-fast, .15s), color var(--t-fast, .15s);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 5px;
       min-height: 44px;
     }
-    .back-btn:hover { background: rgba(255,255,255,.25); }
+    .back-btn:hover {
+      background: var(--c-cream, #f4f3ef);
+      border-color: var(--fg-tertiary, #6b8070);
+      color: var(--fg-primary, #0d1520);
+    }
     .topbar-match-info { flex: 1; min-width: 0; }
     .topbar-match-name {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1rem; font-weight: 700;
+      color: var(--fg-primary, #0d1520);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .topbar-match-sub { font-size: .78rem; color: rgba(255,255,255,.65); }
+    .topbar-match-sub {
+      font-size: .78rem;
+      color: var(--fg-tertiary, #6b8070);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .topbar-match-sub::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: #2bbf6a; flex-shrink: 0;
+    }
+
+    /* Lang-switcher op witte topbar — overschrijft .lang-btn van style.css */
+    .topbar .lang-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--fg-tertiary, #6b8070);
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      font-size: .72rem; font-weight: 600;
+      padding: 4px 8px; border-radius: var(--r-pill, 999px);
+      cursor: pointer;
+    }
+    .topbar .lang-btn:hover {
+      color: var(--fg-primary, #0d1520);
+      background: var(--c-cream, #f4f3ef);
+    }
+    .topbar .lang-btn.active {
+      color: var(--c-orange-deep, #e05c1a);
+      background: rgba(255,126,66,.10);
+      border-color: rgba(255,126,66,.25);
+    }
 
     /* ── Chat layout ── */
     .chat-wrap {
       flex: 1; display: flex; flex-direction: column;
       max-width: 720px; width: 100%; margin: 0 auto;
       overflow: hidden;
-      /* Safe area inset for iPhone notch */
       padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    /* ── Messages area ── */
+    /* ── Messages area — geen eigen achtergrond, journal schemert door ── */
     .messages-area {
-      flex: 1; overflow-y: auto; padding: 20px 16px;
-      display: flex; flex-direction: column; gap: 10px;
+      flex: 1; overflow-y: auto;
+      padding: var(--s5, 20px) var(--s4, 16px);
+      display: flex; flex-direction: column; gap: var(--s3, 10px);
     }
     .messages-area::-webkit-scrollbar { width: 5px; }
-    .messages-area::-webkit-scrollbar-thumb { background: #c9e8d5; border-radius: 3px; }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: rgba(26,122,72,.25); border-radius: 3px;
+    }
     .messages-area::-webkit-scrollbar-track { background: transparent; }
 
-    /* Day separator */
+    /* Day separator — Caveat in oranje, kantelt licht */
     .day-sep {
-      text-align: center; font-size: .73rem; color: #9ca3af;
-      margin: 6px 0; position: relative;
+      text-align: center;
+      font-family: var(--font-script, 'Caveat', cursive);
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--c-orange-deep, #e05c1a);
+      margin: var(--s4, 16px) 0;
+      position: relative;
+      transform: rotate(-.5deg);
     }
     .day-sep::before, .day-sep::after {
       content: ''; position: absolute; top: 50%;
-      width: calc(50% - 50px); height: 1px; background: #f0f0ee;
+      width: calc(50% - 60px); height: 1px;
+      background: rgba(224,92,26,.18);
     }
     .day-sep::before { left: 0; }
     .day-sep::after  { right: 0; }
@@ -98,9 +171,10 @@
 
     .msg-avatar {
       width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-      background: #e8f5ee; color: #1a7a48;
+      background: var(--c-green, #1a7a48); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Bricolage Grotesque', sans-serif; font-size: .68rem; font-weight: 700;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: .68rem; font-weight: 700;
     }
     .msg-row.own .msg-avatar { display: none; }
 
@@ -109,48 +183,84 @@
     .msg-row.other .bubble-wrap { align-items: flex-start; }
 
     .bubble {
-      padding: 10px 14px; border-radius: 16px; font-size: .9rem; line-height: 1.5;
+      padding: 10px 14px; border-radius: 18px;
+      font-size: .92rem; line-height: 1.5;
       word-break: break-word; white-space: pre-wrap;
     }
-    .msg-row.own   .bubble { background: #1a7a48; color: #fff; border-bottom-right-radius: 4px; }
-    .msg-row.other .bubble { background: #fff; color: #0d1520; border: 1px solid #f0f0ee; border-bottom-left-radius: 4px; }
-
-    .msg-time {
-      font-size: .7rem; color: #9ca3af; margin-top: 3px; padding: 0 2px;
+    /* OWN: solid green — staat semi-transparant in blueprint maar
+       voor leesbaarheid gebruiken we volle accent. */
+    .msg-row.own .bubble {
+      background: var(--c-green, #1a7a48);
+      color: #fff;
+      border-top-right-radius: 4px;
+    }
+    /* OTHER: semi-transparant wit (alpha .94) — KRITIEK voor journal-effect */
+    .msg-row.other .bubble {
+      background: rgba(255,255,255,0.94);
+      color: var(--fg-primary, #0d1520);
+      border: 1px solid var(--line-subtle, rgba(13,26,16,.09));
+      border-top-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
     }
 
-    /* ── Input bar ── */
+    .msg-time {
+      font-family: var(--font-mono, 'DM Mono', monospace);
+      font-size: .68rem;
+      color: var(--fg-tertiary, #6b8070);
+      margin-top: 3px; padding: 0 2px;
+    }
+
+    /* ── Input bar — eigen rustig wit, GEEN achtergrond doorschemering ── */
     .input-bar {
-      background: #fff; border-top: 1px solid #e2e8f0;
-      padding: 12px 16px; flex-shrink: 0;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-top: 1px solid var(--line-subtle, rgba(13,26,16,.09));
+      padding: var(--s3, 12px) var(--s4, 16px);
+      flex-shrink: 0;
       display: flex; align-items: flex-end; gap: 10px;
+      position: relative;
+      box-shadow: 0 -2px 12px rgba(0,0,0,.04);
     }
     @media (max-width: 768px) {
       .input-bar { padding-bottom: 68px; } /* 56px mobile nav + 12px base */
     }
+
     .msg-textarea {
-      flex: 1; resize: none; border: 1.5px solid #e2e8f0; border-radius: 12px;
-      padding: 10px 14px; font-family: 'Outfit', sans-serif;
+      flex: 1; resize: none;
+      border: 1.5px solid var(--line-default, #e2e8f0);
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-family: var(--font-body, 'Outfit', sans-serif);
       font-size: 16px; /* prevents iOS zoom */
-      color: #0d1520; line-height: 1.45; max-height: 120px; overflow-y: auto;
-      outline: none; transition: border-color .15s;
+      color: var(--fg-primary, #0d1520);
+      line-height: 1.45;
+      max-height: 120px;
+      overflow-y: auto;
+      outline: none;
+      transition: border-color var(--t-fast, .15s);
+      background: #fff;
     }
-    .msg-textarea:focus { border-color: #1a7a48; }
+    .msg-textarea:focus { border-color: var(--c-green, #1a7a48); }
     .send-btn {
-      background: #1a7a48; color: #fff; border: none;
+      background: var(--c-orange-deep, #e05c1a);
+      color: #fff; border: none;
       width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; font-size: 1.1rem;
-      transition: background .15s, transform .1s;
+      box-shadow: 0 4px 12px rgba(224,92,26,.32);
+      transition: background var(--t-fast, .15s), transform var(--t-fast, .1s);
     }
-    .send-btn:hover { background: #0f5c36; }
+    .send-btn:hover { background: #b94613; transform: translateY(-1px); }
     .send-btn:active { transform: scale(.94); }
-    .send-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+    .send-btn:disabled { background: #d1d5db; cursor: not-allowed; box-shadow: none; transform: none; }
 
     /* ── Empty / Loading ── */
     .chat-empty {
       flex: 1; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 10px; color: #9ca3af; font-size: .9rem;
+      flex-direction: column; gap: 10px;
+      color: var(--fg-tertiary, #6b8070);
+      font-size: .9rem;
       text-align: center; padding: 40px 20px;
     }
     .chat-empty .icon { font-size: 2.5rem; }
@@ -159,28 +269,50 @@
     .notif {
       position: fixed; bottom: 80px; left: 50%;
       transform: translateX(-50%) translateY(12px);
-      background: #0d1520; color: #fff; padding: 10px 20px;
-      border-radius: 10px; font-size: .88rem;
-      box-shadow: 0 6px 20px rgba(0,0,0,.2); z-index: 9999;
-      opacity: 0; transition: opacity .25s, transform .25s;
+      background: var(--c-ink, #0d1520); color: #fff;
+      padding: 10px 20px;
+      border-radius: var(--r-md, 10px);
+      font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.2);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
       pointer-events: none; white-space: nowrap;
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+    :focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
+    }
 
-    /* ── Input bar lift ── */
-    .input-bar { position: relative; box-shadow: 0 -2px 12px rgba(0,0,0,.05); }
+    /* ── Optimistic message states ── */
+    .msg-row[data-status="pending"] .bubble { opacity: .55; }
+    .msg-row[data-status="failed"]  .bubble { border: 1.5px solid #b82020; opacity: .85; }
+    .msg-retry-btn {
+      background: none; border: none; color: #b82020;
+      font-size: .75rem; cursor: pointer;
+      padding: 2px 4px;
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      text-decoration: underline;
+      margin-top: 2px; display: block;
+    }
+    .msg-retry-btn:hover { opacity: .75; }
 
     /* ── Emoji button ── */
     .emoji-btn {
       background: none; border: none; font-size: 1.22rem;
       width: 36px; height: 44px; flex-shrink: 0;
       display: none; align-items: center; justify-content: center;
-      border-radius: 8px; cursor: pointer; transition: background .15s;
-      color: #9ca3af; padding: 0;
+      border-radius: 8px; cursor: pointer;
+      transition: background var(--t-fast, .15s);
+      color: var(--fg-tertiary, #6b8070);
+      padding: 0;
     }
-    .emoji-btn:hover, .emoji-btn.active { background: #f4f3ef; color: #374151; }
+    .emoji-btn:hover, .emoji-btn.active {
+      background: var(--c-cream, #f4f3ef);
+      color: var(--fg-secondary, #2e4038);
+    }
 
     /* ── Emoji picker container ── */
     #emoji-picker-container {
@@ -198,15 +330,122 @@
 
     /* ── Bubble chain (consecutive messages same sender) ── */
     .msg-row.own   .bubble.chain-top    { border-top-right-radius: 4px; }
-    .msg-row.own   .bubble.chain-bottom { border-bottom-right-radius: 16px; }
+    .msg-row.own   .bubble.chain-bottom { border-bottom-right-radius: 18px; }
     .msg-row.other .bubble.chain-top    { border-top-left-radius: 4px; }
-    .msg-row.other .bubble.chain-bottom { border-bottom-left-radius: 16px; }
+    .msg-row.other .bubble.chain-bottom { border-bottom-left-radius: 18px; }
 
     /* Spacer keeps alignment when avatar is hidden for chained messages */
     .msg-avatar-spacer { width: 28px; flex-shrink: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+      .day-sep { transform: none; }
+    }
+
+    /* ── Minesweeper ── */
+    .mine-btn {
+      background: none; border: none; font-size: 1.22rem;
+      width: 36px; height: 44px; flex-shrink: 0;
+      display: none; align-items: center; justify-content: center;
+      border-radius: 8px; cursor: pointer; transition: background .15s;
+      color: #9ca3af; padding: 0;
+    }
+    .mine-btn:hover { background: #f4f3ef; color: #374151; }
+    .mine-panel {
+      position: fixed; inset: 0; z-index: 8000;
+      background: rgba(13,21,32,.55); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mine-chrome {
+      background: #c0c0c0;
+      border-top: 3px solid #fff; border-left: 3px solid #fff;
+      border-right: 3px solid #808080; border-bottom: 3px solid #808080;
+      padding: 6px; width: min(360px, 100vw);
+      max-height: 90vh; overflow-y: auto;
+      animation: msPopIn .2s ease-out;
+    }
+    @keyframes msPopIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @media (max-width: 480px) {
+      .mine-panel { align-items: stretch; }
+      .mine-chrome { width: 100vw; max-height: 100vh; border: none; border-radius: 0; }
+    }
+    .mine-titlebar {
+      background: linear-gradient(90deg, #000080, #1084d0);
+      color: #fff; padding: 3px 6px; font-size: .78rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: space-between;
+      user-select: none;
+    }
+    .mine-close-x {
+      background: #c0c0c0; border-top: 2px solid #fff; border-left: 2px solid #fff;
+      border-right: 2px solid #808080; border-bottom: 2px solid #808080;
+      width: 16px; height: 14px; font-size: .65rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 0;
+    }
+    .mine-close-x:active { border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #fff; border-bottom: 2px solid #fff; }
+    .mine-hud {
+      background: #c0c0c0; padding: 5px 6px;
+      border: 2px inset #808080;
+      margin: 5px 0; display: flex; align-items: center; justify-content: space-between;
+    }
+    .mine-led {
+      background: #000; color: #f00; font-family: 'Courier New', monospace;
+      font-size: 1rem; font-weight: bold; padding: 1px 4px;
+      border: 2px inset #808080; min-width: 3ch; text-align: right;
+    }
+    .mine-face-btn {
+      background: #c0c0c0; border-top: 2px solid #fff; border-left: 2px solid #fff;
+      border-right: 2px solid #808080; border-bottom: 2px solid #808080;
+      width: 26px; height: 26px; font-size: .95rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; padding: 0;
+    }
+    .mine-face-btn:active { border-top: 2px solid #808080; border-left: 2px solid #808080; border-right: 2px solid #fff; border-bottom: 2px solid #fff; }
+    .mine-grid {
+      display: grid;
+      border-top: 3px solid #808080; border-left: 3px solid #808080;
+      border-right: 3px solid #fff; border-bottom: 3px solid #fff;
+    }
+    .mine-cell {
+      width: 22px; height: 22px; font-size: .7rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; user-select: none; font-family: 'Courier New', monospace;
+      border-top: 2px solid #fff; border-left: 2px solid #fff;
+      border-right: 2px solid #808080; border-bottom: 2px solid #808080;
+      background: #c0c0c0; box-sizing: border-box;
+    }
+    @media (max-width: 480px) { .mine-cell { width: 18px; height: 18px; font-size: .58rem; } }
+    .mine-cell.revealed { border: 1px solid #808080; cursor: default; }
+    .mine-cell.flagged { color: #f00; }
+    .mine-cell.mine-explode { background: #f00; }
+    .mine-cell[data-n="1"] { color: #00f; }
+    .mine-cell[data-n="2"] { color: #008000; }
+    .mine-cell[data-n="3"] { color: #f00; }
+    .mine-cell[data-n="4"] { color: #000080; }
+    .mine-cell[data-n="5"] { color: #800000; }
+    .mine-cell[data-n="6"] { color: #008080; }
+    .mine-cell[data-n="7"] { color: #000; }
+    .mine-cell[data-n="8"] { color: #808080; }
+    .mine-turn-bar {
+      text-align: center; font-size: .78rem; padding: 3px 0;
+      font-family: 'Outfit', sans-serif;
+    }
+    .mine-invite-box {
+      padding: 16px; text-align: center; font-family: 'Outfit', sans-serif;
+    }
+    .mine-flag-btn {
+      background: #c0c0c0; border-top: 2px solid #fff; border-left: 2px solid #fff;
+      border-right: 2px solid #808080; border-bottom: 2px solid #808080;
+      padding: 2px 10px; font-size: .75rem; cursor: pointer; font-family: 'Courier New', monospace;
+    }
+    .mine-flag-btn.active {
+      border-top: 2px solid #808080; border-left: 2px solid #808080;
+      border-right: 2px solid #fff; border-bottom: 2px solid #fff; background: #a0a0a0;
+    }
   </style>
 </head>
-<body>
+<body class="page-chat">
 
 <div class="notif" id="notif"></div>
 
@@ -218,10 +457,10 @@
     <div class="topbar-match-sub" id="topbarMatchSub"></div>
   </div>
   <a id="match-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
-  <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:rgba(255,255,255,.3);text-decoration:none;padding:5px 4px;">Privacy</a>
+  <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:var(--fg-tertiary,#6b8070);text-decoration:none;padding:5px 4px;">Privacy</a>
   <button onclick="performLogout()" style="
     flex-shrink:0;background:none;border:none;
-    color:rgba(255,255,255,.45);font-size:.75rem;font-family:'Outfit',sans-serif;
+    color:var(--fg-tertiary,#6b8070);font-size:.75rem;font-family:'Outfit',sans-serif;
     cursor:pointer;padding:5px 8px;border-radius:6px;
     transition:color .15s;" title="Uitloggen">↪ Uit</button>
   <div class="lang-switcher" style="margin-left:0;flex-shrink:0">
@@ -271,6 +510,10 @@
             onclick="toggleEmojiPicker()"
             aria-label="Emoji toevoegen"
             title="Emoji toevoegen">😊</button>
+    <button class="mine-btn" id="mineBtn"
+            onclick="openMinesweeperInvite()"
+            aria-label="Mijnenveger spelen"
+            title="Mijnenveger starten">💣</button>
     <div id="emoji-picker-container" style="display:none"></div>
     <textarea
       class="msg-textarea"
@@ -357,9 +600,9 @@
 
     if (!messages || messages.length === 0) {
       area.innerHTML = `
-        <div class="chat-empty">
-          <span class="icon">💬</span>
-          Nog geen berichten. Stuur een bericht om het gesprek te starten!
+        <div class="chat-empty empty-state empty-state--chat">
+          <p class="es-primary">Begin met een open vraag.</p>
+          <p class="es-secondary">Bijvoorbeeld: <em>wat zou een goede stage hier voor jou inhouden?</em></p>
         </div>`;
       return;
     }
@@ -377,7 +620,8 @@
       const isOwn      = msg.sender_id === currentUser?.id;
       const rowClass   = isOwn ? 'own' : 'other';
       const senderInit = escapeHtml((msg._senderName || 'X').slice(0, 2).toUpperCase());
-      const text       = escapeHtml(msg.content || '');
+      const raw        = (window.Internly?.profanity?.filter(msg.content || '')) ?? (msg.content || '');
+      const text       = escapeHtml(raw).replace(/\bbobba\b/g, '<span style="color:#E85D24;font-weight:500">bobba</span>');
       const time       = escapeHtml(formatTime(msg.created_at));
 
       // Consecutive bubble detection — don't chain across day separators
@@ -413,7 +657,8 @@
     const isOwn      = msg.sender_id === currentUser?.id;
     const rowClass   = isOwn ? 'own' : 'other';
     const senderInit = escapeHtml((msg._senderName || 'X').slice(0, 2).toUpperCase());
-    const text       = escapeHtml(msg.content || '');
+    const raw        = (window.Internly?.profanity?.filter(msg.content || '')) ?? (msg.content || '');
+    const text       = escapeHtml(raw).replace(/\bbobba\b/g, '<span style="color:#E85D24;font-weight:500">bobba</span>');
     const time       = escapeHtml(formatTime(msg.created_at));
 
     // Check if the previous row is from the same sender → apply chain styling
@@ -767,6 +1012,7 @@
     }
 
     convId = conv.id;
+    _msShowBtn();
     await loadMessages();
     subscribeRealtime();
     markMessagesRead();
@@ -840,40 +1086,66 @@
     toggleEmojiPicker(false); // close picker if open
     if (!convId || !currentUser) return;
     const input = document.getElementById('msgInput');
-    const content = input.value.trim();
+    const content = input.value
+      .replace(/[​‌‍‎‏﻿ ]/g, '')
+      .trim();
     if (!content) return;
 
     const btn = document.getElementById('sendBtn');
     btn.disabled = true;
+    const filtered = (window.Internly?.profanity?.filter(content)) ?? content;
     input.value = '';
     input.style.height = 'auto';
 
     const myName = getDisplayName(currentUser);
 
-    // Optimistic append
-    const optimistic = {
+    // Optimistic append met pending-status
+    const optimisticMsg = {
       id:              'opt-' + Date.now(),
       sender_id:       currentUser.id,
       _senderName:     myName,
-      content,
+      content:         filtered,
       created_at:      new Date().toISOString(),
       conversation_id: convId,
     };
-    appendMessage(optimistic);
+    appendMessage(optimisticMsg);
+
+    const area         = document.getElementById('messagesArea');
+    const pendingRow   = area.querySelector('.msg-row.own:last-of-type');
+    if (pendingRow) pendingRow.dataset.status = 'pending';
 
     const { error } = await db.from('messages').insert({
       conversation_id: convId,
       sender_id:       currentUser.id,
-      content,
+      content:         filtered,
     });
 
     btn.disabled = false;
 
     if (error) {
-      notify('Fout bij verzenden: ' + (error?.message || 'onbekende fout'));
       console.error('Send error:', error?.message || 'onbekende fout');
+      if (pendingRow) {
+        pendingRow.dataset.status = 'failed';
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'msg-retry-btn';
+        retryBtn.textContent = 'Opnieuw proberen';
+        retryBtn.onclick = () => {
+          pendingRow.remove();
+          input.value = filtered;
+          sendMessage();
+        };
+        const wrap = pendingRow.querySelector('.bubble-wrap');
+        if (wrap) wrap.appendChild(retryBtn);
+      }
+      toast.error('Bericht kon niet worden verzonden', () => {
+        if (pendingRow) pendingRow.remove();
+        input.value = filtered;
+        sendMessage();
+      });
       return;
     }
+
+    if (pendingRow) pendingRow.removeAttribute('data-status');
 
     // Notify recipient (fire-and-forget)
     if (otherPartyId) {
@@ -1122,6 +1394,7 @@
     }
 
     convId = conv.id;
+    _msShowBtn();
     await loadMessages();
     subscribeRealtime();
     markMessagesRead();
@@ -1130,9 +1403,10 @@
   // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
   window.addEventListener('unhandledrejection', function(e) {
     if (e.reason && (
-      e.reason.message?.includes('JWT') ||
-      e.reason.message?.includes('session') ||
-      e.reason.code === 'PGRST301'
+      e.reason.code === 'PGRST301' ||
+      e.reason.status === 401 ||
+      e.reason.message === 'Auth session missing!' ||
+      e.reason.message?.includes('JWT expired')
     )) {
       sessionStorage.clear();
       window.location.replace('auth.html?expired=1');
@@ -1149,6 +1423,18 @@
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;
+
+    // Profile guard — audit fix 2026-04-30
+    const { data: _profRow } = await db.from('profiles')
+      .select('role').eq('id', user.id).maybeSingle();
+    if (_profRow?.role === 'student') {
+      const { data: _sp } = await db.from('student_profiles')
+        .select('naam').eq('profile_id', user.id).maybeSingle();
+      if (!_sp?.naam) {
+        window.location.replace('student-profile.html');
+        return;
+      }
+    }
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
@@ -1190,8 +1476,382 @@
   window.addEventListener('beforeunload', () => {
     if (realtimeSub)     realtimeSub.unsubscribe();
     if (meetingNotifSub) meetingNotifSub.unsubscribe();
+    if (_msChannel)      _msChannel.unsubscribe();
   });
+
+  // ── Minesweeper ───────────────────────────────────────────────────────────
+
+  const MS = { ROWS: 15, COLS: 15, MINES: 30, MAX_PER_HOUR: 3 };
+  let _msChannel = null;
+  let _msState   = null;
+  let _msTimer   = null;
+
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function hashString(s) {
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = (h * 0x01000193) >>> 0; }
+    return h;
+  }
+
+  function _msGenBoard(seed) {
+    const rng = mulberry32(hashString(seed));
+    const n = MS.ROWS * MS.COLS;
+    const cells = Array.from({ length: n }, (_, k) => ({
+      row: Math.floor(k / MS.COLS), col: k % MS.COLS,
+      mine: false, revealed: false, flagged: false, adjacent: 0
+    }));
+    const idx = Array.from({ length: n }, (_, k) => k);
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [idx[i], idx[j]] = [idx[j], idx[i]];
+    }
+    for (let i = 0; i < MS.MINES; i++) cells[idx[i]].mine = true;
+    for (const c of cells) {
+      if (c.mine) continue;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        const nr = c.row + dr, nc = c.col + dc;
+        if (nr >= 0 && nr < MS.ROWS && nc >= 0 && nc < MS.COLS && cells[nr * MS.COLS + nc].mine) c.adjacent++;
+      }
+    }
+    return cells;
+  }
+
+  // Self-test: two seeds must produce different boards
+  (function() {
+    const m1 = _msGenBoard('seed-aaa').filter(c => c.mine).map(c => c.row * 15 + c.col).join();
+    const m2 = _msGenBoard('seed-bbb').filter(c => c.mine).map(c => c.row * 15 + c.col).join();
+    if (m1 === m2) console.error('[Mijnenveger] PRNG self-test FAIL: identical boards for different seeds');
+  })();
+
+  function _msRateOk() {
+    const key = 'msw_' + (convId || 'x');
+    const now = Date.now();
+    const arr = JSON.parse(localStorage.getItem(key) || '[]').filter(t => now - t < 3600000);
+    if (arr.length >= MS.MAX_PER_HOUR) { notify('Max 3 potjes per uur per gesprek bereikt'); return false; }
+    arr.push(now);
+    localStorage.setItem(key, JSON.stringify(arr));
+    return true;
+  }
+
+  function _msCh() {
+    if (_msChannel || !convId) return _msChannel;
+    _msChannel = db.channel('minesweeper-' + convId, { config: { broadcast: { self: false } } })
+      .on('broadcast', { event: 'invite' },          e => _msOnInvite(e.payload))
+      .on('broadcast', { event: 'invite_accepted' }, e => _msOnAccepted(e.payload))
+      .on('broadcast', { event: 'invite_declined' }, () => _msOnDeclined())
+      .on('broadcast', { event: 'invite_timeout' },  () => _msOnTimeout())
+      .on('broadcast', { event: 'move' },            e => _msOnMove(e.payload))
+      .on('broadcast', { event: 'mine_hit' },        e => _msOnMineHit(e.payload))
+      .on('broadcast', { event: 'board_done' },      e => _msOnBoardDone(e.payload))
+      .on('broadcast', { event: 'quit' },            e => _msOnQuit(e.payload))
+      .subscribe();
+    return _msChannel;
+  }
+
+  function _msShowBtn() {
+    const btn = document.getElementById('mineBtn');
+    if (!btn || !convId) return;
+    db.from('conversations')
+      .select('match_id, matches(type)')
+      .eq('id', convId)
+      .maybeSingle()
+      .then(({ data: conv }) => {
+        const mType = conv?.matches?.type;
+        const blocked = ['school_bedrijf', 'school_posting'];
+        if (!mType || !blocked.includes(mType)) btn.style.display = 'flex';
+      });
+  }
+
+  function openMinesweeperInvite() {
+    _msCh();
+    _msShow(`<div class="mine-invite-box">
+      <div style="font-size:2rem">💣</div>
+      <div style="font-weight:600;margin:8px 0">Mijnenveger</div>
+      <div style="font-size:.82rem;color:#555;margin-bottom:14px">Beurten · 15×15 · 30 mijnen · 1 pt per veilige cel</div>
+      <button onclick="_msSendInvite()" style="background:#000080;color:#fff;border:none;padding:7px 18px;font-size:.88rem;cursor:pointer;font-family:'Outfit',sans-serif">Uitdagen 🎮</button>
+      <button onclick="closeMinesweeper()" style="background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:6px 14px;margin-left:8px;cursor:pointer;font-family:'Outfit',sans-serif">Annuleren</button>
+    </div>`);
+  }
+
+  function _msSendInvite() {
+    if (!_msRateOk()) { closeMinesweeper(); return; }
+    _msCh().send({ type: 'broadcast', event: 'invite', payload: { name: getDisplayName(currentUser) } });
+    _msState = { role: 'inviter', myTurn: true, scores: { inviter: 0, receiver: 0 }, board: null, seed: null, flagMode: false, done: false };
+    let s = 60;
+    _msShow(`<div class="mine-invite-box">
+      <div style="font-size:1.5rem">⏳</div>
+      <div style="font-weight:600;margin:8px 0">Wacht op ${escapeHtml(otherPartyName)}…</div>
+      <div id="ms-cd" style="font-size:.82rem;color:#555">Verloopt over <b>${s}</b>s</div>
+      <button onclick="_msCancelInvite()" style="margin-top:10px;background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:5px 12px;cursor:pointer;font-family:'Outfit',sans-serif">Annuleren</button>
+    </div>`);
+    _msTimer = setInterval(() => {
+      const el = document.getElementById('ms-cd');
+      if (el) el.innerHTML = `Verloopt over <b>${--s}</b>s`;
+      if (s <= 0) { clearInterval(_msTimer); _msCh().send({ type: 'broadcast', event: 'invite_timeout', payload: {} }); closeMinesweeper(); }
+    }, 1000);
+  }
+
+  function _msCancelInvite() {
+    clearInterval(_msTimer);
+    _msCh().send({ type: 'broadcast', event: 'invite_timeout', payload: {} });
+    closeMinesweeper();
+  }
+
+  function _msOnInvite(p) {
+    _msCh();
+    _msState = { role: 'receiver', myTurn: false, scores: { inviter: 0, receiver: 0 }, board: null, seed: null, flagMode: false, done: false };
+    _msShow(`<div class="mine-invite-box">
+      <div style="font-size:1.5rem">💣</div>
+      <div style="font-weight:600;margin:8px 0">${escapeHtml(p.name)} daagt je uit!</div>
+      <div style="font-size:.82rem;color:#555;margin-bottom:12px">Beurt-gebaseerd Mijnenveger · 15×15 · 30 mijnen</div>
+      <button onclick="_msAcceptInvite()" style="background:#000080;color:#fff;border:none;padding:7px 16px;font-size:.88rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-right:8px">✓ Accepteren</button>
+      <button onclick="_msDeclineInvite()" style="background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:6px 14px;cursor:pointer;font-family:'Outfit',sans-serif">✕ Weigeren</button>
+    </div>`);
+  }
+
+  function _msAcceptInvite() {
+    const seed = convId + '-' + Date.now();
+    _msCh().send({ type: 'broadcast', event: 'invite_accepted', payload: { seed } });
+    _msState.board = _msGenBoard(seed);
+    _msState.seed  = seed;
+    _msState.myTurn = false;
+    _msRenderGame();
+  }
+
+  function _msDeclineInvite() {
+    _msCh().send({ type: 'broadcast', event: 'invite_declined', payload: {} });
+    closeMinesweeper();
+  }
+
+  function _msOnAccepted(p) {
+    clearInterval(_msTimer);
+    _msState.board  = _msGenBoard(p.seed);
+    _msState.seed   = p.seed;
+    _msState.myTurn = true;
+    _msRenderGame();
+  }
+
+  function _msOnDeclined() {
+    clearInterval(_msTimer);
+    notify(escapeHtml(otherPartyName) + ' heeft de uitdaging afgewezen');
+    closeMinesweeper();
+  }
+
+  function _msOnTimeout() { notify('Uitdaging verlopen'); closeMinesweeper(); }
+
+  function _msRenderGame() {
+    const s = _msState;
+    if (!s || !s.board) return;
+    const theirRole = s.role === 'inviter' ? 'receiver' : 'inviter';
+    const myScore    = s.scores[s.role];
+    const theirScore = s.scores[theirRole];
+    const flagsLeft  = MS.MINES - s.board.filter(c => c.flagged).length;
+    const face       = s.done ? (myScore >= theirScore ? '😎' : '😵') : '🙂';
+
+    const hud = `
+      <div class="mine-hud">
+        <div class="mine-led">${String(Math.max(0, flagsLeft)).padStart(3, '0')}</div>
+        <button class="mine-face-btn" onclick="_msQuit()" title="Opgeven">${face}</button>
+        <div class="mine-led">${myScore}-${theirScore}</div>
+      </div>
+      <div class="mine-turn-bar" style="color:${s.myTurn && !s.done ? '#1a7a48' : '#b82020'}">
+        ${s.done ? '🏁 Spel voorbij' : s.myTurn ? '🟢 Jouw beurt' : `🔴 Beurt van ${escapeHtml(otherPartyName)}`}
+      </div>
+      <div style="display:flex;justify-content:center;margin:3px 0">
+        <button class="mine-flag-btn${s.flagMode ? ' active' : ''}" onclick="_msFlagToggle()">🚩 Vlag-modus</button>
+        ${s.flagMode ? '<span style="font-size:.68rem;color:#9ca3af;margin-left:6px;">vlaggen kost een beurt</span>' : ''}
+      </div>`;
+
+    const grid = `<div class="mine-grid" id="ms-grid" style="grid-template-columns:repeat(${MS.COLS},1fr)">${
+      s.board.map((c, i) => {
+        let cls = 'mine-cell', content = '', dn = '';
+        if (c.revealed) {
+          cls += ' revealed';
+          if (c.mine) { cls += ' mine-explode'; content = '💥'; }
+          else if (c.adjacent) { content = c.adjacent; dn = ` data-n="${c.adjacent}"`; }
+        } else if (c.flagged) { cls += ' flagged'; content = '🚩'; }
+        const canClick = s.myTurn && !s.done && !c.revealed;
+        const onclick  = canClick ? `onclick="_msReveal(${i})"` : '';
+        return `<div class="${cls}"${dn} ${onclick} oncontextmenu="_msFlag(event,${i})">${content}</div>`;
+      }).join('')
+    }</div>`;
+
+    _msShow(hud + grid);
+    _msAttachLongPress();
+  }
+
+  function _msFlagToggle() {
+    if (_msState) { _msState.flagMode = !_msState.flagMode; _msRenderGame(); }
+  }
+
+  function _msReveal(i) {
+    const s = _msState;
+    if (!s || !s.myTurn || s.done || s.board[i].revealed || s.board[i].flagged) return;
+    if (s.flagMode) { _msFlag(null, i); return; }
+
+    if (s.board[i].mine) {
+      s.board[i].revealed = true;
+      _msRevealMines();
+      s.done = true;
+      _msRenderGame();
+      _msCh().send({ type: 'broadcast', event: 'mine_hit', payload: { scores: s.scores } });
+      const theirRole = s.role === 'inviter' ? 'receiver' : 'inviter';
+      _msSendChat(`💣 ${escapeHtml(getDisplayName(currentUser))} raapte een mijn op! ${escapeHtml(otherPartyName)} wint ${s.scores[theirRole]}-${s.scores[s.role]}.`);
+      setTimeout(closeMinesweeper, 3000);
+      return;
+    }
+
+    const pts = _msCascade(s.board, i);
+    s.scores[s.role] += pts;
+    const revealedIdxs = s.board.map((c, j) => c.revealed ? j : -1).filter(j => j >= 0);
+    const safeLeft = s.board.filter(c => !c.mine && !c.revealed).length;
+
+    if (safeLeft === 0) {
+      s.done = true;
+      _msRenderGame();
+      _msCh().send({ type: 'broadcast', event: 'board_done', payload: { scores: s.scores } });
+      _msEndMessage(s.scores, s.role);
+      setTimeout(closeMinesweeper, 3000);
+      return;
+    }
+
+    _msCh().send({ type: 'broadcast', event: 'move', payload: { revealed: revealedIdxs, scores: s.scores } });
+    s.myTurn = false;
+    _msRenderGame();
+  }
+
+  function _msCascade(board, i) {
+    if (board[i].revealed || board[i].mine || board[i].flagged) return 0;
+    board[i].revealed = true;
+    let n = 1;
+    if (board[i].adjacent === 0) {
+      const r = board[i].row, c = board[i].col;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        const nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < MS.ROWS && nc >= 0 && nc < MS.COLS) n += _msCascade(board, nr * MS.COLS + nc);
+      }
+    }
+    return n;
+  }
+
+  function _msRevealMines() { _msState.board.forEach(c => { if (c.mine) c.revealed = true; }); }
+
+  function _msFlag(e, i) {
+    if (e) e.preventDefault();
+    const s = _msState;
+    if (!s || !s.myTurn || s.done || s.board[i].revealed) return;
+    s.board[i].flagged = !s.board[i].flagged;
+    s.myTurn = false;
+    _msCh().send({ type: 'broadcast', event: 'move', payload: { revealed: [], flagged: i, scores: s.scores } });
+    _msRenderGame();
+  }
+
+  function _msOnMove(p) {
+    const s = _msState;
+    if (!s) return;
+    p.revealed.forEach(i => { if (s.board[i]) s.board[i].revealed = true; });
+    if (typeof p.flagged === 'number' && s.board[p.flagged]) {
+      s.board[p.flagged].flagged = !s.board[p.flagged].flagged;
+    }
+    s.scores = p.scores;
+    s.myTurn = true;
+    _msRenderGame();
+  }
+
+  function _msOnMineHit(p) {
+    const s = _msState;
+    if (!s) return;
+    s.scores = p.scores; s.done = true;
+    _msRevealMines(); _msRenderGame();
+    notify(escapeHtml(otherPartyName) + ' raapte een mijn op — jij wint! 🎉');
+    setTimeout(closeMinesweeper, 3000);
+  }
+
+  function _msOnBoardDone(p) {
+    const s = _msState;
+    if (!s) return;
+    s.scores = p.scores; s.done = true;
+    _msRenderGame();
+    setTimeout(closeMinesweeper, 3000);
+  }
+
+  function _msEndMessage(scores, myRole) {
+    const theirRole = myRole === 'inviter' ? 'receiver' : 'inviter';
+    const mine = scores[myRole], theirs = scores[theirRole];
+    let msg;
+    if (mine > theirs)       msg = `🏆 ${escapeHtml(getDisplayName(currentUser))} wint Mijnenveger! ${mine}-${theirs}.`;
+    else if (theirs > mine)  msg = `🏆 ${escapeHtml(otherPartyName)} wint Mijnenveger! ${theirs}-${mine}.`;
+    else                     msg = `🤝 Gelijkspel in Mijnenveger! ${mine}-${theirs}.`;
+    _msSendChat(msg);
+  }
+
+  function _msQuit() {
+    if (_msState && !_msState.done) {
+      _msCh().send({ type: 'broadcast', event: 'quit', payload: { name: getDisplayName(currentUser) } });
+      _msSendChat(`🏳️ ${escapeHtml(getDisplayName(currentUser))} heeft de Mijnenveger opgegeven.`);
+    }
+    closeMinesweeper();
+  }
+
+  function _msOnQuit(p) {
+    notify(escapeHtml(p.name || 'Tegenstander') + ' heeft opgegeven');
+    closeMinesweeper();
+  }
+
+  async function _msSendChat(text) {
+    if (!convId || !currentUser) return;
+    await db.from('messages').insert({ conversation_id: convId, sender_id: currentUser.id, content: text });
+  }
+
+  function _msShow(html) {
+    const body = document.getElementById('mine-body');
+    if (body) body.innerHTML = html;
+    document.getElementById('mine-panel').style.display = 'flex';
+  }
+
+  function closeMinesweeper() {
+    clearInterval(_msTimer);
+    _msState = null;
+    const p = document.getElementById('mine-panel');
+    if (p) p.style.display = 'none';
+  }
+
+  function _msAttachLongPress() {
+    if (window.innerWidth > 480) return;
+    const grid = document.getElementById('ms-grid');
+    if (!grid) return;
+    let lt = null;
+    grid.addEventListener('touchstart', e => {
+      const cell = e.target.closest('.mine-cell');
+      if (!cell) return;
+      const i = [...grid.children].indexOf(cell);
+      lt = setTimeout(() => _msFlag(null, i), 500);
+    }, { passive: true });
+    grid.addEventListener('touchend',  () => clearTimeout(lt));
+    grid.addEventListener('touchmove', () => clearTimeout(lt));
+  }
 </script>
+
+<!-- Minesweeper panel -->
+<div id="mine-panel" class="mine-panel" style="display:none">
+  <div class="mine-chrome">
+    <div class="mine-titlebar">
+      <span>💣 Mijnenveger</span>
+      <button class="mine-close-x" onclick="closeMinesweeper()">✕</button>
+    </div>
+    <div id="mine-body"></div>
+  </div>
+</div>
 
 <script src="js/translate.js"></script>
 <script src="js/calendar.js"></script>

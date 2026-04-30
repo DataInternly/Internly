@@ -8,24 +8,35 @@ Gehost via FileZilla FTP · Sasubo Holding B.V.
 Projectmap: c:\Projects\Internly
 
 ## Rollen en routing
-| Rol           | Na login                  | Hub                  |
-|---------------|---------------------------|----------------------|
-| BOL student   | student-profile.html      | match-dashboard.html |
-| BBL student   | bbl-profile.html          | bbl-hub.html         |
-| Bedrijf       | company-dashboard.html    | —                    |
-| School        | school-dashboard.html     | —                    |
-| Begeleider    | begeleider-dashboard.html | —                    |
-| Gepensioneerd | buddy-dashboard.html      | —                    |
 
-routeStudent() in utils.js (7/11 — enige routing-beslisser):
-  BBL (bbl_mode === true) → bbl-profile.html
-  BOL (alles anders)      → student-profile.html
+**Canon (29 apr 2026 — sign-off Picard2/Reid2/Hal/Bedward/7/11/Dax2/TQ):** post-login student-routing draait door één functie: `resolveStudentDashboard()` in `js/roles.js`. Voor non-students gebruikt auth.html nog een lokale `ROUTES`-dict (afgeschaft in fase 2 stap 5).
+
+| Rol / staat | Bestemming | Bron |
+|---|---|---|
+| Student, geen `student_profiles` rij | match-dashboard.html (toont profiel-banner) | resolveStudentDashboard |
+| Student, `bbl_mode === true` | bbl-hub.html | resolveStudentDashboard |
+| Student, `student_type === 'international'` | international-student-dashboard.html | resolveStudentDashboard |
+| Student, BOL/HBO/WO standaard | match-dashboard.html | resolveStudentDashboard |
+| Bedrijf · School · Begeleider · Buddy · Admin | (eigen dashboard per rol) | auth.html ROUTES |
+| School met intl-profiel | international-school-dashboard.html | auth.html hardcoded |
+
+**Functie-status — twee canons, één wrapper, één helper:**
+
+| Functie | Locatie | Status |
+|---|---|---|
+| `resolveStudentDashboard()` | js/roles.js | **CANON** — student-router |
+| `ROLE_LANDING` | js/utils.js | **CANON** — non-student-routing lookup |
+| `getRoleLanding()` | js/utils.js | **WRAPPER** — delegeert naar resolveStudentDashboard (student) of ROLE_LANDING (non-student) |
+| `isValidRole()` | js/utils.js | **HELPER** — valideert of role-string in ROLE_LANDING staat |
 
 ## Centrale bestanden
 js/utils.js        — notify(), escapeHtml(),
                      formatNLDate(), getNotifText(),
                      createNotification(), TOAST_TIMEOUT_MS,
-                     routeStudent() (centrale BBL/BOL routing)
+                     routeStudent() — DEPRECATED, zie §Rollen en routing
+js/roles.js        — INTERNLY_ROLES, detectRole(), routeForRole(),
+                     resolveStudentDashboard()
+                     (canon student-routing — zie §Rollen en routing)
 js/supabase.js     — Supabase client, SUPABASE_URL,
                      SUPABASE_ANON_KEY, hasActivePlan(),
                      initSessionTimeout()
@@ -36,6 +47,10 @@ js/calendar.js     — InternlyCalendar module,
                      calNotify() (lokale toast-variant,
                      targets #cal-notif, niet #notif)
 js/buddy.js        — buddy request/accept/decline flow
+js/account.js      — window.AccountModule shared module —
+                     renderAccountScreen() en handleSaveContact()
+                     als publieke entry-points; CSV-export en
+                     deletion_requested-flow ook geëxporteerd
 js/telemetry.js    — client-side sessie-bewaking v2.1
                      zie "Telemetry.js — hunter codenames" hieronder
                      voor vertaaltabel codenamen ↔ echte namen
@@ -44,13 +59,20 @@ css/style.css      — CSS variabelen en gedeelde stijlen
 
 ## Laadvolgorde (elke app-pagina)
 1. js/utils.js
-2. js/supabase.js
-3. js/push.js (alleen pagina's met push-notificaties)
-4. js/calendar.js (alleen pagina's met kalender — geladen onderaan body)
-5. js/buddy.js (alleen buddy-pagina's)
-6. js/telemetry.js (ALTIJD als laatste — snapshots utils-functies)
+2. js/roles.js (NIEUW 29 apr — routing-canon, altijd direct na utils.js)
+3. js/supabase.js
+4. js/push.js (alleen pagina's met push-notificaties)
+5. js/calendar.js (alleen pagina's met kalender — geladen onderaan body)
+6. js/buddy.js (alleen buddy-pagina's)
+7. js/telemetry.js (ALTIJD als laatste — snapshots utils-functies)
 
-index.html: laadt utils.js + supabase.js + telemetry.js (toegevoegd 20 april — auth gate vereist db).
+js/roles.js bevat de canonieke student-routing (zie §Rollen en routing).
+Pagina's die smartHomeRedirect, getRoleLanding, routeStudent of
+resolveStudentDashboard aanroepen MOETEN js/roles.js laden. Pagina's zonder
+routing-aanroepen kunnen js/roles.js weglaten. Notatie: relatief pad
+`js/roles.js` (geen leading slash).
+
+index.html: laadt utils.js + roles.js + supabase.js + telemetry.js (auth gate vereist db).
 Publieke info-pagina's (about, privacybeleid, spelregels, 404): laden telemetry.js NIET.
 
 ## Loop-shield regels (uitgebreid — Tarlok + Hal)
@@ -75,11 +97,11 @@ GEEN definitie. grep -n ipv -l gebruiken om te onderscheiden.
 
 ## Bekende stubs en dead code
 - hasActivePlan() bevraagt subscriptions-tabel actief
-  (HANDOVER.md zegt "altijd true/stub" — dat is ONJUIST)
+  (_archief/ex_2026-04-20-21/HANDOVER.md zegt "altijd true/stub" — dat is ONJUIST)
 - send-meeting-email Edge Function bestaat niet
   (invoke verwijderd uit calendar.js, in-app notificatie actief)
 - stage-hub.html = dood bestand, vervangen door
-  match-dashboard.html (staat nog foutief in HANDOVER.md
+  match-dashboard.html (staat nog foutief in _archief/ex_2026-04-20-21/HANDOVER.md
   FileZilla-lijst — niet uploaden)
 - Ghosting-bestraffing = niet geïmplementeerd
 - Trust Score auto-algoritme = niet geïmplementeerd
@@ -109,7 +131,10 @@ new_message · new_meeting · meeting_accepted ·
 meeting_rejected · new_match · eval_signed ·
 eval_completed · buddy_request · buddy_accepted ·
 buddy_declined · subscription_activated ·
-subscription_failed · new_review
+subscription_failed · new_review ·
+application_accepted · application_rejected ·
+school_referral · begeleider_invite
+(bijgewerkt 22 april 2026 — JJ2 audit correctie; CLAUDE.md was verouderd t.o.v. code)
 
 ## Test accounts
 Student:    65ed548f (student@internly.pro)
@@ -165,7 +190,7 @@ Vóór elke nieuwe Claude Code instructie:
 - Begeleider-agenda
 - Postadres Sasubo Holding in privacybeleid.html
 - Mollie betaalintegratie (pricing.html startCheckout stub)
-- STARR SQL-migratie uitvoeren (zie HANDOVER.md)
+- STARR SQL-migratie uitvoeren (zie _archief/ex_2026-04-20-21/HANDOVER.md)
 - about.html + index.html: inline SUPABASE_URL opruimen
 - renderApplications (mijn-sollicitaties.html, ~151 regels) opsplitsen
 - renderESG (company-dashboard.html, ~128 regels) opsplitsen

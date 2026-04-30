@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<!--
+  INTERNATIONAL SCHOOL DASHBOARD — Internly Worldwide
+  ─────────────────────────────────────────────────────────────────────────────
+  Logged-in dashboard for foreign universities monitoring their students'
+  inbound internships in the Netherlands.
+
+  Auth guard: profiles.role = 'school' AND international_school_profiles row exists.
+
+  Three sections:
+    6a  My Students   — list Learning Agreements where school_id = auth.uid()
+    6b  Sign Documents — direct sign for LAs awaiting university signature
+    6c  Account       — manage international_school_profiles (institution name,
+                        country, website, contact, verified status)
+
+  All text English. No NL terminology.
+  Load order: utils.js → supabase.js → inline.
+  Each catch: notify() + console.error().
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f5c36">
+  <title>Internly Worldwide — University Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/toast.js"></script>
+  <script>
+    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    window._fCtx = {
+      _init: function(p) {
+        console.warn('[telemetry] js/telemetry.js niet geladen, ' +
+                     'bescherming inactief op pagina: ' + p);
+      },
+      _plant: function() {},
+      _guard: function() { return true; },
+      blockIfFilled: function() { return false; }
+    };
+  </script>
+  <script src="js/telemetry.js"></script>
+  <style>
+    :root {
+      --green:       #1a7a48;
+      --green-deep:  #0f5c36;
+      --green-bg:    #e8f5ee;
+      --orange:      #FF7E42;
+      --orange-deep: #e05c1a;
+      --orange-bg:   #fdf0e8;
+      --ink:         #0d1520;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
+      --ink4:        #9ca3af;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #f0f0ee;
+      --border2:     #e2e8f0;
+      --red:         #b82020;
+      --red-bg:      #fdeaea;
+      --amber:       #a06010;
+      --amber-bg:    #fdf3e0;
+      --r:           16px;
+      --r-sm:        8px;
+      --sidebar-w:   220px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    *:focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
+    }
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar (dark + green head) ──────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--ink);
+      color: rgba(255,255,255,.85);
+      display: flex; flex-direction: column;
+      position: sticky; top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sidebar-head {
+      background: var(--green-deep);
+      padding: 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .brand {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: #fff;
+      letter-spacing: -.01em;
+    }
+    .brand span { color: var(--orange); }
+    .brand-sub {
+      font-size: .68rem; color: rgba(255,255,255,.55);
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .sidebar-user {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.12); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: .85rem; flex-shrink: 0;
+    }
+    .uname { font-size: .85rem; color: #fff; font-weight: 500; line-height: 1.2; }
+    .umail { font-size: .72rem; color: rgba(255,255,255,.45); margin-top: 2px; }
+    .verify-pill {
+      font-size: .66rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 20px;
+      letter-spacing: .04em; text-transform: uppercase;
+      background: var(--green); color: #fff;
+      margin-top: 4px; display: inline-block;
+    }
+    .verify-pill.pending {
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.7);
+    }
+    .sidebar-inner { padding: 16px 12px; flex: 1; }
+    .sidebar-section { margin-bottom: 18px; }
+    .sidebar-label {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: rgba(255,255,255,.4);
+      padding: 0 8px; margin-bottom: 8px;
+      display: block;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 9px 12px; margin-bottom: 2px;
+      background: none; border: none;
+      color: rgba(255,255,255,.7);
+      font-family: inherit; font-size: .9rem;
+      text-align: left; cursor: pointer;
+      border-radius: var(--r-sm);
+      transition: background .15s, color .15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .nav-btn.active {
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-icon { font-size: 1rem; }
+    .nav-badge {
+      margin-left: auto;
+      font-size: .72rem; font-weight: 700;
+      background: var(--orange); color: #fff;
+      padding: 1px 7px; border-radius: 20px;
+      min-width: 18px; text-align: center;
+    }
+    .sidebar-bottom {
+      padding: 12px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-bottom a, .sidebar-bottom button {
+      display: block; width: 100%;
+      background: none; border: none;
+      color: rgba(255,255,255,.45);
+      font-size: .78rem; padding: 6px 0;
+      text-decoration: none;
+      text-align: left; cursor: pointer;
+      font-family: inherit;
+    }
+    .sidebar-bottom a:hover, .sidebar-bottom button:hover { color: #fff; }
+
+    /* ── Main ─────────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .page-sub {
+      color: var(--ink3); font-size: .9rem;
+      margin-bottom: 22px;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Banners ─────────────────────────────────────────────── */
+    .banner {
+      padding: 12px 16px;
+      border-radius: var(--r-sm);
+      margin-bottom: 18px;
+      font-size: .9rem;
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap;
+    }
+    .banner.warn  { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(160,96,16,.25); }
+    .banner.info  { background: var(--green-bg); color: var(--green); border: 1px solid rgba(26,122,72,.2); }
+    .banner button.btn-link {
+      margin-left: auto;
+      background: none; border: none;
+      color: inherit; font-weight: 600; cursor: pointer;
+      font-family: inherit; text-decoration: underline;
+    }
+
+    /* ── Cards ────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+    .card-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .card-title { font-weight: 600; color: var(--ink); }
+    .card-sub { font-size: .82rem; color: var(--ink3); margin-top: 2px; }
+
+    /* ── Status pills ─────────────────────────────────────────── */
+    .status-pill {
+      font-size: .72rem; padding: 3px 8px; border-radius: 20px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .status-pill.draft           { background: #f3f4f6;          color: var(--ink3); }
+    .status-pill.student_signed  { background: var(--amber-bg); color: var(--amber); }
+    .status-pill.company_signed  { background: var(--amber-bg); color: var(--amber); }
+    .status-pill.school_signed   { background: var(--amber-bg); color: var(--amber); }
+    .status-pill.complete        { background: var(--green-bg); color: var(--green); }
+    .status-pill.action          { background: var(--orange);   color: #fff; }
+
+    /* ── Forms ────────────────────────────────────────────────── */
+    .form-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 22px 24px;
+      margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--ink2);
+      margin-bottom: 5px;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm);
+      font-family: inherit; font-size: .9rem;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--green);
+    }
+    .field-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--green-deep); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-orange {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-orange:hover:not(:disabled) { background: var(--orange-deep); }
+    .btn-orange:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-ghost {
+      background: none;
+      color: var(--ink2);
+      border: 1.5px solid var(--border2);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .btn-ghost:hover { border-color: var(--ink2); }
+
+    /* ── State boxes ──────────────────────────────────────────── */
+    .state-box {
+      background: var(--white);
+      border: 1px dashed var(--border2);
+      border-radius: var(--r-sm);
+      padding: 32px 18px;
+      text-align: center;
+      color: var(--ink3);
+    }
+    .state-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+    /* ── Notification toast ───────────────────────────────────── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff;
+      padding: 10px 22px;
+      border-radius: var(--r-sm);
+      font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.22);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── LA detail expand ─────────────────────────────────────── */
+    .la-detail {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-size: .88rem;
+    }
+    .la-detail-row {
+      display: flex; align-items: baseline; gap: 12px;
+      padding: 5px 0;
+    }
+    .la-detail-row .lbl {
+      font-size: .72rem;
+      color: var(--ink3);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      min-width: 130px;
+    }
+    .la-detail-row .val {
+      color: var(--ink);
+      flex: 1;
+    }
+    .objectives-list {
+      list-style: disc;
+      margin: 4px 0 0 22px;
+    }
+    .objectives-list li {
+      font-size: .88rem;
+      color: var(--ink2);
+      margin: 3px 0;
+    }
+
+    /* ── Mobile ───────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: relative; }
+      .sidebar-inner { display: flex; gap: 4px; padding: 10px; flex-wrap: wrap; }
+      .sidebar-section { margin: 0; }
+      .sidebar-label { display: none; }
+      .nav-btn { width: auto; }
+      .main { padding: 18px; }
+    }
+    @media (max-width: 480px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<div class="layout">
+
+  <!-- ════════════════════════════════════════════════════════════
+       SIDEBAR
+       ════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">Internly <span>Worldwide</span></div>
+      <div class="brand-sub">University / School</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">?</div>
+      <div>
+        <div class="uname" id="userName">Loading…</div>
+        <div class="umail" id="userEmail">—</div>
+        <span class="verify-pill pending" id="verifyPill" style="display:none">Pending verification</span>
+      </div>
+    </div>
+    <div class="sidebar-inner">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Oversight</span>
+        <button class="nav-btn active" id="nav-students" onclick="show('students')">
+          <span class="nav-icon">🎓</span> My Students
+        </button>
+        <button class="nav-btn" id="nav-signing" onclick="show('signing')">
+          <span class="nav-icon">📜</span> Sign Documents
+          <span class="nav-badge" id="badgePending" style="display:none">0</span>
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Institution</span>
+        <button class="nav-btn" id="nav-institution" onclick="show('institution')">
+          <span class="nav-icon">🏛</span> Institution
+        </button>
+        <button class="nav-btn" id="nav-account" onclick="show('account')">
+          <span class="nav-icon">⚙️</span> Account
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="privacybeleid.html">Privacy</a>
+      <a href="spelregels.html">House rules</a>
+      <button onclick="signOut()">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════════════════════════════════
+       MAIN
+       ════════════════════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- Verification banner — shown when school not yet verified -->
+    <div class="banner warn" id="verifyBanner" style="display:none">
+      <span>⏳ Your institution is pending verification by Internly. Until verified, your account is read-only.</span>
+    </div>
+
+    <!-- ── Sectie 6a — MY STUDENTS ──────────────────────────────── -->
+    <div class="screen active" id="screen-students">
+      <div class="page-title">My students</div>
+      <p class="page-sub">All Learning Agreements where your institution is named.</p>
+      <div id="studentsList">
+        <div class="state-box"><span class="state-icon">⏳</span>Loading agreements…</div>
+      </div>
+    </div>
+
+    <!-- ── Sectie 6b — SIGN DOCUMENTS ───────────────────────────── -->
+    <div class="screen" id="screen-signing">
+      <div class="page-title">Sign documents</div>
+      <p class="page-sub">Learning Agreements that need your signature as the home university.</p>
+      <div id="signingList">
+        <div class="state-box"><span class="state-icon">⏳</span>Loading documents…</div>
+      </div>
+    </div>
+
+    <!-- ── Sectie 6c — INSTITUTION PROFILE ──────────────────────── -->
+    <div class="screen" id="screen-institution">
+      <div class="page-title">Institution</div>
+      <p class="page-sub">Your institution's profile on Internly Worldwide.</p>
+
+      <div class="form-card">
+        <div class="form-section-title">Institution</div>
+        <div class="field">
+          <label>Institution name</label>
+          <input type="text" id="a-institution" maxlength="200" placeholder="e.g. University of Bologna">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Country</label>
+            <input type="text" id="a-country" maxlength="80" placeholder="e.g. Italy">
+          </div>
+          <div class="field">
+            <label>Website</label>
+            <input type="text" id="a-website" maxlength="200" placeholder="https://www.unibo.it">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-section-title">Contact</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Contact name</label>
+            <input type="text" id="a-contact-name" maxlength="100" placeholder="International Office coordinator">
+          </div>
+          <div class="field">
+            <label>Contact email</label>
+            <input type="email" id="a-contact-email" maxlength="150" placeholder="exchange@university.edu">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="saveAccountBtn" onclick="saveAccount()">Save institution</button>
+    </div>
+
+    <!-- ── Sectie 6d — ACCOUNT (personal settings via AccountModule) ─── -->
+    <div class="screen" id="screen-account">
+      <div class="page-title">Account settings</div>
+      <p class="page-sub">Manage your contact information and preferences</p>
+      <div id="account-container"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// State
+// ════════════════════════════════════════════════════════════════
+let currentUser   = null;
+let schoolProfile = null;          // international_school_profiles row
+let agreements    = [];            // learning_agreements where school_id = uid()
+
+// ════════════════════════════════════════════════════════════════
+// Initial mount + auth guard
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { window.location.replace('auth.html'); return; }
+    currentUser = user;
+
+    // Role guard
+    let role = null;
+    try {
+      const { data: prof, error } = await db.from('profiles')
+        .select('role, naam, email')
+        .eq('id', user.id).maybeSingle();
+      if (error) throw error;
+      role = prof?.role;
+      if (prof?.naam) {
+        document.getElementById('userName').textContent = prof.naam;
+        document.getElementById('userAvatar').textContent =
+          (prof.naam.charAt(0) || '?').toUpperCase();
+      }
+      document.getElementById('userEmail').textContent = prof?.email || user.email || '';
+    } catch (err) {
+      console.error('[intl-school] profile lookup fout:', err?.message || err);
+      notify('Could not verify your account', false);
+      return;
+    }
+
+    if (role !== 'school') {
+      // Not a school account — redirect (could be student, company, etc.)
+      window.location.replace('auth.html');
+      return;
+    }
+
+    // Telemetry init — zie CLAUDE.md voor codenames
+    _fCtx._init('intl-school');
+
+    await loadSchoolProfile();
+    await loadAgreements();
+    populateAccountForm();
+    renderStudents();
+    renderSigningList();
+    updateSigningBadge();
+
+    show('students');
+  } catch (err) {
+    console.error('[intl-school] mount fout:', err?.message || err);
+    notify('Could not load dashboard. Please refresh.', false);
+  }
+});
+
+// ════════════════════════════════════════════════════════════════
+// Tab switching
+// ════════════════════════════════════════════════════════════════
+async function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const screen = document.getElementById('screen-' + id);
+  const nav    = document.getElementById('nav-' + id);
+  if (screen) screen.classList.add('active');
+  if (nav)    nav.classList.add('active');
+
+  if (id === 'students') renderStudents();
+  if (id === 'signing')  renderSigningList();
+  if (id === 'account') {
+    window._currentUserId = currentUser?.id;
+    // renderAccountScreen returnt een Promise die resolvet ná de
+    // requestAnimationFrame — we kunnen daarna betrouwbaar de DOM lezen
+    // zonder setTimeout-race.
+    await AccountModule.renderAccountScreen('account-container', 'en');
+    const form = document.querySelector('#account-container .account-form');
+    if (form) _fCtx._plant(form);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// School profile load + save (Sectie 6c)
+// ════════════════════════════════════════════════════════════════
+async function loadSchoolProfile() {
+  try {
+    const { data, error } = await db.from('international_school_profiles')
+      .select('profile_id, institution_name, country, website, contact_name, contact_email, verified')
+      .eq('profile_id', currentUser.id)
+      .maybeSingle();
+    if (error) throw error;
+    schoolProfile = data || null;
+
+    // Verification badge
+    const pill   = document.getElementById('verifyPill');
+    const banner = document.getElementById('verifyBanner');
+    if (schoolProfile?.verified) {
+      if (pill)   { pill.style.display = 'inline-block'; pill.textContent = 'Verified ✓'; pill.classList.remove('pending'); }
+      if (banner) banner.style.display = 'none';
+    } else {
+      if (pill)   { pill.style.display = 'inline-block'; pill.textContent = 'Pending verification'; pill.classList.add('pending'); }
+      if (banner) banner.style.display = 'flex';
+    }
+  } catch (err) {
+    console.error('[intl-school] loadSchoolProfile fout:', err?.message || err);
+    notify('Could not load institution profile', false);
+  }
+}
+
+function populateAccountForm() {
+  const sp = schoolProfile || {};
+  setVal('a-institution',   sp.institution_name || '');
+  setVal('a-country',       sp.country || '');
+  setVal('a-website',       sp.website || '');
+  setVal('a-contact-name',  sp.contact_name || '');
+  setVal('a-contact-email', sp.contact_email || '');
+}
+
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = v == null ? '' : v;
+}
+
+async function saveAccount() {
+  if (!currentUser) { notify('Not signed in', false); return; }
+  const btn = document.getElementById('saveAccountBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    profile_id:       currentUser.id,
+    institution_name: document.getElementById('a-institution').value.trim() || '',
+    country:          document.getElementById('a-country').value.trim() || '',
+    website:          document.getElementById('a-website').value.trim() || null,
+    contact_name:     document.getElementById('a-contact-name').value.trim() || null,
+    contact_email:    document.getElementById('a-contact-email').value.trim() || null
+  };
+
+  if (!payload.institution_name) {
+    btn.disabled = false; btn.textContent = 'Save account';
+    notify('Institution name is required', false);
+    return;
+  }
+  if (!payload.country) {
+    btn.disabled = false; btn.textContent = 'Save account';
+    notify('Country is required', false);
+    return;
+  }
+
+  try {
+    const { error } = await db.from('international_school_profiles')
+      .upsert(payload, { onConflict: 'profile_id' });
+
+    btn.disabled = false; btn.textContent = 'Save account';
+
+    if (error) {
+      console.error('[intl-school] saveAccount fout:', error.message);
+      notify('Could not save account — please try again', false);
+      return;
+    }
+    notify('✓ Account saved');
+    schoolProfile = Object.assign({}, schoolProfile || {}, payload);
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Save account';
+    console.error('[intl-school] saveAccount exception:', err?.message || err);
+    notify('Unexpected save error', false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Agreements load + render (Sectie 6a)
+// ════════════════════════════════════════════════════════════════
+async function loadAgreements() {
+  try {
+    // RLS la_school_select restricts to school_id = auth.uid()
+    const { data, error } = await db.from('learning_agreements')
+      .select('id, status, start_date, end_date, hours_per_week, learning_objectives, compensation, compensation_amount, academic_credits, school_name, supervisor_name, supervisor_email, student_id, company_id, student_signed_at, company_signed_at, school_signed_at, created_at')
+      .eq('school_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    agreements = data || [];
+
+    // Fetch student + company names for display
+    const studentIds = [...new Set(agreements.map(a => a.student_id).filter(Boolean))];
+    const companyIds = [...new Set(agreements.map(a => a.company_id).filter(Boolean))];
+    const allIds = [...new Set([...studentIds, ...companyIds])];
+    if (allIds.length > 0) {
+      try {
+        const { data: profs } = await db.from('profiles')
+          .select('id, naam')
+          .in('id', allIds);
+        const nameMap = {};
+        (profs || []).forEach(p => { nameMap[p.id] = p.naam; });
+        agreements.forEach(a => {
+          a._studentName = nameMap[a.student_id] || '—';
+          a._companyName = nameMap[a.company_id] || '—';
+        });
+      } catch (lookupErr) {
+        console.error('[intl-school] profile lookup fout:', lookupErr?.message || lookupErr);
+        agreements.forEach(a => {
+          a._studentName = a._studentName || '—';
+          a._companyName = a._companyName || '—';
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[intl-school] loadAgreements fout:', err?.message || err);
+    notify('Could not load Learning Agreements', false);
+    agreements = [];
+  }
+}
+
+function renderStudents() {
+  const list = document.getElementById('studentsList');
+  if (!list) return;
+  if (!agreements || agreements.length === 0) {
+    list.innerHTML = `
+      <div class="state-box">
+        <span class="state-icon">🎓</span>
+        No Learning Agreements linked to your institution yet.<br>
+        <small style="display:block;margin-top:6px">Students who name your university in their Learning Agreement will appear here.</small>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = agreements.map(a => `
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">${escapeHtml(a._studentName || 'Student')}</div>
+          <div class="card-sub">
+            ${escapeHtml(a._companyName || 'Company')} ·
+            ${a.start_date || '—'} → ${a.end_date || '—'} ·
+            ${a.hours_per_week || '—'} h/wk
+          </div>
+        </div>
+        <span class="status-pill ${escapeHtml(a.status || 'draft')}">${escapeHtml(laStatusLabel(a.status))}</span>
+      </div>
+      <button class="btn-ghost" onclick="toggleDetails('${escapeHtml(a.id)}')" id="td-${escapeHtml(a.id)}-btn">View details ▾</button>
+      <div class="la-detail" id="td-${escapeHtml(a.id)}" style="display:none">
+        ${renderDetail(a)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDetail(a) {
+  const objs = Array.isArray(a.learning_objectives) ? a.learning_objectives : [];
+  const objsHtml = objs.length
+    ? `<ul class="objectives-list">${objs.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>`
+    : '<span style="color:var(--ink3);font-style:italic">None specified</span>';
+  const compLabel = ({ paid: 'Paid', stipend: 'Stipend', unpaid: 'Unpaid' })[a.compensation] || a.compensation || '—';
+  const compAmount = a.compensation_amount ? '€' + Number(a.compensation_amount).toFixed(0) + '/mo' : '';
+
+  return `
+    <div class="la-detail-row"><div class="lbl">Period</div><div class="val">${a.start_date || '—'} → ${a.end_date || '—'}</div></div>
+    <div class="la-detail-row"><div class="lbl">Hours / week</div><div class="val">${a.hours_per_week || '—'}</div></div>
+    <div class="la-detail-row"><div class="lbl">Credits</div><div class="val">${a.academic_credits ? a.academic_credits + ' ECTS' : '—'}</div></div>
+    <div class="la-detail-row"><div class="lbl">Compensation</div><div class="val">${escapeHtml(compLabel)}${compAmount ? ' — ' + escapeHtml(compAmount) : ''}</div></div>
+    <div class="la-detail-row"><div class="lbl">Supervisor</div><div class="val">${escapeHtml(a.supervisor_name || '—')}${a.supervisor_email ? ' (' + escapeHtml(a.supervisor_email) + ')' : ''}</div></div>
+    <div class="la-detail-row" style="align-items:flex-start"><div class="lbl">Objectives</div><div class="val">${objsHtml}</div></div>
+    <div class="la-detail-row" style="margin-top:6px;border-top:1px solid var(--border);padding-top:8px">
+      <div class="lbl">Signatures</div>
+      <div class="val" style="font-size:.82rem">
+        Student: ${a.student_signed_at ? '✓ ' + escapeHtml(formatDateShort(a.student_signed_at)) : '— pending'} ·
+        Company: ${a.company_signed_at ? '✓ ' + escapeHtml(formatDateShort(a.company_signed_at)) : '— pending'} ·
+        University: ${a.school_signed_at ? '✓ ' + escapeHtml(formatDateShort(a.school_signed_at)) : '— pending'}
+      </div>
+    </div>
+  `;
+}
+
+function toggleDetails(id) {
+  const det = document.getElementById('td-' + id);
+  const btn = document.getElementById('td-' + id + '-btn');
+  if (!det) return;
+  const isHidden = det.style.display === 'none';
+  det.style.display = isHidden ? 'block' : 'none';
+  if (btn) btn.textContent = isHidden ? 'Hide details ▴' : 'View details ▾';
+}
+
+function laStatusLabel(s) {
+  return ({
+    draft:           'Draft',
+    student_signed:  'Awaiting countersignatures',
+    company_signed:  'Awaiting your signature',
+    school_signed:   'Awaiting company',
+    complete:        'Complete'
+  })[s] || (s || '—');
+}
+
+function formatDateShort(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch (_e) { return iso; }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Sign list (Sectie 6b) — LAs needing university signature
+// ════════════════════════════════════════════════════════════════
+function pendingForUni() {
+  // University signs after company; or first if company hasn't yet.
+  // We surface anything with status 'student_signed' or 'company_signed' that
+  // does not yet have school_signed_at.
+  return (agreements || []).filter(a =>
+    !a.school_signed_at &&
+    (a.status === 'student_signed' || a.status === 'company_signed')
+  );
+}
+
+function updateSigningBadge() {
+  const badge = document.getElementById('badgePending');
+  if (!badge) return;
+  const n = pendingForUni().length;
+  if (n > 0) { badge.textContent = String(n); badge.style.display = 'inline-block'; }
+  else       { badge.style.display = 'none'; }
+}
+
+function renderSigningList() {
+  const list = document.getElementById('signingList');
+  if (!list) return;
+  const pending = pendingForUni();
+
+  if (pending.length === 0) {
+    list.innerHTML = `
+      <div class="state-box">
+        <span class="state-icon">📜</span>
+        Nothing waiting for your signature right now.
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = pending.map(a => `
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">${escapeHtml(a._studentName || 'Student')} — ${escapeHtml(a._companyName || 'Company')}</div>
+          <div class="card-sub">
+            ${a.start_date || '—'} → ${a.end_date || '—'} ·
+            ${a.hours_per_week || '—'} h/wk ·
+            supervisor ${escapeHtml(a.supervisor_name || '—')}
+          </div>
+        </div>
+        <span class="status-pill action">Action needed</span>
+      </div>
+      <div class="la-detail" style="margin-top:10px">
+        ${renderDetail(a)}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-orange" onclick="signAsSchool('${escapeHtml(a.id)}')">Sign as university</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function signAsSchool(laId) {
+  if (!currentUser) { notify('Not signed in', false); return; }
+  const a = (agreements || []).find(x => x.id === laId);
+  if (!a) { notify('Agreement not found', false); return; }
+  if (!confirm('Sign this Learning Agreement on behalf of your institution? This is binding.')) return;
+
+  try {
+    const newStatus = (a.status === 'company_signed') ? 'complete' : 'school_signed';
+    const { error } = await db.from('learning_agreements')
+      .update({
+        school_signed_at: new Date().toISOString(),
+        status:           newStatus
+      })
+      .eq('id', laId)
+      .eq('school_id', currentUser.id); // RLS safety net (la_school_update)
+    if (error) throw error;
+
+    notify('✓ Signed successfully');
+
+    // Refresh + re-render
+    await loadAgreements();
+    renderStudents();
+    renderSigningList();
+    updateSigningBadge();
+  } catch (err) {
+    console.error('[intl-school] signAsSchool fout:', err?.message || err);
+    notify('Could not sign: ' + (err?.message || 'unknown'), false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Sign out
+// ════════════════════════════════════════════════════════════════
+async function signOut() {
+  try {
+    await db.auth.signOut();
+  } catch (err) {
+    console.error('[intl-school] signOut fout:', err?.message || err);
+  }
+  window.location.href = 'auth.html';
+}
+
+// notify() and escapeHtml() come from js/utils.js — do not redefine here.
+</script>
+</body>
+</html>

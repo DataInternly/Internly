@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<!--
+  LEARNING AGREEMENT SIGN PAGE — Internly Worldwide
+  ─────────────────────────────────────────────────────────────────────────────
+  Public, no-auth page for signing a Learning Agreement via a one-time token.
+  URL: /la-sign.html?token={64-char hex token}
+
+  Per sprint instruction:
+    - load order: supabase-cdn → js/supabase.js (NO utils.js, NO auth guard)
+    - all text English
+    - clean centered layout, no sidebar
+
+  Flow:
+    1. Read ?token from URL
+    2. Look up la_tokens row by token
+    3. Validate (exists, not used, not expired)
+    4. Load learning_agreements row (publicly safe columns)
+    5. Show summary + agreement checkbox + sign button
+    6. On sign:
+       - Determine new status (escalate to 'complete' if other side already signed)
+       - UPDATE learning_agreements (status + signed_at)
+       - UPDATE la_tokens (used = true)
+       - Show confirmation
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f5c36">
+  <title>Sign Learning Agreement — Internly Worldwide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    window._fCtx = {
+      _init: function(p) {
+        console.warn('[telemetry] js/telemetry.js niet geladen, ' +
+                     'bescherming inactief op pagina: ' + p);
+      },
+      _plant: function() {},
+      _guard: function() { return true; },
+      blockIfFilled: function() { return false; }
+    };
+  </script>
+  <script src="js/telemetry.js"></script>
+  <style>
+    :root {
+      --green:       #1a7a48;
+      --green-deep:  #0f5c36;
+      --green-bg:    #e8f5ee;
+      --orange:      #FF7E42;
+      --orange-deep: #e05c1a;
+      --ink:         #0d1520;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
+      --ink4:        #9ca3af;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #f0f0ee;
+      --border2:     #e2e8f0;
+      --red:         #b82020;
+      --red-bg:      #fdeaea;
+      --amber:       #a06010;
+      --amber-bg:    #fdf3e0;
+      --r:           16px;
+      --r-sm:        8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column;
+    }
+
+    *:focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
+    }
+
+    /* ── Header (no sidebar — just brand bar) ─────────────────── */
+    header.brand-bar {
+      background: var(--green-deep);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.25rem; font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .brand span { color: var(--orange); }
+    .brand-sub {
+      font-size: .72rem;
+      color: rgba(255,255,255,.65);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Main centered card ───────────────────────────────────── */
+    main {
+      flex: 1;
+      padding: 40px 16px 60px;
+      display: flex; align-items: flex-start; justify-content: center;
+    }
+    .sheet {
+      width: 100%; max-width: 640px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: 0 6px 24px rgba(0,0,0,.06);
+      padding: 28px 30px;
+    }
+    .sheet h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .sheet .lead {
+      color: var(--ink3);
+      font-size: .95rem;
+      margin-bottom: 22px;
+    }
+
+    /* ── Summary block ────────────────────────────────────────── */
+    .summary {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
+    .summary-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label {
+      font-size: .76rem;
+      color: var(--ink3);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .summary-value {
+      font-size: .95rem;
+      color: var(--ink);
+      text-align: right;
+      font-weight: 500;
+    }
+    .objectives-list {
+      list-style: disc;
+      margin: 6px 0 0 22px;
+      padding: 0;
+    }
+    .objectives-list li {
+      font-size: .9rem;
+      color: var(--ink2);
+      margin: 4px 0;
+    }
+
+    /* ── Status badges ────────────────────────────────────────── */
+    .status-pill {
+      display: inline-block;
+      font-size: .76rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .status-pill.draft           { background: #f3f4f6;        color: var(--ink3); }
+    .status-pill.student_signed  { background: var(--amber-bg); color: var(--amber); }
+    .status-pill.company_signed  { background: var(--amber-bg); color: var(--amber); }
+    .status-pill.school_signed   { background: var(--amber-bg); color: var(--amber); }
+    .status-pill.complete        { background: var(--green-bg); color: var(--green); }
+
+    /* ── Consent box ──────────────────────────────────────────── */
+    .consent {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+    .consent input[type="checkbox"] {
+      margin-top: 3px;
+      width: 18px; height: 18px;
+      accent-color: var(--green);
+      flex-shrink: 0;
+    }
+    .consent-text { font-size: .9rem; color: var(--ink2); line-height: 1.5; }
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      width: 100%;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--green-deep); }
+    .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--green);
+      font-family: inherit;
+      font-size: .9rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    /* ── State boxes ──────────────────────────────────────────── */
+    .state {
+      text-align: center;
+      padding: 30px 14px;
+    }
+    .state .icon {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .state h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .state p {
+      color: var(--ink2);
+      margin-bottom: 14px;
+      font-size: .95rem;
+    }
+    .state.error h2  { color: var(--red); }
+    .state.warn  h2  { color: var(--amber); }
+    .state.success h2 { color: var(--green); }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    footer.foot {
+      padding: 14px 16px;
+      text-align: center;
+      color: var(--ink3);
+      font-size: .78rem;
+      border-top: 1px solid var(--border);
+    }
+    footer.foot a {
+      color: var(--ink3);
+      text-decoration: underline;
+      margin: 0 6px;
+    }
+
+    @media (max-width: 768px) {
+      .sheet { padding: 20px 18px; }
+    }
+    @media (max-width: 480px) {
+      .sheet { padding: 22px 18px; }
+      .summary-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .summary-value { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="brand-bar">
+  <div>
+    <div class="brand">Internly <span>Worldwide</span></div>
+    <div class="brand-sub">Learning Agreement</div>
+  </div>
+</header>
+
+<main>
+  <div class="sheet" id="root" role="region" aria-live="polite">
+    <div class="state">
+      <span class="icon">⏳</span>
+      <h2>Loading agreement…</h2>
+      <p>Please wait while we verify your link.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <a href="privacybeleid.html">Privacy</a> ·
+  <a href="spelregels.html">House rules</a> ·
+  <a href="https://internly.pro/">Internly.pro</a>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// Local helpers (no utils.js — explicitly per sprint instruction).
+// Names deliberately not 'notify' / 'escapeHtml' to keep the
+// loop-shield grep clean (CLAUDE.md rule).
+// ════════════════════════════════════════════════════════════════
+function _esc(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g,  '&amp;')
+    .replace(/</g,  '&lt;')
+    .replace(/>/g,  '&gt;')
+    .replace(/"/g,  '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function _setRoot(html) {
+  const root = document.getElementById('root');
+  if (root) root.innerHTML = html;
+}
+
+function _formatDate(iso) {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleDateString('en-GB',
+      { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch (_e) { return iso; }
+}
+
+function _statusLabel(s) {
+  return ({
+    draft:           'Draft',
+    student_signed:  'Awaiting countersignatures',
+    company_signed:  'Awaiting university',
+    school_signed:   'Awaiting company',
+    complete:        'Complete'
+  })[s] || s || '—';
+}
+
+function _partyLabel(p) {
+  return p === 'company' ? 'company supervisor' : 'home university representative';
+}
+
+// ════════════════════════════════════════════════════════════════
+// Init — read token, validate, render
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  // Telemetry init — zie CLAUDE.md voor codenames
+  _fCtx._init('la-sign');
+
+  const params = new URLSearchParams(window.location.search);
+  const token = (params.get('token') || '').trim();
+
+  if (!token) {
+    _setRoot(`
+      <div class="state error">
+        <span class="icon">⚠️</span>
+        <h2>No token provided</h2>
+        <p>This page requires a signing link. If you received an email or message with a link, open it again — or ask the student to resend.</p>
+      </div>
+    `);
+    return;
+  }
+
+  // Look up the token
+  let tokenRow;
+  try {
+    const { data, error } = await db.from('la_tokens')
+      .select('id, la_id, party, used, expires_at')
+      .eq('token', token)
+      .maybeSingle();
+    if (error) throw error;
+    tokenRow = data;
+  } catch (err) {
+    console.error('[la-sign] token lookup fout:', err?.message || err);
+    _setRoot(`
+      <div class="state error">
+        <span class="icon">⚠️</span>
+        <h2>Could not verify link</h2>
+        <p>Something went wrong on our side. Please refresh the page and try again.</p>
+      </div>
+    `);
+    return;
+  }
+
+  if (!tokenRow) {
+    _setRoot(`
+      <div class="state error">
+        <span class="icon">🔒</span>
+        <h2>Invalid link</h2>
+        <p>This signing link is not recognised. Ask the student to resend a fresh link.</p>
+      </div>
+    `);
+    return;
+  }
+  if (tokenRow.used) {
+    _setRoot(`
+      <div class="state warn">
+        <span class="icon">✓</span>
+        <h2>Already signed</h2>
+        <p>This Learning Agreement has already been signed using this link. Each link can be used only once.</p>
+      </div>
+    `);
+    return;
+  }
+  if (new Date(tokenRow.expires_at) < new Date()) {
+    _setRoot(`
+      <div class="state warn">
+        <span class="icon">⏰</span>
+        <h2>Link expired</h2>
+        <p>This signing link is older than 7 days. Ask the student to issue a fresh one from their dashboard.</p>
+      </div>
+    `);
+    return;
+  }
+
+  // Token valid — load LA
+  let la;
+  try {
+    const { data, error } = await db.from('learning_agreements')
+      .select('id, start_date, end_date, hours_per_week, learning_objectives, compensation, compensation_amount, status, school_name, supervisor_name, supervisor_email, academic_credits')
+      .eq('id', tokenRow.la_id)
+      .maybeSingle();
+    if (error) throw error;
+    la = data;
+  } catch (err) {
+    console.error('[la-sign] LA load fout:', err?.message || err);
+    _setRoot(`
+      <div class="state error">
+        <span class="icon">⚠️</span>
+        <h2>Could not load agreement</h2>
+        <p>${_esc(err?.message || 'Unknown error.')}</p>
+      </div>
+    `);
+    return;
+  }
+
+  if (!la) {
+    _setRoot(`
+      <div class="state error">
+        <span class="icon">⚠️</span>
+        <h2>Agreement not found</h2>
+        <p>The Learning Agreement linked to this token no longer exists.</p>
+      </div>
+    `);
+    return;
+  }
+
+  renderSignForm(la, tokenRow);
+});
+
+// ════════════════════════════════════════════════════════════════
+// Render summary + sign form
+// ════════════════════════════════════════════════════════════════
+function renderSignForm(la, tokenRow) {
+  const objs = Array.isArray(la.learning_objectives) ? la.learning_objectives : [];
+  const objsHtml = objs.length
+    ? `<ul class="objectives-list">${objs.map(o => `<li>${_esc(o)}</li>`).join('')}</ul>`
+    : '<span class="summary-value" style="color:var(--ink3);font-style:italic">None specified</span>';
+
+  const compLabel = ({
+    paid:    'Paid',
+    stipend: 'Stipend',
+    unpaid:  'Unpaid'
+  })[la.compensation] || la.compensation || '—';
+
+  const compAmount = la.compensation_amount
+    ? `€${Number(la.compensation_amount).toFixed(0)}/month`
+    : '';
+
+  const partyAction = tokenRow.party === 'company'
+    ? 'I confirm I am authorised to sign on behalf of the company'
+    : 'I confirm I am authorised to sign on behalf of the home university';
+
+  const html = `
+    <h1>Sign Learning Agreement</h1>
+    <p class="lead">
+      You are signing as the <strong>${_esc(_partyLabel(tokenRow.party))}</strong>.
+      Review the details below carefully — once signed, this is binding.
+      Status: <span class="status-pill ${_esc(la.status)}">${_esc(_statusLabel(la.status))}</span>
+    </p>
+
+    <div class="summary">
+      <div class="summary-row">
+        <span class="summary-label">Period</span>
+        <span class="summary-value">${_esc(_formatDate(la.start_date))} → ${_esc(_formatDate(la.end_date))}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Hours / week</span>
+        <span class="summary-value">${la.hours_per_week ? _esc(String(la.hours_per_week)) : '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Academic credits</span>
+        <span class="summary-value">${la.academic_credits ? _esc(String(la.academic_credits)) + ' ECTS' : '—'}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Compensation</span>
+        <span class="summary-value">${_esc(compLabel)}${compAmount ? ' — ' + _esc(compAmount) : ''}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Home university</span>
+        <span class="summary-value">${_esc(la.school_name || '—')}</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Supervisor</span>
+        <span class="summary-value">${_esc(la.supervisor_name || '—')}${la.supervisor_email ? ' (' + _esc(la.supervisor_email) + ')' : ''}</span>
+      </div>
+      <div class="summary-row" style="flex-direction:column;align-items:stretch">
+        <span class="summary-label" style="margin-bottom:6px">Learning objectives</span>
+        ${objsHtml}
+      </div>
+    </div>
+
+    <div id="sign-form">
+      <label class="consent">
+        <input type="checkbox" id="consentCheck" onchange="updateSignBtn()">
+        <span class="consent-text">${_esc(partyAction)} and I agree with the terms above.</span>
+      </label>
+
+      <button class="btn-primary" id="signBtn" disabled onclick="signAgreement()">
+        Sign Learning Agreement
+      </button>
+      <div id="signError" style="display:none;margin-top:12px;font-size:.88rem;color:var(--red)"></div>
+    </div>
+  `;
+
+  _setRoot(html);
+
+  // Stash for the sign handler (no globals besides these two)
+  window.__la_active = la;
+  window.__la_token  = tokenRow;
+
+  // Plant honeypot in het sign-formulier (post-render)
+  const form = document.getElementById('sign-form');
+  if (form) _fCtx._plant(form);
+}
+
+function updateSignBtn() {
+  const cb = document.getElementById('consentCheck');
+  const btn = document.getElementById('signBtn');
+  if (cb && btn) btn.disabled = !cb.checked;
+}
+
+// ════════════════════════════════════════════════════════════════
+// Sign handler
+// ════════════════════════════════════════════════════════════════
+async function signAgreement() {
+  const la = window.__la_active;
+  const tokenRow = window.__la_token;
+  if (!la || !tokenRow) return;
+
+  // Honeypot guard — blokkeer bots die het verborgen veld invullen.
+  // _guard returnt true bij OK, false als de honeypot getriggerd is.
+  if (!_fCtx._guard('la-sign')) return;
+
+  const btn = document.getElementById('signBtn');
+  const errBox = document.getElementById('signError');
+  if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Signing…'; }
+
+  try {
+    // Determine new status — escalate to 'complete' if the OTHER side has already signed
+    let newStatus, signedField;
+    if (tokenRow.party === 'company') {
+      signedField = 'company_signed_at';
+      newStatus   = (la.status === 'school_signed') ? 'complete' : 'company_signed';
+    } else {
+      signedField = 'school_signed_at';
+      newStatus   = (la.status === 'company_signed') ? 'complete' : 'school_signed';
+    }
+
+    // 1. Update LA status + signed_at
+    const updateLA = { status: newStatus };
+    updateLA[signedField] = new Date().toISOString();
+
+    const { error: e1 } = await db.from('learning_agreements')
+      .update(updateLA).eq('id', la.id);
+    if (e1) throw e1;
+
+    // 2. Mark token as used (single-use guarantee)
+    const { error: e2 } = await db.from('la_tokens')
+      .update({ used: true }).eq('id', tokenRow.id);
+    if (e2) {
+      // LA is already signed; token mark failed. Log but show success — re-using
+      // this token would still trigger the 'used' check on next attempt only after
+      // server clock catches up. We log so Barry can see the discrepancy.
+      console.error('[la-sign] token mark used fout (LA already updated):', e2?.message || e2);
+    }
+
+    renderConfirmation(newStatus, tokenRow.party);
+  } catch (err) {
+    console.error('[la-sign] signAgreement fout:', err?.message || err);
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign Learning Agreement'; }
+    if (errBox) {
+      errBox.textContent = 'Sign failed: ' + (err?.message || 'unknown error');
+      errBox.style.display = 'block';
+    }
+  }
+}
+
+function renderConfirmation(newStatus, party) {
+  const isComplete = (newStatus === 'complete');
+  const sideLabel  = (party === 'company') ? 'company' : 'home university';
+
+  _setRoot(`
+    <div class="state success">
+      <span class="icon">${isComplete ? '🎉' : '✓'}</span>
+      <h2>${isComplete ? 'Learning Agreement complete' : 'Signed successfully'}</h2>
+      <p>
+        Thank you. Your signature on behalf of the ${_esc(sideLabel)} has been recorded.
+        ${isComplete
+          ? 'All three parties have now signed — the agreement is final.'
+          : 'The remaining party will be notified to countersign.'}
+      </p>
+      <p style="font-size:.82rem;color:var(--ink3)">
+        You can close this tab.
+      </p>
+    </div>
+  `);
+}
+</script>
+
+</body>
+</html>

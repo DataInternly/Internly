@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mijn dashboard — Internly (voorbeeld)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-green-deep: #0f5c36; --c-green: #1a7a48; --c-green-glow: #22a85e;
+  --c-orange: #FF7E42; --c-orange-deep: #e05c1a;
+  --c-cream: #f4f3ef; --c-ink: #0d1520;
+  --fg-primary: #0d1520; --fg-secondary: #2e4038; --fg-tertiary: #6b8070;
+  --line-subtle: rgba(13,26,16,.09); --line-default: rgba(13,26,16,.14);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 20px; --r-pill: 999px;
+  --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-script: 'Caveat', cursive;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body); color: var(--fg-primary);
+  background: var(--c-cream);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.dash-shell {
+  display: grid; grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.dash-sidebar {
+  background: var(--c-ink);
+  color: rgba(255,255,255,.78);
+  display: flex; flex-direction: column;
+  padding: var(--s5) 0;
+}
+.sidebar-brand {
+  padding: 0 var(--s5) var(--s6);
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-logo {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.4rem;
+  letter-spacing: -.03em; color: #fff;
+}
+.sidebar-logo span { color: var(--c-orange); }
+.sidebar-section {
+  font-size: .68rem; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(255,255,255,.32);
+  padding: var(--s5) var(--s5) var(--s2);
+}
+.nav-link {
+  display: flex; align-items: center; gap: var(--s3);
+  padding: 10px var(--s5);
+  color: rgba(255,255,255,.7);
+  font-size: .9rem; font-weight: 500;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background 120ms, color 120ms, border-left-color 120ms;
+}
+.nav-link:hover { background: rgba(255,255,255,.04); color: #fff; }
+.nav-link.active {
+  background: rgba(255,126,66,.10);
+  color: #fff;
+  border-left-color: var(--c-orange);
+}
+.nav-icon {
+  width: 20px; display: inline-flex; justify-content: center;
+  font-size: 1rem;
+}
+.nav-badge {
+  margin-left: auto; font-family: var(--font-mono); font-size: .68rem;
+  background: var(--c-orange-deep); color: #fff;
+  padding: 2px 7px; border-radius: var(--r-pill);
+}
+.sidebar-foot {
+  margin-top: auto; padding: var(--s4) var(--s5);
+  border-top: 1px solid rgba(255,255,255,.08);
+  font-size: .76rem; color: rgba(255,255,255,.4);
+}
+
+/* ── MAIN ── */
+.dash-main {
+  display: flex; flex-direction: column;
+  min-width: 0;
+}
+
+/* Topbar */
+.dash-topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--line-subtle);
+  padding: var(--s4) var(--s6);
+  display: flex; align-items: center; gap: var(--s4);
+}
+.topbar-search {
+  flex: 1; max-width: 420px;
+  font-family: var(--font-body); font-size: .9rem;
+  padding: 9px 16px;
+  border: 1.5px solid #e2e8f0; border-radius: var(--r-pill);
+  outline: none;
+  transition: border-color 120ms;
+}
+.topbar-search:focus { border-color: var(--c-green); }
+.topbar-actions { display: flex; align-items: center; gap: var(--s3); margin-left: auto; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1.5px solid var(--line-default); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1rem;
+  transition: background 120ms;
+}
+.icon-btn:hover { background: var(--c-cream); }
+.user-menu {
+  display: flex; align-items: center; gap: var(--s3);
+  padding: 6px 14px 6px 6px;
+  background: var(--c-cream); border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--c-green); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: .82rem;
+}
+.user-name { font-size: .88rem; font-weight: 600; }
+
+/* Content */
+.dash-content {
+  flex: 1; padding: var(--s6);
+  max-width: 1200px; width: 100%;
+}
+
+/* Page header */
+.page-head { margin-bottom: var(--s6); }
+.page-eyebrow {
+  font-family: var(--font-script);
+  font-size: 1.1rem; color: var(--c-orange-deep);
+  display: inline-block; transform: rotate(-1deg);
+  margin-bottom: 4px;
+}
+.page-title {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  letter-spacing: -.02em; line-height: 1.15;
+}
+.page-sub {
+  color: var(--fg-tertiary); font-size: .95rem;
+  margin-top: 6px; max-width: 600px;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s4);
+  margin-bottom: var(--s6);
+}
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  padding: var(--s5);
+  border-left: 3px solid var(--c-green);
+  transition: transform 120ms, box-shadow 120ms;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+.stat-card.accent-orange { border-left-color: var(--c-orange-deep); }
+.stat-label {
+  font-size: .76rem; font-weight: 600;
+  color: var(--fg-tertiary);
+  letter-spacing: .04em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 1.9rem; line-height: 1;
+  color: var(--fg-primary);
+  letter-spacing: -.02em;
+}
+.stat-meta {
+  font-size: .78rem; color: var(--fg-tertiary);
+  margin-top: 6px;
+}
+.stat-trend-up { color: var(--c-green-glow); font-weight: 600; }
+
+/* Grid layout content */
+.dash-grid {
+  display: grid; grid-template-columns: 2fr 1fr; gap: var(--s5);
+}
+.section-card {
+  background: #fff;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.section-head {
+  padding: var(--s4) var(--s5);
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line-subtle);
+}
+.section-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 1rem;
+}
+.section-link {
+  font-size: .82rem; color: var(--c-orange-deep);
+  text-decoration: none; font-weight: 500;
+}
+.section-link:hover { text-decoration: underline; }
+
+/* Activity list */
+.activity-list { padding: var(--s2) 0; }
+.activity-item {
+  padding: var(--s3) var(--s5);
+  display: grid; grid-template-columns: 36px 1fr auto;
+  gap: var(--s3); align-items: center;
+  border-bottom: 1px solid var(--line-subtle);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.activity-item:hover { background: var(--c-cream); }
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(26,122,72,.10); color: var(--c-green);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+}
+.activity-icon.warn { background: rgba(224,92,26,.12); color: var(--c-orange-deep); }
+.activity-text { font-size: .9rem; }
+.activity-text strong { font-weight: 600; }
+.activity-meta {
+  font-family: var(--font-mono); font-size: .72rem;
+  color: var(--fg-tertiary);
+}
+
+/* Trust score widget */
+.trust-widget {
+  padding: var(--s5);
+  text-align: center;
+}
+.trust-score {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 3.4rem; line-height: 1;
+  color: var(--c-green);
+  letter-spacing: -.02em;
+}
+.trust-score-suffix {
+  font-size: 1.1rem; color: var(--fg-tertiary);
+  margin-left: 4px;
+}
+.trust-label {
+  font-family: var(--font-script); font-size: 1.1rem;
+  color: var(--c-orange-deep);
+  margin-top: var(--s2); transform: rotate(-1deg);
+  display: inline-block;
+}
+.trust-bar {
+  margin-top: var(--s4);
+  background: var(--c-cream);
+  border-radius: var(--r-pill);
+  height: 8px;
+  overflow: hidden;
+}
+.trust-fill {
+  width: 84%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-green), var(--c-green-glow));
+  border-radius: var(--r-pill);
+}
+.trust-help {
+  margin-top: var(--s3);
+  font-size: .78rem; color: var(--fg-tertiary);
+  line-height: 1.5;
+}
+
+/* Quick actions */
+.quick-actions { padding: var(--s4) var(--s5); display: grid; gap: var(--s2); }
+.quick-action {
+  display: flex; align-items: center; gap: var(--s3);
+  padding: 10px 14px;
+  background: var(--c-cream);
+  border-radius: var(--r-sm);
+  text-decoration: none; color: var(--fg-primary);
+  font-size: .88rem; font-weight: 500;
+  transition: background 120ms;
+}
+.quick-action:hover { background: rgba(255,126,66,.10); }
+.quick-action-icon {
+  width: 28px; height: 28px; border-radius: var(--r-sm);
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Mobiel */
+@media (max-width: 880px) {
+  .dash-shell { grid-template-columns: 1fr; }
+  .dash-sidebar { display: none; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+  .dash-content { padding: var(--s4); }
+}
+</style>
+</head>
+<body>
+
+<div class="dash-shell">
+
+  <!-- ── SIDEBAR ─────────────────────────────── -->
+  <aside class="dash-sidebar">
+    <div class="sidebar-brand">
+      <span class="sidebar-logo">intern<span>ly</span></span>
+    </div>
+
+    <div class="sidebar-section">Werk</div>
+    <a class="nav-link active" href="#"><span class="nav-icon">●</span> Mijn dashboard</a>
+    <a class="nav-link" href="#"><span class="nav-icon">○</span> Discover</a>
+    <a class="nav-link" href="#"><span class="nav-icon">○</span> Mijn matches</a>
+    <a class="nav-link" href="#"><span class="nav-icon">○</span> Sollicitaties</a>
+    <a class="nav-link" href="#">
+      <span class="nav-icon">○</span> Berichten
+      <span class="nav-badge">2</span>
+    </a>
+
+    <div class="sidebar-section">Profiel</div>
+    <a class="nav-link" href="#"><span class="nav-icon">○</span> Mijn profiel</a>
+    <a class="nav-link" href="#"><span class="nav-icon">○</span> Buddy systeem</a>
+    <a class="nav-link" href="#"><span class="nav-icon">○</span> Instellingen</a>
+
+    <div class="sidebar-foot">
+      © 2026 Sasubo Holding B.V.
+    </div>
+  </aside>
+
+  <!-- ── MAIN ─────────────────────────────── -->
+  <main class="dash-main">
+
+    <header class="dash-topbar">
+      <input type="search" class="topbar-search" placeholder="Zoek bedrijven, opdrachten, gesprekken…">
+      <div class="topbar-actions">
+        <button class="icon-btn" aria-label="Notificaties">🔔</button>
+        <div class="user-menu">
+          <div class="user-avatar">L</div>
+          <div class="user-name">Lena</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="dash-content">
+
+      <div class="page-head">
+        <span class="page-eyebrow">welkom terug</span>
+        <h1 class="page-title">Goedemorgen, Lena</h1>
+        <p class="page-sub">Je hebt 2 nieuwe berichten en 1 sollicitatie wacht op een reactie.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Sollicitaties</div>
+          <div class="stat-value">7</div>
+          <div class="stat-meta">3 wachten op reactie</div>
+        </div>
+        <div class="stat-card accent-orange">
+          <div class="stat-label">Responsratio</div>
+          <div class="stat-value">86<span style="font-size:1.2rem;">%</span></div>
+          <div class="stat-meta">
+            <span class="stat-trend-up">+12%</span> deze week
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Matches</div>
+          <div class="stat-value">3</div>
+          <div class="stat-meta">1 nieuwe deze week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Buddy</div>
+          <div class="stat-value">Jan</div>
+          <div class="stat-meta">Volgende sessie wo 14:00</div>
+        </div>
+      </div>
+
+      <!-- Twee kolommen: activiteit + trust score -->
+      <div class="dash-grid">
+
+        <!-- Recent activity -->
+        <section class="section-card">
+          <header class="section-head">
+            <h2 class="section-title">Recent</h2>
+            <a class="section-link" href="#">Bekijk alles →</a>
+          </header>
+          <div class="activity-list">
+
+            <div class="activity-item">
+              <div class="activity-icon">●</div>
+              <div class="activity-text">
+                <strong>Vandaag Agency</strong> reageerde op je sollicitatie
+              </div>
+              <div class="activity-meta">14:22</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon warn">!</div>
+              <div class="activity-text">
+                Trust Score van <strong>Bedrijf X</strong> daalde — geen reactie binnen 7 dagen
+              </div>
+              <div class="activity-meta">11:08</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon">●</div>
+              <div class="activity-text">
+                <strong>Jan</strong> nodigde je uit voor een buddy-sessie
+              </div>
+              <div class="activity-meta">gisteren</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon">●</div>
+              <div class="activity-text">
+                Nieuwe stage gepubliceerd door <strong>StagePartner BV</strong>
+              </div>
+              <div class="activity-meta">ma</div>
+            </div>
+
+            <div class="activity-item">
+              <div class="activity-icon">○</div>
+              <div class="activity-text">
+                Je profiel is 14 keer bekeken deze week
+              </div>
+              <div class="activity-meta">ma</div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Trust score + quick actions -->
+        <aside>
+          <section class="section-card" style="margin-bottom: var(--s4);">
+            <header class="section-head">
+              <h2 class="section-title">Jouw Trust</h2>
+            </header>
+            <div class="trust-widget">
+              <div>
+                <span class="trust-score">84</span>
+                <span class="trust-score-suffix">/100</span>
+              </div>
+              <div class="trust-label">je doet het goed</div>
+              <div class="trust-bar">
+                <div class="trust-fill"></div>
+              </div>
+              <div class="trust-help">
+                Je reageert gemiddeld binnen 18 uur. Bedrijven zien dat.
+              </div>
+            </div>
+          </section>
+
+          <section class="section-card">
+            <header class="section-head">
+              <h2 class="section-title">Snel</h2>
+            </header>
+            <div class="quick-actions">
+              <a class="quick-action" href="#">
+                <span class="quick-action-icon">+</span>
+                Nieuwe sollicitatie
+              </a>
+              <a class="quick-action" href="#">
+                <span class="quick-action-icon">✎</span>
+                Profiel bijwerken
+              </a>
+              <a class="quick-action" href="#">
+                <span class="quick-action-icon">★</span>
+                Stages opslaan
+              </a>
+            </div>
+          </section>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!--
+  NOTITIE VOOR CLAUDE CODE — bij toepassing op productie dashboard pagina's:
+  · BEHOUD: alle Supabase queries (profile, stats, recent activity, trust score)
+  · BEHOUD: alle id's/classes die JS gebruikt voor data-binding
+  · BEHOUD: routing naar specifieke nav-items (bijv. company-discover voor bedrijven)
+  · BEHOUD: rol-specifieke stat-velden (student vs bedrijf vs school zien andere stats)
+  · VERVANG: alleen de visuele laag — sidebar styling, card design, typografie
+  · KRITIEK: nav-link id's of data-attributen niet veranderen als JS ze aanroept
+
+  ROL-VARIANTEN — pas dezelfde shell toe op alle dashboards:
+  · admin.html:                  pagina-titel "Admin", andere nav-items, andere stats
+  · student-profile.html:        pagina-titel "Mijn profiel", profielvelden ipv stats
+  · company-dashboard.html:      stats: opdrachten/sollicitaties/responsratio/Trust Score
+  · school-dashboard.html:       stats: studenten/opleidingen/risico-cases/inzicht
+  · bbl-dashboard.html:          accent-color groen, stats: contractdagen/leerresultaten
+  · buddy-dashboard.html:        eigen kleur-accent paars, stats: sessies/begeleidingsuren
+-->
+
+</body>
+</html>

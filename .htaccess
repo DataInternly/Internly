@@ -1,6 +1,9 @@
 # ── Directory listing ────────────────────────────────────────────────────────
 Options -Indexes
 
+# ── Custom error pages ────────────────────────────────────────────────────────
+ErrorDocument 404 /404.html
+
 # ── HTTPS redirect ───────────────────────────────────────────────────────────
 RewriteEngine On
 RewriteCond %{HTTPS} off

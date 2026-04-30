@@ -253,6 +253,12 @@ CREATE TABLE IF NOT EXISTS meetings (
   created_at    timestamptz DEFAULT now()
 );
 
+-- Toegevoegd tijdens livetest 22 april 2026 - reeds in live DB aanwezig
+ALTER TABLE meetings ADD COLUMN IF NOT EXISTS contact_info   text;
+ALTER TABLE meetings ADD COLUMN IF NOT EXISTS note            text;
+ALTER TABLE meetings ADD COLUMN IF NOT EXISTS organizer_email text;
+ALTER TABLE meetings ADD COLUMN IF NOT EXISTS attendee_email  text;
+
 -- ────────────────────────────────────────────────────────────
 -- 16. AVAILABILITY  (calendar availability grid)
 -- ────────────────────────────────────────────────────────────
@@ -475,6 +481,21 @@ ALTER TABLE reviews ADD COLUMN IF NOT EXISTS flagged     boolean DEFAULT false;
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS flag_reason text;
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS flagged_by  uuid REFERENCES profiles(id);
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS flagged_at  timestamptz;
+
+-- reviews — MVP feature columns (toegevoegd 22 april 2026, reeds in live DB aanwezig)
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS match_id         uuid REFERENCES matches(id);
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS title            varchar(100);
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS company_reply    text;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS company_reply_at timestamptz;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS helpful_count    integer NOT NULL DEFAULT 0;
+
+-- reviews — indices
+CREATE INDEX IF NOT EXISTS idx_reviews_match_id ON reviews(match_id);
+
+-- reviews — unique constraint: 1 review per match per reviewer
+ALTER TABLE reviews
+  ADD CONSTRAINT reviews_unique_per_match_direction
+  UNIQUE (match_id, reviewer_id);
 
 -- stage_plans — school invite flag
 ALTER TABLE stage_plans ADD COLUMN IF NOT EXISTS school_invited boolean DEFAULT false;
@@ -780,25 +801,75 @@ CREATE POLICY "avail_delete_own" ON availability
   FOR DELETE USING (user_id = auth.uid());
 
 -- ── reviews ──────────────────────────────────────────────────
-DROP POLICY IF EXISTS "rev_select_public"   ON reviews;
-DROP POLICY IF EXISTS "rev_insert_own"      ON reviews;
-DROP POLICY IF EXISTS "rev_update_reviewer" ON reviews;
-DROP POLICY IF EXISTS "rev_delete_admin"    ON reviews;
+DROP POLICY IF EXISTS "rev_select_public"             ON reviews;
+DROP POLICY IF EXISTS "rev_insert_own"                ON reviews;
+DROP POLICY IF EXISTS "rev_update_reviewer"           ON reviews;
+DROP POLICY IF EXISTS "rev_delete_admin"              ON reviews;
+DROP POLICY IF EXISTS "reviews_select_public"         ON reviews;
+DROP POLICY IF EXISTS "reviews_insert_match_gated"    ON reviews;
+DROP POLICY IF EXISTS "reviews_update_own"            ON reviews;
+DROP POLICY IF EXISTS "reviews_update_company_reply"  ON reviews;
+DROP POLICY IF EXISTS "reviews_update_flag"           ON reviews;
 
-CREATE POLICY "rev_select_public" ON reviews
-  FOR SELECT USING (true);
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "rev_insert_own" ON reviews
-  FOR INSERT WITH CHECK (reviewer_id = auth.uid());
-
-CREATE POLICY "rev_update_reviewer" ON reviews
-  FOR UPDATE USING (
-    reviewer_id = auth.uid() OR
-    reviewee_id = auth.uid()  -- for flagging by reviewee
+-- SELECT: unflagged reviews zichtbaar voor iedereen; flagged alleen voor eigen reviewer
+CREATE POLICY "reviews_select_public" ON reviews
+  FOR SELECT
+  TO anon, authenticated
+  USING (
+    flagged = false
+    OR (auth.uid() IS NOT NULL AND auth.uid() = reviewer_id)
   );
 
-CREATE POLICY "rev_delete_admin" ON reviews
-  FOR DELETE USING (
+-- INSERT: match-gated; self-review verboden
+CREATE POLICY "reviews_insert_match_gated" ON reviews
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() = reviewer_id
+    AND reviewer_id != reviewee_id
+    AND EXISTS (
+      SELECT 1 FROM matches m
+      WHERE m.id = match_id
+        AND m.status IN ('accepted', 'completed')
+        AND (
+          (m.party_a = auth.uid() AND m.party_b = reviewee_id)
+          OR
+          (m.party_b = auth.uid() AND m.party_a = reviewee_id)
+        )
+    )
+  );
+
+-- UPDATE: reviewer mag eigen review updaten
+CREATE POLICY "reviews_update_own" ON reviews
+  FOR UPDATE
+  TO authenticated
+  USING  (auth.uid() = reviewer_id)
+  WITH CHECK (auth.uid() = reviewer_id);
+
+-- UPDATE: reviewee (bedrijf) mag company_reply + company_reply_at zetten
+CREATE POLICY "reviews_update_company_reply" ON reviews
+  FOR UPDATE
+  TO authenticated
+  USING  (auth.uid() = reviewee_id)
+  WITH CHECK (auth.uid() = reviewee_id);
+
+-- UPDATE: iedere authenticated user mag een review flaggen
+CREATE POLICY "reviews_update_flag" ON reviews
+  FOR UPDATE
+  TO authenticated
+  USING (true)
+  WITH CHECK (
+    flagged = true
+    AND flagged_by = auth.uid()
+    AND flagged_at IS NOT NULL
+  );
+
+-- DELETE: alleen admin (hallo@internly.pro)
+CREATE POLICY "reviews_delete_admin" ON reviews
+  FOR DELETE
+  USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND email = 'hallo@internly.pro')
   );
 
@@ -991,6 +1062,54 @@ CREATE INDEX IF NOT EXISTS idx_ip_created_by  ON internship_postings(created_by)
 -- reviews
 CREATE INDEX IF NOT EXISTS idx_reviews_reviewee ON reviews(reviewee_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_flagged  ON reviews(flagged) WHERE flagged = true;
+
+-- ============================================================
+-- KENNISBANK  (publieke artikelen)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS kb_articles (
+  id             uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug           text        NOT NULL UNIQUE,
+  title          text        NOT NULL,
+  excerpt        text        NOT NULL,
+  body_markdown  text        NOT NULL,
+  audience       text[]      NOT NULL,
+  tags           text[]      NOT NULL DEFAULT '{}',
+  external_links jsonb       NOT NULL DEFAULT '[]',
+  author         text        NOT NULL DEFAULT 'Internly redactie',
+  published      boolean     NOT NULL DEFAULT false,
+  published_at   timestamptz,
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  updated_at     timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_kb_audience    ON kb_articles USING gin(audience);
+CREATE INDEX IF NOT EXISTS idx_kb_tags        ON kb_articles USING gin(tags);
+CREATE INDEX IF NOT EXISTS idx_kb_slug        ON kb_articles(slug);
+CREATE INDEX IF NOT EXISTS idx_kb_published_at ON kb_articles(published_at DESC) WHERE published = true;
+CREATE INDEX IF NOT EXISTS idx_kb_search      ON kb_articles
+  USING gin(to_tsvector('dutch', title || ' ' || excerpt || ' ' || body_markdown));
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS kb_articles_updated_at ON kb_articles;
+CREATE TRIGGER kb_articles_updated_at
+  BEFORE UPDATE ON kb_articles
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+ALTER TABLE kb_articles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "kb_select_published" ON kb_articles;
+CREATE POLICY "kb_select_published" ON kb_articles
+  FOR SELECT
+  TO anon, authenticated
+  USING (published = true);
 
 -- ============================================================
 -- REALTIME  (enable for live-updating pages)

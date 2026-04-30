@@ -1,3 +1,152 @@
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS — site-wide revamp 2026-04-29
+   Single source of truth voor kleur, spacing, typografie, motion.
+   Gebruikt door alle pagina's. Niet herdefiniëren per pagina.
+
+   AFWIJKING VAN SPEC: --accent is NIET geherdefinieerd. De design-
+   system spec zegt --accent: var(--c-orange-deep) (#e05c1a), maar:
+   1. Bestaand --accent = #FF7E42 (light orange) wordt door alle
+      huidige .btn-primary's gebruikt
+   2. Sectie 8 verbiedt rebrand
+   3. Homepage v2 gebruikt zelf #FF7E42 als primary
+   Nieuwe componenten in fase B+ refereren --c-orange-deep direct
+   waar de deeper tone bedoeld is.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* BREAKPOINTS — uitsluitend 768px (sidebar/layout), 480px (narrow-card/form), 360px (tiny-screen). Niets anders. */
+
+  /* Brand primitives */
+  --c-green-deep:   #0f5c36;
+  --c-green:        #1a7a48;
+  --c-green-glow:   #22a85e;
+  --c-orange:       #FF7E42;
+  --c-orange-deep:  #e05c1a;
+  --c-cream:        #f4f3ef;
+  --c-cream-warm:   #fdfaf6;
+  --c-paper:        #f6f2e8;
+  --c-ink:          #0d1520;
+  --c-ink-soft:     #2a1810;
+
+  /* Semantic — net-nieuwe namen, geen conflict met bestaande */
+  --bg-page:        var(--c-cream);
+  --bg-page-warm:   var(--c-cream-warm);
+  --bg-surface:     #ffffff;
+  --bg-surface-elev:#ffffff;
+  --bg-dark:        var(--c-ink);
+  --bg-hero:        linear-gradient(148deg, #1e8a52 0%, #1a7a48 42%, #145e38 100%);
+
+  --fg-primary:     var(--c-ink);
+  --fg-secondary:   #2e4038;
+  --fg-tertiary:    #6b8070;
+  --fg-on-dark:     #ffffff;
+  --fg-on-dark-soft:rgba(255,255,255,.62);
+
+  /* NB: --accent overgeslagen — zie afwijking-notitie boven. */
+  --accent-soft:    rgba(224,92,26,.12);
+  --accent-glow:    rgba(255,126,66,.35);
+  --accent-line:    #e05c1a;
+
+  --line-subtle:    rgba(13,26,16,.09);
+  --line-default:   rgba(13,26,16,.14);
+
+  /* Buddy role — gepensioneerd */
+  --c-buddy-purple:       #6d28d9;
+  --c-buddy-purple-bg:    #ede9fe;
+  --c-buddy-purple-mid:   #7c3aed;
+  --c-buddy-purple-light: #f8f7ff;
+
+  /* Spacing — 8px scale */
+  --s1: 4px;    --s2: 8px;    --s3: 12px;
+  --s4: 16px;   --s5: 24px;   --s6: 32px;
+  --s7: 48px;   --s8: 64px;   --s9: 96px;
+  --s10: 128px;
+
+  /* Typografie */
+  --font-display:   'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body:      'Outfit', system-ui, sans-serif;
+  --font-mono:      'DM Mono', ui-monospace, monospace;
+  --font-script:    'Caveat', cursive;
+
+  --fs-1:    clamp(.72rem, 1vw,   .76rem);
+  --fs-2:    clamp(.82rem, 1.2vw, .88rem);
+  --fs-3:    clamp(.95rem, 1.4vw, 1.05rem);
+  --fs-4:    clamp(1.15rem,1.8vw, 1.4rem);
+  --fs-5:    clamp(1.5rem, 2.4vw, 2rem);
+  --fs-6:    clamp(2rem,   3.6vw, 3rem);
+  --fs-hero: clamp(2.4rem, 5.6vw, 4.4rem);
+
+  /* Radius — net-nieuwe namen, --radius/--radius-sm blijven bestaan */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   20px;
+  --r-pill: 999px;
+
+  /* Shadow */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:  0 18px 40px rgba(0,0,0,.12);
+  --shadow-cta: 0 10px 30px var(--accent-glow);
+
+  /* Motion */
+  --ease:   cubic-bezier(.16, 1, .3, 1);
+  --t-fast: 120ms;
+  --t-base: 220ms;
+  --t-slow: 420ms;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GEDEELDE COMPONENTEN — staged voor fase B+ herschrijvingen
+   CSS-cascade: latere regels winnen. De bestaande .btn / .btn-primary
+   / .btn-ghost / .card / .card-head etc. staan VERDEROP in dit
+   bestand en winnen voor bestaande pagina's. Hier alleen toevoegen
+   wat NET-NIEUW is (geen conflict met bestaande selectoren).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Net-nieuwe utility — Caveat kanttekening */
+.caveat {
+  font-family: var(--font-script);
+  color:       var(--accent-line);
+  transform:   rotate(-2deg);
+  display:     inline-block;
+}
+
+/* Net-nieuw — accent border bovenkant (bv. trust-card) */
+.card-accent { border-top: 3px solid var(--c-green); }
+
+/* Net-nieuw — secundaire knop variant (.btn / .btn-primary / .btn-ghost
+   bestaan al verderop, .btn-secondary niet) */
+.btn-secondary {
+  background:   transparent;
+  color:        var(--c-orange-deep);
+  border:       1.5px solid var(--c-orange-deep);
+  border-radius:var(--r-pill);
+  padding:      var(--s3) var(--s5);
+  font-family:  var(--font-body);
+  font-size:    var(--fs-3);
+  font-weight:  600;
+  cursor:       pointer;
+  transition:   background var(--t-fast), color var(--t-fast);
+}
+.btn-secondary:hover { background: var(--c-orange-deep); color: #fff; }
+
+/* Net-nieuw — pill input variant (de bestaande input:focus regel
+   verderop in dit bestand blijft globaal werken voor alle inputs) */
+.input-v2 {
+  font-family:   var(--font-body);
+  font-size:     var(--fs-3);
+  padding:       var(--s3) var(--s4);
+  border:        1.5px solid #e2e8f0;
+  border-radius: var(--r-pill);
+  outline:       none;
+  transition:    border-color var(--t-fast);
+}
+.input-v2:focus { border-color: var(--c-green); }
+
+/* ═══════════════════════════════════════════════════════════════
+   EINDE site-wide revamp toevoegingen.
+   Hieronder origineel style.css — ongewijzigd.
+   ═══════════════════════════════════════════════════════════════ */
+
 /* css/style.css — Internly basis stijlen */
 
 :root {
@@ -339,6 +488,8 @@ body {
 .tag.green   { background: #e8f5ee; color: #1a7a48; }
 .tag.neutral { background: #fdf3e0; color: #a06010; }
 .tag.red     { background: #fdeaea; color: #b82020; }
+/* default (no modifier): grijs — gebruikt door Kennisbank tags */
+.tag:not(.green):not(.neutral):not(.red) { background: #f3f4f6; color: #374151; }
 
 /* ── Notificatie ──────────────────────────────────────────────────────────── */
 
@@ -503,6 +654,70 @@ body                  { top: 0 !important; position: static !important; }
   color: #9ca3af;
   font-size: .88rem;
 }
+
+/* ── Empty states (Sprint α) ─────────────────────────────────────────────── */
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.empty-state .es-icon {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+.empty-state .es-primary {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink, #0d1520);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+.empty-state .es-secondary {
+  font-size: 0.92rem;
+  color: var(--ink2, #374151);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.empty-state .btn-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.empty-state .es-cta {
+  display: inline-block;
+  background: var(--green, #1a7a48);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s;
+}
+.empty-state .es-cta:hover { background: #0f5c36; }
+.empty-state .es-ghost {
+  display: inline-block;
+  background: transparent;
+  color: var(--ink2, #374151);
+  border: 1.5px solid var(--ink3, #7a8799);
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color .15s, color .15s;
+}
+.empty-state .es-ghost:hover { border-color: var(--ink, #0d1520); color: var(--ink, #0d1520); }
 
 /* ── Toast notification ──────────────────────────────────────────────────── */
 
@@ -1142,6 +1357,125 @@ button {
   outline-offset: 2px;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   SWIPE UI — matches.html / matchpool.html (gedeeld)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Matchpool toggle filter ─────────────────────────────────────────────── */
+.filter-toggle {
+  background: #fff; border: 1.5px solid #f0f0ee;
+  border-radius: 16px; padding: 14px 18px; margin-bottom: 28px;
+}
+.toggle-row {
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; user-select: none;
+}
+.toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: relative; width: 44px; height: 24px;
+  background: #e2e8f0; border-radius: 12px;
+  transition: background .2s; flex-shrink: 0;
+}
+.toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; background: #fff;
+  border-radius: 50%; transition: transform .2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.toggle-input:checked + .toggle-track { background: #1a7a48; }
+.toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
+.toggle-label { font-size: .92rem; font-weight: 600; color: #374151; }
+.toggle-sub { font-size: .8rem; color: #9ca3af; margin-top: 6px; padding-left: 56px; }
+
+/* ── Trust badge modifiers (swipe cards) ─────────────────────────────────── */
+.trust-a { background: #e8f5ee; color: #1a7a48; }
+.trust-b { background: #fdf3e0; color: #a06010; }
+.trust-c { background: #fdeaea; color: #b82020; }
+
+/* ── Swipe area ──────────────────────────────────────────────────────────── */
+.swipe-area {
+  position: relative; height: 440px;
+  margin-bottom: 20px; touch-action: none;
+}
+.swipe-card {
+  position: absolute; width: 100%; height: 440px;
+  background: #fff; border-radius: 20px;
+  border: 1.5px solid #f0f0ee;
+  box-shadow: 0 4px 20px rgba(0,0,0,.07);
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  cursor: grab; user-select: none;
+  display: flex; flex-direction: column;
+}
+.swipe-card:active { cursor: grabbing; }
+.swipe-card.is-match { border-color: #c9e8d5; box-shadow: 0 4px 20px rgba(26,122,72,.08); }
+
+.card-visual {
+  height: 190px;
+  background: linear-gradient(135deg, #1a7a48, #0f5c36);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 72px; color: rgba(255,255,255,.2);
+  flex-shrink: 0; position: relative;
+}
+.pool-badge {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(244,243,239,.95); color: #6b7280;
+  font-size: .7rem; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px;
+  font-family: 'Outfit', sans-serif;
+  backdrop-filter: blur(4px);
+}
+.card-body { padding: 20px 24px 22px; flex: 1; display: flex; flex-direction: column; }
+.card-top-row {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px; margin-bottom: 4px;
+}
+.card-company { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 600; color: #0d1520; }
+.card-role { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 600; color: #0d1520; margin: 8px 0 12px; }
+.card-desc { color: #374151; font-size: .9rem; line-height: 1.55; flex: 1; }
+
+/* ── Swipe action buttons ────────────────────────────────────────────────── */
+.swipe-actions { display: flex; justify-content: center; gap: 12px; }
+.btn-pass {
+  padding: 13px 32px; background: #fff; color: #374151;
+  border: 1.5px solid #e2e8f0; border-radius: 50px;
+  font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
+  cursor: pointer; transition: border-color .15s, color .15s, background .15s;
+  min-height: unset;
+}
+.btn-pass:hover { border-color: #b82020; color: #b82020; background: #fdeaea; }
+.btn-like {
+  padding: 13px 32px; background: #FF7E42; color: #fff;
+  border: none; border-radius: 50px;
+  font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
+  cursor: pointer; box-shadow: 0 4px 14px rgba(255,126,66,.35);
+  transition: background .15s, transform .1s, box-shadow .15s;
+  min-height: unset;
+}
+.btn-like:hover { background: #e05c1a; box-shadow: 0 6px 18px rgba(255,126,66,.45); }
+.btn-like:active { transform: scale(.97); }
+
+/* ── Swipe empty states ──────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: #6b7280; font-size: .95rem;
+}
+.empty-state .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+.btn-enable-pool {
+  display: inline-block; margin-top: 16px;
+  background: #1a7a48; color: #fff; border: none;
+  padding: 11px 28px; border-radius: 50px;
+  font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 600;
+  cursor: pointer; transition: background .15s; min-height: unset;
+}
+.btn-enable-pool:hover { background: #0f5c36; }
+
+@media (max-width: 480px) {
+  .swipe-area { height: 400px; }
+  .swipe-card { height: 400px !important; }
+  .card-visual { height: 160px !important; }
+}
+
 /* ── Shared student header (O1 + O2) ─────────────────────────────────────── */
 .student-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -1177,6 +1511,20 @@ button {
   transition: filter .12s;
 }
 .profile-chip:hover .avatar { filter: brightness(1.15); }
+.sh-logout-btn {
+  background: none; border: 1px solid rgba(0,0,0,.15); color: #4b5563;
+  padding: 5px 11px; border-radius: 20px;
+  font-family: 'Outfit', sans-serif; font-size: .78rem; cursor: pointer;
+  transition: all .14s; white-space: nowrap;
+}
+.sh-logout-btn:hover { background: rgba(0,0,0,.06); color: #0d1520; border-color: rgba(0,0,0,.28); }
+.sh-back-btn {
+  background: none; border: 1px solid rgba(0,0,0,.12); color: #6b7280;
+  padding: 5px 11px; border-radius: 20px;
+  font-family: 'Outfit', sans-serif; font-size: .78rem; cursor: pointer;
+  transition: all .14s; white-space: nowrap;
+}
+.sh-back-btn:hover { background: rgba(0,0,0,.04); color: #374151; border-color: rgba(0,0,0,.22); }
 /* Logged-out variant */
 .student-header--out { justify-content: space-between; }
 .cta-create-profile {
@@ -1209,8 +1557,334 @@ button {
   box-shadow: 0 8px 24px rgba(13,21,32,.12);
   z-index: 200;
 }
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .student-nav { gap: 12px; }
   .student-nav a { font-size: .8rem; }
   .student-header { padding: 0 14px; }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   ACCOUNT MODULE — gedeeld over alle dashboards (js/account.js)
+   Toegevoegd 29 april 2026.
+   Gebruikt bestaande --green/--red/--ink/--bg/--white/--accent variabelen.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.account-loading,
+.account-error {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--ink3, #7a8799);
+  font-size: .92rem;
+  background: var(--white, #fff);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--r-md, 12px);
+}
+.account-error { color: var(--red, #b82020); }
+
+.account-section {
+  background: var(--white, #fff);
+  border: 1px solid #e5e7eb;
+  border-radius: var(--r-md, 12px);
+  padding: 22px 22px 18px;
+  margin-bottom: 18px;
+}
+.account-section--danger {
+  border-color: rgba(184, 32, 32, .25);
+  background: var(--red-bg, #fdeaea);
+}
+
+.account-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.account-section-title {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink, #0d1520);
+  margin: 0 0 14px;
+  letter-spacing: -.01em;
+}
+.account-section-head .account-section-title { margin: 0; }
+.account-section-title--danger { color: var(--red, #b82020); }
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account-form .form-group { margin: 0; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group--inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.form-label {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--ink2, #374151);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.form-optional {
+  font-weight: 400;
+  font-size: .76rem;
+  color: var(--ink3, #7a8799);
+}
+.form-hint {
+  font-size: .75rem;
+  color: var(--ink3, #7a8799);
+  margin-top: 2px;
+}
+
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size: .92rem;
+  color: var(--ink, #0d1520);
+  background: var(--white, #fff);
+  border: 1px solid #d1d5db;
+  border-radius: var(--r-sm, 8px);
+  transition: border-color .15s, box-shadow .15s;
+  box-sizing: border-box;
+}
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--green, #1a7a48);
+  box-shadow: 0 0 0 3px rgba(26, 122, 72, .12);
+}
+.form-input:disabled {
+  background: var(--bg2, #f4f6f9);
+  color: var(--ink3, #7a8799);
+  cursor: not-allowed;
+}
+
+/* Toggle switch voor email_notificaties */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  background: #cbd5e1;
+  border-radius: 24px;
+  transition: background .15s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: var(--white, #fff);
+  border-radius: 50%;
+  transition: transform .15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+.toggle input:checked + .toggle-slider { background: var(--green, #1a7a48); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+.toggle input:focus-visible + .toggle-slider {
+  box-shadow: 0 0 0 3px rgba(26, 122, 72, .25);
+}
+
+/* Subscription / plan-card */
+.account-plan-card {
+  padding: 16px 18px;
+  border-radius: var(--r-sm, 8px);
+  background: var(--bg2, #f4f6f9);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 12px;
+}
+.account-plan-card--paid {
+  background: var(--green-bg, #e8f5ee);
+  border-color: rgba(26, 122, 72, .25);
+}
+.plan-label {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink3, #7a8799);
+  margin-bottom: 4px;
+}
+.plan-name {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink, #0d1520);
+  margin-bottom: 6px;
+}
+.plan-status {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 500;
+  padding: 2px 9px;
+  border-radius: 999px;
+  margin-right: 6px;
+}
+.plan-status--green  { background: var(--green-bg, #e8f5ee); color: var(--green, #1a7a48); }
+.plan-status--red    { background: var(--red-bg,   #fdeaea); color: var(--red,   #b82020); }
+.plan-status--amber  { background: var(--amber-bg, #fdf3e0); color: var(--amber, #b87a1a); }
+.plan-status--blue   { background: rgba(26, 74, 122, .1);    color: var(--blue,  #1a4a7a); }
+
+.plan-next {
+  margin-top: 8px;
+  font-size: .82rem;
+  color: var(--ink2, #374151);
+}
+
+.account-plan-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Danger buttons (alleen account-context) */
+.btn-danger {
+  background: var(--red, #b82020);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--r-sm, 8px);
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-weight: 500;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-danger:hover { background: #8f1818; }
+.btn-danger:focus-visible {
+  outline: 2px solid var(--red, #b82020);
+  outline-offset: 2px;
+}
+
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--red, #b82020);
+  border: 1.5px solid var(--red, #b82020);
+  padding: 8px 16px;
+  border-radius: var(--r-sm, 8px);
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-weight: 500;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn-danger-ghost:hover {
+  background: var(--red, #b82020);
+  color: #fff;
+}
+
+.btn-xs {
+  padding: 3px 8px;
+  font-size: .72rem;
+  border-radius: 6px;
+}
+
+/* Empty / warning states */
+.account-warning {
+  font-size: .88rem;
+  color: var(--ink2, #374151);
+  margin-bottom: 14px;
+  line-height: 1.45;
+}
+.account-empty {
+  font-size: .88rem;
+  color: var(--ink3, #7a8799);
+  text-align: center;
+  padding: 18px 12px;
+}
+
+/* Payments table */
+.payments-table-wrap {
+  overflow-x: auto;
+  margin: 0 -4px;
+}
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+.payments-table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: .76rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--ink3, #7a8799);
+  padding: 8px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.payments-table td {
+  padding: 10px;
+  color: var(--ink, #0d1520);
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+.payments-table tbody tr:last-child td { border-bottom: none; }
+
+.payment-status {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.payment-status--paid     { background: var(--green-bg, #e8f5ee); color: var(--green, #1a7a48); }
+.payment-status--pending  { background: var(--amber-bg, #fdf3e0); color: var(--amber, #b87a1a); }
+.payment-status--failed   { background: var(--red-bg,   #fdeaea); color: var(--red,   #b82020); }
+.payment-status--refunded { background: var(--bg2,      #f4f6f9); color: var(--ink2,  #374151); }
+
+@media (max-width: 480px) {
+  .account-section { padding: 16px 14px; }
+  .payments-table th:nth-child(2),
+  .payments-table td:nth-child(2) { display: none; }
+  .form-group--inline { flex-wrap: wrap; }
+  .account-plan-actions .btn,
+  .account-plan-actions .btn-danger-ghost { width: 100%; text-align: center; }
+}
+
+/* ── Verplichte velden ───────────────────────────── */
+label.req::after {
+  content: ' *';
+  color: var(--accent, #e05c1a);
+  font-weight: 600;
+  font-size: .9em;
+  margin-left: 2px;
+}
+.form-req-note {
+  font-size: .78rem;
+  color: var(--fg-tertiary, #7a8799);
+  margin-bottom: 1rem;
+}
+.form-req-note strong { color: var(--accent, #e05c1a); }

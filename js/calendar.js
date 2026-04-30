@@ -309,16 +309,17 @@ const InternlyCalendar = (() => {
     const i = document.getElementById('mf-contact');
     if (!l||!i) return;
     const map = {
-      video:  ['Vergaderlink *','https://meet.google.com/...'],
-      call:   ['Telefoonnummer *','+31 6 ...'],
-      fysiek: ['Adres of locatie *','Straat 1, Amsterdam'],
+      video:       ['Vergaderlink *','https://meet.google.com/...'],
+      call:        ['Telefoonnummer *','+31 6 ...'],
+      fysiek:      ['Adres of locatie *','Straat 1, Amsterdam'],
+      driegesprek: ['Vergaderlink *','https://meet.google.com/...'],
     };
     [l.textContent, i.placeholder] = map[t]||['Contactgegevens *',''];
   }
 
   async function submitMeeting(otherUserId, otherEmail, otherName) {
     if (_isSavingMeeting) return;
-    _isSavingMeeting = true;
+
     const subj    = document.getElementById('mf-subj')?.value.trim();
     const type    = document.getElementById('mf-type')?.value;
     const contact = document.getElementById('mf-contact')?.value.trim();
@@ -329,6 +330,8 @@ const InternlyCalendar = (() => {
 
     if (!subj||!contact||!date||!start||!end) { calNotify('Vul alle verplichte velden in',false); return; }
     if (end<=start) { calNotify('Eindtijd moet na starttijd liggen',false); return; }
+
+    _isSavingMeeting = true;
 
     const btn = document.getElementById('mf-submit');
     if (btn) { btn.disabled=true; btn.textContent='Versturen...'; }
@@ -354,7 +357,7 @@ const InternlyCalendar = (() => {
       }).select().maybeSingle();
 
       if (error) throw error;
-      if (!mtg) { calNotify('Beschikbaarheid kon niet worden opgeslagen — probeer opnieuw'); return; }
+      if (!mtg) { calNotify('Afspraak aanmaken mislukt — probeer opnieuw', false); return; }
 
       // In-app notificatie verstuurd via createNotification() — e-mail nog niet actief
 
@@ -393,8 +396,9 @@ const InternlyCalendar = (() => {
     const empty = container.querySelector('.chat-empty');
     if (empty) empty.remove();
 
-    const typeIcon = data.type === 'video' ? '📹 Video'
-                   : data.type === 'call'  ? '📞 Bellen'
+    const typeIcon = data.type === 'video'       ? '📹 Video'
+                   : data.type === 'call'        ? '📞 Bellen'
+                   : data.type === 'driegesprek' ? '👥 Driegesprek'
                    : '🏢 Fysiek';
     const contactLine = data.contact ? ` · ${esc(data.contact)}` : '';
     const now = new Date().toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });

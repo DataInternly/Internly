@@ -10,185 +10,66 @@
   <meta name="theme-color" content="#1a7a48">
   <title>Mijn matches — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
+    /* ═══════════════════════════════════════════════════════════════
+       Lijst archetype (matches) — swipe-card variant.
+       Globale tokens uit css/style.css. Alle .swipe-card / .btn-pass /
+       .btn-like / .empty-state / .filter-toggle CSS staat globaal.
+       Hier alleen pagina-specifieke layout + heading-tokens.
+       ═══════════════════════════════════════════════════════════════ */
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Outfit', sans-serif; background: #f4f3ef; -webkit-font-smoothing: antialiased; }
 
-    /* ── Topbar ── */
-    .topbar {
-      background: linear-gradient(135deg, #1a7a48, #0f5c36);
-      padding: 0 32px; height: 62px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
+    body {
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--bg-page, #f4f3ef);
+      color: var(--fg-primary, #0d1520);
+      -webkit-font-smoothing: antialiased;
     }
-    .topbar .logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.5rem; font-weight: 700; color: #fff;
-      letter-spacing: -.02em; text-decoration: none;
-    }
-    .topbar .logo span { color: #FF7E42; }
-    .topbar .nav { display: flex; gap: 24px; }
-    .topbar .nav a {
-      color: rgba(255,255,255,.7); text-decoration: none;
-      font-size: .95rem; font-weight: 500; transition: color .15s;
-    }
-    .topbar .nav a:hover, .topbar .nav a.active { color: #fff; }
-    .topbar-user { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500; }
-    .topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.2); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
-    .btn-topbar-logout { background: none; border: 1px solid rgba(255,255,255,.3); color: rgba(255,255,255,.7); padding: 5px 12px; border-radius: 20px; font-family: 'Outfit', sans-serif; font-size: .8rem; cursor: pointer; transition: all .15s; }
-    .btn-topbar-logout:hover { background: rgba(255,255,255,.1); color: #fff; }
 
-    /* ── Container ── */
-    .container { max-width: 560px; margin: 0 auto; padding: 40px 24px 80px; }
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: var(--s7, 40px) var(--s5, 24px) var(--s9, 80px);
+    }
+
+    .page-eyebrow {
+      font-family: var(--font-mono, 'DM Mono', monospace);
+      font-size: .72rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--fg-tertiary, #6b8070);
+      margin-bottom: 6px;
+    }
 
     h1 {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 2rem; font-weight: 700; color: #0d1520; margin-bottom: 6px;
-    }
-    .page-sub { color: #6b7280; font-size: 1rem; margin-bottom: 24px; }
-
-    /* ── Toggle filter ── */
-    .filter-toggle {
-      background: #fff; border: 1.5px solid #f0f0ee;
-      border-radius: 16px; padding: 14px 18px; margin-bottom: 28px;
-    }
-    .toggle-row {
-      display: flex; align-items: center; gap: 12px;
-      cursor: pointer; user-select: none;
-    }
-    .toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
-    .toggle-track {
-      position: relative; width: 44px; height: 24px;
-      background: #e2e8f0; border-radius: 12px;
-      transition: background .2s; flex-shrink: 0;
-    }
-    .toggle-thumb {
-      position: absolute; top: 2px; left: 2px;
-      width: 20px; height: 20px; background: #fff;
-      border-radius: 50%; transition: transform .2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,.2);
-    }
-    .toggle-input:checked + .toggle-track { background: #1a7a48; }
-    .toggle-input:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
-    .toggle-label { font-size: .92rem; font-weight: 600; color: #374151; }
-    .toggle-sub { font-size: .8rem; color: #9ca3af; margin-top: 6px; padding-left: 56px; }
-
-    /* ── Trust badge ── */
-    .trust-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: .73rem; font-weight: 700; padding: 4px 10px;
-      border-radius: 50px; white-space: nowrap; flex-shrink: 0;
-    }
-    .trust-a { background: #e8f5ee; color: #1a7a48; }
-    .trust-b { background: #fdf3e0; color: #a06010; }
-    .trust-c { background: #fdeaea; color: #b82020; }
-
-    /* ── Swipe area ── */
-    .swipe-area {
-      position: relative; height: 440px;
-      margin-bottom: 20px; touch-action: none;
-    }
-    @media (max-width: 480px) {
-      .swipe-area { height: 400px; }
-      .swipe-card { height: 400px !important; }
-      .card-visual { height: 160px !important; }
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -.025em;
+      color: var(--fg-primary, #0d1520);
+      margin-bottom: 6px;
+      line-height: 1.15;
     }
 
-    .swipe-card {
-      position: absolute; width: 100%; height: 440px;
-      background: #fff; border-radius: 20px;
-      border: 1.5px solid #f0f0ee;
-      box-shadow: 0 4px 20px rgba(0,0,0,.07);
-      overflow: hidden;
-      transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
-      cursor: grab; user-select: none;
-      display: flex; flex-direction: column;
-    }
-    .swipe-card:active { cursor: grabbing; }
-    .swipe-card.is-match { border-color: #c9e8d5; box-shadow: 0 4px 20px rgba(26,122,72,.08); }
-
-    .card-visual {
-      height: 190px;
-      background: linear-gradient(135deg, #1a7a48, #0f5c36);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 72px; color: rgba(255,255,255,.2);
-      flex-shrink: 0; position: relative;
+    .page-sub {
+      color: var(--fg-tertiary, #6b8070);
+      font-size: 1rem;
+      margin-bottom: var(--s5, 24px);
+      line-height: 1.55;
     }
 
-    .pool-badge {
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(244,243,239,.95); color: #6b7280;
-      font-size: .7rem; font-weight: 600;
-      padding: 4px 10px; border-radius: 20px;
-      font-family: 'Outfit', sans-serif;
-      backdrop-filter: blur(4px);
+    :focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
     }
-
-    .card-body { padding: 20px 24px 22px; flex: 1; display: flex; flex-direction: column; }
-    .card-top-row {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 10px; margin-bottom: 4px;
-    }
-    .card-company { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 600; color: #0d1520; }
-    .card-role { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 600; color: #0d1520; margin: 8px 0 12px; }
-    .card-desc { color: #374151; font-size: .9rem; line-height: 1.55; flex: 1; }
-
-    /* ── Action buttons ── */
-    .actions { display: flex; justify-content: center; gap: 12px; }
-
-    .btn-pass {
-      padding: 13px 32px; background: #fff; color: #374151;
-      border: 1.5px solid #e2e8f0; border-radius: 50px;
-      font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
-      cursor: pointer; transition: border-color .15s, color .15s, background .15s;
-    }
-    .btn-pass:hover { border-color: #b82020; color: #b82020; background: #fdeaea; }
-
-    .btn-like {
-      padding: 13px 32px; background: #FF7E42; color: #fff;
-      border: none; border-radius: 50px;
-      font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
-      cursor: pointer; box-shadow: 0 4px 14px rgba(255,126,66,.35);
-      transition: background .15s, transform .1s, box-shadow .15s;
-    }
-    .btn-like:hover { background: #e05c1a; box-shadow: 0 6px 18px rgba(255,126,66,.45); }
-    .btn-like:active { transform: scale(.97); }
-
-    /* ── Empty states ── */
-    .empty-state {
-      text-align: center; padding: 60px 20px;
-      color: #6b7280; font-size: .95rem;
-    }
-    .empty-state .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
-    .btn-enable-pool {
-      display: inline-block; margin-top: 16px;
-      background: #1a7a48; color: #fff; border: none;
-      padding: 11px 28px; border-radius: 50px;
-      font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 600;
-      cursor: pointer; transition: background .15s;
-    }
-    .btn-enable-pool:hover { background: #0f5c36; }
-
-    /* ── Notif (toast) ── */
-    .notif {
-      position: fixed; bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      background: #0d1520; color: #fff; padding: 12px 24px;
-      border-radius: 12px; font-size: .9rem;
-      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
-      opacity: 0; transition: opacity .25s, transform .25s;
-      pointer-events: none; white-space: nowrap;
-    }
-    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* Bell border on green topbar */
-    .topbar .bell-count { border-color: #1a7a48; }
   </style>
 </head>
 <body>
@@ -222,6 +103,7 @@
 </nav>
 
 <div class="container">
+  <div class="page-eyebrow">Verbindingen</div>
   <h1>Mijn Matches</h1>
   <p class="page-sub">Bedrijven die ook interesse in jou hebben</p>
 
@@ -237,7 +119,7 @@
 
   <div class="swipe-area" id="swipe-container"></div>
 
-  <div class="actions">
+  <div class="swipe-actions">
     <button class="btn-pass" onclick="skipCard()">Passen</button>
     <button class="btn-like" onclick="likeCard()">Like ❤️</button>
   </div>
@@ -819,9 +701,8 @@
     currentUser = user;
 
     const { data: sp } = await db.from('student_profiles')
-      .select('bbl_mode, onderwijsniveau').eq('profile_id', user.id).maybeSingle();
-    if (sp?.bbl_mode === true) { window.location.replace('bbl-hub.html'); return; }
-    if (sp?.onderwijsniveau === 'MBO_BOL') { window.location.replace('bol-profile.html'); return; }
+      .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+    if (sp?.bbl_mode === true) { window.location.replace(getRoleLanding('student', true)); return; }
 
     await loadMatches();
 

@@ -24,14 +24,15 @@ const MEETING_NOTIFICATION_TYPE = 'new_meeting';
 // index.html is a public landing page and does not register push notifications.
 
 /* ── SESSION TIMEOUT ────────────────────────────────────────────────────────
-   Tracks inactivity. Warns user at 25 min, signs out at 30 min.
+   Tracks inactivity. Warns user at 18 min, signs out at 20 min.
+   Resets on any user activity (mouse, keyboard, touch, scroll).
    Call once after confirming the user is authenticated.
    Works with both the global `supabase` client (index.html) and the page-level
    `db` client used by all other pages.
    ─────────────────────────────────────────────────────────────────────────── */
 function initSessionTimeout() {
-  const WARN_MS    = 25 * 60 * 1000; // 25 minutes
-  const SIGNOUT_MS = 30 * 60 * 1000; // 30 minutes
+  const WARN_MS    = 18 * 60 * 1000; // 18 minutes — warn 2 min before signout
+  const SIGNOUT_MS = 20 * 60 * 1000; // 20 minutes inactivity → signout
   let warnTimeout, signoutTimeout;
 
   function resetTimers() {
@@ -52,7 +53,7 @@ function initSessionTimeout() {
     }, SIGNOUT_MS);
   }
 
-  ['mousemove', 'keydown', 'click', 'touchstart'].forEach(evt =>
+  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll', 'pointerdown'].forEach(evt =>
     document.addEventListener(evt, resetTimers, { passive: true })
   );
   resetTimers();

@@ -19,8 +19,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -121,7 +123,7 @@
     .field input:focus, .field select:focus, .field textarea:focus { border-color: #1a7a48; }
     .field textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+    @media(max-width:480px) { .field-row { grid-template-columns: 1fr; } }
 
     /* Leerdoel inputs */
     .ld-field {
@@ -175,7 +177,7 @@
     .ov-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;
     }
-    @media(max-width:420px) { .ov-grid { grid-template-columns: 1fr; } }
+    @media(max-width:480px) { .ov-grid { grid-template-columns: 1fr; } }
     .ov-item {}
     .ov-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #9ca3af; margin-bottom: 3px; }
     .ov-val   { font-size: .9rem; color: #374151; }
@@ -218,7 +220,7 @@
       .shell { padding: 16px 12px 80px; }
       .topbar-bbl-nav { gap: 10px; }
     }
-    @media (max-width: 400px) {
+    @media (max-width: 360px) {
       .topbar-bbl-tag { display: none; }
       .topbar-user { display: none; }
       .topbar { padding: 0 14px; }
@@ -428,9 +430,10 @@ function showLoading(containerId, tekst) {
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -556,6 +559,13 @@ async function saveProfile() {
   const contractStart = document.getElementById('contract_start').value || null;
   const contractEnd   = document.getElementById('contract_end').value   || null;
 
+  const _cs = document.getElementById('contract_start')?.value;
+  const _ce = document.getElementById('contract_end')?.value;
+  if (_cs && _ce && _ce < _cs) {
+    notify('Einddatum BBL-contract mag niet vóór de startdatum liggen.', false);
+    return;
+  }
+
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
   btn.textContent = 'Opslaan…';
@@ -586,7 +596,7 @@ async function saveProfile() {
 
   if (error) {
     console.error('[bbl-profile] upsert fout:', error.message);
-    notify('Fout bij opslaan: ' + (error?.message || 'onbekende fout'));
+    notify('Fout bij opslaan: ' + (error?.message || 'onbekende fout'), false);
     return;
   }
 
@@ -670,9 +680,20 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Nieuw profiel — toon formulier direct
     document.getElementById('view-form').style.display = 'block';
   }
+
+  InternlyCalendar.render('ical-container', db, user.id);
 });
 </script>
 
+<!-- ── BESCHIKBAARHEID ──────────────────────────────────────────────────────── -->
+<div class="container" style="padding-top:0;padding-bottom:2.5rem">
+  <div class="section-label">Jouw planning</div>
+  <div class="section-title">Beschikbaarheid</div>
+  <p class="section-sub">Geef aan wanneer je beschikbaar bent voor gesprekken of afspraken. Je leerbedrijf en begeleider zien dit bij het plannen van een meeting.</p>
+  <div id="ical-container"></div>
+</div>
+
+<script src="js/calendar.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

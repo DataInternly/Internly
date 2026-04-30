@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a7a48">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="description" content="Schrijf een review over je stageervaringen via Internly.">
+  <title>Review schrijven — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/profanity.js"></script>
+  <script src="js/reviews.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/telemetry.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    :root {
+      --green:      #1a7a48;
+      --green-dark: #0f5c36;
+      --green-bg:   #e8f5ee;
+      --ink:        #0d1520;
+      --ink2:       #374151;
+      --ink3:       #6b7280;
+      --ink4:       #9ca3af;
+      --bg:         #f4f3ef;
+      --white:      #ffffff;
+      --border:     #f0f0ee;
+      --border2:    #e2e8f0;
+      --red:        #b82020;
+      --red-bg:     #fdeaea;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.95); backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 56px;
+    }
+    .logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); text-decoration: none; }
+    .logo span { color: var(--green); }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+    }
+
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--ink); margin-bottom: 6px;
+    }
+    .page-sub { font-size: .9rem; color: var(--ink3); margin-bottom: 32px; }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px;
+      border: 1px solid var(--border2);
+      margin-bottom: 20px;
+    }
+
+    .field-label {
+      display: block;
+      font-weight: 600; font-size: .88rem;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .field-hint { font-size: .78rem; color: var(--ink3); font-weight: 400; margin-left: 6px; }
+
+    /* ── STAR PICKER ── */
+    .star-picker { display: flex; gap: 8px; margin-bottom: 24px; }
+    .star-picker button {
+      background: none; border: none; cursor: pointer;
+      font-size: 2rem; color: #d1d5db;
+      padding: 0; line-height: 1;
+      transition: color .1s, transform .1s;
+    }
+    .star-picker button.active { color: #f59e0b; }
+    .star-picker button:hover { transform: scale(1.15); }
+
+    /* ── TEXT INPUTS ── */
+    .form-input, .form-textarea {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid var(--border2); border-radius: 12px;
+      font-family: 'Outfit', sans-serif; font-size: .95rem;
+      color: var(--ink); background: #fff;
+      outline: none; transition: border-color .15s;
+      margin-bottom: 4px;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--green); }
+    .form-textarea { min-height: 130px; resize: vertical; }
+
+    .char-counter { font-size: .75rem; color: var(--ink4); text-align: right; margin-bottom: 20px; }
+    .char-counter.warn { color: var(--red); }
+
+    /* ── GUIDELINES ── */
+    .guidelines-box {
+      background: #f8f9fa; border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 24px;
+      border-left: 3px solid var(--green);
+    }
+    .guidelines-box ul { list-style: none; padding: 0; }
+    .guidelines-box li { font-size: .83rem; color: var(--ink2); padding: 3px 0; }
+    .guidelines-box li::before { content: '✓ '; color: var(--green); font-weight: 700; }
+
+    /* ── CHECKBOX ── */
+    .tos-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 28px; }
+    .tos-row input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
+    .tos-row label { font-size: .84rem; color: var(--ink2); cursor: pointer; line-height: 1.5; }
+    .tos-row a { color: var(--green); text-decoration: underline; }
+
+    /* ── SUBMIT ── */
+    .btn-submit {
+      width: 100%; padding: 15px;
+      background: var(--green); color: #fff;
+      border: none; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: background .14s;
+    }
+    .btn-submit:hover:not(:disabled) { background: var(--green-dark); }
+    .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    /* ── ERROR / SUCCESS ── */
+    .form-error { font-size: .85rem; color: var(--red); margin-bottom: 16px; display: none; }
+    .form-error.show { display: block; }
+
+    /* ── STAR LABEL ── */
+    .star-label { font-size: .85rem; color: var(--ink3); margin-bottom: 16px; min-height: 20px; }
+
+    /* ── NOTIF ── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff; padding: 12px 24px;
+      border-radius: 12px; font-size: .9rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999;
+      opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── STATE BOXES ── */
+    .state-box { text-align: center; padding: 64px 20px; color: var(--ink3); font-size: .95rem; line-height: 2; }
+    .state-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+    .state-box.error { color: var(--red); }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<div class="topbar">
+  <a href="discover.html" class="logo">intern<span>ly</span></a>
+</div>
+
+<div class="page-wrap">
+  <div id="page-state">
+    <div class="state-box"><span class="state-icon">⏳</span>Controleren…</div>
+  </div>
+
+  <div id="review-form-wrap" style="display:none">
+    <p class="page-sub">Deel je eerlijke ervaring. Reviews helpen andere studenten een weloverwogen keuze te maken.</p>
+    <h1 class="page-title">Review schrijven</h1>
+
+    <div class="form-card">
+
+      <!-- Star picker -->
+      <label class="field-label">Beoordeling <span class="field-hint">(verplicht)</span></label>
+      <div class="star-picker" id="star-picker" role="group" aria-label="Sterren beoordeling">
+        <button type="button" data-val="1" aria-label="1 ster">★</button>
+        <button type="button" data-val="2" aria-label="2 sterren">★</button>
+        <button type="button" data-val="3" aria-label="3 sterren">★</button>
+        <button type="button" data-val="4" aria-label="4 sterren">★</button>
+        <button type="button" data-val="5" aria-label="5 sterren">★</button>
+      </div>
+      <div class="star-label" id="star-label">Klik om een beoordeling te geven</div>
+
+      <!-- Title -->
+      <label class="field-label" for="rev-title">Titel <span class="field-hint">(optioneel, max. 100 tekens)</span></label>
+      <input type="text" id="rev-title" class="form-input" maxlength="100" placeholder="Bijv. 'Goede begeleiding maar weinig uitdaging'" autocomplete="off">
+      <div class="char-counter" id="title-counter">0 / 100</div>
+
+      <!-- Body -->
+      <label class="field-label" for="rev-body">Jouw ervaring <span class="field-hint">(20–1000 tekens, verplicht)</span></label>
+      <textarea id="rev-body" class="form-textarea" maxlength="1000" placeholder="Beschrijf je stage-ervaring. Wat ging goed? Wat had beter gekund? Hoe was de begeleiding?"></textarea>
+      <div class="char-counter" id="body-counter">0 / 1000</div>
+
+      <!-- Guidelines -->
+      <div class="guidelines-box">
+        <ul>
+          <li>Schrijf vanuit je eigen ervaring</li>
+          <li>Vermijd naam, adres of andere persoonsgegevens</li>
+          <li>Geen beledigingen of discriminerende taal</li>
+          <li>Reviews worden gemodereerd — ongepaste content wordt verwijderd</li>
+        </ul>
+      </div>
+
+      <!-- TOS checkbox -->
+      <div class="tos-row">
+        <input type="checkbox" id="tos-check">
+        <label for="tos-check">
+          Ik bevestig dat deze review op mijn eigen eerlijke ervaring is gebaseerd en akkoord ga met de <a href="spelregels.html" target="_blank" rel="noopener noreferrer">spelregels</a> van Internly.
+        </label>
+      </div>
+
+      <div class="form-error" id="form-error"></div>
+
+      <button class="btn-submit" id="submit-btn" type="button" onclick="handleSubmit()" disabled>
+        Review plaatsen
+      </button>
+    </div>
+
+    <p style="font-size:.78rem;color:var(--ink4);text-align:center;margin-top:12px">
+      Je review kan door ons team worden beoordeeld vóór publicatie.
+    </p>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const STAR_LABELS = ['', 'Slecht', 'Matig', 'Oké', 'Goed', 'Uitstekend'];
+let _rating = 0;
+let _companyId = null;
+let _matchId   = null;
+
+function showError(msg) {
+  const el = document.getElementById('form-error');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function clearError() {
+  const el = document.getElementById('form-error');
+  el.textContent = '';
+  el.classList.remove('show');
+}
+
+// ── Star picker ──
+document.getElementById('star-picker').addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-val]');
+  if (!btn) return;
+  _rating = parseInt(btn.dataset.val, 10);
+  document.querySelectorAll('#star-picker button').forEach((b, i) => {
+    b.classList.toggle('active', i < _rating);
+  });
+  document.getElementById('star-label').textContent = STAR_LABELS[_rating] || '';
+  updateSubmitState();
+});
+
+// ── Char counters ──
+document.getElementById('rev-title').addEventListener('input', function() {
+  const len = this.value.length;
+  const el  = document.getElementById('title-counter');
+  el.textContent = `${len} / 100`;
+  el.classList.toggle('warn', len >= 90);
+  updateSubmitState();
+});
+
+document.getElementById('rev-body').addEventListener('input', function() {
+  const len = this.value.length;
+  const el  = document.getElementById('body-counter');
+  el.textContent = `${len} / 1000`;
+  el.classList.toggle('warn', len >= 900);
+  updateSubmitState();
+});
+
+document.getElementById('tos-check').addEventListener('change', updateSubmitState);
+
+function updateSubmitState() {
+  const bodyLen = document.getElementById('rev-body').value.trim().length;
+  const tosOk   = document.getElementById('tos-check').checked;
+  document.getElementById('submit-btn').disabled = !(_rating >= 1 && bodyLen >= 20 && tosOk);
+}
+
+// ── Submit ──
+async function handleSubmit() {
+  clearError();
+  const title = document.getElementById('rev-title').value.trim() || null;
+  const body  = document.getElementById('rev-body').value.trim();
+
+  if (_rating < 1 || _rating > 5) { showError('Kies een beoordeling (1–5 sterren).'); return; }
+  if (body.length < 20)            { showError('Je review is te kort (minimaal 20 tekens).'); return; }
+  if (!document.getElementById('tos-check').checked) { showError('Accepteer de spelregels om door te gaan.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled    = true;
+  btn.textContent = 'Bezig…';
+
+  const result = await submitReview({ companyId: _companyId, rating: _rating, title, body, matchId: _matchId });
+
+  if (result.ok) {
+    document.getElementById('review-form-wrap').innerHTML = `
+      <div class="state-box">
+        <span class="state-icon">🎉</span>
+        <strong>Bedankt voor je review!</strong><br>
+        <span style="font-size:.9rem">Je bijdrage helpt andere studenten.<br>
+        <a href="vacature-detail.html" style="color:var(--green)">← Terug naar overzicht</a></span>
+      </div>`;
+  } else {
+    showError('Review plaatsen mislukt — probeer het opnieuw.');
+    btn.disabled    = false;
+    btn.textContent = 'Review plaatsen';
+  }
+}
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  _companyId   = params.get('company');
+  _matchId     = params.get('match');
+
+  const stateEl = document.getElementById('page-state');
+  const formEl  = document.getElementById('review-form-wrap');
+
+  if (!_companyId || !_matchId) {
+    stateEl.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Ongeldige URL — geen bedrijf of match opgegeven.<br><a href="discover.html" style="color:var(--green)">Terug naar overzicht →</a></div>`;
+    return;
+  }
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) {
+    window.location.replace('auth.html');
+    return;
+  }
+
+  const eligibility = await canWriteReview(_companyId);
+
+  if (!eligibility.ok) {
+    const messages = {
+      already_reviewed: 'Je hebt al een review geschreven voor dit bedrijf.',
+      no_match:         'Je kunt alleen een review schrijven als je een geaccepteerde of afgeronde stage hebt bij dit bedrijf.',
+      self_review:      'Je kunt geen review schrijven over je eigen bedrijf.',
+      error:            'Er is een fout opgetreden. Probeer het opnieuw.',
+    };
+    stateEl.innerHTML = `<div class="state-box error"><span class="state-icon">🚫</span>${messages[eligibility.reason] || 'Je kunt op dit moment geen review plaatsen.'}<br><br><a href="discover.html" style="color:var(--green)">← Terug naar vacatures</a></div>`;
+    return;
+  }
+
+  _matchId = eligibility.match_id;
+  stateEl.style.display = 'none';
+  formEl.style.display  = '';
+});
+</script>
+</body>
+</html>

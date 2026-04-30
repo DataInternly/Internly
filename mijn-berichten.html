@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a7a48">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <title>Mijn Berichten — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/animations/match-celebrate.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/telemetry.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f4f3ef; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+    /* ── Student header placeholder ── */
+    #student-header { min-height: 60px; }
+
+    /* ── Page shell ── */
+    .page-wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.8rem; font-weight: 700; color: #0d1520; margin-bottom: 4px;
+    }
+    .page-sub { color: #6b7280; font-size: .95rem; margin-bottom: 24px; }
+
+    /* ── Filter pills ── */
+    .pill-bar {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .pill {
+      padding: 6px 14px; border-radius: 50px; border: 1.5px solid #e2e8f0;
+      background: #fff; font-size: .82rem; font-weight: 600; color: #6b7280;
+      cursor: pointer; transition: all .15s; white-space: nowrap;
+    }
+    .pill.active { background: #1a7a48; color: #fff; border-color: #1a7a48; }
+    .pill:hover:not(.active) { border-color: #1a7a48; color: #1a7a48; }
+
+    /* ── Verzoeken sectie ── */
+    .requests-section { margin-bottom: 24px; }
+    .section-label {
+      font-size: .75rem; font-weight: 700; color: #9ca3af;
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
+    }
+    .request-card {
+      background: #fff; border: 1.5px solid #fde68a; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .request-avatar {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: #fef9c3; color: #92400e;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: .85rem; font-weight: 700;
+    }
+    .request-info { flex: 1; min-width: 0; }
+    .request-name { font-weight: 600; font-size: .9rem; color: #0d1520; }
+    .request-sub  { font-size: .78rem; color: #6b7280; margin-top: 2px; }
+    .request-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn-accept {
+      background: #1a7a48; color: #fff; border: none;
+      padding: 6px 14px; border-radius: 8px; font-size: .8rem;
+      font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: background .15s;
+    }
+    .btn-accept:hover { background: #0f5c36; }
+    .btn-decline {
+      background: #fff; color: #6b7280; border: 1.5px solid #e2e8f0;
+      padding: 6px 12px; border-radius: 8px; font-size: .8rem;
+      font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;
+      transition: all .15s;
+    }
+    .btn-decline:hover { border-color: #b82020; color: #b82020; }
+
+    /* ── Conversation cards ── */
+    .conv-card {
+      background: #fff; border: 1.5px solid #f0f0ee; border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px;
+      transition: box-shadow .15s, border-color .15s;
+    }
+    .conv-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); border-color: #d1d5db; }
+    .conv-card.has-unread { border-color: #1a7a48; }
+
+    .conv-avatar {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: .9rem; font-weight: 700;
+    }
+    .conv-avatar.type-bedrijf  { background: #e8f5ee; color: #1a7a48; }
+    .conv-avatar.type-buddy    { background: #eff6ff; color: #1e40af; }
+    .conv-avatar.type-school   { background: #fff7ed; color: #c2410c; }
+    .conv-avatar.type-begeleider { background: #f5f3ff; color: #6d28d9; }
+
+    .conv-body { flex: 1; min-width: 0; }
+    .conv-top  { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+    .conv-name { font-weight: 600; font-size: .92rem; color: #0d1520; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-badge {
+      font-size: .65rem; font-weight: 700; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 50px; white-space: nowrap; flex-shrink: 0;
+    }
+    .conv-badge.type-bedrijf   { background: #e8f5ee; color: #1a7a48; }
+    .conv-badge.type-buddy     { background: #eff6ff; color: #1e40af; }
+    .conv-badge.type-school    { background: #fff7ed; color: #c2410c; }
+    .conv-badge.type-begeleider { background: #f5f3ff; color: #6d28d9; }
+
+    .conv-preview { font-size: .82rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .conv-time { font-size: .72rem; color: #9ca3af; }
+    .unread-badge {
+      background: #1a7a48; color: #fff; border-radius: 50px;
+      font-size: .68rem; font-weight: 700; padding: 2px 7px; min-width: 20px; text-align: center;
+    }
+
+    /* ── Begeleider-knop (link boven lijst) ── */
+    .begeleider-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .82rem; color: #6b7280; text-decoration: none;
+      margin-bottom: 16px; cursor: pointer; background: none; border: none;
+      font-family: 'Outfit', sans-serif; padding: 0;
+    }
+    .begeleider-link:hover { color: #1a7a48; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 60px 24px;
+    }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .empty-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 700; color: #0d1520; margin-bottom: 8px; }
+    .empty-sub   { color: #6b7280; font-size: .9rem; max-width: 340px; margin: 0 auto 28px; line-height: 1.6; }
+    .empty-ctas  { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+    .empty-cta-btn {
+      width: 100%; max-width: 280px; padding: 12px 20px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: .9rem; font-weight: 600;
+      text-decoration: none; text-align: center; cursor: pointer; border: none;
+      transition: all .15s;
+    }
+    .empty-cta-btn.primary { background: #1a7a48; color: #fff; }
+    .empty-cta-btn.primary:hover { background: #0f5c36; }
+    .empty-cta-btn.secondary { background: #fff; color: #0d1520; border: 1.5px solid #e2e8f0; }
+    .empty-cta-btn.secondary:hover { border-color: #1a7a48; color: #1a7a48; }
+    .empty-cta-btn.tertiary { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+    .empty-cta-btn.tertiary:hover { background: #ffedd5; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(13,21,32,.45);
+      backdrop-filter: blur(4px); z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-box {
+      background: #fff; border-radius: 16px; padding: 28px;
+      width: 100%; max-width: 480px; max-height: 80vh;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    }
+    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .modal-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; font-weight: 700; color: #0d1520; }
+    .modal-sub   { font-size: .85rem; color: #6b7280; margin-top: 4px; }
+    .modal-close-btn {
+      background: none; border: none; font-size: 1.2rem; cursor: pointer;
+      color: #9ca3af; flex-shrink: 0; line-height: 1; padding: 2px;
+    }
+    .modal-close-btn:hover { color: #374151; }
+    .modal-search {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0;
+      border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: .9rem;
+      outline: none; transition: border-color .15s;
+    }
+    .modal-search:focus { border-color: #1a7a48; }
+    .modal-results { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .modal-result-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+      border: 1.5px solid #f0f0ee; border-radius: 10px; transition: border-color .15s;
+    }
+    .modal-result-item:hover { border-color: #d1d5db; }
+    .modal-result-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: #e8f5ee; color: #1a7a48;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: .8rem; font-weight: 700;
+    }
+    .modal-result-info { flex: 1; min-width: 0; }
+    .modal-result-name { font-weight: 600; font-size: .88rem; color: #0d1520; }
+    .modal-result-sub  { font-size: .75rem; color: #6b7280; }
+    .btn-invite {
+      background: #1a7a48; color: #fff; border: none;
+      padding: 6px 14px; border-radius: 8px; font-size: .8rem;
+      font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;
+      white-space: nowrap; transition: background .15s; flex-shrink: 0;
+    }
+    .btn-invite:hover { background: #0f5c36; }
+    .btn-invite:disabled { background: #d1d5db; cursor: default; }
+    .modal-empty { text-align: center; color: #9ca3af; font-size: .85rem; padding: 24px 0; }
+
+    /* ── Loading skeleton ── */
+    .skeleton-card {
+      background: #fff; border: 1.5px solid #f0f0ee; border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .skel { background: linear-gradient(90deg, #f4f3ef 25%, #eae8e3 50%, #f4f3ef 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skel-circle { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+    .skel-lines  { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .skel-line   { height: 12px; }
+    .skel-line.w60 { width: 60%; }
+    .skel-line.w40 { width: 40%; }
+
+    /* ── Notif toast ── */
+    .notif { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(12px); background: #0d1520; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: .88rem; box-shadow: 0 6px 20px rgba(0,0,0,.2); z-index: 9999; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; white-space: nowrap; }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+<div id="student-header"></div>
+
+<main class="page-wrap">
+  <h1 class="page-title">Mijn Berichten</h1>
+  <p class="page-sub">Al je gesprekken op één plek</p>
+
+  <!-- Filter pills -->
+  <div class="pill-bar" id="pillBar">
+    <button class="pill active" data-filter="alle"      onclick="setFilter('alle')">Alle</button>
+    <button class="pill"        data-filter="bedrijf"   onclick="setFilter('bedrijf')">Bedrijven</button>
+    <button class="pill"        data-filter="buddy"     onclick="setFilter('buddy')">Buddies</button>
+    <button class="pill"        data-filter="school"    onclick="setFilter('school')">School</button>
+    <button class="pill"        data-filter="begeleider" onclick="setFilter('begeleider')">Begeleider</button>
+  </div>
+
+  <!-- Begeleider toevoegen link (alleen BOL zonder begeleider) -->
+  <button id="addBegeleiderLink" class="begeleider-link" style="display:none" onclick="openBegeleiderModal()">
+    + Nog geen begeleider? Voeg er een toe
+  </button>
+
+  <!-- Verzoeken sectie -->
+  <div class="requests-section" id="requestsSection" style="display:none">
+    <div class="section-label">Openstaande verzoeken</div>
+    <div id="requestsList"></div>
+  </div>
+
+  <!-- Berichten lijst -->
+  <div id="convList">
+    <!-- Skeleton loading -->
+    <div class="skeleton-card"><div class="skel skel-circle"></div><div class="skel-lines"><div class="skel skel-line w60"></div><div class="skel skel-line w40"></div></div></div>
+    <div class="skeleton-card"><div class="skel skel-circle"></div><div class="skel-lines"><div class="skel skel-line w60"></div><div class="skel skel-line w40"></div></div></div>
+    <div class="skeleton-card"><div class="skel skel-circle"></div><div class="skel-lines"><div class="skel skel-line w60"></div><div class="skel skel-line w40"></div></div></div>
+  </div>
+</main>
+
+<!-- Voeg-begeleider modal -->
+<div id="begeleiderModal" class="modal-overlay" style="display:none" onclick="_modalBgClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Voeg je stagebegeleider toe</div>
+        <div class="modal-sub">Zoek je school of begeleider op naam.</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeBegeleiderModal()">×</button>
+    </div>
+    <input class="modal-search" id="begeleiderSearch" type="text"
+           placeholder="Zoek op naam of school…" oninput="_begeleiderSearchDebounce()"
+           autocomplete="off">
+    <div class="modal-results" id="begeleiderResults">
+      <div class="modal-empty">Begin met typen om te zoeken.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentUser = null;
+  let _allConvs   = [];  // alle geladen conversations
+  let _activeFilter = 'alle';
+  let _isBBL = false;
+  let _hasBegeleider = false; // accepted/pending begeleider_link
+  let _searchTimer = null;
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  function formatRelativeTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+    const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    if (msgDay >= today)     return d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    if (msgDay >= yesterday) return 'Gisteren';
+    return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  }
+
+  function avatarInitials(naam) {
+    if (!naam) return '?';
+    return naam.split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '?';
+  }
+
+  function convTypeClass(type) {
+    if (type === 'buddy')   return 'buddy';
+    if (type === 'school' || type === 'begeleider') return type;
+    return 'bedrijf';
+  }
+
+  function convTypeLabel(type) {
+    if (type === 'buddy')      return 'Buddy';
+    if (type === 'school')     return 'School';
+    if (type === 'begeleider') return 'Begeleider';
+    return 'Bedrijf';
+  }
+
+  // ── Filter ───────────────────────────────────────────────────────────────
+
+  function setFilter(f) {
+    _activeFilter = f;
+    document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.filter === f));
+    renderConvList();
+  }
+
+  function _convMatchesFilter(conv) {
+    if (_activeFilter === 'alle') return true;
+    return conv._type === _activeFilter;
+  }
+
+  // ── Render conversations ──────────────────────────────────────────────────
+
+  function renderConvList() {
+    const el = document.getElementById('convList');
+    if (!el) return;
+    const visible = _allConvs.filter(_convMatchesFilter);
+
+    if (visible.length === 0 && _allConvs.length === 0) {
+      el.innerHTML = _emptyStateHtml();
+      return;
+    }
+
+    if (visible.length === 0) {
+      el.innerHTML = `<div style="text-align:center;padding:40px 0;color:#9ca3af;font-size:.88rem">Geen gesprekken in deze categorie.</div>`;
+      return;
+    }
+
+    el.innerHTML = visible.map(_convCardHtml).join('');
+    _updatePillCounts();
+  }
+
+  function _convCardHtml(conv) {
+    const tc      = convTypeClass(conv._type);
+    const init    = escapeHtml(avatarInitials(conv._otherName));
+    const name    = escapeHtml(conv._otherName || 'Onbekend');
+    const preview = escapeHtml((conv._lastMsg || 'Nog geen berichten').slice(0, 60));
+    const time    = escapeHtml(formatRelativeTime(conv._lastTime));
+    const unread  = conv._unread || 0;
+
+    const href = conv._buddyPairId
+      ? `chat.html?buddy_pair_id=${encodeURIComponent(conv._buddyPairId)}`
+      : `chat.html?match=${encodeURIComponent(conv._matchId)}`;
+
+    return `
+      <div class="conv-card${unread > 0 ? ' has-unread' : ''}" onclick="window.location.href='${escapeHtml(href)}'">
+        <div class="conv-avatar type-${tc}">${init}</div>
+        <div class="conv-body">
+          <div class="conv-top">
+            <span class="conv-name">${name}</span>
+            <span class="conv-badge type-${tc}">${convTypeLabel(conv._type)}</span>
+          </div>
+          <div class="conv-preview">${preview}</div>
+        </div>
+        <div class="conv-meta">
+          <span class="conv-time">${time}</span>
+          ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function _emptyStateHtml() {
+    const begBtnHtml = (!_isBBL && !_hasBegeleider)
+      ? `<button class="empty-cta-btn tertiary" onclick="openBegeleiderModal()">+ Voeg begeleider toe</button>`
+      : '';
+    return `
+      <div class="empty-state">
+        <div class="empty-icon">💬</div>
+        <div class="empty-title">Hier komen straks je gesprekken te staan.</div>
+        <div class="empty-sub">Zodra je matcht met een bedrijf, buddy of school verschijnen ze hier.</div>
+        <div class="empty-ctas">
+          <a href="/discover.html" class="empty-cta-btn primary">Vind een stage</a>
+          <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>
+          ${begBtnHtml}
+        </div>
+      </div>`;
+  }
+
+  function _updatePillCounts() {
+    const counts = { alle: _allConvs.length, bedrijf: 0, buddy: 0, school: 0, begeleider: 0 };
+    _allConvs.forEach(c => { if (counts[c._type] !== undefined) counts[c._type]++; });
+    document.querySelectorAll('.pill').forEach(p => {
+      const f = p.dataset.filter;
+      const n = counts[f] || 0;
+      const label = { alle: 'Alle', bedrijf: 'Bedrijven', buddy: 'Buddies', school: 'School', begeleider: 'Begeleider' }[f] || f;
+      p.textContent = n > 0 ? `${label} (${n})` : label;
+    });
+  }
+
+  // ── Verzoeken ─────────────────────────────────────────────────────────────
+
+  function renderRequests(requests) {
+    const section = document.getElementById('requestsSection');
+    const list    = document.getElementById('requestsList');
+    if (!requests || requests.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    list.innerHTML = requests.map(r => {
+      const init = escapeHtml(avatarInitials(r._fromName));
+      const name = escapeHtml(r._fromName || 'Onbekend');
+      const sub  = r._fromRole === 'school' ? 'School' : 'Begeleider';
+      return `
+        <div class="request-card" id="req-${escapeHtml(String(r.id))}" data-match-type="${escapeHtml(r.type || '')}" data-match-id="${escapeHtml(String(r.id))}">
+          <div class="request-avatar">${init}</div>
+          <div class="request-info">
+            <div class="request-name">${name}</div>
+            <div class="request-sub">${escapeHtml(sub)} wil jouw begeleider zijn</div>
+          </div>
+          <div class="request-btns">
+            <button class="btn-accept" onclick="acceptRequest('${escapeHtml(String(r.id))}', '${escapeHtml(String(r.party_a))}')">Accepteer</button>
+            <button class="btn-decline" onclick="declineRequest('${escapeHtml(String(r.id))}')">Weiger</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function acceptRequest(matchId, fromId) {
+    const btn = document.querySelector(`#req-${CSS.escape(matchId)} .btn-accept`);
+    if (btn) btn.disabled = true;
+
+    const { error: upErr } = await db.from('matches')
+      .update({ status: 'accepted' })
+      .eq('id', matchId);
+    if (upErr) { notify('Fout bij accepteren — probeer opnieuw'); if (btn) btn.disabled = false; return; }
+
+    // Maak conversation aan
+    const { error: convErr } = await db.from('conversations').insert({ match_id: matchId });
+    if (convErr) {
+      // Rollback: zet match terug naar pending
+      await db.from('matches').update({ status: 'pending' }).eq('id', matchId);
+      notify('Chat kon niet worden aangemaakt — probeer opnieuw');
+      console.error('[mijn-berichten] conversation insert failed:', convErr);
+      if (btn) btn.disabled = false;
+      return;
+    }
+
+    // Animatie — lees matchType uit data-attribuut van de card
+    const _reqCard = document.getElementById(`req-${CSS.escape(matchId)}`);
+    if (_reqCard) {
+      const _rawType = _reqCard.dataset.matchType || '';
+      const _animType = _rawType === 'buddy_pair'      ? 'buddy'
+                      : _rawType === 'begeleider_link'  ? 'school'
+                      : (_rawType === 'student_bedrijf' || _rawType === 'student_posting') ? 'bedrijf'
+                      : null;
+      if (_animType && window.Internly?.animations?.celebrate) {
+        window.Internly.animations.celebrate({ type: _animType, targetEl: _reqCard });
+      }
+    }
+
+    // Notificatie naar initiator
+    const myName = escapeHtml(currentUser?.user_metadata?.naam || currentUser?.email || 'Student');
+    await createNotification(fromId, 'begeleider_invite', matchId, 'match',
+      `${myName} heeft je begeleiderverzoek geaccepteerd.`);
+
+    notify('Begeleider toegevoegd!');
+    document.getElementById(`req-${CSS.escape(matchId)}`)?.remove();
+    // Reload conversation list
+    await loadAll();
+  }
+
+  async function declineRequest(matchId) {
+    const btn = document.querySelector(`#req-${CSS.escape(matchId)} .btn-decline`);
+    if (btn) btn.disabled = true;
+    try {
+      const { data: m } = await db.from('matches').select('party_a').eq('id', matchId).maybeSingle();
+      const { error: upErr } = await db.from('matches').update({ status: 'rejected' }).eq('id', matchId);
+      if (upErr) {
+        console.error('[declineRequest] match update fout:', upErr);
+        notify('Kon verzoek niet afwijzen — probeer opnieuw');
+        if (btn) btn.disabled = false;
+        return;
+      }
+      if (m?.party_a) {
+        const myName = escapeHtml(currentUser?.user_metadata?.naam || currentUser?.email || 'Student');
+        await createNotification(m.party_a, 'begeleider_invite', matchId, 'match',
+          `${myName} heeft je begeleiderverzoek afgewezen.`);
+      }
+      notify('Verzoek geweigerd');
+      document.getElementById(`req-${CSS.escape(matchId)}`)?.remove();
+      const remaining = document.querySelectorAll('.request-card');
+      if (remaining.length === 0) document.getElementById('requestsSection').style.display = 'none';
+    } catch (err) {
+      console.error('[declineRequest] onverwachte fout:', err);
+      notify('Kon verzoek niet afwijzen — probeer opnieuw');
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  // ── Data laden ───────────────────────────────────────────────────────────
+
+  async function loadAll() {
+    if (!currentUser) return;
+    const uid = currentUser.id;
+
+    // 1. Match-based conversations (accepted only)
+    const { data: matches } = await db.from('matches')
+      .select('id, type, party_a, party_b, status')
+      .or(`party_a.eq.${uid},party_b.eq.${uid}`)
+      .eq('status', 'accepted');
+
+    // 2. Pending begeleider_link-verzoeken waar ik party_b ben
+    const { data: pendingReqs } = await db.from('matches')
+      .select('id, type, party_a, party_b, status')
+      .eq('type', 'begeleider_link')
+      .eq('party_b', uid)
+      .eq('status', 'pending');
+
+    // 3. Buddy pairs
+    const { data: buddyPairs } = await db.from('buddy_pairs')
+      .select('id, student_id, buddy_id, type')
+      .or(`student_id.eq.${uid},buddy_id.eq.${uid}`);
+
+    // 4. Controleer begeleider-status
+    const { data: anyBegeleider } = await db.from('matches')
+      .select('id')
+      .eq('type', 'begeleider_link')
+      .or(`party_a.eq.${uid},party_b.eq.${uid}`)
+      .in('status', ['accepted', 'pending'])
+      .limit(1)
+      .maybeSingle();
+    _hasBegeleider = !!anyBegeleider;
+    document.getElementById('addBegeleiderLink').style.display =
+      (!_isBBL && !_hasBegeleider) ? 'inline-flex' : 'none';
+
+    // 5. Pending verzoeken enrichen met profielnamen
+    if (pendingReqs?.length > 0) {
+      const fromIds = pendingReqs.map(r => r.party_a);
+      const { data: fromProfiles } = await db.from('profiles')
+        .select('id, naam, role').in('id', fromIds);
+      const profileMap = Object.fromEntries((fromProfiles || []).map(p => [p.id, p]));
+      const enrichedReqs = pendingReqs.map(r => ({
+        ...r,
+        _fromName: profileMap[r.party_a]?.naam || 'Onbekend',
+        _fromRole: profileMap[r.party_a]?.role || 'begeleider',
+      }));
+      renderRequests(enrichedReqs);
+    } else {
+      renderRequests([]);
+    }
+
+    // 6. Conversations ophalen voor matches
+    const matchIds = (matches || []).map(m => m.id);
+    const pairIds  = (buddyPairs || []).map(p => p.id);
+
+    let convs = [];
+
+    if (matchIds.length > 0) {
+      const { data: matchConvs } = await db.from('conversations')
+        .select('id, match_id').in('match_id', matchIds);
+      convs.push(...(matchConvs || []).map(c => ({ ...c, _source: 'match' })));
+    }
+    if (pairIds.length > 0) {
+      const { data: pairConvs } = await db.from('conversations')
+        .select('id, buddy_pair_id').in('buddy_pair_id', pairIds);
+      convs.push(...(pairConvs || []).map(c => ({ ...c, _source: 'buddy' })));
+    }
+
+    if (convs.length === 0) {
+      _allConvs = [];
+      renderConvList();
+      return;
+    }
+
+    // 7. Laatste bericht + unread per conversation
+    const convIds = convs.map(c => c.id);
+    const { data: allMsgs } = await db.from('messages')
+      .select('conversation_id, content, created_at, read, sender_id')
+      .in('conversation_id', convIds)
+      .order('created_at', { ascending: false });
+
+    const lastMsgMap  = {};
+    const unreadMap   = {};
+    (allMsgs || []).forEach(m => {
+      if (!lastMsgMap[m.conversation_id]) lastMsgMap[m.conversation_id] = m;
+      if (!m.read && m.sender_id !== uid) {
+        unreadMap[m.conversation_id] = (unreadMap[m.conversation_id] || 0) + 1;
+      }
+    });
+
+    // 8. Andere-party-namen ophalen
+    const matchMap = Object.fromEntries((matches || []).map(m => [m.id, m]));
+    const pairMap  = Object.fromEntries((buddyPairs || []).map(p => [p.id, p]));
+
+    const otherIds = new Set();
+    convs.forEach(c => {
+      if (c._source === 'match') {
+        const m = matchMap[c.match_id];
+        if (m) otherIds.add(m.party_a === uid ? m.party_b : m.party_a);
+      } else {
+        const p = pairMap[c.buddy_pair_id];
+        if (p) otherIds.add(p.student_id === uid ? p.buddy_id : p.student_id);
+      }
+    });
+
+    const { data: otherProfiles } = await db.from('profiles')
+      .select('id, naam, role').in('id', [...otherIds]);
+    const otherMap = Object.fromEntries((otherProfiles || []).map(p => [p.id, p]));
+
+    // 9. Samenvoegen
+    _allConvs = convs.map(c => {
+      let otherId, type;
+      if (c._source === 'match') {
+        const m = matchMap[c.match_id];
+        if (!m) return null;
+        otherId = m.party_a === uid ? m.party_b : m.party_a;
+        type = m.type === 'begeleider_link' ? 'begeleider'
+             : (m.type === 'school_referral' || m.type === 'school_posting') ? 'school'
+             : 'bedrijf';
+      } else {
+        const p = pairMap[c.buddy_pair_id];
+        if (!p) return null;
+        otherId = p.student_id === uid ? p.buddy_id : p.student_id;
+        type = 'buddy';
+      }
+      const other = otherMap[otherId] || {};
+      const lm = lastMsgMap[c.id];
+      return {
+        id:           c.id,
+        _matchId:     c.match_id || null,
+        _buddyPairId: c.buddy_pair_id || null,
+        _type:        type,
+        _otherName:   other.naam || 'Onbekend',
+        _lastMsg:     lm?.content || '',
+        _lastTime:    lm?.created_at || null,
+        _unread:      unreadMap[c.id] || 0,
+      };
+    }).filter(Boolean);
+
+    // Sorteer: ongelezen eerst, dan op laatste bericht
+    _allConvs.sort((a, b) => {
+      if (b._unread !== a._unread) return b._unread - a._unread;
+      if (!a._lastTime && !b._lastTime) return 0;
+      if (!a._lastTime) return 1;
+      if (!b._lastTime) return -1;
+      return new Date(b._lastTime) - new Date(a._lastTime);
+    });
+
+    renderConvList();
+  }
+
+  // ── Begeleider modal ─────────────────────────────────────────────────────
+
+  function openBegeleiderModal() {
+    document.getElementById('begeleiderModal').style.display = 'flex';
+    document.getElementById('begeleiderSearch').value = '';
+    document.getElementById('begeleiderResults').innerHTML = '<div class="modal-empty">Begin met typen om te zoeken.</div>';
+    setTimeout(() => document.getElementById('begeleiderSearch').focus(), 50);
+  }
+
+  function closeBegeleiderModal() {
+    document.getElementById('begeleiderModal').style.display = 'none';
+  }
+
+  function _modalBgClick(e) {
+    if (e.target === document.getElementById('begeleiderModal')) closeBegeleiderModal();
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeBegeleiderModal();
+  });
+
+  function _begeleiderSearchDebounce() {
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(_runBegeleiderSearch, 300);
+  }
+
+  async function _runBegeleiderSearch() {
+    const q = document.getElementById('begeleiderSearch').value.trim();
+    const results = document.getElementById('begeleiderResults');
+    if (q.length < 2) {
+      results.innerHTML = '<div class="modal-empty">Begin met typen om te zoeken.</div>';
+      return;
+    }
+    results.innerHTML = '<div class="modal-empty">Zoeken…</div>';
+
+    // Profiles (school of begeleider)
+    const { data: profs } = await db.from('profiles')
+      .select('id, naam, role')
+      .in('role', ['school', 'begeleider'])
+      .ilike('naam', `%${q}%`)
+      .limit(10);
+
+    // School profiles voor schoolnaam
+    const profIds = (profs || []).map(p => p.id);
+    let schoolMap = {};
+    if (profIds.length > 0) {
+      const { data: schoolProfs } = await db.from('school_profiles')
+        .select('profile_id, schoolnaam').in('profile_id', profIds);
+      (schoolProfs || []).forEach(s => { schoolMap[s.profile_id] = s.schoolnaam; });
+    }
+
+    if (!profs || profs.length === 0) {
+      results.innerHTML = '<div class="modal-empty">Geen resultaten gevonden.</div>';
+      return;
+    }
+
+    results.innerHTML = profs.map(p => {
+      const init  = escapeHtml(avatarInitials(p.naam));
+      const name  = escapeHtml(p.naam || 'Onbekend');
+      const sub   = escapeHtml(schoolMap[p.id] || (p.role === 'school' ? 'School' : 'Begeleider'));
+      return `
+        <div class="modal-result-item">
+          <div class="modal-result-avatar">${init}</div>
+          <div class="modal-result-info">
+            <div class="modal-result-name">${name}</div>
+            <div class="modal-result-sub">${sub}</div>
+          </div>
+          <button class="btn-invite" id="inv-${escapeHtml(p.id)}" onclick="_sendBegeleiderInvite('${escapeHtml(p.id)}', '${name}')">Uitnodig</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function _sendBegeleiderInvite(targetId, targetName) {
+    const btn = document.getElementById(`inv-${CSS.escape(targetId)}`);
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+    // Controleer of er al een uitnodiging is
+    const { data: existing } = await db.from('matches')
+      .select('id, status')
+      .eq('type', 'begeleider_link')
+      .or(`party_a.eq.${currentUser.id},party_b.eq.${currentUser.id}`)
+      .in('status', ['pending', 'accepted'])
+      .maybeSingle();
+    if (existing) {
+      notify('Je hebt al een begeleiderverzoek lopen');
+      if (btn) { btn.disabled = false; btn.textContent = 'Uitnodig'; }
+      return;
+    }
+
+    const { data: newMatch, error } = await db.from('matches').insert({
+      type:         'begeleider_link',
+      party_a:      currentUser.id,
+      party_b:      targetId,
+      status:       'pending',
+      initiated_by: currentUser.id,
+      match_target: 'profile',
+    }).select('id').maybeSingle();
+
+    if (error || !newMatch) {
+      notify('Fout bij versturen — probeer opnieuw');
+      if (btn) { btn.disabled = false; btn.textContent = 'Uitnodig'; }
+      return;
+    }
+
+    const myName = currentUser?.user_metadata?.naam || currentUser?.email || 'Student';
+    await createNotification(targetId, 'begeleider_invite', newMatch.id, 'match',
+      `${escapeHtml(myName)} heeft je uitgenodigd als begeleider.`);
+
+    notify('Uitnodiging verstuurd naar ' + targetName);
+    _hasBegeleider = true;
+    document.getElementById('addBegeleiderLink').style.display = 'none';
+    closeBegeleiderModal();
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    const hasRole = await requireRole('student');
+    if (!hasRole) return;
+
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { window.location.replace('auth.html'); return; }
+    currentUser = user;
+
+    // BBL-check
+    const { data: sp } = await db.from('student_profiles')
+      .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+    _isBBL = sp?.bbl_mode === true;
+
+    await renderStudentHeader({ activeTab: 'berichten' });
+    await loadAll();
+  });
+</script>
+
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
+</body>
+</html>

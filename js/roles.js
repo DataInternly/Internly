@@ -2,9 +2,10 @@
 // Internly rol-contract — centrale rol-detectie en routing
 // Gebruikt door: auth.html, student-profile.html, bol-profile.html
 // en toekomstige rol-gevoelige pagina's.
-// BBL-bestanden (bbl-hub, bbl-dashboard, bbl-profile) blijven hun
-// eigen routing via js/utils.js routeStudentByMode gebruiken —
-// die functie wordt NIET gewijzigd in deze sessie.
+// Sinds 29 apr 2026 (fase 2 canon-keuze): resolveStudentDashboard
+// hieronder is de canonieke student-router. Voor non-students:
+// ROLE_LANDING in js/utils.js. Voor wrappers: zie §Rollen en
+// routing in CLAUDE.md.
 // ═══════════════════════════════════════════════════════════════
 
 const INTERNLY_ROLES = {
@@ -44,22 +45,6 @@ function detectRole({ role, bbl_mode, onderwijsniveau }) {
   return INTERNLY_ROLES.STUDENT_ONBEKEND;
 }
 
-// Post-login bestemming per rol. Volgt role-matrix.md §3.
-function routeForRole(roleKey) {
-  switch (roleKey) {
-    case INTERNLY_ROLES.BEDRIJF:          return '/company-dashboard.html';
-    case INTERNLY_ROLES.SCHOOL:           return '/school-dashboard.html';
-    case INTERNLY_ROLES.BEGELEIDER:       return '/begeleider-dashboard.html';
-    case INTERNLY_ROLES.BUDDY:            return '/buddy-dashboard.html';
-    case INTERNLY_ROLES.STUDENT_MBO_BBL:  return '/bbl-hub.html';
-    case INTERNLY_ROLES.STUDENT_MBO_BOL:  return '/bol-profile.html';
-    case INTERNLY_ROLES.STUDENT_HBO:      return '/match-dashboard.html';
-    case INTERNLY_ROLES.STUDENT_WO:       return '/match-dashboard.html';
-    case INTERNLY_ROLES.STUDENT_ONBEKEND: return '/student-profile.html';
-    default:                              return '/student-profile.html';
-  }
-}
-
 // Helper: de rij-velden die detectRole nodig heeft. Gebruik deze als
 // kolom-whitelist bij elke SELECT die rol-detectie moet doen.
 const ROLE_DETECTION_COLUMNS = {
@@ -67,8 +52,29 @@ const ROLE_DETECTION_COLUMNS = {
   student_profiles: ['bbl_mode', 'onderwijsniveau']
 };
 
+// ═══════════════════════════════════════════════════════════════
+// resolveStudentDashboard — single source of truth voor post-login
+// student routing. Leest profiles.role + student_profiles.student_type
+// + bbl_mode. Retourneert het exacte bestandspad voor redirect.
+// Gebruikt door auth.html bij doLogin.
+//
+// Voor non-student rollen: gebruik getRoleLanding() in js/utils.js
+// (delegeert naar ROLE_LANDING).
+// ═══════════════════════════════════════════════════════════════
+function resolveStudentDashboard(profile, studentProfile) {
+  if (!profile || profile.role !== 'student') return null;
+  if (!studentProfile) return 'match-dashboard.html';
+  if (studentProfile.bbl_mode === true) return 'bbl-hub.html';
+  if (studentProfile.student_type === 'international') {
+    return 'international-student-dashboard.html';
+  }
+  return 'match-dashboard.html';
+}
+
 window.Internly = window.Internly || {};
 window.Internly.ROLES                  = INTERNLY_ROLES;
 window.Internly.detectRole             = detectRole;
-window.Internly.routeForRole           = routeForRole;
 window.Internly.ROLE_DETECTION_COLUMNS = ROLE_DETECTION_COLUMNS;
+
+// Beschikbaar op window voor gebruik in auth.html en andere pagina's
+window.resolveStudentDashboard = resolveStudentDashboard;

@@ -7,9 +7,17 @@
 // js/supabase.js — niet hier.
 
 // ── Role routing ─────────────────────────────────────────────────────────────
-// Centrale logica voor ingelogde user landing. Enige plek waar rol → URL beslist.
+// ROLE_LANDING — canon voor non-student-routing.
+// Voor student-routing zie resolveStudentDashboard in js/roles.js.
+// Beide worden door getRoleLanding (regel 20) gewrapt.
+// Niet aanraken zonder §Rollen en routing in CLAUDE.md bij te werken.
+//
+// De 'student' entry hieronder is alleen een vangnet — getRoleLanding
+// leest hem nooit voor role === 'student' (delegeert dan naar de canon
+// in roles.js). Behouden voor het geval een toekomstige caller direct
+// ROLE_LANDING[role] doet.
 const ROLE_LANDING = {
-  student:      'match-dashboard.html',
+  student:      'discover.html',
   bedrijf:      'company-dashboard.html',
   school:       'school-dashboard.html',
   gepensioneerd:'buddy-dashboard.html',
@@ -18,9 +26,31 @@ const ROLE_LANDING = {
 };
 
 function getRoleLanding(role, bblMode = false) {
-  if (role === 'student' && bblMode === true) return 'bbl-hub.html';
-  return ROLE_LANDING[role] || 'discover.html';
+  // Wrapper for two canon mechanisms:
+  //   - resolveStudentDashboard (js/roles.js) for student-routing
+  //   - ROLE_LANDING (this file) for non-student-routing
+  // See §Rollen en routing in CLAUDE.md.
+
+  // Student path — delegate to roles.js canon
+  // js/roles.js gegarandeerd geladen via §Laadvolgorde — geen typeof-check nodig
+  if (role === 'student') {
+    return resolveStudentDashboard(
+      { role: role },
+      bblMode ? { bbl_mode: true } : null
+    );
+  }
+
+  // Non-student path — local lookup
+  return ROLE_LANDING[role] || 'index.html';
 }
+
+// isValidRole — valideert of een rol-string een bekende
+// productie-rol is. Gebruikt ROLE_LANDING als bron-van-waarheid.
+// Zie §Rollen en routing in CLAUDE.md.
+function isValidRole(role) {
+  return typeof role === 'string' && role in ROLE_LANDING;
+}
+if (typeof window !== 'undefined') window.isValidRole = isValidRole;
 
 async function smartHomeRedirect() {
   try {
@@ -40,8 +70,10 @@ async function smartHomeRedirect() {
     if (prof.role === 'student') {
       const { data: sp } = await client.from('student_profiles')
         .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
-      // Geen student_profile → profiel nog niet aangemaakt (halverwege registratie).
-      // Spiegelt routeStudent() gedrag exact.
+      // Onboarding-guard: student zonder profiel → profiel-form
+      // OPEN VRAAG (30 apr 2026): mogelijk conflict met canon B2 —
+      // zie stap 4 deliverable. Identiek patroon als discover.html:1406
+      // en auth.html:843.
       if (!sp) { window.location.href = 'student-profile.html'; return; }
       bblMode = sp.bbl_mode === true;
     }
@@ -104,6 +136,7 @@ async function requireRole(...allowedRoles) {
   return true;
 }
 
+
 function getDisplayName(user) {
   if (!user) return 'Gebruiker';
   const naam = user?.user_metadata?.naam || user?.naam || user?.full_name;
@@ -112,6 +145,19 @@ function getDisplayName(user) {
   if (email && typeof email === 'string' && email.includes('@')) return email.split('@')[0];
   return 'Gebruiker';
 }
+
+// Ga terug naar vorige pagina; val terug op fallbackHref als er geen history is.
+// Respecteert de authenticatie: logt NIET uit.
+function goBack(fallbackHref) {
+  const ref = document.referrer;
+  const hasMeaningfulHistory = ref && !ref.includes('auth.html') && ref !== window.location.href;
+  if (hasMeaningfulHistory || window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = fallbackHref || 'index.html';
+  }
+}
+window.goBack = goBack;
 
 async function performLogout() {
   try {
@@ -153,8 +199,8 @@ window.getDisplayName = getDisplayName;
 window.performLogout  = performLogout;
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
+// TOAST_TIMEOUT_MS bewaard voor backward compat (callers kunnen het uitlezen)
 const TOAST_TIMEOUT_MS = 3200;
-let   _toastTimer      = null;
 
 // ── Globale sollicitatie-guard ────────────────────────────────────────────────
 // Voorkomt dat een student tegelijkertijd op meerdere vacatures solliciteert,
@@ -170,23 +216,24 @@ function setApplying(bool) {
   }
 }
 
+// notify() — backward-compat wrapper om window.toast heen.
+// ok === true  → toast.success (groen)
+// ok === false → toast.error   (rood, persistent)
+// ok === null  → toast.info    (blauw)
+// Als toast.js nog niet geladen is: valt terug op de #notif div.
 function notify(msg, ok = null) {
+  if (window.toast) {
+    if (ok === true)  return window.toast.success(msg);
+    if (ok === false) return window.toast.error(msg);
+    return window.toast.info(msg);
+  }
+  // Fallback — toast.js niet geladen
   const n = document.getElementById('notif');
   if (!n) return;
-  if (_toastTimer) clearTimeout(_toastTimer);
-
-  const icon = ok === true  ? '✓ '
-             : ok === false ? '✕ '
-             : '';
-
-  n.textContent = icon + msg;
-  n.style.background = ok === true
-    ? 'var(--green, #1a7a48)'
-    : ok === false
-    ? 'var(--red, #b82020)'
-    : 'var(--ink, #0d1520)';
+  n.textContent = (ok === true ? '✓ ' : ok === false ? '✕ ' : '') + msg;
+  n.style.background = ok === true ? 'var(--green,#1a7a48)' : ok === false ? 'var(--red,#b82020)' : 'var(--ink,#0d1520)';
   n.classList.add('show');
-  _toastTimer = setTimeout(() => n.classList.remove('show'), TOAST_TIMEOUT_MS);
+  setTimeout(() => n.classList.remove('show'), TOAST_TIMEOUT_MS);
 }
 
 // ── Trust badge (platform-breed gedeeld) ─────────────────────────────────────
@@ -246,69 +293,22 @@ async function createNotification(userId, type, refId, refType, message) {
                : (typeof supabase !== 'undefined') ? supabase
                : null;
   if (!client) return;
-  const { error } = await client.from('notifications').insert({
-    user_id:    userId,
-    type,
-    ref_id:     refId   || null,
-    ref_type:   refType || null,
-    message,
-    read:       false,
-    read_at:    null,
-    created_at: new Date().toISOString(),
+  // RPC naar SECURITY DEFINER function (server-side validatie + audit-trail)
+  // 29-04-2026 — gepatched van directe .insert() naar .rpc('create_notification')
+  // om notification-spoofing (Unsub Knob P1) te blokkeren.
+  const { error } = await client.rpc('create_notification', {
+    target_user_id:  userId,
+    notif_type:      type,
+    notif_ref_id:    refId   || null,
+    notif_ref_type:  refType || null,
+    notif_message:   message,
   });
-  if (error) console.warn('[createNotification] non-blocking error:', error.message);
-}
-
-// ── Centrale student routing ──────────────────────────────────────────────────
-/**
- * Centrale student routing na login.
- * ENIGE plek waar bbl_mode routing beslist.
- * 7/11 principe: nooit dupliceren.
- *
- * @param {object} profile        - Supabase profiles row (moet role === 'student' zijn)
- * @param {object} studentProfile - student_profiles row (of null bij nieuw account)
- */
-function routeStudent(profile, studentProfile) {
-  if (!profile) {
-    window.location.href = 'auth.html';
-    return;
-  }
-
-  if (profile.role !== 'student') {
-    console.error('[route] routeStudent aangeroepen voor non-student rol:', profile.role);
-    window.location.href = 'auth.html';
-    return;
-  }
-
-  // Geen profiel nog → profielaanmaak
-  if (!studentProfile) {
-    window.location.href = 'student-profile.html';
-    return;
-  }
-
-  // Delegeer naar hub-routing — routeStudentByMode is de enige beslisser
-  routeStudentByMode(studentProfile);
-}
-
-// ── Student hub routing na profielopslag ────────────────────────────────────
-// Gebruikt na save in student-profile.html en na login met bestaand profiel.
-// Andere functie dan routeStudent(): die stuurt naar profiel-invulpagina's;
-// deze stuurt naar de werkende hub.
-//
-// PRODUCT KEUZE 19 apr 2026 — redirect alleen bij eerste aanmaak en track-wissel.
-// Normale profielbewerking stuurt niet door (dat is verwarrend voor de student).
-// Track-wissel (BOL→BBL of BBL→BOL) is hub-wisselend, daar is redirect logisch.
-function routeStudentByMode(studentProfile) {
-  if (!studentProfile || typeof studentProfile.bbl_mode !== 'boolean') {
-    console.error('[routeStudentByMode] ongeldig profiel', studentProfile);
-    if (typeof notify === 'function') notify('Profielgegevens onvolledig — log opnieuw in.');
-    window.location.href = 'auth.html';
-    return;
-  }
-  if (studentProfile.bbl_mode === true) {
-    window.location.href = 'bbl-hub.html';
-  } else {
-    window.location.href = 'match-dashboard.html';
+  if (error) {
+    if (error.code === '42501') {
+      console.warn('[createNotification] geweigerd door RPC validatie:', error.message);
+    } else {
+      console.warn('[createNotification] non-blocking error:', error.message);
+    }
   }
 }
 
@@ -326,6 +326,9 @@ const VALID_NOTIFICATION_TYPES = [
   'new_review',
   'application_accepted', 'application_rejected',
   'school_referral',
+  'begeleider_invite',
+  'bundeling_approved',
+  'bundeling_denied',
 ];
 
 function getNotifText(n) {
@@ -343,6 +346,9 @@ function getNotifText(n) {
     case 'buddy_request':           return 'Nieuw buddy-verzoek ontvangen';
     case 'buddy_accepted':          return '✓ Buddy-verzoek geaccepteerd';
     case 'buddy_declined':          return 'Buddy-verzoek afgewezen';
+    case 'begeleider_invite':       return 'Nieuw begeleider-verzoek';
+    case 'bundeling_approved':      return '✓ Je bundelverzoek is goedgekeurd';
+    case 'bundeling_denied':        return 'Je bundelverzoek is helaas afgewezen';
     case 'subscription_activated':  return '✓ Abonnement geactiveerd';
     case 'subscription_failed':     return 'Betaling mislukt — controleer je gegevens';
     case 'new_review':              return '⭐ Er is een nieuwe beoordeling over jou geplaatst';
@@ -373,13 +379,18 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
   const logoHref    = bblMode ? '/bbl-hub.html' : '/discover.html';
 
   const bolNav = `
+    <a href="/match-dashboard.html"    class="${activeTab === 'hub'           ? 'active' : ''}">Mijn Stage Hub</a>
+    <a href="/matchpool.html"          class="${activeTab === 'matchpool'     ? 'active' : ''}">Matchpool</a>
     <a href="/discover.html"          class="${activeTab === 'discover'      ? 'active' : ''}">Vacatures</a>
-    <a href="/matches.html"           class="${activeTab === 'matches'       ? 'active' : ''}">Mijn matches</a>
-    <a href="/mijn-sollicitaties.html" class="${activeTab === 'sollicitaties' ? 'active' : ''}">Sollicitaties</a>`;
+    <a href="/mijn-sollicitaties.html" class="${activeTab === 'sollicitaties' ? 'active' : ''}">Sollicitaties</a>
+    <a href="/mijn-berichten.html"    class="${activeTab === 'berichten'     ? 'active' : ''}">Berichten</a>
+    <a href="/kennisbank.html"         class="${activeTab === 'kennisbank'    ? 'active' : ''}">Kennisbank</a>`;
 
   const bblNav = `
-    <a href="/bbl-hub.html"       class="${activeTab === 'discover' ? 'active' : ''}">BBL Traject</a>
-    <a href="/bbl-dashboard.html" class="${activeTab === 'matches'  ? 'active' : ''}">Dashboard</a>`;
+    <a href="/bbl-hub.html"        class="${activeTab === 'discover'    ? 'active' : ''}">BBL Traject</a>
+    <a href="/bbl-dashboard.html"  class="${activeTab === 'matches'     ? 'active' : ''}">Dashboard</a>
+    <a href="/mijn-berichten.html" class="${activeTab === 'berichten'   ? 'active' : ''}">Berichten</a>
+    <a href="/kennisbank.html"     class="${activeTab === 'kennisbank'  ? 'active' : ''}">Kennisbank</a>`;
 
   return `
     <header class="student-header">
@@ -406,6 +417,8 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
         <a href="${profileHref}" class="profile-chip" title="Mijn profiel" aria-label="Mijn profiel">
           <span class="avatar">${escapeHtml(avatarInit)}</span>
         </a>
+        <button class="sh-back-btn" onclick="goBack('discover.html')" title="Vorige pagina" aria-label="Vorige pagina">← Terug</button>
+        <button class="sh-logout-btn" onclick="performLogout()" title="Uitloggen" aria-label="Uitloggen">↪ Uit</button>
       </div>
     </header>`;
 }
@@ -415,7 +428,7 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
  *
  * @param {object} [opts={}]
  * @param {string} [opts.containerId='student-header']  id van het div-element waar de header in rendert.
- * @param {string|null} [opts.activeTab=null]  welke tab visueel actief is. Waarden: 'discover' | 'matches' | 'sollicitaties' | 'buddy' | null.
+ * @param {string|null} [opts.activeTab=null]  welke tab visueel actief is. Waarden: 'hub' | 'matchpool' | 'discover' | 'sollicitaties' | 'berichten' | 'buddy' | null.
  * @returns {Promise<void>}  Rendert inline, geen return-waarde.
  */
 async function renderStudentHeader({ containerId = 'student-header', activeTab = null } = {}) {
@@ -467,3 +480,86 @@ async function renderStudentHeader({ containerId = 'student-header', activeTab =
 }
 
 window.renderStudentHeader = renderStudentHeader;
+
+// ── Ongelezen berichten teller (over alle conversations) ──────────────────────
+async function getUnreadTotal(userId) {
+  if (!userId) return 0;
+  try {
+    const client = (typeof db !== 'undefined') ? db : null;
+    if (!client) return 0;
+
+    // 1. Match-based conversations
+    const { data: userMatches } = await client.from('matches')
+      .select('id')
+      .or(`party_a.eq.${userId},party_b.eq.${userId}`)
+      .eq('status', 'accepted');
+    const matchIds = (userMatches || []).map(m => m.id);
+
+    // 2. Buddy-pair conversations
+    const { data: userPairs } = await client.from('buddy_pairs')
+      .select('id')
+      .or(`student_id.eq.${userId},buddy_id.eq.${userId}`);
+    const pairIds = (userPairs || []).map(p => p.id);
+
+    if (matchIds.length === 0 && pairIds.length === 0) return 0;
+
+    // 3. Conversation IDs voor beide bronnen
+    let convFilter = '';
+    if (matchIds.length > 0) convFilter += `match_id.in.(${matchIds.join(',')})`;
+    if (pairIds.length > 0)  convFilter += (convFilter ? ',' : '') + `buddy_pair_id.in.(${pairIds.join(',')})`;
+
+    const { data: convs } = await client.from('conversations')
+      .select('id')
+      .or(convFilter);
+    const convIds = (convs || []).map(c => c.id);
+    if (convIds.length === 0) return 0;
+
+    // 4. Ongelezen berichten waar ik NIET de afzender ben
+    const { count } = await client.from('messages')
+      .select('id', { count: 'exact', head: true })
+      .in('conversation_id', convIds)
+      .eq('read', false)
+      .neq('sender_id', userId);
+
+    return count || 0;
+  } catch (e) {
+    console.warn('[utils] getUnreadTotal failed:', e?.message || e);
+    return 0;
+  }
+}
+
+window.getUnreadTotal = getUnreadTotal;
+window.Internly = window.Internly || {};
+window.Internly.getUnreadTotal = getUnreadTotal;
+
+// ── Validatie helpers ─────────────────────────────────────────────────────────
+// Één plek. Nooit elders definiëren. (7/11 principe)
+
+function validatePassword(password) {
+  if (typeof password !== 'string') return { length:false, uppercase:false, number:false, valid:false };
+  const length    = password.length >= 8;
+  const uppercase = /[A-Z]/.test(password);
+  const number    = /[0-9]/.test(password);
+  return { length, uppercase, number, valid: length && uppercase && number };
+}
+
+function validateEmail(email) {
+  if (typeof email !== 'string') return false;
+  return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email.trim().toLowerCase());
+}
+
+function sanitizeNaam(naam) {
+  if (typeof naam !== 'string') return '';
+  return naam.trim().slice(0, 100);
+}
+
+function validatePostcode(postcode) {
+  if (typeof postcode !== 'string') return null;
+  const normalized = postcode.trim().toUpperCase().replace(/\s/g, '');
+  return /^[0-9]{4}[A-Z]{2}$/.test(normalized) ? normalized : null;
+}
+
+window.validatePassword = validatePassword;
+window.validateEmail    = validateEmail;
+window.sanitizeNaam     = sanitizeNaam;
+window.validatePostcode = validatePostcode;

@@ -1,80 +1,34 @@
 // ============================================================
 // INTERNLY — BUDDY SYSTEM MODULE
 // File: js/buddy.js
-// Version: 1.0
+// Version: 2.0  (single-type, gepensioneerd-only)
 //
 // PURPOSE
 // Central, reusable module for all buddy functionality across
 // the platform. Import once per page that needs it.
 //
-// BUDDY TYPES — this system is intentionally multi-functional.
-// Each type has different matching logic, privacy rules,
-// and UI presentation. All share the same DB table and JS API.
+// BUDDY TYPE — only 'gepensioneerd' is supported.
+// Earlier versions defined peer/insider/mentor/school types;
+// these were removed (sprint 29 april 2026, kernfeit Barry):
+// "Buddy rol = ALLEEN gepensioneerden."
 //
-//   'peer'          Student ↔ student, same opleiding/sector.
-//                   General support, tip-sharing, solidarity.
-//                   Used on: discover.html, student-profile.html
-//
-//   'insider'       BBL-student ↔ existing employee at same bedrijf.
-//                   Anonymous until contract ends. Core BBL feature.
-//                   Used on: bbl-dashboard.html
-//
-//   'mentor'        Student ↔ experienced professional (not employer).
-//                   Career advice, portfolio review, sector insight.
-//                   Used on: student-profile.html (fase 2)
-//
-//   'gepensioneerd' Student ↔ retired professional via waitlist pool.
-//                   Waitlist already exists on site (HANDOVER.md).
-//                   Used on: discover.html, dedicated buddy page (fase 2)
-//
-//   'school'        Begeleider ↔ student outside formal evaluation.
-//                   Lighter-touch than the official school dashboard.
-//                   Used on: school-dashboard.html (fase 2)
+//   'gepensioneerd' Student ↔ retired professional volunteer.
+//                   Voluntary, opt-in, consent from all parties.
+//                   Sources: waitlist (legacy) + profiles (auth flow).
+//                   Used on: buddy-dashboard.html,
+//                            international-student-dashboard.html,
+//                            bbl-hub.html, discover.html.
 //
 // USAGE
 //   <script src="js/buddy.js"></script>
 //   await buddyInit(userId, userRole, db, userName);
-//
-// HOW TO ADD A NEW BUDDY TYPE
-//   1. Add the type string to BUDDY_TYPES below
-//   2. Add its config object to BUDDY_CONFIG
-//   3. Add a SQL migration for any type-specific columns
-//   4. renderBuddyCard() and renderBuddyRequest() read from
-//      BUDDY_CONFIG so UI adapts automatically.
 // ============================================================
 
 // ── CONSTANTS ───────────────────────────────────────────────
 
-const BUDDY_TYPES = ['peer', 'insider', 'mentor', 'gepensioneerd', 'school'];
+const BUDDY_TYPES = ['gepensioneerd'];
 
 const BUDDY_CONFIG = {
-  peer: {
-    label: 'Medestudent-buddy',
-    description: 'Een student in jouw sector die je tips geeft vanuit eigen ervaring.',
-    matchOn: ['opleiding', 'sector', 'opdracht_domein'],
-    anonymous: false,
-    revealStrategy: 'immediate',
-    availableFor: ['student'],
-  },
-  insider: {
-    label: 'Anonieme bedrijfsbuddy',
-    description: 'Iemand die al werkt bij jouw leerbedrijf en je eerlijk vertelt hoe het er echt aan toe gaat.',
-    matchOn: ['company_id'],
-    anonymous: true,
-    revealStrategy: 'after_contract',
-    availableFor: ['student'], // BBL only — enforce via profile.bbl_mode check
-    privacyNote: 'Jouw identiteit blijft verborgen tot na je contract.',
-  },
-  mentor: {
-    label: 'Sectormentor',
-    description: 'Een professional buiten je werkgever die je begeleidt op loopbaanvragen.',
-    matchOn: ['sector', 'expertise_tags'],
-    anonymous: false,
-    revealStrategy: 'immediate',
-    availableFor: ['student'],
-    // Mentors register via a dedicated page and get role='mentor' in profiles.
-    // Build that page before enabling this type in the UI.
-  },
   gepensioneerd: {
     label: 'Gepensioneerde buddy',
     description: 'Een ervaren professional die zijn kennis wil doorgeven.',
@@ -83,14 +37,6 @@ const BUDDY_CONFIG = {
     revealStrategy: 'immediate',
     availableFor: ['student'],
     sourceTable: 'waitlist', // candidates from waitlist WHERE type='buddy_gepensioneerd'
-  },
-  school: {
-    label: 'Informele schoolbuddy',
-    description: 'Je begeleider als aanspreekpunt buiten de formele evaluatiegesprekken.',
-    matchOn: ['school_id', 'opleiding'],
-    anonymous: false,
-    revealStrategy: 'immediate',
-    availableFor: ['student', 'school'],
   },
 };
 
@@ -288,56 +234,7 @@ async function buddyFindCandidates(type, context = {}) {
     excludedIds.add(r.receiver_id);
   });
 
-  // ── per-type matching queries ────────────────────────────────
-
-  if (type === 'peer') {
-    // Match on sector/opleiding/opdracht_domein via student_profiles
-    let q = db
-      .from('student_profiles')
-      .select('profile_id, naam, opleiding, opdracht_domein, sector')
-      .limit(10);
-
-    if (context.opdracht_domein) q = q.eq('opdracht_domein', context.opdracht_domein);
-    else if (context.sector)     q = q.eq('sector', context.sector);
-    else if (context.opleiding)  q = q.ilike('opleiding', `%${context.opleiding}%`);
-
-    const { data } = await q;
-    return (data || [])
-      .filter(r => !excludedIds.has(r.profile_id))
-      .map(r => ({ id: r.profile_id, naam: r.naam, sub: r.opleiding || r.sector || '' }));
-  }
-
-  if (type === 'insider') {
-    // Employees at context.company_id who have opted in as buddy
-    // Requires profiles with role='bedrijf' linked to the company, or future employees table
-    if (!context.company_id) return [];
-    const { data } = await db
-      .from('profiles')
-      .select('id, naam, role')
-      .eq('role', 'bedrijf')
-      .eq('company_id', context.company_id) // company_id FK on profiles
-      .eq('is_buddy_eligible', true)         // opt-in flag
-      .limit(5);
-
-    return (data || [])
-      .filter(r => !excludedIds.has(r.id))
-      .map(r => ({ id: r.id, naam: 'Anonieme buddy', sub: '' })); // always masked
-  }
-
-  if (type === 'mentor') {
-    let q = db
-      .from('profiles')
-      .select('id, naam, expertise_tags, sector')
-      .eq('role', 'mentor')
-      .limit(5);
-
-    if (context.sector) q = q.eq('sector', context.sector);
-
-    const { data } = await q;
-    return (data || [])
-      .filter(r => !excludedIds.has(r.id))
-      .map(r => ({ id: r.id, naam: r.naam, sub: r.sector || '' }));
-  }
+  // ── per-type matching query (only 'gepensioneerd' supported) ──
 
   if (type === 'gepensioneerd') {
     // Candidates come from the waitlist table, not profiles
@@ -353,21 +250,6 @@ async function buddyFindCandidates(type, context = {}) {
     return (data || [])
       .filter(r => !excludedIds.has(r.id))
       .map(r => ({ id: r.id, naam: r.naam, sub: r.sector || '' }));
-  }
-
-  if (type === 'school') {
-    let q = db
-      .from('profiles')
-      .select('id, naam, school')
-      .eq('role', 'school')
-      .limit(5);
-
-    if (context.school) q = q.eq('school', context.school);
-
-    const { data } = await q;
-    return (data || [])
-      .filter(r => !excludedIds.has(r.id))
-      .map(r => ({ id: r.id, naam: r.naam, sub: r.school || '' }));
   }
 
   return [];
@@ -770,4 +652,80 @@ function buddyShowToast(message) {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
   }, 3200);
+}
+
+// ── Buddy profile (buddy_profiles tabel) ──────────────────────────────────
+
+async function loadBuddyProfile() {
+  const form = document.getElementById('buddy-profile-form');
+  if (!form) return;
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const { data: bp, error } = await db
+    .from('buddy_profiles')
+    .select('kennis_gebieden, specialiteiten, grove_beschikbaarheid, postcode, stad, leeftijd, active')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.warn('[buddy-dash] loadBuddyProfile fout:', error.message);
+    return;
+  }
+
+  if (bp) populateBuddyProfile(form, bp);
+}
+
+function populateBuddyProfile(form, data) {
+  if (!form || !data) return;
+
+  const kg = data.kennis_gebieden || [];
+  form.querySelectorAll('[data-kg]').forEach(cb => { cb.checked = kg.includes(cb.value); });
+
+  const sp = data.specialiteiten || [];
+  form.querySelectorAll('[data-sp]').forEach(cb => { cb.checked = sp.includes(cb.value); });
+
+  const gbd = form.querySelector('#bp-grove-beschikbaarheid');
+  if (gbd && data.grove_beschikbaarheid) gbd.value = data.grove_beschikbaarheid;
+
+  const postcode = form.querySelector('#bp-postcode');
+  if (postcode && data.postcode) postcode.value = data.postcode;
+
+  const stad = form.querySelector('#bp-stad');
+  if (stad && data.stad) stad.value = data.stad;
+
+  const leeftijd = form.querySelector('#bp-leeftijd');
+  if (leeftijd && data.leeftijd != null) leeftijd.value = data.leeftijd;
+
+  const actief = form.querySelector('#bp-actief');
+  if (actief) actief.checked = data.active !== false;
+}
+
+function collectBuddyProfileData(form) {
+  return {
+    kennis_gebieden:      [...form.querySelectorAll('[data-kg]:checked')].map(cb => cb.value),
+    specialiteiten:       [...form.querySelectorAll('[data-sp]:checked')].map(cb => cb.value),
+    grove_beschikbaarheid: form.querySelector('#bp-grove-beschikbaarheid')?.value || null,
+    postcode:             form.querySelector('#bp-postcode')?.value.trim() || null,
+    stad:                 form.querySelector('#bp-stad')?.value.trim() || null,
+    leeftijd:             parseInt(form.querySelector('#bp-leeftijd')?.value, 10) || null,
+    active:               form.querySelector('#bp-actief')?.checked !== false,
+  };
+}
+
+async function saveBuddyProfile(formData) {
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { notify('Niet ingelogd', false); return; }
+
+  const { error } = await db
+    .from('buddy_profiles')
+    .upsert({ profile_id: user.id, ...formData }, { onConflict: 'profile_id' });
+
+  if (error) {
+    notify('Profiel opslaan mislukt — probeer opnieuw', false);
+    console.error('[buddy-dash] saveBuddyProfile fout:', error.message);
+    return;
+  }
+  notify('Profiel bijgewerkt!', true);
 }

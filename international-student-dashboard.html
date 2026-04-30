@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<!--
+  INTERNATIONAL STUDENT DASHBOARD — Internly
+  ─────────────────────────────────────────────────────────────────────────────
+  Inbound students (foreign → NL internships).
+  Loaded after auth when student_profiles.student_type === 'international'.
+  Routing: js/roles.js NIET geladen op deze pagina — dit dashboard heeft
+  geen routing-aanroepen (smartHomeRedirect / getRoleLanding /
+  resolveStudentDashboard worden hier nergens aangeroepen).
+  Indien toekomstige refactor één van die functies hier toevoegt, MOET
+  js/roles.js eerst worden geladen (zie §Laadvolgorde in CLAUDE.md).
+
+  Sections:
+    4a Document Hub (always-visible top strip)
+    4b Profile (form)
+    4c Onboarding gate (overlay on Discover)
+    4d Timeline (8 steps)
+    4e Discover (open_to_international filter)
+    4f Applications (own matches)
+    4g Learning Agreement builder
+
+  Storage bucket: 'intern-documents', path = {user_id}/{kind}_{ts}.{ext}
+  Per-user RLS isolation expected on storage.objects.
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0f5c36">
+  <title>Internly Worldwide — International Internships</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/toast.js"></script>
+  <script>
+    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    window._fCtx = {
+      _init: function(p) {
+        console.warn('[telemetry] js/telemetry.js niet geladen, ' +
+                     'bescherming inactief op pagina: ' + p);
+      },
+      _plant: function() {},
+      _guard: function() { return true; },
+      blockIfFilled: function() { return false; }
+    };
+  </script>
+  <script src="js/telemetry.js"></script>
+  <style>
+    :root {
+      --green:       #1a7a48;
+      --green-deep:  #0f5c36;
+      --green-bg:    #e8f5ee;
+      --orange:      #FF7E42;
+      --orange-deep: #e05c1a;
+      --orange-bg:   #fdf0e8;
+      --ink:         #0d1520;
+      --ink2:        #374151;
+      --ink3:        #6b7280;
+      --ink4:        #9ca3af;
+      --bg:          #f4f3ef;
+      --white:       #ffffff;
+      --border:      #f0f0ee;
+      --border2:     #e2e8f0;
+      --red:         #b82020;
+      --red-bg:      #fdeaea;
+      --amber:       #a06010;
+      --amber-bg:    #fdf3e0;
+      --r:           16px;
+      --r-sm:        8px;
+      --sidebar-w:   220px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.55;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    *:focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
+    }
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar (dark + green head per design rule) ──────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--ink);
+      color: rgba(255,255,255,.85);
+      display: flex; flex-direction: column;
+      position: sticky; top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sidebar-head {
+      background: var(--green-deep);
+      padding: 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .brand {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: #fff;
+      letter-spacing: -.01em;
+    }
+    .brand span { color: var(--orange); }
+    .brand-sub {
+      font-size: .68rem; color: rgba(255,255,255,.55);
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .sidebar-user {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.12); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: .85rem;
+      flex-shrink: 0;
+    }
+    .uname { font-size: .85rem; color: #fff; font-weight: 500; line-height: 1.2; }
+    .umail { font-size: .72rem; color: rgba(255,255,255,.45); margin-top: 2px; }
+    .sidebar-inner { padding: 16px 12px; flex: 1; }
+    .sidebar-section { margin-bottom: 18px; }
+    .sidebar-label {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: rgba(255,255,255,.4);
+      padding: 0 8px; margin-bottom: 8px;
+      display: block;
+    }
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 9px 12px; margin-bottom: 2px;
+      background: none; border: none;
+      color: rgba(255,255,255,.7);
+      font-family: inherit; font-size: .9rem;
+      text-align: left; cursor: pointer;
+      border-radius: var(--r-sm);
+      transition: background .15s, color .15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .nav-btn.active {
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-icon { font-size: 1rem; }
+    .sidebar-bottom {
+      padding: 12px 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-bottom a, .sidebar-bottom button {
+      display: block; width: 100%;
+      background: none; border: none;
+      color: rgba(255,255,255,.45);
+      font-size: .78rem; padding: 6px 0;
+      text-decoration: none;
+      text-align: left; cursor: pointer;
+      font-family: inherit;
+    }
+    .sidebar-bottom a:hover, .sidebar-bottom button:hover { color: #fff; }
+
+    /* ── Main ─────────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      padding: 28px 36px;
+      overflow-y: auto;
+    }
+
+    /* ── Document Hub strip (Sectie 4a) ───────────────────────── */
+    .doc-hub {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .doc-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 14px;
+      transition: border-color .15s;
+      min-height: 132px;
+      display: flex; flex-direction: column;
+    }
+    .doc-card:hover { border-color: rgba(0,0,0,.15); }
+    .doc-label {
+      font-size: .66rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--ink4); margin-bottom: 8px;
+    }
+    .doc-title {
+      font-size: .9rem; font-weight: 600; color: var(--ink);
+      margin-bottom: 10px;
+    }
+    .doc-status {
+      font-size: .76rem; padding: 3px 9px; border-radius: 20px;
+      display: inline-block; font-weight: 500;
+      align-self: flex-start;
+    }
+    .doc-status.ok    { background: var(--green-bg); color: var(--green); }
+    .doc-status.warn  { background: var(--amber-bg); color: var(--amber); }
+    .doc-status.bad   { background: var(--red-bg);   color: var(--red); }
+    .doc-status.idle  { background: #f3f4f6;          color: var(--ink3); }
+    .doc-action {
+      margin-top: auto; font-size: .78rem; color: var(--green);
+      cursor: pointer;
+      background: none; border: none; padding: 0;
+      font-family: inherit; text-align: left;
+      align-self: flex-start;
+    }
+    .doc-action:hover { text-decoration: underline; }
+    .doc-card select {
+      width: 100%; font-size: .78rem; padding: 5px 6px;
+      border: 1px solid var(--border2); border-radius: 6px;
+      font-family: inherit; margin-top: auto;
+    }
+
+    /* ── Profile completion bar ───────────────────────────────── */
+    .completion-bar {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .completion-track {
+      flex: 1;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .completion-fill {
+      height: 100%;
+      background: var(--green);
+      transition: width .3s ease;
+    }
+    .completion-pct {
+      font-weight: 700;
+      color: var(--ink);
+      font-size: .9rem;
+      min-width: 42px;
+      text-align: right;
+    }
+    .completion-label {
+      font-size: .82rem;
+      color: var(--ink3);
+    }
+
+    /* ── Screens ──────────────────────────────────────────────── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .page-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .page-sub {
+      color: var(--ink3); font-size: .9rem;
+      margin-bottom: 22px;
+    }
+
+    /* ── Forms ────────────────────────────────────────────────── */
+    .form-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 22px 24px;
+      margin-bottom: 16px;
+    }
+    .form-section-title {
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--ink2);
+      margin-bottom: 5px;
+    }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm);
+      font-family: inherit; font-size: .9rem;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--green);
+    }
+    .field textarea { resize: vertical; min-height: 90px; }
+    .field-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+
+    /* ── Buttons ──────────────────────────────────────────────── */
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--green-deep); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-orange {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-orange:hover:not(:disabled) { background: var(--orange-deep); }
+    .btn-orange:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: none;
+      color: var(--ink2);
+      border: 1.5px solid var(--border2);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .88rem;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--ink2); }
+    .btn-ghost:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Language tags ────────────────────────────────────────── */
+    .tags-box {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 8px 10px;
+      border: 1.5px solid var(--border2);
+      border-radius: var(--r-sm);
+      background: var(--white);
+      min-height: 44px;
+      align-items: center;
+    }
+    .tags-box:focus-within { border-color: var(--green); }
+    .tag-chip {
+      background: var(--green-bg);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: .78rem;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .tag-chip button {
+      background: none; border: none;
+      color: var(--green); cursor: pointer;
+      padding: 0; font-size: 1rem; line-height: 1;
+    }
+    .tags-input {
+      flex: 1; min-width: 80px;
+      border: none; outline: none;
+      font-size: .88rem;
+      font-family: inherit;
+      background: transparent;
+    }
+
+    /* ── Timeline (Sectie 4d) ─────────────────────────────────── */
+    .timeline-eta {
+      background: var(--orange-bg);
+      color: var(--orange-deep);
+      padding: 12px 16px;
+      border-radius: var(--r-sm);
+      margin-bottom: 18px;
+      font-size: .9rem;
+      font-weight: 500;
+    }
+    .timeline-list {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      overflow: hidden;
+    }
+    .timeline-step {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .timeline-step:last-child { border-bottom: none; }
+    .step-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: .85rem;
+      flex-shrink: 0;
+    }
+    .step-dot.done    { background: var(--green);  color: #fff; }
+    .step-dot.active  { background: var(--orange); color: #fff; }
+    .step-dot.pending { background: #f3f4f6;       color: var(--ink4); }
+    .step-text { font-size: .92rem; color: var(--ink); flex: 1; }
+    .step-meta { font-size: .78rem; color: var(--ink3); }
+
+    /* ── Vacancies (Sectie 4e) ────────────────────────────────── */
+    .filter-row {
+      display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .filter-row input, .filter-row select {
+      padding: 8px 12px;
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      font-size: .88rem;
+      font-family: inherit;
+      background: var(--white);
+    }
+    .filter-row input { flex: 1; min-width: 200px; }
+    .vac-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .vac-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 16px 18px;
+      display: flex; flex-direction: column;
+    }
+    .vac-card h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .vac-meta {
+      font-size: .82rem; color: var(--ink3);
+      margin-bottom: 10px;
+    }
+    .vac-badges {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-bottom: 10px;
+    }
+    .vac-badge {
+      font-size: .7rem; padding: 3px 8px; border-radius: 20px;
+      font-weight: 600;
+    }
+    .vac-badge.visa    { background: #e8f0fc; color: #1756a8; }
+    .vac-badge.housing { background: var(--green-bg); color: var(--green); }
+    .vac-badge.trust-a { background: var(--green-bg); color: var(--green); }
+    .vac-badge.trust-b { background: var(--amber-bg); color: var(--amber); }
+    .vac-badge.trust-c { background: var(--red-bg);   color: var(--red); }
+    .vac-desc {
+      font-size: .85rem; color: var(--ink2);
+      line-height: 1.5; margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .vac-actions {
+      display: flex; gap: 8px;
+      margin-top: auto;
+    }
+    .vac-disabled-note {
+      font-size: .78rem;
+      color: var(--ink3);
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      text-align: center;
+    }
+
+    /* ── Profile gate overlay (Sectie 4c) ─────────────────────── */
+    .gate-overlay {
+      background: var(--orange-bg);
+      border: 1px solid rgba(224,92,26,.3);
+      border-radius: var(--r-sm);
+      padding: 18px 22px;
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 16px;
+      flex-wrap: wrap;
+    }
+    .gate-text { flex: 1; min-width: 220px; }
+    .gate-title {
+      font-weight: 700;
+      color: var(--orange-deep);
+      margin-bottom: 4px;
+    }
+    .gate-sub { font-size: .85rem; color: var(--ink2); }
+    .gate-progress {
+      width: 100%; max-width: 220px;
+      margin-top: 8px;
+    }
+    .gate-progress-track {
+      height: 6px; background: rgba(0,0,0,.08);
+      border-radius: 3px; overflow: hidden;
+    }
+    .gate-progress-fill {
+      height: 100%; background: var(--orange);
+      transition: width .3s ease;
+    }
+    .gate-progress-label {
+      font-size: .72rem; color: var(--ink2);
+      margin-top: 4px;
+    }
+
+    /* ── Applications + LA list (Sectie 4f / 4g) ──────────────── */
+    .app-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 16px 18px;
+      margin-bottom: 12px;
+    }
+    .app-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .app-title { font-weight: 600; color: var(--ink); }
+    .app-sub { font-size: .82rem; color: var(--ink3); margin-top: 2px; }
+    .app-status {
+      font-size: .72rem; padding: 3px 8px; border-radius: 20px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .app-status.pending  { background: var(--amber-bg); color: var(--amber); }
+    .app-status.accepted { background: var(--green-bg); color: var(--green); }
+    .app-status.rejected { background: var(--red-bg);   color: var(--red); }
+    .app-status.draft    { background: #f3f4f6;          color: var(--ink3); }
+
+    /* ── State boxes ──────────────────────────────────────────── */
+    .state-box {
+      background: var(--white);
+      border: 1px dashed var(--border2);
+      border-radius: var(--r-sm);
+      padding: 32px 18px;
+      text-align: center;
+      color: var(--ink3);
+    }
+    .state-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .state-box.error { border-color: rgba(184,32,32,.3); color: var(--red); }
+
+    /* ── Notification toast ───────────────────────────────────── */
+    .notif {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--ink); color: #fff;
+      padding: 10px 22px;
+      border-radius: var(--r-sm);
+      font-size: .88rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.22);
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Buddy section ────────────────────────────────────────── */
+    .buddy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .buddy-card-item {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r, 14px);
+      padding: 16px 18px;
+      display: flex; flex-direction: column;
+    }
+    .buddy-card-item h4 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .buddy-card-item .meta {
+      font-size: .82rem; color: var(--ink3);
+      margin-bottom: 10px;
+    }
+    .buddy-card-item .lang-pills {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-bottom: 12px;
+    }
+    .buddy-card-item .lang-pill {
+      font-size: .7rem; padding: 3px 8px; border-radius: 20px;
+      background: var(--green-bg); color: var(--green);
+      font-weight: 600;
+    }
+    .buddy-card-item .actions { margin-top: auto; }
+    .buddy-msg-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      font-family: inherit; font-size: .82rem;
+      margin-bottom: 8px;
+      resize: vertical;
+      min-height: 50px;
+      box-sizing: border-box;
+    }
+    .buddy-status-chip {
+      font-size: .7rem; padding: 3px 8px; border-radius: 20px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .buddy-status-chip.requested { background: var(--amber-bg); color: var(--amber); }
+    .buddy-status-chip.active    { background: var(--green-bg); color: var(--green); }
+
+    /* ── Sign link box (LA flow) ──────────────────────────────── */
+    .sign-link-box {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      padding: 14px;
+      margin-top: 8px;
+    }
+    .sign-link-label { font-size: .72rem; color: var(--ink3); font-weight: 600; }
+    .sign-link-url {
+      font-family: monospace;
+      font-size: .76rem;
+      background: var(--white);
+      padding: 6px 8px;
+      border-radius: 4px;
+      word-break: break-all;
+      margin-top: 4px;
+      display: block;
+    }
+    .copy-btn {
+      margin-top: 6px;
+      font-size: .78rem;
+      background: none;
+      border: 1px solid var(--border2);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--ink2);
+    }
+    .copy-btn:hover { border-color: var(--ink2); }
+
+    /* ── Mobile (768px breakpoint) ────────────────────────────── */
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar {
+        width: 100%; height: auto; position: relative;
+      }
+      .sidebar-inner { display: flex; gap: 4px; padding: 10px; flex-wrap: wrap; }
+      .sidebar-section { margin: 0; }
+      .sidebar-label { display: none; }
+      .nav-btn { width: auto; }
+      .main { padding: 18px; }
+      .doc-hub { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .field-row { grid-template-columns: 1fr; }
+      .doc-hub { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<div class="layout">
+
+  <!-- ════════════════════════════════════════════════════════════
+       SIDEBAR
+       ════════════════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">Internly <span>Worldwide</span></div>
+      <div class="brand-sub">International Student</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">?</div>
+      <div>
+        <div class="uname" id="userName">Loading…</div>
+        <div class="umail" id="userEmail">—</div>
+      </div>
+    </div>
+
+    <div class="sidebar-inner">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Your journey</span>
+        <button class="nav-btn active" id="nav-timeline" onclick="show('timeline')">
+          <span class="nav-icon">🗺</span> Timeline
+        </button>
+        <button class="nav-btn" id="nav-profile" onclick="show('profile')">
+          <span class="nav-icon">👤</span> Profile
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Internships</span>
+        <button class="nav-btn" id="nav-discover" onclick="show('discover')">
+          <span class="nav-icon">🔍</span> Discover
+        </button>
+        <button class="nav-btn" id="nav-applications" onclick="show('applications')">
+          <span class="nav-icon">📨</span> Applications
+        </button>
+        <button class="nav-btn" id="nav-learning" onclick="show('learning')">
+          <span class="nav-icon">📜</span> Learning Agreement
+        </button>
+        <button class="nav-btn" id="nav-buddy" onclick="show('buddy')">
+          <span class="nav-icon">🤝</span> Buddy
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Account</span>
+        <button class="nav-btn" id="nav-account" onclick="show('account')">
+          <span class="nav-icon">⚙️</span> Account
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <a href="privacybeleid.html">Privacy</a>
+      <a href="spelregels.html">House rules</a>
+      <button onclick="signOut()">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════════════════════════════════
+       MAIN
+       ════════════════════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ── Sectie 4a — DOCUMENT HUB STRIP (always visible) ─────────────── -->
+    <div class="doc-hub" id="docHub">
+
+      <!-- Card 1 — Visa -->
+      <div class="doc-card">
+        <div class="doc-label">Visa</div>
+        <div class="doc-title">Status</div>
+        <span class="doc-status idle" id="hub-visa-status">Loading…</span>
+        <select id="visa-status-select" onchange="updateVisaStatus()" style="margin-top:10px">
+          <option value="not_required">Not required (EU)</option>
+          <option value="not_started">Not started</option>
+          <option value="in_progress">In progress</option>
+          <option value="approved">Approved</option>
+        </select>
+      </div>
+
+      <!-- Card 2 — Work Authorization -->
+      <div class="doc-card">
+        <div class="doc-label">Work auth</div>
+        <div class="doc-title" id="hub-work-type">—</div>
+        <div id="hub-work-status" style="font-size:.74rem;color:var(--ink3);margin-bottom:6px">No document yet</div>
+        <input type="file" id="work-auth-file" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="uploadWorkAuth(event)">
+        <button class="doc-action" onclick="document.getElementById('work-auth-file').click()">📎 Upload</button>
+      </div>
+
+      <!-- Card 3 — Health Insurance -->
+      <div class="doc-card">
+        <div class="doc-label">Health</div>
+        <div class="doc-title">Insurance</div>
+        <span class="doc-status idle" id="hub-health-status">Not arranged</span>
+        <input type="file" id="health-file" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="uploadHealth(event)">
+        <button class="doc-action" onclick="document.getElementById('health-file').click()" style="margin-top:8px">📎 Upload</button>
+      </div>
+
+      <!-- Card 4 — Housing -->
+      <div class="doc-card">
+        <div class="doc-label">Housing</div>
+        <div class="doc-title">Status</div>
+        <select id="housing-status-select" onchange="updateHousing()" style="margin-top:10px">
+          <option value="no_option">🔴 No option yet</option>
+          <option value="searching">🟡 Actively searching</option>
+          <option value="found">🟢 Found</option>
+        </select>
+      </div>
+
+      <!-- Card 5 — Learning Agreement -->
+      <div class="doc-card">
+        <div class="doc-label">LA</div>
+        <div class="doc-title" id="hub-la-count">— agreements</div>
+        <button class="doc-action" onclick="show('learning')" style="margin-top:8px">View →</button>
+      </div>
+
+    </div>
+
+    <!-- Profile completion bar -->
+    <div class="completion-bar" id="completionBar" style="display:none">
+      <div class="completion-track"><div class="completion-fill" id="completionFill" style="width:0%"></div></div>
+      <div class="completion-pct" id="completionPct">0%</div>
+      <div class="completion-label">Profile complete</div>
+    </div>
+
+    <!-- ── Sectie 4d — TIMELINE ─────────────────────────────────── -->
+    <div class="screen active" id="screen-timeline">
+      <div class="page-title">Your journey</div>
+      <p class="page-sub">A step-by-step view of where you are in the international internship process.</p>
+      <div class="timeline-eta" id="timelineEta">Estimating timeline…</div>
+      <div class="timeline-list" id="timelineList"></div>
+    </div>
+
+    <!-- ── Sectie 4b — PROFILE ──────────────────────────────────── -->
+    <div class="screen" id="screen-profile">
+      <div class="page-title">Your profile</div>
+      <p class="page-sub">Companies and universities use this to assess your fit. Keep it accurate.</p>
+
+      <div class="form-card">
+        <div class="form-section-title">Personal</div>
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="p-naam" maxlength="100" placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label>Nationality</label>
+          <input type="text" id="p-nationality" maxlength="60" placeholder="e.g. Italian">
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-section-title">Studies</div>
+        <div class="field">
+          <label>Home university</label>
+          <input type="text" id="p-home-university" maxlength="150" placeholder="e.g. University of Bologna">
+        </div>
+        <div class="field">
+          <label>University contact email</label>
+          <input type="email" id="p-uni-email" maxlength="150" placeholder="exchange@university.edu">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Study level</label>
+            <select id="p-study-level">
+              <option value="">Select…</option>
+              <option value="bachelor">Bachelor</option>
+              <option value="master">Master</option>
+              <option value="phd">PhD</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Study field</label>
+            <input type="text" id="p-study-field" maxlength="100" placeholder="e.g. Computer Science">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-section-title">Languages spoken</div>
+        <div class="field">
+          <label>Add languages you speak fluently</label>
+          <div class="tags-box" id="langsBox" onclick="document.getElementById('langsInput').focus()">
+            <input type="text" id="langsInput" class="tags-input" placeholder="EN, NL, IT, DE…" maxlength="20">
+          </div>
+          <div style="font-size:.78rem;color:var(--ink3);margin-top:4px">Press Enter after each language. Common: EN, NL, DE, FR, ES, IT.</div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-section-title">Authorization</div>
+        <div class="field">
+          <label>Work authorization type</label>
+          <select id="p-work-auth">
+            <option value="">Select…</option>
+            <option value="eu_free">EU Free Movement</option>
+            <option value="cpt">CPT (Curricular Practical Training)</option>
+            <option value="opt">OPT (Optional Practical Training)</option>
+            <option value="j1">J-1 visa</option>
+            <option value="study_visa">Study visa with work permission</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Save profile</button>
+    </div>
+
+    <!-- ── Sectie 4e — DISCOVER (with Sectie 4c gate overlay) ──── -->
+    <div class="screen" id="screen-discover">
+      <div class="page-title">Available internships</div>
+      <p class="page-sub">Curated for international students — visa sponsorship, housing support, language fit.</p>
+
+      <div class="gate-overlay" id="discoverGate" style="display:none">
+        <div class="gate-text">
+          <div class="gate-title">Complete your profile to apply for internships</div>
+          <div class="gate-sub">You can browse vacancies, but the apply button and chat are disabled until your profile is complete.</div>
+          <div class="gate-progress">
+            <div class="gate-progress-track"><div class="gate-progress-fill" id="gateProgressFill" style="width:0%"></div></div>
+            <div class="gate-progress-label" id="gateProgressLabel">0% complete</div>
+          </div>
+        </div>
+        <button class="btn-orange" onclick="show('profile')">Complete profile →</button>
+      </div>
+
+      <div class="filter-row">
+        <input type="text" id="searchBox" placeholder="Search by title, company, sector…" oninput="filterVacs()">
+        <select id="sectorFilter" onchange="filterVacs()">
+          <option value="">All sectors</option>
+        </select>
+      </div>
+
+      <div id="vacContainer">
+        <div class="state-box"><span class="state-icon">⏳</span>Loading vacancies…</div>
+      </div>
+    </div>
+
+    <!-- ── Sectie 4f — APPLICATIONS ─────────────────────────────── -->
+    <div class="screen" id="screen-applications">
+      <div class="page-title">Your applications</div>
+      <p class="page-sub">Track the status of internships you've applied to.</p>
+      <div id="applicationsList">
+        <div class="state-box"><span class="state-icon">⏳</span>Loading applications…</div>
+      </div>
+    </div>
+
+    <!-- ── Sectie 4g — LEARNING AGREEMENT ───────────────────────── -->
+    <div class="screen" id="screen-learning">
+      <div class="page-title">Learning Agreement</div>
+      <p class="page-sub">Once you have an accepted application, build your Learning Agreement here.</p>
+
+      <div id="laListContainer">
+        <div class="state-box"><span class="state-icon">⏳</span>Loading…</div>
+      </div>
+
+      <div id="laBuilder" style="display:none;margin-top:18px">
+        <div class="form-card">
+          <div class="form-section-title">Build Learning Agreement</div>
+          <div class="field-row">
+            <div class="field">
+              <label>Start date</label>
+              <input type="date" id="la-start">
+            </div>
+            <div class="field">
+              <label>End date</label>
+              <input type="date" id="la-end">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Hours per week</label>
+              <input type="number" id="la-hours" min="1" max="60" placeholder="e.g. 32">
+            </div>
+            <div class="field">
+              <label>Academic credits (ECTS)</label>
+              <input type="number" id="la-credits" min="0" max="60" placeholder="e.g. 30">
+            </div>
+          </div>
+          <div class="field">
+            <label>Learning objectives (max 5, one per line)</label>
+            <textarea id="la-objectives" rows="5" maxlength="2000" placeholder="• Develop full-stack web skills..."></textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Compensation</label>
+              <select id="la-compensation">
+                <option value="unpaid">Unpaid</option>
+                <option value="stipend">Stipend</option>
+                <option value="paid">Paid</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Compensation amount (€/month)</label>
+              <input type="number" id="la-amount" min="0" placeholder="e.g. 500">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Supervisor name</label>
+              <input type="text" id="la-supervisor-name" maxlength="100" placeholder="Maria Jansen">
+            </div>
+            <div class="field">
+              <label>Supervisor email</label>
+              <input type="email" id="la-supervisor-email" maxlength="150" placeholder="m.jansen@company.com">
+            </div>
+          </div>
+          <button class="btn-primary" id="laSubmitBtn" onclick="submitLA()">Create &amp; sign as student</button>
+          <button class="btn-ghost" onclick="cancelLABuilder()" style="margin-left:8px">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Sectie Buddy ─────────────────────────────────────────── -->
+    <div class="screen" id="screen-buddy">
+      <div class="page-title">Find a buddy</div>
+      <p class="page-sub">Retired professionals from across the Netherlands offer informal guidance to international interns. They are volunteers — not your supervisor.</p>
+
+      <div id="buddyContent">
+        <div class="state-box"><span class="state-icon">⏳</span>Loading buddies…</div>
+      </div>
+    </div>
+
+    <!-- ── Sectie Account ───────────────────────────────────────── -->
+    <div class="screen" id="screen-account">
+      <div class="page-title">Account settings</div>
+      <p class="page-sub">Manage your contact information and preferences</p>
+      <div id="account-container"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// State
+// ════════════════════════════════════════════════════════════════
+let currentUser    = null;
+let studentProfile = null;
+let postings       = [];
+let myMatches      = [];
+let myAgreements   = [];
+let activeMatchForLA = null;
+let languagesSpoken = [];
+
+// ════════════════════════════════════════════════════════════════
+// isProfileComplete — exact spec (Barry, sprint internationale)
+// ════════════════════════════════════════════════════════════════
+function isProfileComplete(sp) {
+  if (!sp) return false;
+  const hasBasics = !!(
+    sp.nationality && sp.home_university &&
+    sp.study_level && sp.study_field && sp.work_auth_type
+  );
+  const hasLanguages = Array.isArray(sp.languages_spoken) &&
+                       sp.languages_spoken.length > 0;
+  return hasBasics && hasLanguages;
+}
+
+// ════════════════════════════════════════════════════════════════
+// Initial mount
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) { window.location.replace('auth.html'); return; }
+    currentUser = user;
+    document.getElementById('userEmail').textContent = user.email || '';
+
+    // Telemetry init — zie CLAUDE.md voor codenames
+    _fCtx._init('intl-student');
+
+    initLangsInput();
+    await loadProfile();
+    show('timeline'); // default tab
+  } catch (err) {
+    console.error('[intl-dash] mount fout:', err?.message || err);
+    notify('Could not load dashboard. Please refresh.', false);
+  }
+});
+
+// ════════════════════════════════════════════════════════════════
+// Tab switching
+// ════════════════════════════════════════════════════════════════
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const screen = document.getElementById('screen-' + id);
+  const nav    = document.getElementById('nav-' + id);
+  if (screen) screen.classList.add('active');
+  if (nav)    nav.classList.add('active');
+
+  if (id === 'discover')     applyDiscoverGate();
+  if (id === 'applications') renderApplications();
+  if (id === 'learning')     renderAgreementsList();
+  if (id === 'timeline')     renderTimeline();
+  if (id === 'buddy')        loadBuddySection();
+  if (id === 'account') {
+    window._currentUserId = currentUser?.id;
+    AccountModule.renderAccountScreen('account-container', 'en');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Profile load + save
+// ════════════════════════════════════════════════════════════════
+async function loadProfile() {
+  try {
+    const { data, error } = await db
+      .from('student_profiles')
+      .select('profile_id, naam, student_type, nationality, home_university, home_university_email, study_level, study_field, languages_spoken, visa_status, work_auth_type, work_auth_doc_url, health_insurance_status, health_insurance_doc_url, housing_status')
+      .eq('profile_id', currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[intl-dash] loadProfile fout:', error.message);
+      notify('Could not load your profile', false);
+      studentProfile = {};
+    } else {
+      studentProfile = data || {};
+    }
+
+    // Top user-strip
+    if (studentProfile.naam) {
+      document.getElementById('userName').textContent = studentProfile.naam;
+      document.getElementById('userAvatar').textContent =
+        (studentProfile.naam.charAt(0) || '?').toUpperCase();
+    }
+
+    // Profile form
+    setVal('p-naam',            studentProfile.naam || '');
+    setVal('p-nationality',     studentProfile.nationality || '');
+    setVal('p-home-university', studentProfile.home_university || '');
+    setVal('p-uni-email',       studentProfile.home_university_email || '');
+    setVal('p-study-level',     studentProfile.study_level || '');
+    setVal('p-study-field',     studentProfile.study_field || '');
+    setVal('p-work-auth',       studentProfile.work_auth_type || '');
+
+    // Languages
+    languagesSpoken = Array.isArray(studentProfile.languages_spoken)
+      ? studentProfile.languages_spoken.slice() : [];
+    renderLanguagesChips();
+
+    // Hub + completion + dependent loads
+    populateDocHub();
+    updateCompletionBar();
+
+    await Promise.all([
+      loadMatches(),
+      loadAgreements()
+    ]);
+
+    populateDocHub(); // re-populate to show LA count
+    renderTimeline();
+    await loadVacancies();
+  } catch (err) {
+    console.error('[intl-dash] loadProfile exception:', err?.message || err);
+    notify('Profile could not be loaded.', false);
+  }
+}
+
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = v == null ? '' : v;
+}
+
+async function saveProfile() {
+  if (!currentUser) { notify('Not signed in', false); return; }
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  // Sweep any unconfirmed language input
+  const lastLang = document.getElementById('langsInput');
+  if (lastLang && lastLang.value.trim()) {
+    addLanguage(lastLang.value.trim().replace(/,/g, ''));
+    lastLang.value = '';
+  }
+
+  const payload = {
+    profile_id:             currentUser.id,
+    naam:                   document.getElementById('p-naam').value.trim() || null,
+    student_type:           'international',
+    nationality:            document.getElementById('p-nationality').value.trim() || null,
+    home_university:        document.getElementById('p-home-university').value.trim() || null,
+    home_university_email:  document.getElementById('p-uni-email').value.trim() || null,
+    study_level:            document.getElementById('p-study-level').value || null,
+    study_field:            document.getElementById('p-study-field').value.trim() || null,
+    languages_spoken:       languagesSpoken.slice(),
+    work_auth_type:         document.getElementById('p-work-auth').value || null
+  };
+
+  try {
+    const { error } = await db.from('student_profiles')
+      .upsert(payload, { onConflict: 'profile_id' });
+
+    btn.disabled = false; btn.textContent = 'Save profile';
+
+    if (error) {
+      console.error('[intl-dash] saveProfile fout:', error.message);
+      notify('Could not save profile — please try again', false);
+      return;
+    }
+    notify('✓ Profile saved');
+
+    Object.assign(studentProfile, payload);
+    if (studentProfile.naam) {
+      document.getElementById('userName').textContent = studentProfile.naam;
+      document.getElementById('userAvatar').textContent =
+        (studentProfile.naam.charAt(0) || '?').toUpperCase();
+    }
+    populateDocHub();
+    updateCompletionBar();
+    renderTimeline();
+    applyDiscoverGate();
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Save profile';
+    console.error('[intl-dash] saveProfile exception:', err?.message || err);
+    notify('Unexpected save error', false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Document Hub (Sectie 4a)
+// ════════════════════════════════════════════════════════════════
+function populateDocHub() {
+  const sp = studentProfile || {};
+
+  const visaSel = document.getElementById('visa-status-select');
+  visaSel.value = sp.visa_status || 'not_required';
+  setVisaBadge(visaSel.value);
+
+  const workTitle = document.getElementById('hub-work-type');
+  const workStat  = document.getElementById('hub-work-status');
+  workTitle.textContent = workAuthLabel(sp.work_auth_type) || 'Not set';
+  workStat.textContent  = sp.work_auth_doc_url ? '✓ Document on file' : 'No document yet';
+
+  setHealthBadge(sp.health_insurance_status || 'not_arranged');
+
+  const housSel = document.getElementById('housing-status-select');
+  housSel.value = sp.housing_status || 'no_option';
+
+  const laCount = (myAgreements || []).length;
+  document.getElementById('hub-la-count').textContent =
+    laCount === 0 ? 'No agreements' :
+    laCount === 1 ? '1 agreement'   :
+    laCount + ' agreements';
+}
+
+function setVisaBadge(status) {
+  const el = document.getElementById('hub-visa-status');
+  el.classList.remove('ok','warn','bad','idle');
+  const map = {
+    not_required: { cls: 'ok',   txt: 'Not required (EU)' },
+    not_started:  { cls: 'bad',  txt: 'Not started' },
+    in_progress:  { cls: 'warn', txt: 'In progress' },
+    approved:     { cls: 'ok',   txt: 'Approved ✓' }
+  };
+  const m = map[status] || map.not_required;
+  el.classList.add(m.cls);
+  el.textContent = m.txt;
+}
+
+function setHealthBadge(status) {
+  const el = document.getElementById('hub-health-status');
+  el.classList.remove('ok','warn','bad','idle');
+  const map = {
+    not_arranged: { cls: 'bad',  txt: 'Not arranged' },
+    in_progress:  { cls: 'warn', txt: 'In progress' },
+    arranged:     { cls: 'ok',   txt: 'Arranged ✓' }
+  };
+  const m = map[status] || map.not_arranged;
+  el.classList.add(m.cls);
+  el.textContent = m.txt;
+}
+
+function workAuthLabel(t) {
+  return ({
+    eu_free:    'EU Free',
+    cpt:        'CPT',
+    opt:        'OPT',
+    j1:         'J-1',
+    study_visa: 'Study visa',
+    other:      'Other'
+  })[t] || '';
+}
+
+async function updateVisaStatus() {
+  if (!currentUser) return;
+  const v = document.getElementById('visa-status-select').value;
+  try {
+    const { error } = await db.from('student_profiles')
+      .upsert({ profile_id: currentUser.id, visa_status: v }, { onConflict: 'profile_id' });
+    if (error) throw error;
+    studentProfile.visa_status = v;
+    setVisaBadge(v);
+    notify('✓ Visa status updated');
+    renderTimeline();
+  } catch (err) {
+    console.error('[intl-dash] updateVisaStatus fout:', err?.message || err);
+    notify('Could not update visa status', false);
+  }
+}
+
+async function updateHousing() {
+  if (!currentUser) return;
+  const v = document.getElementById('housing-status-select').value;
+  try {
+    const { error } = await db.from('student_profiles')
+      .upsert({ profile_id: currentUser.id, housing_status: v }, { onConflict: 'profile_id' });
+    if (error) throw error;
+    studentProfile.housing_status = v;
+    notify('✓ Housing status updated');
+    updateCompletionBar();
+    renderTimeline();
+  } catch (err) {
+    console.error('[intl-dash] updateHousing fout:', err?.message || err);
+    notify('Could not update housing status', false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// File uploads (Storage bucket: intern-documents)
+// Path: {user_id}/{kind}_{timestamp}.{ext}
+// We store the path (not the public URL) in student_profiles.
+// ════════════════════════════════════════════════════════════════
+async function uploadWorkAuth(ev) {
+  await uploadDoc(ev, 'work_auth', 'work_auth_doc_url');
+}
+async function uploadHealth(ev) {
+  await uploadDoc(ev, 'health_insurance', 'health_insurance_doc_url', async () => {
+    // After health upload, automatically promote status to 'arranged'
+    await updateField('health_insurance_status', 'arranged');
+  });
+}
+
+async function uploadDoc(ev, kind, urlColumn, onAfter) {
+  if (!currentUser) { notify('Not signed in', false); return; }
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+
+  // Reasonable size cap to avoid runaway uploads
+  if (file.size > 8 * 1024 * 1024) {
+    notify('File too large (max 8 MB)', false);
+    ev.target.value = '';
+    return;
+  }
+
+  const ext  = (file.name.split('.').pop() || 'pdf').toLowerCase();
+  const path = `${currentUser.id}/${kind}_${Date.now()}.${ext}`;
+
+  try {
+    const { error: upErr } = await db.storage
+      .from('intern-documents')
+      .upload(path, file, { cacheControl: '3600', upsert: false });
+    if (upErr) throw upErr;
+
+    const update = { profile_id: currentUser.id };
+    update[urlColumn] = path; // store path, not public URL
+    const { error: dbErr } = await db.from('student_profiles')
+      .upsert(update, { onConflict: 'profile_id' });
+    if (dbErr) throw dbErr;
+
+    studentProfile[urlColumn] = path;
+    notify('✓ Document uploaded');
+    populateDocHub();
+    if (typeof onAfter === 'function') await onAfter();
+    updateCompletionBar();
+    renderTimeline();
+  } catch (err) {
+    console.error('[intl-dash] uploadDoc fout:', err?.message || err);
+    notify('Upload failed: ' + (err?.message || 'unknown'), false);
+  }
+  ev.target.value = '';
+}
+
+async function updateField(col, val) {
+  if (!currentUser) return;
+  try {
+    const upd = { profile_id: currentUser.id };
+    upd[col] = val;
+    const { error } = await db.from('student_profiles')
+      .upsert(upd, { onConflict: 'profile_id' });
+    if (error) throw error;
+    studentProfile[col] = val;
+    if (col === 'health_insurance_status') setHealthBadge(val);
+  } catch (err) {
+    console.error('[intl-dash] updateField fout:', err?.message || err);
+    notify('Update failed', false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Languages tags
+// ════════════════════════════════════════════════════════════════
+function initLangsInput() {
+  const inp = document.getElementById('langsInput');
+  if (!inp) return;
+  inp.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+      e.preventDefault();
+      addLanguage(this.value.trim().replace(/,/g, ''));
+      this.value = '';
+    }
+  });
+}
+
+function addLanguage(s) {
+  const norm = String(s || '').trim();
+  if (!norm) return;
+  if (languagesSpoken.length >= 12) return;
+  if (languagesSpoken.includes(norm)) return;
+  languagesSpoken.push(norm);
+  renderLanguagesChips();
+}
+
+function removeLanguage(s) {
+  const i = languagesSpoken.indexOf(s);
+  if (i > -1) languagesSpoken.splice(i, 1);
+  renderLanguagesChips();
+}
+
+function renderLanguagesChips() {
+  const box = document.getElementById('langsBox');
+  const inp = document.getElementById('langsInput');
+  if (!box || !inp) return;
+  box.querySelectorAll('.tag-chip').forEach(c => c.remove());
+  languagesSpoken.forEach(l => {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.appendChild(document.createTextNode(l));
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', () => removeLanguage(l));
+    chip.appendChild(closeBtn);
+    box.insertBefore(chip, inp);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// Profile completion bar
+// ════════════════════════════════════════════════════════════════
+function updateCompletionBar() {
+  if (!studentProfile) return;
+  const score = computeProfileScore();
+
+  const bar  = document.getElementById('completionBar');
+  const fill = document.getElementById('completionFill');
+  const pct  = document.getElementById('completionPct');
+  if (!bar || !fill || !pct) return;
+  bar.style.display = 'flex';
+  fill.style.width = score + '%';
+  pct.textContent = score + '%';
+}
+
+function computeProfileScore() {
+  if (!studentProfile) return 0;
+  const required = [
+    'nationality','home_university','study_level',
+    'study_field','work_auth_type'
+  ];
+  const filled = required.filter(f => studentProfile[f]).length;
+  const langs = Array.isArray(studentProfile.languages_spoken) &&
+                studentProfile.languages_spoken.length > 0;
+  return Math.round(((filled + (langs ? 1 : 0)) / (required.length + 1)) * 100);
+}
+
+// ════════════════════════════════════════════════════════════════
+// Discover gate (Sectie 4c) — read-only flow for incomplete profile
+// ════════════════════════════════════════════════════════════════
+function applyDiscoverGate() {
+  const gate = document.getElementById('discoverGate');
+  const fill = document.getElementById('gateProgressFill');
+  const lbl  = document.getElementById('gateProgressLabel');
+  const complete = isProfileComplete(studentProfile);
+  const score = computeProfileScore();
+
+  if (gate) gate.style.display = complete ? 'none' : 'flex';
+  if (fill) fill.style.width = score + '%';
+  if (lbl)  lbl.textContent  = score + '% complete';
+  renderVacancies();
+}
+
+// ════════════════════════════════════════════════════════════════
+// Vacancies (Sectie 4e)
+// ════════════════════════════════════════════════════════════════
+async function loadVacancies() {
+  try {
+    const { data, error } = await db.from('internship_postings')
+      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, created_by, open_to_international, visa_sponsorship, housing_available, language_requirements')
+      .eq('status', 'active')
+      .eq('open_to_international', true)
+      .order('trust_score', { ascending: false });
+    if (error) throw error;
+    postings = data || [];
+
+    // Sector filter options
+    const sectors = [...new Set(postings.map(p => p.sector).filter(Boolean))];
+    const sf = document.getElementById('sectorFilter');
+    if (sf) {
+      while (sf.options.length > 1) sf.remove(1);
+      sectors.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        sf.appendChild(opt);
+      });
+    }
+
+    renderVacancies();
+  } catch (err) {
+    console.error('[intl-dash] loadVacancies fout:', err?.message || err);
+    notify('Could not load vacancies', false);
+    document.getElementById('vacContainer').innerHTML =
+      '<div class="state-box error"><span class="state-icon">⚠️</span>Could not load vacancies. Please refresh.</div>';
+  }
+}
+
+function filterVacs() { renderVacancies(); }
+
+function renderVacancies() {
+  const container = document.getElementById('vacContainer');
+  if (!container) return;
+  const search = (document.getElementById('searchBox').value || '').toLowerCase();
+  const sector = document.getElementById('sectorFilter').value || '';
+  const complete = isProfileComplete(studentProfile);
+
+  const filtered = postings.filter(p => {
+    if (sector && p.sector !== sector) return false;
+    if (!search) return true;
+    const blob = `${p.title || ''} ${p.company_name || ''} ${p.sector || ''} ${p.description || ''}`.toLowerCase();
+    return blob.includes(search);
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="state-box"><span class="state-icon">📭</span>No vacancies match your filters yet.</div>';
+    return;
+  }
+
+  container.innerHTML = '<div class="vac-grid">' +
+    filtered.map(p => renderVacCard(p, complete)).join('') +
+    '</div>';
+}
+
+function renderVacCard(p, profileComplete) {
+  const eTitle   = escapeHtml(p.title || '');
+  const eCompany = escapeHtml(p.company_name || '');
+  const eSector  = escapeHtml(p.sector || '');
+  const eDesc    = escapeHtml(p.description || '');
+  const eDur     = escapeHtml(p.duration || '');
+  const grade    = (p.trust_grade || '').toUpperCase();
+  const gradeCls = grade ? 'trust-' + grade.toLowerCase() : '';
+  const isApplied = (myMatches || []).some(m => m.posting_id === p.id);
+
+  return `
+    <div class="vac-card">
+      <h3>${eTitle || 'Internship'}</h3>
+      <div class="vac-meta">${eCompany} · ${eSector || '—'} · ${eDur || 'Flexible'}</div>
+      <div class="vac-badges">
+        ${grade ? `<span class="vac-badge ${gradeCls}">Trust ${grade}</span>` : ''}
+        ${p.visa_sponsorship    ? '<span class="vac-badge visa">🛂 Visa sponsorship</span>' : ''}
+        ${p.housing_available   ? '<span class="vac-badge housing">🏠 Housing</span>' : ''}
+      </div>
+      <div class="vac-desc">${eDesc}</div>
+      <div class="vac-actions">
+        ${profileComplete
+          ? (isApplied
+              ? '<button class="btn-ghost" disabled>Applied ✓</button>'
+              : `<button class="btn-primary" onclick="applyForPosting('${escapeHtml(p.id)}')">Apply</button>`)
+          : ''}
+      </div>
+      ${!profileComplete ? '<div class="vac-disabled-note">Complete your profile to apply or chat.</div>' : ''}
+    </div>
+  `;
+}
+
+async function applyForPosting(postingId) {
+  if (!currentUser) { notify('Not signed in', false); return; }
+  if (!isProfileComplete(studentProfile)) {
+    notify('Complete your profile first', false);
+    show('profile');
+    return;
+  }
+  const p = postings.find(x => x.id === postingId);
+  if (!p) { notify('Vacancy not found', false); return; }
+
+  try {
+    const { error } = await db.from('matches').insert({
+      match_type:  'student_to_company',
+      party_a:     currentUser.id,
+      party_b:     p.created_by,
+      posting_id:  postingId,
+      status:      'pending'
+    });
+    if (error) throw error;
+
+    notify('✓ Application sent');
+    await loadMatches();
+    renderVacancies();
+
+    // Soft prompt — student can start LA from Applications when accepted
+    setTimeout(() => {
+      if (confirm('Application sent! Want to view your applications now?')) {
+        show('applications');
+      }
+    }, 600);
+  } catch (err) {
+    console.error('[intl-dash] applyForPosting fout:', err?.message || err);
+    notify('Could not submit application', false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Applications (Sectie 4f)
+// ════════════════════════════════════════════════════════════════
+async function loadMatches() {
+  try {
+    const { data, error } = await db.from('matches')
+      .select('id, match_type, party_a, party_b, posting_id, status, created_at')
+      .eq('party_a', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    myMatches = data || [];
+  } catch (err) {
+    console.error('[intl-dash] loadMatches fout:', err?.message || err);
+    myMatches = [];
+  }
+}
+
+async function renderApplications() {
+  const list = document.getElementById('applicationsList');
+  if (!list) return;
+  if (!myMatches || myMatches.length === 0) {
+    list.innerHTML = '<div class="state-box"><span class="state-icon">📭</span>You haven\'t applied to any internships yet.<br><small style="display:block;margin-top:6px">Browse vacancies in <a href="#" onclick="show(\'discover\');return false;" style="color:var(--green);font-weight:600">Discover</a>.</small></div>';
+    return;
+  }
+
+  // Lookup posting + company info
+  const postingIds = [...new Set(myMatches.map(m => m.posting_id).filter(Boolean))];
+  let postingMap = {};
+  if (postingIds.length > 0) {
+    try {
+      const { data: posts } = await db.from('internship_postings')
+        .select('id, title, company_name, trust_grade, sector')
+        .in('id', postingIds);
+      (posts || []).forEach(p => { postingMap[p.id] = p; });
+    } catch (err) {
+      console.error('[intl-dash] postings lookup fout:', err?.message || err);
+    }
+  }
+
+  list.innerHTML = myMatches.map(m => {
+    const p = postingMap[m.posting_id] || {};
+    const eTitle   = escapeHtml(p.title || 'Internship');
+    const eCompany = escapeHtml(p.company_name || '—');
+    const grade    = (p.trust_grade || '').toUpperCase();
+    const status   = (m.status || 'pending').toLowerCase();
+    const hasLA    = (myAgreements || []).some(la => la.match_id === m.id);
+    const completeOk = isProfileComplete(studentProfile);
+
+    let actionHTML = '';
+    if (hasLA) {
+      actionHTML = '<div class="app-sub" style="margin-top:8px;color:var(--green)">📜 Learning Agreement in progress · <a href="#" onclick="show(\'learning\');return false;" style="color:var(--green);font-weight:600">View</a></div>';
+    } else if (status === 'accepted') {
+      if (completeOk) {
+        actionHTML = `<button class="btn-orange" onclick="startLA('${escapeHtml(m.id)}')" style="margin-top:8px">📜 Start Learning Agreement</button>`;
+      } else {
+        actionHTML = '<div class="vac-disabled-note" style="margin-top:8px">Complete your profile to start the Learning Agreement.</div>';
+      }
+    }
+
+    return `
+      <div class="app-card">
+        <div class="app-head">
+          <div>
+            <div class="app-title">${eTitle}</div>
+            <div class="app-sub">${eCompany}${grade ? ' · Trust ' + grade : ''}</div>
+          </div>
+          <span class="app-status ${status}">${labelStatus(status)}</span>
+        </div>
+        ${actionHTML}
+      </div>
+    `;
+  }).join('');
+}
+
+function labelStatus(s) {
+  return ({
+    pending:  'Pending',
+    accepted: 'Accepted',
+    rejected: 'Declined',
+    draft:    'Draft'
+  })[s] || s;
+}
+
+// ════════════════════════════════════════════════════════════════
+// Learning Agreement (Sectie 4g)
+// ════════════════════════════════════════════════════════════════
+async function loadAgreements() {
+  try {
+    const { data, error } = await db.from('learning_agreements')
+      .select('id, match_id, status, start_date, end_date, hours_per_week, school_name, supervisor_name, student_signed_at, company_signed_at, school_signed_at, created_at')
+      .eq('student_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    myAgreements = data || [];
+  } catch (err) {
+    console.error('[intl-dash] loadAgreements fout:', err?.message || err);
+    myAgreements = [];
+  }
+}
+
+function startLA(matchId) {
+  if (!isProfileComplete(studentProfile)) {
+    notify('Complete your profile first', false);
+    show('profile');
+    return;
+  }
+  activeMatchForLA = matchId;
+  show('learning');
+  const builder = document.getElementById('laBuilder');
+  if (builder) {
+    builder.style.display = 'block';
+    setTimeout(() => builder.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+}
+
+function cancelLABuilder() {
+  activeMatchForLA = null;
+  const builder = document.getElementById('laBuilder');
+  if (builder) builder.style.display = 'none';
+  ['la-start','la-end','la-hours','la-credits','la-objectives','la-amount','la-supervisor-name','la-supervisor-email'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+
+async function renderAgreementsList() {
+  const c = document.getElementById('laListContainer');
+  if (!c) return;
+  if (!myAgreements || myAgreements.length === 0) {
+    c.innerHTML = '<div class="state-box"><span class="state-icon">📜</span>No Learning Agreements yet.<br><small style="display:block;margin-top:6px">Create one from an accepted application in <a href="#" onclick="show(\'applications\');return false;" style="color:var(--green);font-weight:600">Applications</a>.</small></div>';
+    return;
+  }
+
+  c.innerHTML = myAgreements.map(la => `
+    <div class="app-card">
+      <div class="app-head">
+        <div>
+          <div class="app-title">${escapeHtml(la.school_name || 'Learning Agreement')}</div>
+          <div class="app-sub">${la.start_date || '—'} → ${la.end_date || '—'} · ${la.hours_per_week || '—'} h/wk · supervisor ${escapeHtml(la.supervisor_name || '—')}</div>
+        </div>
+        <span class="app-status ${laStatusCls(la.status)}">${laStatusLabel(la.status)}</span>
+      </div>
+      <div class="app-sub" style="margin-top:8px;font-size:.78rem">
+        Student: ${la.student_signed_at ? '✓ signed' : '— pending'} ·
+        Company: ${la.company_signed_at ? '✓ signed' : '— pending'} ·
+        University: ${la.school_signed_at ? '✓ signed' : '— pending'}
+      </div>
+    </div>
+  `).join('');
+}
+
+function laStatusLabel(s) {
+  return ({
+    draft:           'Draft',
+    student_signed:  'Awaiting countersignatures',
+    company_signed:  'Awaiting university',
+    school_signed:   'Awaiting company',
+    complete:        'Complete'
+  })[s] || (s || '—');
+}
+function laStatusCls(s) {
+  if (s === 'complete') return 'accepted';
+  if (s === 'draft')    return 'draft';
+  return 'pending';
+}
+
+async function submitLA() {
+  if (!currentUser) { notify('Not signed in', false); return; }
+  if (!activeMatchForLA) { notify('No active application selected', false); return; }
+  if (!isProfileComplete(studentProfile)) {
+    notify('Complete your profile first', false);
+    show('profile');
+    return;
+  }
+  const btn = document.getElementById('laSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  const match = (myMatches || []).find(m => m.id === activeMatchForLA);
+  if (!match) {
+    btn.disabled = false; btn.textContent = 'Create & sign as student';
+    notify('Could not find application', false);
+    return;
+  }
+
+  // Parse objectives — split lines, strip bullets, max 5
+  const objText = (document.getElementById('la-objectives').value || '')
+    .split('\n')
+    .map(s => s.trim().replace(/^[•\-\*]\s*/, ''))
+    .filter(Boolean)
+    .slice(0, 5);
+
+  // Validatie LA velden — audit fix 2026-04-30
+  const _laStart  = document.getElementById('la-start')?.value;
+  const _laEnd    = document.getElementById('la-end')?.value;
+  const _laHours  = parseInt(document.getElementById('la-hours')?.value || '0', 10);
+  const _laSupName = document.getElementById('la-supervisor-name')?.value?.trim();
+  const _laSupEmail = document.getElementById('la-supervisor-email')?.value?.trim();
+
+  if (!_laStart || !_laEnd) {
+    notify('Vul start- en einddatum in.', false); return;
+  }
+  if (_laEnd <= _laStart) {
+    notify('Einddatum moet na de startdatum liggen.', false); return;
+  }
+  if (_laStart === _laEnd) {
+    notify('Stage kan niet op dezelfde dag beginnen en eindigen.', false); return;
+  }
+  if (!_laHours || _laHours < 1) {
+    notify('Vul een geldig aantal uren per week in (minimaal 1).', false); return;
+  }
+  if (!_laSupName) {
+    notify('Vul de naam van je supervisor in.', false); return;
+  }
+  if (!_laSupEmail || !_laSupEmail.includes('@')) {
+    notify('Vul een geldig e-mailadres van je supervisor in.', false); return;
+  }
+
+  const payload = {
+    match_id:               activeMatchForLA,
+    student_id:             currentUser.id,
+    company_id:             match.party_b,
+    school_name:            studentProfile?.home_university || null,
+    school_contact_email:   studentProfile?.home_university_email || null,
+    start_date:             document.getElementById('la-start').value || null,
+    end_date:               document.getElementById('la-end').value   || null,
+    hours_per_week:         parseInt(document.getElementById('la-hours').value, 10) || null,
+    learning_objectives:    objText,
+    academic_credits:       parseInt(document.getElementById('la-credits').value, 10) || null,
+    compensation:           document.getElementById('la-compensation').value || 'unpaid',
+    compensation_amount:    parseFloat(document.getElementById('la-amount').value)  || null,
+    supervisor_name:        document.getElementById('la-supervisor-name').value.trim()  || null,
+    supervisor_email:       document.getElementById('la-supervisor-email').value.trim() || null,
+    status:                 'draft'
+  };
+
+  try {
+    // 1. Insert LA (draft)
+    const { data: laRow, error: e1 } = await db.from('learning_agreements')
+      .insert(payload).select().single();
+    if (e1) throw e1;
+
+    // 2. Sign as student
+    const { error: e2 } = await db.from('learning_agreements')
+      .update({ status: 'student_signed', student_signed_at: new Date().toISOString() })
+      .eq('id', laRow.id);
+    if (e2) throw e2;
+
+    // 3. Tokens for company + school
+    const { data: cToken, error: e3 } = await db.from('la_tokens')
+      .insert({ la_id: laRow.id, party: 'company' }).select().single();
+    if (e3) throw e3;
+    const { data: sToken, error: e4 } = await db.from('la_tokens')
+      .insert({ la_id: laRow.id, party: 'school' }).select().single();
+    if (e4) throw e4;
+
+    // 4. Notify company (best-effort — wrapped so LA flow does not fail if notification CHECK fails)
+    try {
+      await db.from('notifications').insert({
+        user_id:  match.party_b,
+        type:     'la_signature_requested',
+        ref_id:   laRow.id,
+        ref_type: 'learning_agreement',
+        message:  `${studentProfile?.naam || 'Your intern'} has prepared a Learning Agreement for your signature.`,
+        read:     false
+      });
+    } catch (notifyErr) {
+      console.error('[intl-dash] notification insert fout (non-blocking):', notifyErr?.message || notifyErr);
+    }
+
+    // Build signing URLs to present to student
+    const baseUrl = window.location.origin + '/la-sign.html?token=';
+    const cUrl = baseUrl + cToken.token;
+    const sUrl = baseUrl + sToken.token;
+
+    notify('✓ Learning Agreement created & signed');
+    btn.disabled = false; btn.textContent = 'Create & sign as student';
+
+    const builder = document.getElementById('laBuilder');
+    if (builder) {
+      builder.innerHTML = `
+        <div class="form-card">
+          <div class="form-section-title">Learning Agreement created ✓</div>
+          <p style="font-size:.9rem;color:var(--ink2);margin-bottom:14px">
+            Forward these links to your company supervisor and your home university coordinator.
+            Each link is valid for 7 days and works once.
+          </p>
+          <div class="sign-link-box">
+            <div class="sign-link-label">For your company supervisor</div>
+            <span class="sign-link-url" id="cSignUrl">${escapeHtml(cUrl)}</span>
+            <button class="copy-btn" onclick="copyText('cSignUrl')">Copy link</button>
+          </div>
+          <div class="sign-link-box" style="margin-top:8px">
+            <div class="sign-link-label">For your home university</div>
+            <span class="sign-link-url" id="sSignUrl">${escapeHtml(sUrl)}</span>
+            <button class="copy-btn" onclick="copyText('sSignUrl')">Copy link</button>
+          </div>
+          <button class="btn-ghost" onclick="cancelLABuilder()" style="margin-top:14px">Done</button>
+        </div>
+      `;
+    }
+
+    activeMatchForLA = null;
+    await loadAgreements();
+    populateDocHub();
+    renderTimeline();
+    renderApplications();
+    renderAgreementsList();
+  } catch (err) {
+    btn.disabled = false; btn.textContent = 'Create & sign as student';
+    console.error('[intl-dash] submitLA fout:', err?.message || err);
+    notify('Could not submit Learning Agreement: ' + (err?.message || 'unknown'), false);
+  }
+}
+
+function copyText(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const text = el.textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => notify('✓ Link copied'),
+      () => notify('Could not copy — please select manually', false)
+    );
+  } else {
+    try {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      document.execCommand('copy');
+      notify('✓ Link copied');
+    } catch (e) {
+      console.error('[intl-dash] copy fallback fout:', e?.message || e);
+      notify('Could not copy', false);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Timeline (Sectie 4d)
+// ════════════════════════════════════════════════════════════════
+function renderTimeline() {
+  const list = document.getElementById('timelineList');
+  const eta  = document.getElementById('timelineEta');
+  if (!list) return;
+  const sp = studentProfile || {};
+  const profileScore = computeProfileScore();
+
+  const acceptedMatch = (myMatches || []).find(m => m.status === 'accepted');
+  const completeLA    = (myAgreements || []).find(la => la.status === 'complete');
+  const studentSigned = (myAgreements || []).find(la =>
+    ['student_signed','company_signed','school_signed','complete'].includes(la.status));
+  const companySigned = (myAgreements || []).find(la =>
+    ['company_signed','complete'].includes(la.status));
+  const schoolSigned  = (myAgreements || []).find(la =>
+    ['school_signed','complete'].includes(la.status));
+
+  const steps = [
+    { label: 'Create profile',            done: profileScore > 80 },
+    { label: 'Set visa status',           done: !!sp.visa_status && sp.visa_status !== 'not_started' },
+    { label: 'Upload work authorization', done: !!sp.work_auth_doc_url },
+    { label: 'Upload health insurance',   done: sp.health_insurance_status === 'arranged' },
+    { label: 'Find an internship match',  done: !!acceptedMatch },
+    { label: 'Sign Learning Agreement',   done: !!studentSigned },
+    { label: 'Company signs LA',          done: !!companySigned || !!completeLA },
+    { label: 'University signs LA',       done: !!schoolSigned  || !!completeLA }
+  ];
+
+  let foundActive = false;
+  list.innerHTML = steps.map((s, i) => {
+    let cls;
+    if (s.done) cls = 'done';
+    else if (!foundActive) { cls = 'active'; foundActive = true; }
+    else cls = 'pending';
+    return `
+      <div class="timeline-step">
+        <div class="step-dot ${cls}">${cls === 'done' ? '✓' : (i + 1)}</div>
+        <div class="step-text">${s.label}</div>
+        <div class="step-meta">${cls === 'done' ? 'Done' : (cls === 'active' ? 'Now' : '')}</div>
+      </div>
+    `;
+  }).join('');
+
+  const remaining = steps.filter(s => !s.done).length;
+  if (eta) {
+    if (remaining === 0) {
+      eta.textContent = '🎉 You\'re all set! Enjoy your internship.';
+    } else {
+      eta.textContent = `Estimated ${remaining} week${remaining === 1 ? '' : 's'} of preparation remaining.`;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Buddy section (worldwide buddy zoeker)
+// ════════════════════════════════════════════════════════════════
+let buddyCandidates = [];
+let myBuddyRequests = [];
+let myBuddyPairs    = [];
+
+async function loadBuddySection() {
+  const c = document.getElementById('buddyContent');
+  if (!c) return;
+  c.innerHTML = '<div class="state-box"><span class="state-icon">⏳</span>Loading buddies…</div>';
+
+  try {
+    // 1. Available buddies (registered with role='gepensioneerd' AND open_to_international)
+    const candPromise = db.from('profiles')
+      .select('id, naam, open_to_international, buddy_languages')
+      .eq('role', 'gepensioneerd')
+      .eq('open_to_international', true)
+      .order('naam');
+
+    // 2. Existing requests by this student
+    const reqPromise = db.from('buddy_requests')
+      .select('id, receiver_id, status, student_type, created_at')
+      .eq('requester_id', currentUser.id)
+      .in('status', ['pending', 'accepted']);
+
+    // 3. Existing active pairs
+    const pairPromise = db.from('buddy_pairs')
+      .select('id, requester_id, receiver_id, status, type')
+      .or(`requester_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`)
+      .eq('status', 'active');
+
+    const [{ data: cands, error: e1 }, { data: reqs, error: e2 }, { data: pairs, error: e3 }] =
+      await Promise.all([candPromise, reqPromise, pairPromise]);
+    if (e1) throw e1;
+    if (e2) throw e2;
+    if (e3) throw e3;
+
+    buddyCandidates = cands || [];
+    myBuddyRequests = reqs   || [];
+    myBuddyPairs    = pairs  || [];
+
+    renderBuddySection();
+  } catch (err) {
+    console.error('[intl-dash] loadBuddySection fout:', err?.message || err);
+    notify('Could not load buddies', false);
+    c.innerHTML = '<div class="state-box error"><span class="state-icon">⚠️</span>Could not load buddies. Please refresh.</div>';
+  }
+}
+
+function renderBuddySection() {
+  const c = document.getElementById('buddyContent');
+  if (!c) return;
+
+  if (buddyCandidates.length === 0) {
+    c.innerHTML = `
+      <div class="state-box">
+        <span class="state-icon">🤝</span>
+        <strong>No buddies available yet</strong>
+        <div style="margin-top:6px">
+          We are building our network of Internly Worldwide buddies.
+          Check back soon — or ask your host company if they can connect you
+          with an experienced professional.
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  c.innerHTML = '<div class="buddy-grid" id="buddy-request-form">' +
+    buddyCandidates.map(b => renderBuddyCardItem(b)).join('') +
+    '</div>';
+
+  // Plant honeypot in het buddy-aanvraag formulier (post-render)
+  const form = document.getElementById('buddy-request-form');
+  if (form) _fCtx._plant(form);
+}
+
+function renderBuddyCardItem(b) {
+  const eName = escapeHtml(b.naam || 'Buddy');
+  const langs = Array.isArray(b.buddy_languages) ? b.buddy_languages : [];
+  const langPills = langs.length
+    ? '<div class="lang-pills">' + langs.map(l =>
+        `<span class="lang-pill">${escapeHtml(l)}</span>`).join('') + '</div>'
+    : '<div class="meta" style="font-style:italic">No specific languages set</div>';
+
+  // Determine current state with this buddy
+  const reqRow = (myBuddyRequests || []).find(r => r.receiver_id === b.id);
+  const isPaired = (myBuddyPairs || []).some(p =>
+    (p.requester_id === b.id && p.receiver_id === currentUser.id) ||
+    (p.receiver_id === b.id && p.requester_id === currentUser.id)
+  );
+
+  let actionHtml;
+  if (isPaired || reqRow?.status === 'accepted') {
+    actionHtml = '<span class="buddy-status-chip active">✓ Active buddy</span>';
+  } else if (reqRow?.status === 'pending') {
+    actionHtml = '<span class="buddy-status-chip requested">⏳ Request sent</span>';
+  } else {
+    const safeId = escapeHtml(b.id);
+    actionHtml = `
+      <textarea class="buddy-msg-input" id="msg-${safeId}" placeholder="Optional message — introduce yourself in 1–2 lines"></textarea>
+      <button class="btn-primary" onclick="requestBuddy('${safeId}')">Request buddy</button>
+    `;
+  }
+
+  return `
+    <div class="buddy-card-item">
+      <h4>${eName}</h4>
+      <div class="meta">Retired professional</div>
+      ${langPills}
+      <div class="actions">${actionHtml}</div>
+    </div>
+  `;
+}
+
+async function requestBuddy(buddyId) {
+  if (!currentUser) { notify('Not signed in', false); return; }
+
+  // Honeypot guard — blokkeer bots die het verborgen veld invullen.
+  // _guard returnt true bij OK, false als de honeypot getriggerd is.
+  if (!_fCtx._guard('buddy-request')) return;
+
+  const msgEl = document.getElementById('msg-' + buddyId);
+  const message = msgEl?.value.trim() || null;
+
+  try {
+    const { error } = await db.from('buddy_requests').insert({
+      requester_id: currentUser.id,
+      receiver_id:  buddyId,
+      type:         'gepensioneerd',
+      status:       'pending',
+      student_type: 'international',
+      message
+    });
+    if (error) throw error;
+
+    // Best-effort notification to buddy
+    try {
+      await db.from('notifications').insert({
+        user_id:  buddyId,
+        type:     'buddy_request',
+        ref_type: 'buddy',
+        message:  `${studentProfile?.naam || 'An international student'} wants you as their buddy.`,
+        read:     false
+      });
+    } catch (notifyErr) {
+      console.error('[intl-dash] buddy notification fout (non-blocking):', notifyErr?.message || notifyErr);
+    }
+
+    notify('✓ Buddy request sent');
+    await loadBuddySection();
+  } catch (err) {
+    console.error('[intl-dash] requestBuddy fout:', err?.message || err);
+    notify('Could not send request — please try again', false);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// Sign out
+// ════════════════════════════════════════════════════════════════
+async function signOut() {
+  try {
+    await db.auth.signOut();
+  } catch (err) {
+    console.error('[intl-dash] signOut fout:', err?.message || err);
+  }
+  window.location.href = 'auth.html';
+}
+
+// notify() and escapeHtml() come from js/utils.js — do not redefine here.
+</script>
+</body>
+</html>

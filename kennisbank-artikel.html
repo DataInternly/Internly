@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a7a48">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="description" id="article-meta-desc" content="">
+  <link rel="canonical" id="canonical-link" href="https://internly.pro/kennisbank-artikel.html">
+  <title id="article-title-tag">Artikel — Internly Kennisbank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="js/utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/kb.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #f4f3ef; color: #0d1520; font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+    /* ── TOPBAR (shared with kennisbank.html via kb.js renderKBHeader) ── */
+    .kb-topbar { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-bottom: 1px solid #f0f0ee; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 58px; gap: 16px; }
+    .kb-logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 700; color: #0d1520; text-decoration: none; flex-shrink: 0; }
+    .kb-logo span { color: #e05c1a; }
+    .kb-nav { display: flex; gap: 20px; }
+    .kb-nav a { color: #374151; text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .14s; }
+    .kb-nav a:hover, .kb-nav a.active { color: #1a7a48; }
+    .kb-header-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+    .kb-btn-secondary { padding: 7px 16px; border: 1.5px solid #e2e8f0; border-radius: 20px; color: #374151; background: none; font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 500; cursor: pointer; text-decoration: none; transition: border-color .14s, color .14s; }
+    .kb-btn-secondary:hover { border-color: #1a7a48; color: #1a7a48; }
+    .kb-btn-primary { padding: 7px 18px; background: #1a7a48; color: #fff; border: none; border-radius: 20px; font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .14s; }
+    .kb-btn-primary:hover { background: #0f5c36; }
+
+    /* ── LAYOUT ── */
+    .kb-article-page { max-width: 720px; margin: 0 auto; padding: 36px 20px 80px; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: #1a7a48; text-decoration: none; font-size: .88rem; font-weight: 500; margin-bottom: 28px; transition: color .14s; }
+    .back-link:hover { color: #0f5c36; }
+
+    /* ── ARTICLE ── */
+    .kb-article-header { margin-bottom: 32px; }
+    .kb-article-header .audience-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    #article-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2rem; font-weight: 700; color: #0d1520; line-height: 1.25; letter-spacing: -.02em; margin-bottom: 12px; }
+    #article-excerpt { font-size: 1.05rem; color: #6b7280; line-height: 1.7; }
+
+    /* ── BODY CONTENT (rendered markdown) ── */
+    .article-body { margin: 32px 0; }
+    .article-body h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 700; color: #0d1520; margin: 32px 0 12px; border-bottom: 2px solid #f0f0ee; padding-bottom: 8px; }
+    .article-body h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; color: #0d1520; margin: 22px 0 8px; }
+    .article-body p { margin-bottom: 14px; color: #374151; line-height: 1.75; }
+    .article-body ul { padding-left: 1.4rem; margin-bottom: 14px; }
+    .article-body li { color: #374151; line-height: 1.7; margin-bottom: 4px; }
+    .article-body strong { color: #0d1520; font-weight: 700; }
+    .article-body em { color: #374151; font-style: italic; }
+    .article-body a { color: #1a7a48; text-decoration: underline; }
+    .article-body a:hover { color: #0f5c36; }
+
+    /* ── FOOTER ── */
+    .article-footer { padding-top: 28px; border-top: 1px solid #f0f0ee; margin-top: 32px; }
+    .kb-sources-title { font-size: .9rem; font-weight: 700; color: #374151; margin-bottom: 10px; }
+    .kb-sources-list { list-style: none; padding: 0; }
+    .kb-sources-list li { margin-bottom: 6px; }
+    .kb-sources-list a { color: #1a7a48; font-size: .88rem; text-decoration: underline; }
+    .article-meta { margin-top: 20px; font-size: .8rem; color: #9ca3af; }
+
+    /* ── GERELATEERD ── */
+    .related-articles { margin-top: 48px; padding-top: 32px; border-top: 1px solid #f0f0ee; }
+    .related-articles h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; color: #0d1520; margin-bottom: 16px; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+
+    /* ── CARDS (shared with kennisbank.html) ── */
+    .kb-card { display: flex; flex-direction: column; background: #fff; border: 1.5px solid #f0f0ee; border-radius: 16px; padding: 20px 18px; text-decoration: none; color: inherit; transition: transform .14s, box-shadow .14s, border-color .14s; }
+    .kb-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.07); border-color: #c8e6d4; }
+    .kb-card-audience { font-size: .73rem; font-weight: 700; color: #1a7a48; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+    .kb-card-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 700; color: #0d1520; margin-bottom: 6px; line-height: 1.35; }
+    .kb-card-excerpt { font-size: .85rem; color: #6b7280; line-height: 1.55; flex: 1; margin-bottom: 12px; }
+    .kb-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .kb-card-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .kb-card-date { font-size: .72rem; color: #9ca3af; flex-shrink: 0; }
+
+    /* ── NOTIF ── */
+    .notif { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px); background: #0d1520; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: .9rem; box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; }
+    .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 768px) {
+      .kb-topbar { padding: 0 16px; }
+      .kb-nav { display: none; }
+      #article-title { font-size: 1.6rem; }
+      .related-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+<div id="kb-header"></div>
+
+<main class="kb-article-page">
+  <a href="kennisbank.html" class="back-link">← Terug naar kennisbank</a>
+
+  <article>
+    <header class="kb-article-header">
+      <div class="audience-tags" id="audience-tags"></div>
+      <h1 id="article-title">Laden…</h1>
+      <p id="article-excerpt"></p>
+    </header>
+
+    <div class="article-body" id="article-body"></div>
+
+    <footer class="article-footer">
+      <div id="external-links"></div>
+      <p class="article-meta">
+        Door <span id="article-author"></span> &nbsp;·&nbsp;
+        <time id="article-date"></time>
+      </p>
+    </footer>
+  </article>
+
+  <aside class="related-articles" id="related-section">
+    <h3>Gerelateerde artikelen</h3>
+    <div class="related-grid" id="related-grid"></div>
+  </aside>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderKBHeader('kb-header');
+
+  const slug = new URLSearchParams(window.location.search).get('slug');
+  if (!slug) {
+    window.location.replace('kennisbank.html');
+    return;
+  }
+
+  await loadAndRenderArticle(slug);
+});
+</script>
+
+</body>
+</html>

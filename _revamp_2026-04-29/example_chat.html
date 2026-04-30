@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat — Internly (voorbeeld)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-green-deep: #0f5c36; --c-green: #1a7a48; --c-orange: #FF7E42; --c-orange-deep: #e05c1a;
+  --c-cream: #f4f3ef; --c-cream-warm: #fdfaf6; --c-ink: #0d1520;
+  --fg-primary: #0d1520; --fg-secondary: #2e4038; --fg-tertiary: #6b8070;
+  --line-subtle: rgba(13,26,16,.09); --line-default: rgba(13,26,16,.14);
+  --r-md: 12px; --r-pill: 999px;
+  --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --font-display: 'Bricolage Grotesque', sans-serif; --font-body: 'Outfit', sans-serif;
+  --font-mono: 'DM Mono', monospace; --font-script: 'Caveat', cursive;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+/* ─── DOTTED JOURNAL ACHTERGROND — Barry's verzoek ─── */
+body.page-chat {
+  font-family: var(--font-body);
+  color: var(--fg-primary);
+  background-color: var(--c-cream-warm);
+  background-image:
+    radial-gradient(circle, rgba(13, 26, 16, 0.07) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 60% at 90% 8%, rgba(255, 126, 66, 0.10), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 8% 92%, rgba(224, 92, 26, 0.05), transparent 60%);
+  background-size: 22px 22px, 100% 100%, 100% 100%;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+.chat-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ─── SIDEBAR — conversaties lijst ─── */
+.chat-sidebar {
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-right: 1px solid var(--line-subtle);
+  display: flex; flex-direction: column;
+}
+.sidebar-head {
+  padding: var(--s5) var(--s5) var(--s4);
+  border-bottom: 1px solid var(--line-subtle);
+}
+.logo {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.4rem;
+  letter-spacing: -.03em; color: var(--c-green-deep);
+}
+.logo span { color: var(--c-orange-deep); }
+.sidebar-search {
+  margin: var(--s4) var(--s5) var(--s3);
+  font-family: var(--font-body); font-size: .88rem;
+  padding: 9px 14px; border-radius: var(--r-pill);
+  border: 1.5px solid #e2e8f0; outline: none;
+  transition: border-color 120ms;
+}
+.sidebar-search:focus { border-color: var(--c-green); }
+.conv-list { flex: 1; overflow-y: auto; padding: var(--s2) 0; }
+.conv-item {
+  display: grid; grid-template-columns: 36px 1fr auto; gap: var(--s3);
+  padding: var(--s3) var(--s5); cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 120ms, border-left-color 120ms;
+}
+.conv-item:hover { background: rgba(255,126,66,.06); }
+.conv-item.active {
+  background: rgba(255,126,66,.10);
+  border-left-color: var(--c-orange-deep);
+}
+.conv-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--c-green); color: #fff;
+  font-family: var(--font-display); font-weight: 700; font-size: .9rem;
+}
+.conv-meta { min-width: 0; }
+.conv-name {
+  font-family: var(--font-display); font-weight: 600; font-size: .92rem;
+  color: var(--fg-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.conv-preview {
+  font-size: .8rem; color: var(--fg-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.conv-time {
+  font-family: var(--font-mono); font-size: .68rem; color: var(--fg-tertiary);
+}
+.conv-unread .conv-name { font-weight: 700; }
+.conv-unread .conv-time { color: var(--c-orange-deep); font-weight: 600; }
+
+/* ─── THREAD VIEW ─── */
+.chat-thread {
+  display: flex; flex-direction: column;
+  /* Bewust GEEN achtergrond — body's dotted journal schemert door
+     waar berichten geen bubble vullen. Dat is het effect Barry wil. */
+}
+.thread-head {
+  padding: var(--s4) var(--s5);
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-subtle);
+  display: flex; align-items: center; gap: var(--s4);
+}
+.thread-head-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--c-orange); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700;
+}
+.thread-head-info { flex: 1; }
+.thread-head-name {
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+}
+.thread-head-sub {
+  font-size: .78rem; color: var(--fg-tertiary); margin-top: 2px;
+  display: flex; align-items: center; gap: 6px;
+}
+.status-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #2bbf6a;
+  display: inline-block;
+}
+.thread-head-actions { display: flex; gap: var(--s2); }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: var(--r-pill);
+  border: 1.5px solid var(--line-default); background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 120ms, border-color 120ms;
+  font-size: 1rem; color: var(--fg-secondary);
+}
+.icon-btn:hover { background: var(--c-cream); border-color: var(--fg-tertiary); }
+
+.thread-messages {
+  flex: 1; overflow-y: auto;
+  padding: var(--s6) var(--s5) var(--s5);
+  display: flex; flex-direction: column; gap: var(--s4);
+}
+
+/* Datum-divider — laat de dotted journal door */
+.day-divider {
+  display: flex; align-items: center; gap: var(--s3);
+  margin: var(--s4) 0;
+  font-family: var(--font-script); font-size: 1.1rem;
+  color: var(--c-orange-deep);
+  transform: rotate(-.5deg);
+}
+.day-divider::before, .day-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(224,92,26,.18);
+}
+
+/* Berichten — bubble dekt de dotted journal NIET volledig, blijft semi-transparant */
+.msg { display: flex; gap: var(--s3); max-width: 72%; }
+.msg-them { align-self: flex-start; }
+.msg-me { align-self: flex-end; flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--c-green); color: #fff;
+  font-family: var(--font-display); font-weight: 700; font-size: .82rem;
+  flex-shrink: 0;
+}
+.msg-me .msg-avatar { background: var(--c-orange-deep); }
+
+.msg-bubble {
+  padding: var(--s3) var(--s4);
+  border-radius: 18px;
+  font-size: .92rem; line-height: 1.5;
+  background: rgba(255,255,255,0.94);
+  border: 1px solid var(--line-subtle);
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.msg-them .msg-bubble {
+  border-top-left-radius: 4px;
+}
+.msg-me .msg-bubble {
+  background: var(--c-green);
+  color: #fff;
+  border-color: transparent;
+  border-top-right-radius: 4px;
+}
+.msg-time {
+  font-family: var(--font-mono); font-size: .65rem;
+  color: var(--fg-tertiary); margin-top: 4px;
+  display: block;
+}
+.msg-me .msg-time { color: rgba(255,255,255,.65); text-align: right; }
+
+/* Trust-context kaart in de thread */
+.context-card {
+  align-self: center; max-width: 480px;
+  background: rgba(232, 245, 238, .9);
+  border: 1px solid rgba(26, 122, 72, .2);
+  border-radius: var(--r-md);
+  padding: var(--s4);
+  font-size: .85rem; color: var(--fg-secondary);
+  text-align: center;
+}
+.context-card-title {
+  font-family: var(--font-display); font-weight: 700;
+  color: var(--c-green); margin-bottom: 4px;
+}
+
+/* ─── COMPOSER ─── */
+.composer {
+  padding: var(--s4) var(--s5);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line-subtle);
+  display: flex; align-items: flex-end; gap: var(--s3);
+}
+.composer-input {
+  flex: 1;
+  font-family: var(--font-body); font-size: .95rem;
+  padding: 10px 16px;
+  border: 1.5px solid var(--line-default);
+  border-radius: 22px;
+  background: #fff;
+  outline: none; resize: none; min-height: 44px; max-height: 120px;
+  transition: border-color 120ms;
+}
+.composer-input:focus { border-color: var(--c-green); }
+.composer-send {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--c-orange-deep); color: #fff;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 12px rgba(224,92,26,.32);
+  transition: background 120ms, transform 120ms;
+}
+.composer-send:hover { background: #b94613; transform: translateY(-1px); }
+
+.composer-hint {
+  font-family: var(--font-script); font-size: .95rem;
+  color: var(--c-orange-deep); transform: rotate(-1deg);
+  margin: 0 var(--s5) var(--s2); opacity: .65;
+}
+
+/* Mobiel */
+@media (max-width: 720px) {
+  .chat-shell { grid-template-columns: 1fr; }
+  .chat-sidebar { display: none; }
+}
+</style>
+</head>
+<body class="page-chat">
+
+<div class="chat-shell">
+
+  <!-- ── SIDEBAR ──────────────────────────────── -->
+  <aside class="chat-sidebar">
+    <div class="sidebar-head">
+      <div class="logo">intern<span>ly</span></div>
+    </div>
+
+    <input type="search" class="sidebar-search" placeholder="Zoek een gesprek…">
+
+    <div class="conv-list">
+      <div class="conv-item active">
+        <div class="conv-avatar">M</div>
+        <div class="conv-meta">
+          <div class="conv-name">Mara — Vandaag Agency</div>
+          <div class="conv-preview">Top, ik zie je maandag om 9 uur.</div>
+        </div>
+        <div class="conv-time">14:22</div>
+      </div>
+
+      <div class="conv-item conv-unread">
+        <div class="conv-avatar" style="background:var(--c-orange-deep)">J</div>
+        <div class="conv-meta">
+          <div class="conv-name">Jan — Buddy</div>
+          <div class="conv-preview">Hoe voelde dat eerste gesprek?</div>
+        </div>
+        <div class="conv-time">11:08</div>
+      </div>
+
+      <div class="conv-item">
+        <div class="conv-avatar" style="background:#7c5fb5">S</div>
+        <div class="conv-meta">
+          <div class="conv-name">Stagebureau HvA</div>
+          <div class="conv-preview">Je beoordeling van week 3 staat klaar.</div>
+        </div>
+        <div class="conv-time">gisteren</div>
+      </div>
+
+      <div class="conv-item">
+        <div class="conv-avatar">D</div>
+        <div class="conv-meta">
+          <div class="conv-name">Daan — BBL groep</div>
+          <div class="conv-preview">Jullie deadline is over 14 dagen.</div>
+        </div>
+        <div class="conv-time">ma</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── THREAD ──────────────────────────────── -->
+  <main class="chat-thread">
+
+    <header class="thread-head">
+      <div class="thread-head-avatar">M</div>
+      <div class="thread-head-info">
+        <div class="thread-head-name">Mara — Vandaag Agency</div>
+        <div class="thread-head-sub">
+          <span class="status-dot"></span>
+          Online · stagebegeleider
+        </div>
+      </div>
+      <div class="thread-head-actions">
+        <button class="icon-btn" aria-label="Trust score">★</button>
+        <button class="icon-btn" aria-label="Meer opties">⋯</button>
+      </div>
+    </header>
+
+    <div class="thread-messages">
+
+      <div class="day-divider">vandaag</div>
+
+      <div class="msg msg-them">
+        <div class="msg-avatar">M</div>
+        <div>
+          <div class="msg-bubble">
+            Hoi Lena — leuk dat je solliciteerde op onze content-stage.
+            Ik heb je profiel doorgenomen, kunnen we dinsdag bellen?
+          </div>
+          <span class="msg-time">14:18</span>
+        </div>
+      </div>
+
+      <div class="msg msg-me">
+        <div class="msg-avatar">L</div>
+        <div>
+          <div class="msg-bubble">
+            Top! Dinsdag 11 uur werkt voor mij. Ik bel je dan via Internly.
+          </div>
+          <span class="msg-time">14:20</span>
+        </div>
+      </div>
+
+      <div class="context-card">
+        <div class="context-card-title">Trust score actie</div>
+        Mara heeft binnen 4 uur gereageerd. Vandaag Agency krijgt +3 punten.
+      </div>
+
+      <div class="msg msg-them">
+        <div class="msg-avatar">M</div>
+        <div>
+          <div class="msg-bubble">
+            Top, ik zie je maandag om 9 uur.
+          </div>
+          <span class="msg-time">14:22</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="composer-hint">geen ghosting hier</div>
+    <div class="composer">
+      <textarea class="composer-input" placeholder="Schrijf een bericht…"></textarea>
+      <button class="composer-send" aria-label="Verstuur">→</button>
+    </div>
+
+  </main>
+
+</div>
+
+<!--
+  NOTITIE VOOR CLAUDE CODE — bij toepassing op productie chat.html:
+  · BEHOUD: alle JS-imports (utils.js, supabase.js, chat-specific js), alle id's voor message-list, composer, send-btn, etc.
+  · BEHOUD: Supabase Realtime subscription, message broadcast logica, push notifications
+  · BEHOUD: alle bestaande database calls (messages tabel, conversations tabel)
+  · VERVANG: alleen de visuele laag — body achtergrond, sidebar styling, message bubble styling
+  · KRITIEK: page-chat klasse op body MOET aanwezig zijn voor de dotted journal achtergrond
+  · KRITIEK: msg-bubble blijft semi-transparant (alpha .94) zodat journal patroon doorschemert
+-->
+
+</body>
+</html>

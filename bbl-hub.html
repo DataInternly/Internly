@@ -6,7 +6,7 @@
 
   -- 1. BBL-modus activeren voor test-student:
   -- UPDATE student_profiles SET bbl_mode = true, schooldag = 'dinsdag'
-  --   WHERE profile_id = '65ed548f-a7da-4a9b-96c3-e64ccb9ca7d7';
+  --   WHERE profile_id = '<TEST_STUDENT_UUID>';
 
   -- 2. Vergroot de meetings-status constraint voor evaluatie-handtekeningen:
   -- ALTER TABLE meetings DROP CONSTRAINT IF EXISTS meetings_status_check;
@@ -55,24 +55,41 @@
   <meta name="theme-color" content="#1a7a48">
   <title>BBL Traject — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+          integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
+          crossorigin="anonymous"></script>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/buddy.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
-    /* ── BBL Hub pagina-specifieke stijlen ────────────────────────────────── */
-    /* Basis variabelen zijn al in css/style.css. Hier ALLEEN BBL-specifiek.  */
+    /* ═══════════════════════════════════════════════════════════════
+       Dashboard archetype (bbl-hub) — BBL-traject hub met 4 views
+       (Berichten/Kalender/Evaluatie/Verlenging).
+       Globale tokens uit css/style.css. Topbar wordt door utils.js
+       renderStudentHeader (BBL variant) gerendered in #student-header.
+       NB: pagina-eigen .topbar/.topbar-bbl-* legacy CSS is DEAD CODE
+       (geen <div class="topbar"> in de body) — behouden voor compat.
+       Sprint-restrictie: eindverslag-flow + 90-dagen alert NIET
+       refactoren.
+       ═══════════════════════════════════════════════════════════════ */
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Outfit', sans-serif;
-      background: #f4f3ef;
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--bg-page, #f4f3ef);
+      color: var(--fg-primary, #0d1520);
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--c-orange-deep, #e05c1a);
+      outline-offset: 2px;
     }
 
     /* ── Topbar ── exact patroon als chat.html / discover.html */
@@ -400,7 +417,7 @@
       display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 6px; margin-bottom: 10px;
     }
-    @media (max-width: 420px) { .meet-type-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .meet-type-grid { grid-template-columns: 1fr; } }
     .mtype-btn {
       padding: 9px 11px; border-radius: 10px;
       border: 1.5px solid rgba(15,17,23,.1); background: #fff;
@@ -644,7 +661,7 @@
       .signoff-row { flex-direction: column; }
       .vtab { font-size: 10px; padding: 6px 3px; }
     }
-    @media (max-width: 400px) {
+    @media (max-width: 360px) {
       .topbar-bbl-tag { display: none; }
       .topbar-user { display: none; }
       .topbar { padding: 0 14px; }
@@ -709,21 +726,12 @@
       </div>
     </div>
 
-    <!-- Buddy kaart in berichten (wordt gevuld na buddyInit) -->
-    <div class="hcard" id="buddyCard" style="display:none;">
-      <div class="slbl">BBL-buddy (anoniem)</div>
-      <div style="background:var(--amber-bg,#fdf3e0);
-        border-radius:var(--r-sm,8px);
-        padding:.75rem 1rem;
-        font-size:.82rem;
-        color:var(--amber,#a06010);
-        margin-bottom:.75rem;">
-        Het insider-beoordelingssysteem is momenteel
-        in ontwikkeling. Je anonimiteit is beschermd
-        — beoordelingen worden zichtbaar zodra het
-        systeem volledig geactiveerd is.
+    <!-- Buddy sectie (gepensioneerd — sprint 29 april) -->
+    <div class="hcard" id="buddyCard">
+      <div class="slbl">Gepensioneerde buddy</div>
+      <div id="buddyCardContent">
+        <div style="font-size:.82rem;color:var(--ink3,#7a8799);padding:.5rem 0;">Buddy laden…</div>
       </div>
-      <div id="buddyCardContent"></div>
     </div>
   </div>
 
@@ -1126,7 +1134,7 @@ function updateContractStrip(contractEndDate) {
 // VIEW 1 — BERICHTEN
 // ─────────────────────────────────────────────────────────────────────────────
 
-function renderParticipants(praktijkbegeleider, rocBegeleider, hasInsiderBuddy) {
+function renderParticipants(praktijkbegeleider, rocBegeleider) {
   const container = document.getElementById('participantsRow');
   const pb = praktijkbegeleider || praktijkbegeleiderName || 'Praktijkbegeleider';
   const pbInit = escapeHtml(pb.slice(0, 2).toUpperCase());
@@ -1139,13 +1147,6 @@ function renderParticipants(praktijkbegeleider, rocBegeleider, hasInsiderBuddy) 
       <div class="av av-amber" style="width:20px;height:20px;font-size:8px;">${rocBegeleider ? escapeHtml(rocBegeleider.slice(0,2).toUpperCase()) : 'SC'}</div>
       <span>${rocBegeleider ? escapeHtml(rocBegeleider) : 'School'} (ROC-begeleider)</span>
     </div>`;
-  if (hasInsiderBuddy) {
-    html += `
-    <div class="participant">
-      <div class="av av-gray" style="width:20px;height:20px;font-size:9px;">?</div>
-      <span>Anonieme buddy</span>
-    </div>`;
-  }
   container.innerHTML = html;
 }
 
@@ -1273,7 +1274,7 @@ async function markMessagesRead() {
 
 async function sendMessage() {
   if (!activeConvId || !currentUser) {
-    notify('Geen actief gesprek gevonden — controleer je BBL-koppeling');
+    notify('Geen actief gesprek gevonden — controleer je BBL-koppeling', false);
     return;
   }
   const input = document.getElementById('msgInput');
@@ -1307,7 +1308,7 @@ async function sendMessage() {
   btn.disabled = false;
 
   if (error) {
-    notify('Fout bij verzenden: ' + (error?.message || 'onbekende fout'));
+    notify('Fout bij verzenden: ' + (error?.message || 'onbekende fout'), false);
     return;
   }
 
@@ -1525,7 +1526,7 @@ async function createMeeting() {
   if (!date) { notify('Kies een datum'); return; }
   const today = new Date().toISOString().slice(0, 10);
   if (date < today) { notify('Kies een datum in de toekomst'); return; }
-  if (!currentUser || !activeMatch) { notify('Koppeling niet geladen — ververs de pagina'); return; }
+  if (!currentUser || !activeMatch) { notify('Koppeling niet geladen — ververs de pagina', false); return; }
 
   const subject = {
     evaluatie: 'Evaluatiegesprek',
@@ -1549,8 +1550,8 @@ async function createMeeting() {
     match_id:      activeMatch.id,
   }).select('id').maybeSingle();
 
-  if (error) { notify('Aanmaken mislukt: ' + (error?.message || 'onbekende fout')); return; }
-  if (!newMeeting) { notify('Er ging iets mis'); return; }
+  if (error) { notify('Aanmaken mislukt: ' + (error?.message || 'onbekende fout'), false); return; }
+  if (!newMeeting) { notify('Er ging iets mis', false); return; }
 
   if (selectedMeetType === 'driegesprek') {
     if (activeMatch.roc_profile_id) {
@@ -2193,7 +2194,7 @@ function updateReflectieVoortgangLbl() {
 }
 
 async function saveReflectie() {
-  if (!activeConvId || !currentUser) { notify('Koppeling niet geladen'); return; }
+  if (!activeConvId || !currentUser) { notify('Koppeling niet geladen', false); return; }
 
   const situatie   = document.getElementById('reflectie-situatie')?.value.trim()   || '';
   const taak       = document.getElementById('reflectie-taak')?.value.trim()       || '';
@@ -2212,7 +2213,7 @@ async function saveReflectie() {
     content:         '[Zelfreflectie-STARR] ' + content,
     type:            'zelfreflectie',
   });
-  if (error) { notify('Opslaan mislukt: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { notify('Opslaan mislukt: ' + (error?.message || 'onbekende fout'), false); return; }
 
   // Cache to localStorage for PDF export
   try {
@@ -2266,7 +2267,7 @@ async function signOff(party) {
     .from('meetings')
     .update({ status: newStatus })
     .eq('id', evalMeeting.id);
-  if (error) { _isSigningOff = false; notify('Handtekening plaatsen mislukt: ' + (error?.message || 'onbekende fout')); return; }
+  if (error) { _isSigningOff = false; notify('Handtekening plaatsen mislukt: ' + (error?.message || 'onbekende fout'), false); return; }
 
   evalMeeting.status = newStatus;
   renderSignoffStatus(newStatus);
@@ -2372,7 +2373,7 @@ async function loadRenewalStatus() {
 }
 
 async function studentChoice(keuze) {
-  if (!activeMatch?.id) { notify('Koppeling niet geladen — ververs de pagina'); return; }
+  if (!activeMatch?.id) { notify('Koppeling niet geladen — ververs de pagina', false); return; }
 
   // Haal huidige renewal_status op, merge student-keuze, schrijf terug
   let status = {};
@@ -2463,9 +2464,10 @@ function goToDriegesprek() {
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -2615,7 +2617,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 6. Deelnemers in berichten-view
-  renderParticipants(praktijkbegeleiderName, rocNaam, false);
+  renderParticipants(praktijkbegeleiderName, rocNaam);
 
   // Geen actieve koppeling — toon lege staat in hub-shell
   if (!match) {
@@ -2625,16 +2627,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // 7. Buddy init (insider type voor BBL)
+  // 7. Buddy (gepensioneerd) — load active pair OR available candidates
   try {
-    await buddyInit(user.id, 'student', db, name);
-    const insiderPair = BuddyModule.activePairs.find(p => p.type === 'insider');
-    if (insiderPair) {
-      renderParticipants(praktijkbegeleiderName, rocNaam, true);
-      renderBuddyCard(insiderPair);
-    }
-  } catch(e) {
-    console.warn('[bbl-hub] buddy init fout (non-blocking):', e);
+    await loadBuddySection();
+  } catch (err) {
+    console.error('[bbl-hub] buddy section fout:', err?.message || err);
+    notify('Kon buddies niet laden', false);
   }
 
   // 8. Kalender: laad meetings voor huidige maand (lazy — renderCalendar wordt aangeroepen bij view switch)
@@ -2653,27 +2651,205 @@ window.addEventListener('DOMContentLoaded', async () => {
   initSessionTimeout();
 });
 
-// Buddy kaart in berichten-view
-function renderBuddyCard(pair) {
+// ── Buddy sectie (gepensioneerd) — sprint 29 april ──────────────────────
+// State for buddy section
+let _buddyCandidates = [];
+let _buddyActivePair = null;
+let _myBuddyRequests = [];
+
+async function loadBuddySection() {
+  if (!currentUser) return;
   const card = document.getElementById('buddyCard');
   const content = document.getElementById('buddyCardContent');
   if (!card || !content) return;
 
-  const isAnon = pair.reveal_after && new Date(pair.reveal_after) > new Date();
-  const name   = isAnon ? 'Anonieme buddy' : escapeHtml(pair.buddy_name || 'Buddy');
-  const sub    = isAnon ? 'Identiteit zichtbaar na je contract' : 'BBL-buddy · actief';
-  const init   = isAnon ? '?' : escapeHtml((pair.buddy_name || '?')[0].toUpperCase());
+  const uid = currentUser.id;
 
+  // Parallel: actieve pair, openstaande verzoeken van deze student, beschikbare buddies
+  let pairs = [];
+  let reqs  = [];
+  let bps   = [];
+  let nameMap = {};
+
+  try {
+    const pairPromise = db.from('buddy_pairs')
+      .select('id, requester_id, receiver_id, type, status')
+      .or(`requester_id.eq.${uid},receiver_id.eq.${uid}`)
+      .eq('status', 'active')
+      .eq('type', 'gepensioneerd');
+
+    const reqPromise = db.from('buddy_requests')
+      .select('id, receiver_id, status')
+      .eq('requester_id', uid)
+      .in('status', ['pending', 'accepted']);
+
+    // active=true buddy_profiles — geen open_to_international filter
+    const bpPromise = db.from('buddy_profiles')
+      .select('profile_id, kennis_gebieden, stad, active')
+      .eq('active', true)
+      .limit(20);
+
+    const [pairR, reqR, bpR] = await Promise.all([pairPromise, reqPromise, bpPromise]);
+    if (pairR.error) throw pairR.error;
+    if (reqR.error)  throw reqR.error;
+    if (bpR.error)   throw bpR.error;
+
+    pairs = pairR.data || [];
+    reqs  = reqR.data  || [];
+    bps   = bpR.data   || [];
+
+    // Naam-lookup voor buddies + actieve pair-tegenpartij
+    const ids = new Set();
+    bps.forEach(b => { if (b.profile_id) ids.add(b.profile_id); });
+    pairs.forEach(p => {
+      const other = p.requester_id === uid ? p.receiver_id : p.requester_id;
+      if (other) ids.add(other);
+    });
+    if (ids.size > 0) {
+      const { data: profs, error: nErr } = await db.from('profiles')
+        .select('id, naam')
+        .in('id', [...ids]);
+      if (nErr) {
+        console.error('[bbl-hub] buddy naam-lookup fout:', nErr.message);
+      } else {
+        (profs || []).forEach(p => { nameMap[p.id] = p.naam; });
+      }
+    }
+  } catch (err) {
+    console.error('[bbl-hub] loadBuddySection fout:', err?.message || err);
+    notify('Buddy-sectie kon niet laden — probeer pagina te verversen', false);
+    content.innerHTML = '<div style="font-size:.82rem;color:var(--ink3,#7a8799);padding:.5rem 0;">Buddy-sectie kon niet laden.</div>';
+    return;
+  }
+
+  _buddyCandidates = bps;
+  _buddyActivePair = pairs[0] || null;
+  _myBuddyRequests = reqs;
+  _buddyNameMap = nameMap;
+
+  renderBuddySection();
+}
+
+let _buddyNameMap = {};
+
+function renderBuddySection() {
+  const content = document.getElementById('buddyCardContent');
+  if (!content) return;
+
+  // 1. Actieve pair → tonen met chat-link
+  if (_buddyActivePair) {
+    const uid = currentUser.id;
+    const otherId = _buddyActivePair.requester_id === uid
+      ? _buddyActivePair.receiver_id
+      : _buddyActivePair.requester_id;
+    const otherName = escapeHtml(_buddyNameMap[otherId] || 'Buddy');
+    const init = escapeHtml((otherName[0] || 'B').toUpperCase());
+    const pairId = String(_buddyActivePair.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
+    content.innerHTML = `
+      <div class="person">
+        <div class="av av-gray">${init}</div>
+        <div>
+          <div class="p-name">${otherName}</div>
+          <div class="p-role">Gepensioneerde buddy · actief</div>
+        </div>
+      </div>
+      <div class="pills" style="margin-top:.5rem;">
+        <a class="pill pill-primary" href="chat.html?buddy_pair=${encodeURIComponent(pairId)}">Stuur bericht</a>
+      </div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:8px;">
+        Jouw buddy is een gepensioneerde professional die zijn ervaring vrijwillig met je deelt.
+      </div>`;
+    return;
+  }
+
+  // 2. Geen pair, geen buddies beschikbaar → lege staat
+  if (_buddyCandidates.length === 0) {
+    content.innerHTML = `
+      <div style="text-align:center;padding:1rem .5rem;color:var(--ink3,#7a8799);">
+        <div style="font-size:1.4rem;margin-bottom:.4rem;">🤝</div>
+        <div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen buddies beschikbaar</div>
+        <div style="font-size:.82rem;line-height:1.5;">
+          We zijn ons buddy-netwerk aan het opbouwen. Kijk later nog eens of vraag je
+          ROC-begeleider om je in contact te brengen met een ervaren professional.
+        </div>
+      </div>`;
+    return;
+  }
+
+  // 3. Lijst met beschikbare buddies (max 20)
+  const cardsHtml = _buddyCandidates.map(b => renderBuddyCandidate(b)).join('');
   content.innerHTML = `
-    <div class="person">
-      <div class="av av-gray">${init}</div>
-      <div><div class="p-name">${name}</div><div class="p-role">${sub}</div></div>
+    <div style="font-size:.82rem;color:var(--ink2,#374151);margin-bottom:.6rem;">
+      Vrijwillige gepensioneerden die hun kennis willen delen. Stuur een verzoek om
+      te koppelen — geen verplichting.
     </div>
-    ${!isAnon ? `<div class="pills"><button class="pill pill-primary" onclick="buddyOpenChat('${String(pair.id||'').replace(/[^a-zA-Z0-9\-]/g,'')}')">Stuur bericht</button></div>` : ''}
-    <div style="font-size:11px;color:#9ca3af;margin-top:8px;">
-      Jouw buddy werkt bij ${escapeHtml(activeMatch?.internship_postings?.company_name || 'dit bedrijf')} en kan je anoniem eerlijk vertellen hoe het er echt aan toe gaat.
+    <div style="display:grid;gap:.5rem;">${cardsHtml}</div>`;
+}
+
+function renderBuddyCandidate(b) {
+  const safeId = String(b.profile_id || '').replace(/[^a-zA-Z0-9\-]/g, '');
+  const eName = escapeHtml(_buddyNameMap[b.profile_id] || 'Buddy');
+  const eStad = escapeHtml(b.stad || '');
+  const kgArr = Array.isArray(b.kennis_gebieden) ? b.kennis_gebieden : [];
+  const kgPills = kgArr.slice(0, 4).map(k =>
+    `<span style="font-size:10px;background:var(--c-buddy-purple-bg,#ede9fe);color:var(--c-buddy-purple,#6d28d9);padding:2px 7px;border-radius:20px;font-weight:600;">${escapeHtml(k)}</span>`
+  ).join(' ');
+
+  // Heeft de student al een verzoek bij deze buddy uitstaan?
+  const existingReq = (_myBuddyRequests || []).find(r => r.receiver_id === b.profile_id);
+  const init = escapeHtml((eName[0] || 'B').toUpperCase());
+
+  let actionHtml;
+  if (existingReq?.status === 'accepted') {
+    actionHtml = '<span style="font-size:10px;background:var(--c-green-bg,#e8f5ee);color:var(--c-green,#1a7a48);padding:2px 8px;border-radius:20px;font-weight:600;">✓ Geaccepteerd</span>';
+  } else if (existingReq?.status === 'pending') {
+    actionHtml = '<span style="font-size:10px;background:var(--amber-bg,#fdf3e0);color:var(--amber,#a06010);padding:2px 8px;border-radius:20px;font-weight:600;">⏳ Verzoek verstuurd</span>';
+  } else {
+    actionHtml = `<button class="pill pill-primary" onclick="requestBuddyBBL('${safeId}')" style="font-size:11px;padding:4px 10px;">Vraag buddy aan</button>`;
+  }
+
+  return `
+    <div style="border:1px solid rgba(15,17,23,.09);border-radius:8px;padding:.6rem .75rem;background:#fff;">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;">
+        <div class="av av-gray" style="width:28px;height:28px;font-size:11px;">${init}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:.85rem;font-weight:500;color:#0d1520;">${eName}</div>
+          ${eStad ? `<div style="font-size:.72rem;color:#9ca3af;">${eStad}</div>` : ''}
+        </div>
+      </div>
+      ${kgPills ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.4rem;">${kgPills}</div>` : ''}
+      <div>${actionHtml}</div>
     </div>`;
-  card.style.display = 'block';
+}
+
+async function requestBuddyBBL(buddyId) {
+  if (!currentUser) { notify('Niet ingelogd', false); return; }
+  if (!buddyId) return;
+
+  try {
+    const { error } = await db.from('buddy_requests').insert({
+      requester_id: currentUser.id,
+      receiver_id:  buddyId,
+      type:         'gepensioneerd',
+      status:       'pending',
+      student_type: 'nl'
+    });
+    if (error) throw error;
+
+    // Best-effort notification
+    try {
+      const _buddyMsg = `${name || 'Een BBL-student'} wil jou als buddy.`;
+      await createNotification(buddyId, 'buddy_request', null, 'buddy', _buddyMsg);
+    } catch (notifyErr) {
+      console.error('[bbl-hub] buddy notificatie fout (non-blocking):', notifyErr?.message || notifyErr);
+    }
+
+    notify('✓ Buddy-verzoek verstuurd');
+    await loadBuddySection();
+  } catch (err) {
+    console.error('[bbl-hub] requestBuddyBBL fout:', err?.message || err);
+    notify('Kon verzoek niet versturen — probeer opnieuw', false);
+  }
 }
 
 // Herlaad berichten bij terugkeer naar tab (stale data preventie)

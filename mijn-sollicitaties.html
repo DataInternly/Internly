@@ -9,81 +9,154 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <title>Mijn sollicitaties — Internly</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/optimistic.js"></script>
   <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    :focus-visible { outline: 2px solid #FF7E42; outline-offset: 2px; }
+    /* ═══════════════════════════════════════════════════════════════
+       Lijst archetype (mijn-sollicitaties) — applications overzicht.
+       Globale tokens uit css/style.css. Topbar wordt door utils.js
+       renderStudentHeader gerendered in #student-header.
+       ═══════════════════════════════════════════════════════════════ */
 
+    :focus-visible {
+      outline: 2px solid var(--c-orange-deep, #FF7E42);
+      outline-offset: 2px;
+    }
+
+    /* Legacy topbar-user / topbar-avatar / btn-topbar-logout
+       (mogelijk gebruikt door utils.js renderStudentHeader) — token-based */
     .topbar-user {
       display: flex; align-items: center; gap: 10px;
-      color: rgba(255,255,255,.85); font-size: .88rem; font-weight: 500;
+      color: var(--fg-secondary, #374151);
+      font-size: .88rem; font-weight: 500;
     }
     .topbar-avatar {
       width: 30px; height: 30px; border-radius: 50%;
-      background: rgba(255,255,255,.2); color: #fff;
+      background: var(--c-green, #1a7a48);
+      color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: .75rem; font-weight: 700; flex-shrink: 0;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: .75rem; font-weight: 700;
+      flex-shrink: 0;
     }
     .btn-topbar-logout {
-      background: none; border: 1px solid rgba(255,255,255,.3);
-      color: rgba(255,255,255,.7); padding: 5px 12px; border-radius: 20px;
-      font-family: 'Outfit', sans-serif; font-size: .8rem; cursor: pointer;
-      transition: all .15s;
+      background: none;
+      border: 1px solid var(--line-default, rgba(13,26,16,.14));
+      color: var(--fg-tertiary, #6b8070);
+      padding: 5px 12px;
+      border-radius: var(--r-pill, 20px);
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      font-size: .8rem;
+      cursor: pointer;
+      transition: all var(--t-fast, .15s);
     }
-    .btn-topbar-logout:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .btn-topbar-logout:hover {
+      background: var(--c-cream, #f4f3ef);
+      color: var(--fg-primary, #0d1520);
+    }
 
-    .page-head { margin-bottom: 28px; }
+    /* ── Page head ── */
+    .page-head { margin-bottom: var(--s6, 28px); }
+    .page-eyebrow {
+      font-family: var(--font-mono, 'DM Mono', monospace);
+      font-size: .72rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--fg-tertiary, #6b8070);
+      margin-bottom: 6px;
+    }
     .page-title {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.6rem; font-weight: 700; color: #0d1520; margin-bottom: 4px;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: clamp(1.4rem, 3.2vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: -.025em;
+      color: var(--fg-primary, #0d1520);
+      margin-bottom: 4px;
+      line-height: 1.15;
     }
-    .page-sub { font-size: .9rem; color: #6b7280; }
+    .page-sub {
+      font-size: .9rem;
+      color: var(--fg-tertiary, #6b8070);
+    }
 
+    /* ── Status bar — 4 counters ── */
     .status-bar {
-      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+      display: flex; gap: 12px;
+      margin-bottom: var(--s5, 24px);
+      flex-wrap: wrap;
     }
     .status-count {
-      background: #fff; border: 1px solid #f0f0ee;
-      border-radius: 10px; padding: 10px 16px;
-      font-size: .82rem; color: #6b7280;
+      background: var(--bg-surface, #fff);
+      border: 1px solid var(--line-subtle, #f0f0ee);
+      border-radius: var(--r-md, 10px);
+      padding: 10px 16px;
+      font-size: .82rem;
+      color: var(--fg-tertiary, #6b7280);
+      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
     }
-    .status-count strong { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.4rem; color: #0d1520; line-height: 1; margin-bottom: 2px; }
+    .status-count strong {
+      display: block;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.4rem; font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--fg-primary, #0d1520);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
 
+    /* ── Empty state — page-level (lokaal, niet de globale) ── */
     .empty-state {
-      text-align: center; padding: 60px 20px;
-      background: #fff; border: 1px solid #f0f0ee;
-      border-radius: 12px; color: #9ca3af; font-size: .9rem; line-height: 2;
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--bg-surface, #fff);
+      border: 1px solid var(--line-subtle, #f0f0ee);
+      border-radius: var(--r-md, 12px);
+      color: var(--fg-tertiary, #9ca3af);
+      font-size: .9rem;
+      line-height: 2;
     }
-    .empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+    .empty-state .icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 12px;
+    }
 
-    /* Review pending badge */
+    /* ── Review badges ── */
     .review-pending-badge {
       display: inline-flex; align-items: center; gap: 5px;
       font-size: .78rem; font-weight: 600;
-      background: #fdf3e0; color: #a06010;
-      padding: 4px 10px; border-radius: 20px;
-      cursor: pointer; border: none;
-      font-family: 'Outfit', sans-serif;
-      transition: background .15s;
+      background: #fdf3e0;
+      color: #a06010;
+      padding: 4px 10px;
+      border-radius: var(--r-pill, 20px);
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      transition: background var(--t-fast, .15s);
       min-height: 32px;
     }
     .review-pending-badge:hover { background: #fde8b0; }
     .review-placed-badge {
       display: inline-flex; align-items: center; gap: 5px;
       font-size: .78rem; font-weight: 600;
-      background: #e8f5ee; color: #1a7a48;
-      padding: 4px 10px; border-radius: 20px;
+      background: #e8f5ee;
+      color: var(--c-green, #1a7a48);
+      padding: 4px 10px;
+      border-radius: var(--r-pill, 20px);
     }
     .review-soon-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      font-size: .78rem; color: #9ca3af;
-      padding: 4px 10px; border-radius: 20px;
-      background: #f4f3ef;
+      font-size: .78rem;
+      color: var(--fg-tertiary, #9ca3af);
+      padding: 4px 10px;
+      border-radius: var(--r-pill, 20px);
+      background: var(--c-cream, #f4f3ef);
     }
   </style>
 </head>
@@ -118,6 +191,7 @@
   <div class="layout">
     <main class="main">
       <div class="page-head">
+        <div class="page-eyebrow">Mijn aanvragen</div>
         <div class="page-title" style="display:flex;align-items:center;gap:6px;">Mijn Sollicitaties<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg statussen en Stage Hub">ⓘ<span class="info-pop"><strong>Statussen:</strong><br>✓ Uitgenodigd — het bedrijf wil je spreken.<br>⏳ In behandeling — je aanvraag wordt beoordeeld.<br>✕ Afgewezen — het bedrijf gaat niet verder.<br><br>Klik op <strong>Stage Hub →</strong> bij een actieve stage om je persoonlijke werkruimte te openen.</span></span></div>
         <div class="page-sub">Overzicht van je ingediende aanvragen</div>
       </div>
@@ -274,9 +348,10 @@
       if (norm.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <span class="icon">📭</span>
-            Je hebt nog geen sollicitaties ingediend.<br>
-            <a href="discover.html" style="color:#1a7a48;font-weight:600">Ontdek vacatures →</a>
+            <span class="es-icon">📭</span>
+            <p class="es-primary">Nog geen sollicitaties verstuurd.</p>
+            <p class="es-secondary">Op Internly krijg je altijd een antwoord — meestal binnen de tijd die het bedrijf zelf belooft.</p>
+            <a href="discover.html" class="es-cta">Bekijk vacatures</a>
           </div>`;
         return;
       }
@@ -383,8 +458,21 @@
           }
         }
 
+        const terugnemenBtn = (app._status === 'wacht' && app.id)
+          ? `<button class="btn-terugnem"
+               data-app-id="${escapeHtml(String(app.id))}"
+               data-internship-id="${escapeHtml(String(app.internship_id || ''))}"
+               style="background:none;border:1px solid #d1d5db;color:var(--ink3,#7a8799);
+                      border-radius:6px;font-size:.78rem;padding:3px 10px;cursor:pointer;
+                      font-family:'Outfit',sans-serif;transition:border-color .15s,color .15s;"
+               onmouseover="this.style.borderColor='#b82020';this.style.color='#b82020';"
+               onmouseout="this.style.borderColor='#d1d5db';this.style.color='var(--ink3,#7a8799)';">
+               Terugnemen
+             </button>`
+          : '';
+
         return `
-          <div class="card">
+          <div class="card" data-app-id="${escapeHtml(String(app.id || ''))}">
             <div class="card-head">
               <div style="min-width:0">
                 <div class="card-title" title="${escapeHtml(title)}">${escapeHtml(titleShort)}</div>
@@ -396,6 +484,7 @@
               ${statusTag}
               ${created ? `<span style="color:#9ca3af;font-size:.82rem">${formatDate(created)}</span>` : ''}
               <span style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;align-items:center">
+                ${terugnemenBtn}
                 ${detailLink}
                 ${chatLink}
                 ${stageHubLink}
@@ -404,6 +493,12 @@
             ${reviewSection}
           </div>`;
       }).join('');
+
+      // Wire terugnemen buttons via delegation
+      container.querySelectorAll('.btn-terugnem').forEach(btn => {
+        btn.addEventListener('click', () =>
+          terugnemenOptimistic(btn.dataset.appId, btn.dataset.internshipId));
+      });
 
       // Wire review buttons + stars via delegation (avoids inline onclick with user strings)
       container.querySelectorAll('.review-star').forEach(span => {
@@ -421,6 +516,39 @@
       container.querySelectorAll('.review-cancel-btn').forEach(btn => {
         btn.addEventListener('click', () => closeReviewForm(btn.dataset.app));
       });
+    }
+
+    // ── Sollicitatie terugnemen (optimistic UI + undo) ────────────────────
+    async function terugnemenOptimistic(appId, internshipId) {
+      const cardEl = document.querySelector(`.card[data-app-id="${CSS.escape(appId)}"]`);
+      const restoreCard = optimistic.hideEl(cardEl);
+
+      const ok = await optimistic.do(
+        'Sollicitatie teruggenomen',
+        () => db.from('applications').delete().eq('id', appId).eq('student_id', currentUserId),
+        async () => {
+          // Undo: re-insert + reload
+          const { error: reErr } = await db.from('applications').insert({
+            internship_id: internshipId,
+            student_id:    currentUserId,
+            status:        'pending',
+          });
+          if (reErr) {
+            console.error('[sollicitaties] undo terugnemen fout:', reErr?.message);
+            toast.error('Ongedaan maken mislukt — neem contact op met support');
+            return;
+          }
+          await loadApplications(currentUserId);
+          const newCard = document.querySelector('#applications-container .card:first-child');
+          if (newCard) newCard.classList.add('undo-flash');
+        }
+      );
+
+      if (ok) {
+        setTimeout(() => cardEl?.remove(), 300);
+      } else {
+        restoreCard();
+      }
     }
 
     // ── Load applications ─────────────────────────────────────────────────
@@ -675,9 +803,8 @@
       currentUserId = user.id;
 
       const { data: sp } = await db.from('student_profiles')
-        .select('bbl_mode, onderwijsniveau').eq('profile_id', user.id).maybeSingle();
-      if (sp?.bbl_mode === true) { window.location.replace('bbl-hub.html'); return; }
-      if (sp?.onderwijsniveau === 'MBO_BOL') { window.location.replace('bol-profile.html'); return; }
+        .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+      if (sp?.bbl_mode === true) { window.location.replace(getRoleLanding('student', true)); return; }
 
       await renderStudentHeader({ activeTab: 'sollicitaties' });
 
@@ -699,9 +826,10 @@
     // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
     window.addEventListener('unhandledrejection', function(e) {
       if (e.reason && (
-        e.reason.message?.includes('JWT') ||
-        e.reason.message?.includes('session') ||
-        e.reason.code === 'PGRST301'
+        e.reason.code === 'PGRST301' ||
+        e.reason.status === 401 ||
+        e.reason.message === 'Auth session missing!' ||
+        e.reason.message?.includes('JWT expired')
       )) {
         sessionStorage.clear();
         window.location.replace('auth.html?expired=1');

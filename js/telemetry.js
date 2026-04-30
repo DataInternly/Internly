@@ -4,6 +4,42 @@
 // Laad dit bestand ALTIJD als laatste script, na js/utils.js en js/supabase.js.
 // Alle modules degraderen graceful als afhankelijkheden ontbreken.
 // ─────────────────────────────────────────────────────────────────────────────
+//
+// COVERAGE-TIERS (sprint 29 april 2026 — Hal V3 verificatie)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// TIER-1 — pagina's met pre-load shim. _fCtx is altijd gedefinieerd
+//          (echte impl OF stub als telemetry.js 404't). Inline page-locals
+//          MOGEN typeof-guards NIET gebruiken — ze zijn ruis en verbergen
+//          niets. Direct aanroepen: _fCtx._init('name'), _fCtx._plant(el),
+//          _fCtx._guard('label'), _fCtx.blockIfFilled('label').
+//
+//   - auth.html
+//   - index.html
+//   - la-sign.html
+//   - international-student-dashboard.html
+//   - international-school-dashboard.html
+//
+// TIER-2 — pagina's zonder pre-load shim. _fCtx kan undefined zijn als
+//          telemetry.js niet vóór deze pagina-modules geladen wordt of
+//          als de pagina helemaal geen telemetry coverage heeft.
+//          SHARED MODULES (js/account.js, js/buddy.js, js/calendar.js,
+//          etc.) draaien op zowel TIER-1 als TIER-2 pagina's en MOETEN
+//          daarom defensief typeof gebruiken:
+//            if (typeof _fCtx !== 'undefined' && _fCtx._guard &&
+//                !_fCtx._guard('account-save')) return;
+//
+//   Pagina's die op dit moment shared modules laden zonder shim:
+//   - buddy-dashboard.html       (laadt account.js, buddy.js)
+//   - bbl-dashboard.html         (laadt account.js)
+//   - bbl-hub.html               (laadt buddy.js)
+//   - discover.html              (laadt buddy.js)
+//   - student-profile.html       (laadt buddy.js)
+//
+// REGEL — page-locals (inline <script> in HTML) op TIER-1 pagina's: GEEN
+//         typeof-guards. Shared modules in js/*.js: WEL typeof-guards.
+//         Bij twijfel: shared module → typeof, page-local → direct.
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOK 0 — _cfg
@@ -243,10 +279,13 @@ async function _yield() {
 const _fCtx = (function() {
   if (!_cfg.honeypot.enabled)
     return {
+      _init(p)        { /* no-op when honeypot disabled */
+        try { _tel.report('page_init', { page: String(p || 'unknown'), enabled: false }); } catch (e) {}
+      },
       _plant() {},
-      _guard() {},
-      isFilled()     { return false; },
-      blockIfFilled(){ return false; }
+      _guard()        { return true; },     // disabled → always allow through
+      isFilled()      { return false; },
+      blockIfFilled() { return false; }
     };
 
   let _plantCount = 0; // telt geplante velden voor unieke IDs
@@ -272,24 +311,38 @@ const _fCtx = (function() {
     containerEl.appendChild(t);
   }
 
-  // Voor echte <form>-elementen met submit-event.
-  function _guard(formEl, onBlocked) {
-    if (!formEl) return;
-    _plant(formEl);
-    formEl.addEventListener('submit', e => {
-      // zoek trap binnen deze specifieke form
-      const trap = formEl.querySelector('[data-hp-id]');
-      if ((trap?.value?.length ?? 0) > 0) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        _sess._inc(
-          'honeypot',
-          _cfg.honeypot.score,
-          'form submit with trap filled'
-        );
-        if (typeof onBlocked === 'function') onBlocked();
-      }
-    });
+  // Polymorf:
+  //   _guard(formEl, onBlocked)   — legacy: bind submit-listener op een <form>
+  //   _guard('label')             — boolean check: true = OK, false = blocked
+  //   _guard()                    — defensieve no-op, true (allow)
+  function _guard(arg, onBlocked) {
+    // Legacy form-listener invocation
+    if (arg && typeof arg === 'object' && typeof arg.addEventListener === 'function') {
+      _plant(arg);
+      arg.addEventListener('submit', e => {
+        const trap = arg.querySelector('[data-hp-id]');
+        if ((trap?.value?.length ?? 0) > 0) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          _sess._inc('honeypot', _cfg.honeypot.score, 'form submit with trap filled');
+          if (typeof onBlocked === 'function') onBlocked();
+        }
+      });
+      return true; // form listener attached
+    }
+    // String-label invocation: returns true when OK to proceed
+    const label = typeof arg === 'string' ? arg : 'unlabeled';
+    return !blockIfFilled(label);
+  }
+
+  // Init-tag voor SecurityLog (_tel) — vervangt de inline init op pagina's.
+  // Geen DOM-side-effects: de echte boot draait al via BLOK 10 (_bootReady).
+  function _init(pageName) {
+    try {
+      _tel.report('page_init', { page: String(pageName || 'unknown'), ts: Date.now() });
+    } catch (e) {
+      // Nooit de pagina laten breken vanwege telemetry
+    }
   }
 
   // Controleert ALLE geplante traps op de pagina.
@@ -309,8 +362,14 @@ const _fCtx = (function() {
     return true;
   }
 
-  return { _plant, _guard, isFilled, blockIfFilled };
+  return { _init, _plant, _guard, isFilled, blockIfFilled };
 })();
+
+// ─ Window-export — pre-load shim op pagina's wordt hierdoor overschreven. ─
+// Pagina's plaatsen vóór dit script een minimale window._fCtx-stub zodat
+// inline calls (_fCtx._init / _fCtx._plant / _fCtx._guard) altijd defined
+// zijn, ook als telemetry.js 404't of door een blocker tegengehouden wordt.
+window._fCtx = _fCtx;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOK 5 — _env

@@ -13,9 +13,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/buddy.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     body { background: #f4f3ef; }
@@ -86,7 +88,7 @@
     .field textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
 
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media(max-width:520px) { .field-row { grid-template-columns: 1fr; } }
+    @media(max-width:480px) { .field-row { grid-template-columns: 1fr; } }
 
     .char-count { font-size: .75rem; color: #9ca3af; text-align: right; margin-top: 3px; }
     .char-count.warn { color: #FF7E42; }
@@ -1243,7 +1245,7 @@ async function submitProfile() {
       const sector = document.getElementById('opdracht_domein').value;
       await triggerStudentMatching(currentUser?.id, sector);
     }
-    routeStudentByMode({ bbl_mode: newBblMode });
+    window.location.href = getRoleLanding('student', newBblMode === true);
   }
 }
 
@@ -1256,9 +1258,10 @@ function showLoading(containerId, tekst) {
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');

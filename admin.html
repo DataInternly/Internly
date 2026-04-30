@@ -10,37 +10,40 @@
   <link rel="manifest" href="/manifest.json">
   <title>Beheer — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
     :root {
-      --orange:      #FF7E42;
-      --orange-dark: #e05c1a;
-      --orange-bg:   #fdf0e8;
-      --ink:         #0d1520;
-      --ink2:        #374151;
-      --ink3:        #6b7280;
+      /* Pagina-aliassen → globale tokens (css/style.css) */
+      --orange:      var(--c-orange, #FF7E42);
+      --orange-dark: var(--c-orange-deep, #e05c1a);
+      --orange-bg:   var(--c-orange-bg, #fdf0e8);
+      --ink:         var(--c-ink, #0d1520);
+      --ink2:        var(--c-ink2, #374151);
+      --ink3:        var(--c-ink3, #6b7280);
       --ink4:        #9ca3af;
-      --bg:          #f4f3ef;
+      --bg:          var(--c-cream-warm, #f4f3ef);
       --white:       #ffffff;
-      --border:      #f0f0ee;
+      --border:      var(--line-subtle, #f0f0ee);
       --border2:     #e2e8f0;
-      --red:         #b82020;
+      --red:         var(--c-red, #b82020);
       --red-bg:      #fdeaea;
-      --green:       #1a7a48;
-      --green-bg:    #e8f5ee;
-      --r:           16px;
-      --r-sm:        8px;
+      --green:       var(--c-green, #1a7a48);
+      --green-bg:    var(--c-green-bg, #e8f5ee);
+      --r:           var(--r-md, 16px);
+      --r-sm:        var(--r-sm, 8px);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; }
     body {
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--font-body, 'Outfit', sans-serif);
       background: var(--bg);
       color: var(--ink);
       font-size: 15px;
@@ -49,33 +52,37 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── TOPBAR ── */
+    /* ── TOPBAR (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      background: var(--ink);
+      background: rgba(244,243,239,.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
       height: 56px; padding: 0 24px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .topbar-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.2rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.2rem; font-weight: 700; color: var(--ink);
       letter-spacing: -.02em; text-decoration: none;
     }
-    .topbar-logo span { color: var(--orange); }
+    .topbar-logo span { color: var(--orange-dark); }
     .topbar-right { display: flex; align-items: center; gap: 16px; }
     .admin-pill {
-      background: var(--orange);
+      background: var(--orange-dark);
       color: #fff;
-      font-size: .72rem; font-weight: 700;
+      font-family: var(--font-mono, 'DM Mono', monospace);
+      font-size: .70rem; font-weight: 500;
       padding: 4px 10px; border-radius: 20px;
-      letter-spacing: .04em; text-transform: uppercase;
+      letter-spacing: .08em; text-transform: uppercase;
     }
     .topbar-link {
-      color: rgba(255,255,255,.6); text-decoration: none;
+      color: var(--ink2); text-decoration: none;
       font-size: .85rem; font-weight: 500; cursor: pointer;
       background: none; border: none;
     }
-    .topbar-link:hover { color: #fff; }
+    .topbar-link:hover { color: var(--ink); }
 
     /* ── LAYOUT ── */
     .layout {
@@ -691,12 +698,13 @@
         })
         .eq('profile_id', entry.schoolProfileId);
 
-      await db.from('notifications').insert({
-        user_id: entry.schoolProfileId,
-        type:    'bundeling_approved',
-        message: 'Je bundelverzoek is goedgekeurd. Je opleidingen zijn samengevoegd onder één licentie. Log in om je dashboard te bekijken.',
-        read:    false
-      });
+      await createNotification(
+        entry.schoolProfileId,
+        'bundeling_approved',
+        null,
+        null,
+        'Je bundelverzoek is goedgekeurd. Je opleidingen zijn samengevoegd onder één licentie. Log in om je dashboard te bekijken.'
+      );
 
       notify('Verzoek goedgekeurd');
       loadBundelVerzoeken();
@@ -726,12 +734,13 @@
         })
         .eq('id', requestId);
 
-      await db.from('notifications').insert({
-        user_id: entry.schoolProfileId,
-        type:    'bundeling_denied',
-        message: 'Je bundelverzoek is helaas niet goedgekeurd. Toelichting: ' + adminNote,
-        read:    false
-      });
+      await createNotification(
+        entry.schoolProfileId,
+        'bundeling_denied',
+        null,
+        null,
+        'Je bundelverzoek is helaas niet goedgekeurd. Toelichting: ' + adminNote
+      );
 
       notify('Verzoek afgewezen');
       loadBundelVerzoeken();
@@ -791,9 +800,10 @@
   // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
   window.addEventListener('unhandledrejection', function(e) {
     if (e.reason && (
-      e.reason.message?.includes('JWT') ||
-      e.reason.message?.includes('session') ||
-      e.reason.code === 'PGRST301'
+      e.reason.code === 'PGRST301' ||
+      e.reason.status === 401 ||
+      e.reason.message === 'Auth session missing!' ||
+      e.reason.message?.includes('JWT expired')
     )) {
       sessionStorage.clear();
       window.location.replace('auth.html?expired=1');

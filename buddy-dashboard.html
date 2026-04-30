@@ -19,50 +19,60 @@
   <meta name="theme-color" content="#6d28d9">
   <title>Buddy Dashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/account.js"></script>
   <script src="js/buddy.js"></script>
+  <script src="js/swipes.js"></script>
+  <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Outfit', sans-serif;
-      background: #f4f3ef;
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      background: var(--c-cream-warm, #f4f3ef);
+      color: var(--c-ink, #0d1520);
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
     }
 
-    /* ── Topbar ── */
+    /* ── Topbar (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
-      background: linear-gradient(135deg, #6d28d9, #4c1d95);
+      background: rgba(244,243,239,.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line-subtle, #f0f0ee);
       padding: 0 24px; height: 56px;
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
       position: sticky; top: 0; z-index: 100;
     }
     .topbar-logo {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.2rem; font-weight: 700; color: #fff;
+      font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+      font-size: 1.2rem; font-weight: 700; color: var(--c-ink, #0d1520);
       letter-spacing: -.02em; text-decoration: none;
     }
-    .topbar-logo span { color: #FF7E42; }
+    .topbar-logo span { color: var(--c-orange-deep, #e05c1a); }
     .topbar-tag {
-      font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      font-family: var(--font-mono, 'DM Mono', monospace);
       padding: 3px 9px; border-radius: 20px;
-      background: rgba(255,255,255,.15); color: rgba(255,255,255,.9); flex-shrink: 0;
+      background: rgba(109,40,217,.10); color: var(--c-buddy-purple); flex-shrink: 0;
     }
     .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .topbar-user  { font-size: .82rem; color: rgba(255,255,255,.65); }
-    .topbar-signout {
-      background: none; border: none; color: rgba(255,255,255,.45);
-      font-size: .75rem; font-family: 'Outfit', sans-serif;
+    .topbar-user  { font-size: .82rem; color: var(--c-ink2, #374151); }
+    .topbar-signout, .topbar-back {
+      background: none; border: none; color: var(--c-ink3, #6b7280);
+      font-size: .75rem; font-family: var(--font-body, 'Outfit', sans-serif);
       cursor: pointer; padding: 5px; border-radius: 6px; transition: color .15s;
     }
-    .topbar-signout:hover { color: rgba(255,255,255,.8); }
-    .topbar-privacy { font-size: .72rem; color: rgba(255,255,255,.3); text-decoration: none; padding: 5px 4px; transition: color .15s; }
-    .topbar-privacy:hover { color: rgba(255,255,255,.6); }
+    .topbar-signout:hover { color: var(--c-ink, #0d1520); }
+    .topbar-back:hover { color: var(--c-ink, #0d1520); }
+    .topbar-privacy { font-size: .72rem; color: var(--c-ink3, #6b7280); text-decoration: none; padding: 5px 4px; transition: color .15s; }
+    .topbar-privacy:hover { color: var(--c-ink, #0d1520); }
 
     /* ── Shell ── */
     .shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
@@ -99,7 +109,7 @@
     .pair-av {
       width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 600; background: #ede9fe; color: #6d28d9;
+      font-size: 13px; font-weight: 600; background: var(--c-buddy-purple-bg); color: var(--c-buddy-purple);
     }
     .pair-name  { font-size: 13px; font-weight: 500; color: #0d1520; }
     .pair-meta  { font-size: 11px; color: #9ca3af; }
@@ -112,7 +122,7 @@
       border: 1px solid; transition: opacity .1s;
     }
     .btn-sm:hover { opacity: .82; }
-    .btn-primary { background: #6d28d9; color: #fff; border-color: #6d28d9; }
+    .btn-primary { background: var(--c-buddy-purple); color: #fff; border-color: var(--c-buddy-purple); }
     .btn-ghost-sm{ background: transparent; color: #4b5563; border-color: rgba(15,17,23,.15); }
     .btn-danger  { background: #fdecea; color: #b82020; border-color: rgba(184,41,26,.2); }
 
@@ -125,7 +135,7 @@
       background: #e2e8f0; position: relative;
       cursor: pointer; border: none; transition: background .2s; flex-shrink: 0;
     }
-    .toggle-sw.on { background: #6d28d9; }
+    .toggle-sw.on { background: var(--c-buddy-purple); }
     .toggle-sw::after {
       content: ''; position: absolute; top: 3px; left: 3px;
       width: 18px; height: 18px; border-radius: 50%;
@@ -146,10 +156,10 @@
     }
     .profile-field input:focus,
     .profile-field select:focus,
-    .profile-field textarea:focus { border-color: #6d28d9; }
+    .profile-field textarea:focus { border-color: var(--c-buddy-purple); }
     .profile-field textarea { resize: vertical; min-height: 72px; }
     .profile-save-btn {
-      background: #6d28d9; color: #fff; border: none;
+      background: var(--c-buddy-purple); color: #fff; border: none;
       padding: 9px 22px; border-radius: 50px;
       font-family: 'Outfit', sans-serif; font-size: .88rem; font-weight: 600;
       cursor: pointer; transition: background .15s;
@@ -159,7 +169,7 @@
 
     /* ── Empty state ── */
     .empty { text-align: center; padding: 20px; font-size: .88rem; color: #9ca3af; }
-    .empty a { color: #6d28d9; font-weight: 600; text-decoration: none; }
+    .empty a { color: var(--c-buddy-purple); font-weight: 600; text-decoration: none; }
 
     /* ── Availability grid ── */
     .avail-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
@@ -168,7 +178,7 @@
       border: 1.5px solid rgba(15,17,23,.12); cursor: pointer;
       transition: all .1s; background: #fff; color: #4b5563;
     }
-    .avail-day.selected { background: #ede9fe; color: #6d28d9; border-color: rgba(109,40,217,.4); }
+    .avail-day.selected { background: var(--c-buddy-purple-bg); color: var(--c-buddy-purple); border-color: rgba(109,40,217,.4); }
     .avail-note { font-size: 11px; color: #9ca3af; margin-top: 4px; }
 
     /* ── Notif toast ── */
@@ -185,7 +195,7 @@
 
     /* ── Buddy context block ── */
     .buddy-context {
-      background: #f8f7ff; border: 1px solid rgba(109,40,217,.1);
+      background: var(--c-buddy-purple-light); border: 1px solid rgba(109,40,217,.1);
       border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
     }
     .bc-name { font-size: .82rem; font-weight: 600; color: #0d1520; margin-bottom: 3px; }
@@ -200,6 +210,54 @@
     .req-who   { font-size: .88rem; font-weight: 500; color: #0d1520; margin-bottom: 4px; }
     .req-msg   { font-size: .78rem; color: #6b7280; margin-bottom: 8px; font-style: italic; }
     .req-btns  { display: flex; gap: 6px; }
+    .req-badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+    .badge-worldwide {
+      font-size: 10px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px;
+      background: var(--c-green-bg, #e8f5ee); color: var(--c-green, #1a7a48);
+      letter-spacing: .04em;
+    }
+
+    /* ── Internly Worldwide setting ── */
+    .lang-tags-box {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 8px 10px; margin-top: 6px;
+      border: 1.5px solid rgba(15,17,23,.12);
+      border-radius: 8px; background: #fff;
+      min-height: 40px;
+      align-items: center;
+    }
+    .lang-tags-box:focus-within { border-color: var(--c-buddy-purple); }
+    .lang-chip {
+      background: var(--c-buddy-purple-bg);
+      color: var(--c-buddy-purple);
+      padding: 3px 9px; border-radius: 20px;
+      font-size: .76rem;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .lang-chip button {
+      background: none; border: none;
+      color: var(--c-buddy-purple); cursor: pointer;
+      padding: 0; font-size: .95rem; line-height: 1;
+    }
+    .lang-tags-input {
+      flex: 1; min-width: 70px;
+      border: none; outline: none;
+      font-size: .82rem; font-family: 'Outfit', sans-serif;
+      background: transparent;
+    }
+    .intl-section-title {
+      font-size: .9rem; font-weight: 700;
+      color: var(--c-green, #1a7a48);
+      margin-bottom: 4px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+    }
+    .intl-section-desc {
+      font-size: .8rem; color: #6b7280;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    #intl-langs-row { transition: opacity .2s; }
 
     @media (max-width: 480px) {
       .shell { padding: 14px 12px 80px; }
@@ -218,6 +276,7 @@
     <span class="topbar-user" id="topbarUser"></span>
     <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
     <a href="spelregels.html" class="topbar-privacy">Spelregels</a>
+    <button class="topbar-back" onclick="goBack('index.html')" title="Vorige pagina">← Terug</button>
     <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
   </div>
 </div>
@@ -247,44 +306,144 @@
     </div>
   </div>
 
-  <!-- ── Beschikbaarheid ── -->
-  <div class="card">
-    <div class="card-label">Beschikbaarheid</div>
-    <div class="avail-grid" id="availGrid"></div>
-    <div class="avail-note">Klik op de dagen waarop je beschikbaar bent voor een gesprek. Niet bindend.</div>
+  <!-- ── Interesse in jou ── -->
+  <div class="card" id="incoming-likes-section" style="display:none">
+    <div class="card-label">Interesse in jou</div>
+    <p style="font-size:.82rem;color:#6b7280;margin-bottom:12px;">Studenten en bedrijven die jou een like hebben gestuurd. Accepteer om te koppelen.</p>
+    <div id="incoming-likes-list"></div>
   </div>
 
-  <!-- ── Mijn profiel ── -->
+  <!-- ── Mijn profiel (uitgebreid) ── -->
   <div class="card">
     <div class="card-label">Mijn profiel</div>
-    <div class="profile-field">
-      <label>Naam</label>
-      <input type="text" id="pf-naam" placeholder="Jouw naam">
+    <form id="buddy-profile-form" onsubmit="event.preventDefault(); saveBuddyProfile(collectBuddyProfileData(this))">
+
+      <div class="profile-field">
+        <label>Kennisgebieden</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="IT &amp; Software"> IT &amp; Software
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Marketing"> Marketing &amp; Communicatie
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Finance"> Finance &amp; Economie
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="HR"> HR &amp; Organisatie
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Duurzaamheid"> Duurzaamheid &amp; ESG
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Zorg"> Zorg &amp; Welzijn
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Engineering"> Techniek &amp; Engineering
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Design"> Design &amp; UX
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Onderwijs"> Onderwijs
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-kg value="Overig"> Overig
+          </label>
+        </div>
+      </div>
+
+      <div class="profile-field" style="margin-top:14px;">
+        <label>Specialiteiten</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Loopbaancoaching"> Loopbaancoaching
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Netwerken"> Netwerken
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Presenteren"> Presenteren
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Projectmanagement"> Projectmanagement
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Onderhandelen"> Onderhandelen
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Leidinggeven"> Leidinggeven
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Stressmanagement"> Stressmanagement
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
+            <input type="checkbox" data-sp value="Werkplezier"> Werkplezier &amp; motivatie
+          </label>
+        </div>
+      </div>
+
+      <div class="profile-field" style="margin-top:14px;">
+        <label>Grove beschikbaarheid</label>
+        <select id="bp-grove-beschikbaarheid">
+          <option value="">Kies een optie</option>
+          <option value="1-2u/week">1–2 uur per week</option>
+          <option value="3-5u/week">3–5 uur per week</option>
+          <option value="6-10u/week">6–10 uur per week</option>
+          <option value="10+u/week">Meer dan 10 uur per week</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+        <div class="profile-field" style="margin-top:0;">
+          <label>Postcode</label>
+          <input type="text" id="bp-postcode" placeholder="1234 AB" maxlength="7">
+        </div>
+        <div class="profile-field" style="margin-top:0;">
+          <label>Woonplaats</label>
+          <input type="text" id="bp-stad" placeholder="Amsterdam">
+        </div>
+      </div>
+
+      <div class="profile-field" style="margin-top:14px;">
+        <label>Leeftijd</label>
+        <input type="number" id="bp-leeftijd" placeholder="65" min="18" max="120" style="max-width:120px;">
+      </div>
+
+      <div class="profile-field" style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="bp-actief" checked style="width:16px;height:16px;cursor:pointer;">
+        <label for="bp-actief" style="margin:0;font-weight:500;cursor:pointer;">Profiel actief — zichtbaar voor studenten</label>
+      </div>
+
+      <button type="submit" class="profile-save-btn" style="margin-top:18px;">Profiel opslaan</button>
+    </form>
+  </div>
+
+  <!-- ── Internly Worldwide (internationale studenten) ── -->
+  <div class="card">
+    <div class="card-label">Internly Worldwide</div>
+    <p class="intl-section-desc">
+      Internationale studenten zoeken ook buddy-begeleiding. Zet dit aan als je
+      beschikbaar bent voor een internationale stagiair en geef de talen aan
+      die je spreekt.
+    </p>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-lbl">Zichtbaar voor internationale studenten</div>
+        <div class="toggle-sub">Je profiel verschijnt in de Internly Worldwide buddy-zoeker</div>
+      </div>
+      <button class="toggle-sw" id="intlToggle" onclick="toggleIntl()" aria-pressed="false"></button>
     </div>
-    <div class="profile-field">
-      <label>Sector</label>
-      <select id="pf-sector">
-        <option value="">Kies je sector</option>
-        <option value="IT">IT &amp; Software</option>
-        <option value="Marketing">Marketing &amp; Communicatie</option>
-        <option value="Finance">Finance &amp; Economie</option>
-        <option value="HR">HR &amp; Organisatie</option>
-        <option value="Duurzaamheid">Duurzaamheid &amp; ESG</option>
-        <option value="Gezondheid">Zorg &amp; Welzijn</option>
-        <option value="Engineering">Techniek &amp; Engineering</option>
-        <option value="Design">Design &amp; UX</option>
-        <option value="Niche">Niche / Overig</option>
-      </select>
+
+    <div id="intl-langs-row" style="display:none;margin-top:14px">
+      <div class="toggle-lbl" style="margin-bottom:4px">Talen voor internationale studenten</div>
+      <div class="toggle-sub" style="margin-bottom:6px">Druk Enter na elke taal. Veelgebruikt: EN, DE, FR, ES, NL, AR, ZH</div>
+      <div class="lang-tags-box" id="buddy-lang-tags" onclick="document.getElementById('buddy-lang-input').focus()">
+        <input type="text" id="buddy-lang-input" class="lang-tags-input" placeholder="EN, DE, FR…" maxlength="20">
+      </div>
     </div>
-    <div class="profile-field">
-      <label>Expertisegebieden <span style="font-weight:400;color:#9ca3af;font-size:.76rem">komma-gescheiden</span></label>
-      <input type="text" id="pf-expertise" placeholder="Bijv. leiderschap, agile, strategie">
-    </div>
-    <div class="profile-field">
-      <label>Korte bio</label>
-      <textarea id="pf-bio" placeholder="Vertel iets over jezelf en wat studenten van jou kunnen leren."></textarea>
-    </div>
-    <button class="profile-save-btn" id="saveProfileBtn" onclick="saveProfile()">Profiel opslaan</button>
   </div>
 
   <!-- ── Privacy & instellingen ── -->
@@ -310,6 +469,12 @@
     </div>
   </div>
 
+  <!-- ── Account ── -->
+  <div class="card">
+    <div class="card-label">⚙️ Account</div>
+    <div id="account-container"></div>
+  </div>
+
 </div><!-- /shell -->
 
 <script>
@@ -319,8 +484,6 @@ let currentUser    = null;
 let waitlistRow    = null;  // this buddy's waitlist entry
 let activePairs    = [];
 let pendingReqs    = [];
-let _selectedDays  = new Set();
-const DAYS = ['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -331,60 +494,6 @@ function showLoading(containerId, tekst) {
 }
 
 function signOut() { performLogout(); }
-
-// ── Availability grid ──────────────────────────────────────────────────────
-
-function renderAvailGrid() {
-  const grid = document.getElementById('availGrid');
-  grid.innerHTML = DAYS.map(d => `
-    <button class="avail-day${_selectedDays.has(d) ? ' selected' : ''}" onclick="toggleDay('${d}')">${d}</button>
-  `).join('');
-}
-
-function toggleDay(day) {
-  if (_selectedDays.has(day)) _selectedDays.delete(day);
-  else _selectedDays.add(day);
-  renderAvailGrid();
-  saveAvailability();
-}
-
-async function saveAvailability() {
-  const days = [..._selectedDays];
-  // Lokale write voor snelheid
-  localStorage.setItem('buddy_avail_' + (currentUser?.id || ''), JSON.stringify(days));
-  // DB write naar waitlist.available_days
-  if (waitlistRow?.id) {
-    const { error } = await db
-      .from('waitlist')
-      .update({ available_days: days })
-      .eq('id', waitlistRow.id);
-    if (error) console.warn('[buddy-dash] available_days write fout:', error.message);
-  }
-}
-
-async function loadAvailability() {
-  // DB leidend
-  if (waitlistRow?.id) {
-    try {
-      const { data: wl } = await db
-        .from('waitlist')
-        .select('available_days')
-        .eq('id', waitlistRow.id)
-        .maybeSingle();
-      if (wl?.available_days?.length) {
-        _selectedDays = new Set(wl.available_days);
-        renderAvailGrid();
-        return;
-      }
-    } catch(e) {}
-  }
-  // Lokale fallback
-  try {
-    const saved = JSON.parse(localStorage.getItem('buddy_avail_' + (currentUser?.id || '')) || '[]');
-    _selectedDays = new Set(saved);
-  } catch(e) { _selectedDays = new Set(); }
-  renderAvailGrid();
-}
 
 // ── Pairs (active couplings) ───────────────────────────────────────────────
 
@@ -502,7 +611,7 @@ async function endPair(pairId) {
     .update({ status: 'ended', ended_at: new Date().toISOString() })
     .eq('id', pairId)
     .or(`requester_id.eq.${uid},receiver_id.eq.${uid}`);
-  if (error) { notify('Beëindigen mislukt — probeer opnieuw'); return; }
+  if (error) { notify('Beëindigen mislukt — probeer opnieuw', false); return; }
   activePairs = activePairs.filter(p => String(p.id) !== pairId);
   renderPairs();
   notify('Koppeling beëindigd');
@@ -514,7 +623,7 @@ async function loadPendingRequests() {
   const { data, error } = await db
     .from('buddy_requests')
     .select(`
-      id, type, message, created_at,
+      id, type, message, created_at, student_type,
       sender:profiles!buddy_requests_requester_id_fkey(id, naam)
     `)
     .eq('receiver_id', currentUser.id)
@@ -536,8 +645,13 @@ function renderRequests() {
   list.innerHTML = pendingReqs.map(r => {
     const reqId = String(r.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
     const name  = escapeHtml(r.sender?.naam || 'Student');
+    const isIntl = r.student_type === 'international';
+    const badge = isIntl
+      ? '<span class="badge-worldwide">🌍 Internly Worldwide</span>'
+      : '';
     return `
       <div class="req-card">
+        ${badge ? `<div class="req-badge-row">${badge}</div>` : ''}
         <div class="req-who">${name} vraagt een buddy-koppeling aan</div>
         ${r.message ? `<div class="req-msg">&ldquo;${escapeHtml(r.message)}&rdquo;</div>` : ''}
         <div class="req-btns">
@@ -557,10 +671,10 @@ async function acceptRequest(reqId) {
     .eq('receiver_id', currentUser.id)
     .maybeSingle();
 
-  if (rErr || !req) { notify('Verzoek niet gevonden'); return; }
+  if (rErr || !req) { notify('Verzoek niet gevonden', false); return; }
 
   const { error: updErr } = await db.from('buddy_requests').update({ status: 'accepted' }).eq('id', reqId);
-  if (updErr) { notify('Accepteren mislukt — probeer opnieuw'); return; }
+  if (updErr) { notify('Accepteren mislukt — probeer opnieuw', false); return; }
 
   // 2. Create pair
   const { data: pair, error: pErr } = await db
@@ -570,7 +684,7 @@ async function acceptRequest(reqId) {
   if (pErr) {
     // Roll back acceptance
     await db.from('buddy_requests').update({ status: 'pending' }).eq('id', reqId).catch(e => { console.warn('[buddy] rollback request mislukt:', e); });
-    notify('Koppeling aanmaken mislukt — probeer opnieuw'); return;
+    notify('Koppeling aanmaken mislukt — probeer opnieuw', false); return;
   }
   if (!pair) {
     notify('Koppeling bevestigd — student wordt op de hoogte gesteld');
@@ -597,44 +711,9 @@ async function declineRequest(reqId) {
     .update({ status: 'declined' })
     .eq('id', reqId)
     .eq('receiver_id', currentUser.id);
-  if (error) { notify('Afwijzen mislukt'); return; }
+  if (error) { notify('Afwijzen mislukt', false); return; }
   pendingReqs = pendingReqs.filter(r => String(r.id) !== reqId);
   renderRequests();
-}
-
-// ── Profile save ───────────────────────────────────────────────────────────
-
-async function saveProfile() {
-  const btn   = document.getElementById('saveProfileBtn');
-  btn.disabled = true;
-  btn.textContent = 'Opslaan…';
-
-  const naam      = document.getElementById('pf-naam').value.trim();
-  const sector    = document.getElementById('pf-sector').value;
-  const expertRaw = document.getElementById('pf-expertise').value.trim();
-  const bio       = document.getElementById('pf-bio').value.trim();
-  const expertise = expertRaw ? expertRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
-
-  // Update profiles table (naam)
-  const { error: pErr } = await db.from('profiles').update({ naam }).eq('id', currentUser.id);
-  if (pErr) console.warn('[buddy-dash] profile update fout:', pErr.message);
-
-  // Update waitlist entry (sector, expertise_tags)
-  if (waitlistRow?.id) {
-    const { error: wErr } = await db.from('waitlist')
-      .update({ naam, sector: sector || null, expertise_tags: expertise.length ? expertise : null })
-      .eq('id', waitlistRow.id);
-    if (wErr) console.warn('[buddy-dash] waitlist update fout:', wErr.message);
-  }
-
-  // Bio is stored in user metadata (no waitlist column)
-  if (bio) {
-    await db.auth.updateUser({ data: { bio } }).catch(e => { console.warn('[buddy] bio metadata update mislukt:', e); });
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Profiel opslaan';
-  notify('Profiel bijgewerkt!');
 }
 
 // ── Anon + Pause toggles ───────────────────────────────────────────────────
@@ -703,6 +782,112 @@ async function togglePause() {
   notify(paused ? 'Matching gepauzeerd — je bent nu onzichtbaar voor nieuwe studenten.' : 'Matching hervat!');
 }
 
+// ── Internly Worldwide settings (open_to_international + buddy_languages) ─
+
+let buddyLangs = [];
+
+async function loadIntlSettings() {
+  if (!currentUser) return;
+  try {
+    const { data, error } = await db.from('profiles')
+      .select('open_to_international, buddy_languages')
+      .eq('id', currentUser.id)
+      .maybeSingle();
+    if (error) throw error;
+
+    const open = !!(data && data.open_to_international);
+    buddyLangs = Array.isArray(data?.buddy_languages) ? data.buddy_languages.slice() : [];
+    _setToggle('intlToggle', open);
+    document.getElementById('intl-langs-row').style.display = open ? 'block' : 'none';
+    renderBuddyLangsChips();
+  } catch (err) {
+    console.error('[buddy-dash] loadIntlSettings fout:', err?.message || err);
+    notify('Kon internationale instelling niet laden', false);
+  }
+}
+
+async function toggleIntl() {
+  const cur = document.getElementById('intlToggle')?.classList.contains('on') ?? false;
+  const next = !cur;
+  _setToggle('intlToggle', next);
+  document.getElementById('intl-langs-row').style.display = next ? 'block' : 'none';
+  await saveIntlSettings();
+}
+
+async function saveIntlSettings() {
+  if (!currentUser) { notify('Niet ingelogd', false); return; }
+  const open = document.getElementById('intlToggle')?.classList.contains('on') ?? false;
+  // Sweep any pending text in the input as a final tag
+  const inp = document.getElementById('buddy-lang-input');
+  if (inp && inp.value.trim()) {
+    addBuddyLang(inp.value.trim().replace(/,/g, ''));
+    inp.value = '';
+  }
+  try {
+    const { error } = await db.from('profiles')
+      .update({
+        open_to_international: open,
+        buddy_languages:       buddyLangs.slice()
+      })
+      .eq('id', currentUser.id);
+    if (error) throw error;
+    notify(open
+      ? 'Zichtbaar voor internationale studenten'
+      : 'Verborgen voor internationale studenten');
+  } catch (err) {
+    console.error('[buddy-dash] saveIntlSettings fout:', err?.message || err);
+    notify('Kon instelling niet opslaan — probeer opnieuw', false);
+  }
+}
+
+function addBuddyLang(s) {
+  const norm = String(s || '').trim();
+  if (!norm) return;
+  if (buddyLangs.length >= 10) return;
+  if (buddyLangs.includes(norm)) return;
+  buddyLangs.push(norm);
+  renderBuddyLangsChips();
+  // Persist immediately so the user doesn't lose it on refresh
+  saveIntlSettings().catch(err => console.error('[buddy-dash] addBuddyLang persist fout:', err?.message || err));
+}
+
+function removeBuddyLang(s) {
+  const i = buddyLangs.indexOf(s);
+  if (i > -1) buddyLangs.splice(i, 1);
+  renderBuddyLangsChips();
+  saveIntlSettings().catch(err => console.error('[buddy-dash] removeBuddyLang persist fout:', err?.message || err));
+}
+
+function renderBuddyLangsChips() {
+  const box = document.getElementById('buddy-lang-tags');
+  const inp = document.getElementById('buddy-lang-input');
+  if (!box || !inp) return;
+  box.querySelectorAll('.lang-chip').forEach(c => c.remove());
+  buddyLangs.forEach(l => {
+    const chip = document.createElement('span');
+    chip.className = 'lang-chip';
+    chip.appendChild(document.createTextNode(l));
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.textContent = '×';
+    closeBtn.addEventListener('click', () => removeBuddyLang(l));
+    chip.appendChild(closeBtn);
+    box.insertBefore(chip, inp);
+  });
+}
+
+function initBuddyLangsInput() {
+  const inp = document.getElementById('buddy-lang-input');
+  if (!inp) return;
+  inp.addEventListener('keydown', function (e) {
+    if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
+      e.preventDefault();
+      addBuddyLang(this.value.trim().replace(/,/g, ''));
+      this.value = '';
+    }
+  });
+}
+
 // ── Realtime ───────────────────────────────────────────────────────────────
 
 let realtimeSub = null;
@@ -740,9 +925,10 @@ window.addEventListener('beforeunload', () => {
 // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
-    e.reason.message?.includes('JWT') ||
-    e.reason.message?.includes('session') ||
-    e.reason.code === 'PGRST301'
+    e.reason.code === 'PGRST301' ||
+    e.reason.status === 401 ||
+    e.reason.message === 'Auth session missing!' ||
+    e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
     window.location.replace('auth.html?expired=1');
@@ -775,6 +961,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // 2b. AccountModule render — pas nu draaien, buddy-rol bevestigd
+  window._currentUserId = user.id;
+  AccountModule.renderAccountScreen('account-container', 'nl');
+
   // 3. Welkomstgroet
   const naam = profile.naam || user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Buddy';
   const h = new Date().getHours();
@@ -791,32 +981,39 @@ window.addEventListener('DOMContentLoaded', async () => {
     .maybeSingle();
   waitlistRow = wl;
 
-  // 5. Profiel-form voorinvullen
-  document.getElementById('pf-naam').value = naam;
-  if (wl?.sector) {
-    const sel = document.getElementById('pf-sector');
-    if (sel) sel.value = wl.sector;
-  }
-  if (wl?.expertise_tags?.length) {
-    document.getElementById('pf-expertise').value = wl.expertise_tags.join(', ');
-  }
-  const bio = user.user_metadata?.bio || '';
-  if (bio) document.getElementById('pf-bio').value = bio;
+  // 5. Buddy-profiel laden (buddy_profiles tabel) + naam zichtbaar maken
+  await loadBuddyProfile();
 
   // 6. Pairs + requests laden
   await Promise.all([loadPairs(), loadPendingRequests()]);
 
-  // 7. Beschikbaarheid
-  await loadAvailability();
-
-  // 8. Prefs (anoniem, pauze)
+  // 7. Prefs (anoniem, pauze)
   await _loadPrefs();
+
+  // 7b. Internly Worldwide settings (open_to_international + buddy_languages)
+  await loadIntlSettings();
+  initBuddyLangsInput();
+
+  // 8. Incoming likes
+  reloadIncomingLikes();
 
   // 9. Realtime
   subscribeRealtime();
+
+  // 10. Beschikbaarheid voor afspraken (uur-rooster via InternlyCalendar)
+  InternlyCalendar.render('ical-container', db, user.id);
 });
 </script>
 
+<!-- ── BESCHIKBAARHEID VOOR AFSPRAKEN ─────────────────────────────────────── -->
+<div style="max-width:680px;margin:0 auto;padding:0 16px 2.5rem">
+  <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-buddy-purple);margin-bottom:4px;">Jouw planning</div>
+  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;color:#0d1520;margin-bottom:6px;">Beschikbaarheid voor afspraken</div>
+  <p style="font-size:.88rem;color:#6b7280;margin-bottom:12px;">Geef per dag en uur aan wanneer je beschikbaar bent voor een gesprek. Studenten zien dit bij het plannen van een meeting via de chat.</p>
+  <div id="ical-container"></div>
+</div>
+
+<script src="js/calendar.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>
