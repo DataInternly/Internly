@@ -434,6 +434,8 @@
 
   <!-- ── Profieloverzicht ────────────────────────────────────────────────── -->
   <div id="view-profiel" style="display:none">
+    <!-- Completeness-bar — toonCompleetness() vult dit met %, ontbrekende velden, en "Toevoegen"-knoppen. -->
+    <div id="profiel-compleet-container"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
       <div>
         <div class="page-title" id="pv-naam">—</div>
@@ -843,6 +845,7 @@ const skills = [];
 let currentUser    = null;
 let isEditMode     = false;
 let _currentBblMode = false; // tracks initial bbl_mode at form load for switch-warning
+let _currentDomein  = null;  // tracks initial opdracht_domein for re-matching on edit (sessie 6)
 
 function updateProgress(step) {
   for (let i = 0; i < 6; i++) {
@@ -1015,7 +1018,49 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
+function toonCompleetness(data) {
+  const _v = [
+    { key: 'opdracht_domein', label: 'Stage-domein',  impact: 'Bepaalt jouw matches',          gew: 30 },
+    { key: 'postcode',        label: 'Postcode',       impact: 'Schakelt reistijd-filter in',   gew: 15 },
+    { key: 'motivatie',       label: 'Motivatie',      impact: 'Bedrijven lezen dit als eerste', gew: 15 },
+    { key: 'skills',          label: 'Vaardigheden',   impact: 'Toont jouw vaardigheden',       gew: 10 },
+  ];
+  const _heeftWaarde = (val) => val &&
+    (Array.isArray(val) ? val.length > 0 : String(val).trim().length > 0);
+
+  // Verplichte velden (naam/opleiding/school) tellen 30 punten en zijn altijd OK
+  // omdat de save ze afdwingt. Optionele velden voegen 70 punten toe (30+15+15+10).
+  const tot = _v.reduce((s, v) => s + v.gew, 0) + 30;
+  const beh = _v.filter(v => _heeftWaarde(data[v.key]))
+    .reduce((s, v) => s + v.gew, 30);
+  const pct = Math.round((beh / tot) * 100);
+  const kleur = pct >= 80 ? '#1a7a48' : pct >= 50 ? '#a06010' : '#b82020';
+  const mis = _v.filter(v => !_heeftWaarde(data[v.key]));
+
+  const el = document.getElementById('profiel-compleet-container');
+  if (!el) return;
+  el.innerHTML = `<div style="background:var(--bg2,#eceae4);border-radius:12px;padding:1.1rem;margin-bottom:1.25rem;">
+    <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:${mis.length?'.65rem':'0'}">
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:${kleur}">${pct}%</span>
+      <div style="flex:1">
+        <div style="font-size:.78rem;font-weight:500;color:var(--ink2,#374151)">Profiel compleet</div>
+        <div style="height:5px;background:rgba(13,21,32,.1);border-radius:3px;margin-top:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${kleur};border-radius:3px;transition:width .4s"></div>
+        </div>
+      </div>
+    </div>
+    ${mis.length ? `<div style="display:flex;flex-direction:column;gap:6px">
+      ${mis.map(v => `<div style="display:flex;align-items:center;padding:.5rem .75rem;background:white;border-radius:8px;border:1px solid rgba(13,21,32,.09);gap:.5rem">
+        <span style="font-size:.82rem;font-weight:500;color:var(--ink,#0d1520)">${v.label}</span>
+        <span style="font-size:.78rem;color:#1a7a48;flex:1;text-align:right">${v.impact}</span>
+        <button onclick="toonFormulier()" style="font-size:.74rem;padding:3px 9px;border:1px solid rgba(13,21,32,.15);border-radius:6px;background:transparent;cursor:pointer">Toevoegen</button>
+      </div>`).join('')}
+    </div>` : `<div style="font-size:.85rem;color:#1a7a48;font-weight:500">Profiel volledig — je ontvangt de beste matches</div>`}
+  </div>`;
+}
+
 function toonOverzicht(data) {
+  toonCompleetness(data);
   setText('pv-naam',     data.naam     || '—');
   setText('pv-opleiding', data.opleiding || '—');
   setText('pv-school',   data.school   || '—');
@@ -1294,6 +1339,23 @@ async function submitProfile() {
     btn.disabled = false;
     btn.textContent = 'Wijzigingen opslaan →';
     _currentBblMode = newBblMode;
+
+    // Sessie 6: heroproep matching als opdracht_domein is veranderd.
+    // Reden: triggerStudentMatching draaide alleen bij eerste aanmaak — bij
+    // edit bleven de oude pre-seeded matches staan terwijl de student een
+    // nieuwe richting opging. Aanvulsuggesties zouden dan misleidend zijn.
+    const _nieuwDomein = payload.opdracht_domein || null;
+    if (_nieuwDomein && _currentDomein !== _nieuwDomein) {
+      try {
+        await triggerStudentMatching(currentUser?.id, _nieuwDomein);
+        notify('Matches bijgewerkt op basis van jouw stage-domein');
+      } catch (_e) {
+        console.error('[matching-update]', _e);
+        // Niet-fataal — gebruiker krijgt onderstaande algemene bevestiging
+      }
+    }
+    _currentDomein = _nieuwDomein;
+
     toonOverzicht(payload);
     notify('Profiel bijgewerkt');
   } else {
@@ -1301,6 +1363,7 @@ async function submitProfile() {
     if (!wasEditing) {
       const sector = document.getElementById('opdracht_domein').value;
       await triggerStudentMatching(currentUser?.id, sector);
+      _currentDomein = sector || null;
     }
     window.location.href = getRoleLanding('student', newBblMode === true);
   }
@@ -1384,6 +1447,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (existing) {
     isEditMode = true;
+    _currentDomein = existing.opdracht_domein || null;
     populateForm(existing);   // pre-fill hidden form for when user clicks Bewerken
     toonOverzicht(existing);  // show the overview
     _initBuddyProfileSection(user, existing); // non-blocking — buddy section

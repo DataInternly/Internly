@@ -62,6 +62,28 @@
     transition: width .4s ease;
   }
 
+  .sh-suggesties {
+    margin-top: .65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sh-suggestie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem .85rem;
+    border-radius: 8px;
+    background: rgba(26,122,72,.08);
+    border: 1px solid rgba(26,122,72,.15);
+    text-decoration: none;
+    font-size: .82rem;
+    color: #1a7a48;
+    font-weight: 500;
+    transition: background .12s;
+  }
+  .sh-suggestie:hover { background: rgba(26,122,72,.15); }
+
   .sh-cards {
     display: flex;
     flex-direction: column;
@@ -145,6 +167,7 @@
       <div class="sh-progress-track">
         <div class="sh-progress-fill" id="sh-progress-fill"></div>
       </div>
+      <div id="sh-suggesties" class="sh-suggesties" style="display:none"></div>
     </section>
 
     <section class="sh-cards">
@@ -206,7 +229,7 @@
 
       const { data: sp } = await db
         .from('student_profiles')
-        .select('naam, opleiding, school, bbl_mode')
+        .select('naam, opleiding, school, bbl_mode, opdracht_domein, postcode, motivatie, skills')
         .eq('profile_id', user.id)
         .maybeSingle();
 
@@ -222,12 +245,42 @@
       document.getElementById('sh-meta').textContent =
         [sp.opleiding, sp.school].filter(Boolean).join(' · ') || 'Internly · Jouw stageplek';
 
-      const velden = ['naam','opleiding','school'].filter(k => sp[k]);
-      const pct = Math.round((velden.length / 3) * 100);
+      // Gewogen completeness — verplichte velden tellen mee maar geven geen suggestie.
+      // Optionele velden hebben impact-tekst die als aanvulsuggestie wordt getoond.
+      const _cVelden = [
+        { key: 'naam',            gewicht: 10, impact: null },
+        { key: 'opleiding',       gewicht: 10, impact: null },
+        { key: 'school',          gewicht: 10, impact: null },
+        { key: 'opdracht_domein', gewicht: 30, impact: 'Bepaalt jouw matches' },
+        { key: 'postcode',        gewicht: 15, impact: 'Schakelt reistijd-filter in' },
+        { key: 'motivatie',       gewicht: 15, impact: 'Bedrijven lezen dit als eerste' },
+        { key: 'skills',          gewicht: 10, impact: 'Toont jouw vaardigheden' },
+      ];
+      const _heeftWaarde = (v) => v &&
+        (Array.isArray(v) ? v.length > 0 : String(v).trim().length > 0);
+      const _totaal  = _cVelden.reduce((s, v) => s + v.gewicht, 0);
+      const _behaald = _cVelden
+        .filter(v => _heeftWaarde(sp[v.key]))
+        .reduce((s, v) => s + v.gewicht, 0);
+      const pct = Math.round((_behaald / _totaal) * 100);
+
       if (pct < 100) {
         document.getElementById('sh-pct').textContent = pct;
         document.getElementById('sh-progress-fill').style.width = pct + '%';
         document.getElementById('sh-progress-wrap').style.display = '';
+      }
+
+      const _ontbrekend = _cVelden.filter(v => v.impact && !_heeftWaarde(sp[v.key]));
+      if (_ontbrekend.length > 0) {
+        const _sugEl = document.getElementById('sh-suggesties');
+        if (_sugEl) {
+          _sugEl.style.display = '';
+          _sugEl.innerHTML = _ontbrekend.slice(0, 2).map(v => `
+            <a href="bol-profile.html" class="sh-suggestie">
+              <span>+ ${v.impact}</span><span>→</span>
+            </a>
+          `).join('');
+        }
       }
 
       // Parallel: header rendering + actieve match + sollicitatie-teller.
