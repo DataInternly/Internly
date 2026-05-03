@@ -193,77 +193,108 @@
 
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script>
   (async () => {
-    const { data: { user } } = await db.auth.getUser();
-    if (!user) { window.location.replace('auth.html'); return; }
+    try {
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) { window.location.replace('auth.html'); return; }
 
-    const { data: sp } = await db
-      .from('student_profiles')
-      .select('naam, opleiding, school, bbl_mode')
-      .eq('profile_id', user.id)
-      .maybeSingle();
+      const { data: sp } = await db
+        .from('student_profiles')
+        .select('naam, opleiding, school, bbl_mode')
+        .eq('profile_id', user.id)
+        .maybeSingle();
 
-    if (!sp?.naam) {
-      window.location.replace('bol-profile.html');
-      return;
-    }
-
-    const uur = new Date().getHours();
-    const groet = uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
-    document.getElementById('sh-greeting').textContent = groet + ' 👋';
-    document.getElementById('sh-name').textContent = sp.naam;
-    document.getElementById('sh-meta').textContent =
-      [sp.opleiding, sp.school].filter(Boolean).join(' · ') || 'Internly · Jouw stageplek';
-
-    document.body.removeAttribute('data-auth-pending');
-
-    await renderStudentHeader({ activeTab: 'home' });
-
-    const velden = ['naam','opleiding','school'].filter(k => sp[k]);
-    const pct = Math.round((velden.length / 3) * 100);
-    if (pct < 100) {
-      document.getElementById('sh-pct').textContent = pct;
-      document.getElementById('sh-progress-fill').style.width = pct + '%';
-      document.getElementById('sh-progress-wrap').style.display = '';
-    }
-
-    const { data: match } = await db
-      .from('matches')
-      .select('id, internship_postings(title, company_name)')
-      .eq('party_a', user.id)
-      .in('status', ['active', 'accepted'])
-      .limit(1)
-      .maybeSingle();
-
-    if (match) {
-      const stageEl = document.getElementById('sh-hub-stage');
-      const posting = match.internship_postings;
-      if (posting?.title) {
-        stageEl.textContent = posting.title +
-          (posting.company_name ? ' · ' + posting.company_name : '');
+      if (!sp?.naam) {
+        window.location.replace('bol-profile.html');
+        return;
       }
-      document.getElementById('sh-hub-wrap').style.display = '';
-      document.getElementById('sh-hub-link').href =
-        'match-dashboard.html?match=' + match.id;
+
+      const uur = new Date().getHours();
+      const groet = uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
+      document.getElementById('sh-greeting').textContent = groet + ' 👋';
+      document.getElementById('sh-name').textContent = sp.naam;
+      document.getElementById('sh-meta').textContent =
+        [sp.opleiding, sp.school].filter(Boolean).join(' · ') || 'Internly · Jouw stageplek';
+
+      await renderStudentHeader({ activeTab: 'home' });
+
+      const velden = ['naam','opleiding','school'].filter(k => sp[k]);
+      const pct = Math.round((velden.length / 3) * 100);
+      if (pct < 100) {
+        document.getElementById('sh-pct').textContent = pct;
+        document.getElementById('sh-progress-fill').style.width = pct + '%';
+        document.getElementById('sh-progress-wrap').style.display = '';
+      }
+
+      const { data: match } = await db
+        .from('matches')
+        .select('id, internship_postings(title, company_name)')
+        .eq('party_a', user.id)
+        .in('status', ['active', 'accepted'])
+        .limit(1)
+        .maybeSingle();
+
+      if (match) {
+        const stageEl = document.getElementById('sh-hub-stage');
+        const posting = match.internship_postings;
+        if (posting?.title) {
+          stageEl.textContent = posting.title +
+            (posting.company_name ? ' · ' + posting.company_name : '');
+        }
+        document.getElementById('sh-hub-wrap').style.display = '';
+        document.getElementById('sh-hub-link').href =
+          'match-dashboard.html?match=' + match.id;
+      }
+
+      const { count: solCount } = await db
+        .from('matches')
+        .select('id', { count: 'exact', head: true })
+        .eq('party_a', user.id)
+        .in('status', ['pending','accepted']);
+
+      if (solCount > 0) {
+        document.getElementById('sh-sol-sub').textContent =
+          solCount + ' openstaande sollicitatie' + (solCount !== 1 ? 's' : '');
+      }
+    } catch (e) {
+      console.error('[student-home] init error:', e);
+    } finally {
+      // Anti-flicker garanderen: pagina mag NOOIT permanent onzichtbaar blijven
+      document.body.removeAttribute('data-auth-pending');
     }
-
-    const { count: solCount } = await db
-      .from('matches')
-      .select('id', { count: 'exact', head: true })
-      .eq('party_a', user.id)
-      .in('status', ['pending','accepted']);
-
-    if (solCount > 0) {
-      document.getElementById('sh-sol-sub').textContent =
-        solCount + ' openstaande sollicitatie' + (solCount !== 1 ? 's' : '');
-    }
-
   })();
   </script>
 
-  <script src="js/consent.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
 </body>
 </html>
