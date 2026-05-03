@@ -667,7 +667,7 @@ const HEADER_NAV_BY_ROLE = {
     { id: 'sollicitaties',label: 'Sollicitaties',   href: 'mijn-sollicitaties.html',  icon: '📋' },
     { id: 'berichten',    label: 'Berichten',       href: 'mijn-berichten.html',      icon: '💬' },
     { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
-    { id: 'buddy',        label: 'Buddy',           href: 'matches.html?type=buddy',  icon: '🤝' },
+    { id: 'buddy',        label: 'Buddy',           href: 'matches.html?view=buddy',  icon: '🤝' },
   ],
   // student_bbl — single-source-of-truth voor BBL-nav. Op dit moment rendert
   // _renderStudentHeaderLoggedIn() de BBL-nav inline; deze key documenteert
@@ -678,7 +678,7 @@ const HEADER_NAV_BY_ROLE = {
     { id: 'matchpool',    label: 'Matchpool',       href: 'matchpool.html',           icon: '🌊' },
     { id: 'berichten',    label: 'Berichten',       href: 'mijn-berichten.html',      icon: '💬' },
     { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
-    { id: 'buddy',        label: 'Buddy',           href: 'matches.html?type=buddy',  icon: '🤝' },
+    { id: 'buddy',        label: 'Buddy',           href: 'matches.html?view=buddy',  icon: '🤝' },
   ],
   gepensioneerd: [
     { id: 'overzicht',    label: 'Overzicht',       href: '#section-overzicht', icon: '🏠' },
@@ -802,7 +802,7 @@ function _renderStudentHeaderLoggedOut() {
 function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab }) {
   const avatarInit  = (profile.naam || '?').charAt(0).toUpperCase();
   const buddyLabel  = buddyCount > 0 ? `Buddy (${buddyCount})` : 'Vind een buddy';
-  const buddyHref   = buddyCount > 0 ? '/matches.html?filter=buddy' : '/discover.html?filter=buddy';
+  const buddyHref   = buddyCount > 0 ? '/matches.html?view=buddy' : '/discover.html?filter=buddy';
   const profileHref = bblMode ? '/bbl-profile.html' : '/student-profile.html';
   const logoHref    = bblMode ? '/bbl-hub.html' : '/discover.html';
 
