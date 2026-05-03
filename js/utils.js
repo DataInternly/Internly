@@ -669,6 +669,17 @@ const HEADER_NAV_BY_ROLE = {
     { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
     { id: 'buddy',        label: 'Buddy',           href: 'matches.html?type=buddy',  icon: '🤝' },
   ],
+  // student_bbl — single-source-of-truth voor BBL-nav. Op dit moment rendert
+  // _renderStudentHeaderLoggedIn() de BBL-nav inline; deze key documenteert
+  // de canonieke 5-item lijst voor NAV-01 refactor (renderRoleHeader migratie).
+  // MAX 5 items (incl. buddy) — Hick's Law contract.
+  student_bbl: [
+    { id: 'discover',     label: 'BBL Traject',     href: 'bbl-hub.html',             icon: '🔧' },
+    { id: 'matchpool',    label: 'Matchpool',       href: 'matchpool.html',           icon: '🌊' },
+    { id: 'berichten',    label: 'Berichten',       href: 'mijn-berichten.html',      icon: '💬' },
+    { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
+    { id: 'buddy',        label: 'Buddy',           href: 'matches.html?type=buddy',  icon: '🤝' },
+  ],
   gepensioneerd: [
     { id: 'overzicht',    label: 'Overzicht',       href: '#section-overzicht', icon: '🏠' },
     { id: 'matches',      label: 'Mijn matches',    href: '#section-matches',   icon: '🤝' },
@@ -809,9 +820,12 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
     <a href="/mijn-berichten.html"    class="${activeTab === 'berichten'     ? 'active' : ''}">Berichten</a>
     <a href="/kennisbank.html"         class="${activeTab === 'kennisbank'    ? 'active' : ''}">Kennisbank</a>`;
 
+  // BBL nav — MAX 5 items (incl. buddy via wrapper). Dashboard verwijderd
+  // ten gunste van Matchpool (NAV-00B): bbl-hub.html combineert overzicht +
+  // matches al, en blijft via in-page links bereikbaar vanuit BBL Traject.
   const bblNav = `
     <a href="/bbl-hub.html"        class="${activeTab === 'discover'    ? 'active' : ''}">BBL Traject</a>
-    <a href="/bbl-dashboard.html"  class="${activeTab === 'matches'     ? 'active' : ''}">Dashboard</a>
+    <a href="/matchpool.html"      class="${activeTab === 'matchpool'   ? 'active' : ''}">Matchpool</a>
     <a href="/mijn-berichten.html" class="${activeTab === 'berichten'   ? 'active' : ''}">Berichten</a>
     <a href="/kennisbank.html"     class="${activeTab === 'kennisbank'  ? 'active' : ''}">Kennisbank</a>`;
 
