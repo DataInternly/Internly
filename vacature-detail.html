@@ -594,7 +594,6 @@
   max-width:720px;
   font-size:.9rem;
   color:var(--amber);
-  display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
@@ -1116,12 +1115,11 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // Soft auth check — show banner if not logged in, but don't redirect (page is publicly shareable)
+  // Auth-guard: pagina is publiek bereikbaar — banner toont alleen als user NIET ingelogd is.
+  // Geen requireRole hier: ingelogde non-students mogen vacatures ook bekijken.
   const { data: { user: _guestCheck } } = await db.auth.getUser();
-  if (!_guestCheck) {
-    const banner = document.getElementById('auth-banner');
-    if (banner) banner.style.display = 'flex';
-  }
+  const banner = document.getElementById('auth-banner');
+  if (banner) banner.style.display = _guestCheck ? 'none' : 'flex';
 
   const params = new URLSearchParams(window.location.search);
   const id     = params.get('id');

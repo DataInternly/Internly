@@ -242,17 +242,6 @@
         </div>
       </div>
 
-      <!-- Opgeslagen zonder account (localStorage) -->
-      <div id="local-saved-section" style="display:none;margin-top:40px;">
-        <div style="border-top:1px solid #f0f0ee;padding-top:32px;margin-bottom:16px">
-          <div class="page-title" style="font-size:1.15rem;margin-bottom:4px">Opgeslagen zonder account</div>
-          <div class="page-sub" style="font-size:.88rem">
-            Vacatures die je hebt bewaard vóór het inloggen. <a href="discover.html" style="color:#1a7a48;font-weight:600">Verken meer stages →</a>
-          </div>
-        </div>
-        <div id="local-saved-list"></div>
-      </div>
-
       <div style="text-align:center; margin-top:40px;">
         <a href="discover.html" class="btn btn-primary" style="padding:12px 32px;">Meer vacatures ontdekken →</a>
       </div>
@@ -798,54 +787,15 @@
 
     function signOut() { performLogout(); }
 
-    function renderLocalSaved() {
-      let saved;
-      try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
-      catch(e) { saved = []; }
-
-      const section = document.getElementById('local-saved-section');
-      const list    = document.getElementById('local-saved-list');
-
-      if (!saved || saved.length === 0) { section.style.display = 'none'; return; }
-
-      section.style.display = 'block';
-
-      list.innerHTML = saved.map(v => {
-        const title  = v.title || 'Onbekende vacature';
-        const short  = title.length > 50 ? title.slice(0, 50) + '…' : title;
-        const grade  = v.trust_grade || null;
-        const score  = v.trust_score ?? null;
-        const date   = v.saved_at
-          ? new Date(v.saved_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
-          : '';
-        return `
-          <div class="card">
-            <div class="card-head">
-              <div style="min-width:0">
-                <div class="card-title" title="${escapeHtml(title)}">${escapeHtml(short)}</div>
-                <div class="card-sub">${escapeHtml(v.company_name || '—')}${v.sector ? ' · ' + escapeHtml(v.sector) : ''}</div>
-              </div>
-              ${renderTrustBadge(grade, score)}
-            </div>
-            <div style="margin:10px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <span class="tag neutral">📌 Lokaal opgeslagen</span>
-              ${date ? `<span style="color:#9ca3af;font-size:.82rem">${escapeHtml(date)}</span>` : ''}
-              <a href="vacature-detail.html?id=${escapeHtml(String(v.id))}&source=${escapeHtml(v.source || 'internships')}"
-                style="font-size:.82rem;color:#1a7a48;font-weight:600;text-decoration:none;margin-left:auto;white-space:nowrap;">
-                Bekijk vacature →</a>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
     // ── Init ──────────────────────────────────────────────────────────────
 
     window.addEventListener('DOMContentLoaded', async () => {
-      renderLocalSaved();
-
       // ── Guard: alleen BOL-studenten ──
       const hasValidRole = await requireRole('student');
       if (!hasValidRole) return;
+
+      // Pre-login localStorage opschonen — sollicitaties komen nu uit de DB
+      try { localStorage.removeItem('internly_saved_vacatures'); } catch(e) {}
 
       const { data: { user } } = await db.auth.getUser();
       if (!user) { window.location.replace('auth.html'); return; }
