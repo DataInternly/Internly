@@ -728,6 +728,11 @@ body                  { top: 0 !important; position: static !important; }
   transition: border-color .15s, color .15s;
 }
 .empty-state .es-ghost:hover { border-color: var(--ink, #0d1520); color: var(--ink, #0d1520); }
+.empty-state .es-sub {
+  font-size: .78rem;
+  color: var(--ink3, #7a8799);
+  margin-top: .65rem;
+}
 
 /* ── Toast notification ──────────────────────────────────────────────────── */
 

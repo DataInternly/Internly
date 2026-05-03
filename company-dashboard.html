@@ -2149,7 +2149,13 @@ async function loadBerichten() {
 
     if (mErr) throw mErr;
     if (!matchRows || matchRows.length === 0) {
-      el.innerHTML = `<div class="empty"><span class="empty-icon">💬</span>Nog geen berichten.<br>Zodra een student je match accepteert, verschijnt het gesprek hier.</div>`;
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="es-icon">💬</span>
+          <p class="es-primary">Nog geen berichten</p>
+          <p class="es-secondary">Berichten verschijnen zodra een student jouw interesse accepteert. Bekijk je openstaande aanmeldingen en matches.</p>
+          <button type="button" class="es-cta" onclick="show('matches')">Bekijk aanmeldingen →</button>
+        </div>`;
       const badge = document.getElementById('badge-unread');
       if (badge) badge.style.display = 'none';
       return;

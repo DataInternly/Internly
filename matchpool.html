@@ -318,6 +318,12 @@
 
     .mp-empty-link:hover { text-decoration: underline; }
 
+    .mp-empty-sub {
+      font-size: .78rem;
+      color: var(--ink3, #7a8799);
+      margin-top: .65rem;
+    }
+
     /* ── Loading ──────────────────────────────────────────────────────────── */
     .mp-loading {
       text-align: center;
@@ -347,6 +353,14 @@
 
     <div class="mp-deck" id="mp-deck">
       <div class="mp-loading">Laden…</div>
+    </div>
+
+    <!-- Lege state — getoond door js/matchpool.js showEmpty() (NAV-00C) -->
+    <div class="mp-empty" id="mp-empty" style="display:none;">
+      <div class="mp-empty-icon">✏️</div>
+      <div class="mp-empty-body"></div>
+      <a href="bol-profile.html" class="mp-empty-link">Profiel aanvullen →</a>
+      <p class="mp-empty-sub">Duurt ongeveer 3 minuten — een volledig profiel geeft de beste matches</p>
     </div>
   </main>
 </div>

@@ -967,7 +967,14 @@ async function loadInternships() {
   ].sort((a, b) => (b.trust_score || 0) - (a.trust_score || 0));
 
   if (combined.length === 0) {
-    container.innerHTML = `<div class="state-box"><span class="state-icon">📭</span>Nog geen vacatures beschikbaar.<br><small style="display:block;margin-top:8px;font-size:.85rem;color:var(--ink3,#6b7280)">Ververs de pagina of pas je filters aan — er worden regelmatig nieuwe stages toegevoegd.</small></div>`;
+    container.innerHTML = `
+      <div class="empty-state">
+        <span class="es-icon">📭</span>
+        <p class="es-primary">Nog geen vacatures beschikbaar</p>
+        <p class="es-secondary">Er worden regelmatig nieuwe stages toegevoegd. Probeer het opnieuw, of ontdek wat anders past via de matchpool.</p>
+        <button type="button" class="es-cta" onclick="window.location.reload()">Probeer opnieuw →</button>
+        <a href="matchpool.html" class="es-sub" style="text-decoration:none;display:inline-block;margin-top:.65rem;">of bekijk de matchpool</a>
+      </div>`;
     return;
   }
 

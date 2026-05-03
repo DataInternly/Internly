@@ -790,7 +790,16 @@
         <button class="btn-blue" onclick="show('studenten')">Alle studenten →</button>
       </div>
       <div id="dashboard-studenten">
-        <div class="empty"><span class="empty-icon">👥</span>Nog geen studenten gekoppeld. Deel de Internly-link met je studenten om ze aan deze opleiding te koppelen.</div>
+        <div class="empty-state">
+          <span class="es-icon">👥</span>
+          <p class="es-primary">Nog geen studenten gekoppeld</p>
+          <p class="es-secondary">Deel de registratielink met je studenten zodat zij zich kunnen aanmelden. Zodra ze inloggen, verschijnen ze hier automatisch.</p>
+          <button type="button" class="es-cta"
+            onclick="navigator.clipboard.writeText('https://internly.pro/auth.html?role=student').then(function(){notify('Link gekopieerd!');})">
+            📋 Kopieer studentenlink
+          </button>
+          <p class="es-sub">of stuur de link via email</p>
+        </div>
       </div>
     </div>
 
@@ -804,7 +813,16 @@
         <button class="su-invite-btn" onclick="openSuModal()">+ Nodig student uit</button>
       </div>
       <div id="studenten-list">
-        <div class="empty"><span class="empty-icon">👥</span>Nog geen studenten gekoppeld. Deel de Internly-link met je studenten om ze aan deze opleiding te koppelen.</div>
+        <div class="empty-state">
+          <span class="es-icon">👥</span>
+          <p class="es-primary">Nog geen studenten gekoppeld</p>
+          <p class="es-secondary">Deel de registratielink met je studenten zodat zij zich kunnen aanmelden. Zodra ze inloggen, verschijnen ze hier automatisch.</p>
+          <button type="button" class="es-cta"
+            onclick="navigator.clipboard.writeText('https://internly.pro/auth.html?role=student').then(function(){notify('Link gekopieerd!');})">
+            📋 Kopieer studentenlink
+          </button>
+          <p class="es-sub">of stuur de link via email</p>
+        </div>
       </div>
       <div id="school-linked-section" style="display:none">
         <div class="linked-section-title">Direct uitgenodigd</div>
