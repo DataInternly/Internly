@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FF7E42">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+<title>Cookiebeleid — Internly</title>
+<meta name="description" content="Welke cookies en browseropslag Internly gebruikt, en hoe je je toestemming wijzigt.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Outfit:wght@400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   Subpage archetype (cookiebeleid) — lange tekst, reading-frame.
+   Identieke stijl als privacybeleid.html. Globale tokens uit css/style.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root{
+  --green:    var(--c-green);
+  --green-mid:var(--c-green-glow);
+  --green-bg: #e8f5ee;
+  --deep:     #0b2416;
+  --dark:     var(--c-green-deep);
+  --accent:   var(--c-orange-deep);
+  --accent-bg:#fdf0e8;
+  --ink:      var(--c-ink);
+  --ink2:     var(--fg-secondary);
+  --ink3:     var(--fg-tertiary);
+  --bg:       var(--bg-page);
+  --bg2:      #eceae4;
+  --white:    var(--bg-surface);
+  --bd:       var(--line-subtle);
+  --bd2:      var(--line-default);
+  --r:        var(--r-md, 10px);
+  --rsm:      var(--r-sm, 7px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size:15px;line-height:1.75;
+  background: var(--bg-page);
+  color: var(--fg-primary);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* HEADER */
+.header{
+  background: rgba(244,243,239,.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-subtle);
+  padding:13px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.logo{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:1.2rem;font-weight:800;letter-spacing:-.03em;
+  color: var(--c-green-deep);
+  text-decoration:none;
+}
+.logo-ly{ color: var(--c-orange-deep); }
+.back{
+  font-size:.85rem;
+  color: var(--fg-tertiary);
+  text-decoration:none;
+  display:flex;align-items:center;gap:5px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill, 999px);
+  transition: color var(--t-fast, .12s), background var(--t-fast, .12s);
+}
+.back:hover{
+  color: var(--fg-primary);
+  background: var(--c-cream);
+}
+
+/* HERO */
+.hero{
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
+    linear-gradient(148deg,#1e8a52 0%,#1a7a48 42%,#145e38 100%);
+  padding: var(--s8, 80px) var(--s7, 40px) var(--s7, 60px);
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  background-size: 200px 200px;
+  opacity: .035;
+  mix-blend-mode: overlay;
+  pointer-events:none;
+}
+.hero-inner{position:relative;z-index:1;max-width:640px;}
+.hero-script-eyebrow{
+  font-family: var(--font-script, 'Caveat', cursive);
+  font-size: 1.2rem;
+  color: rgba(255,126,66,.95);
+  display: inline-block;
+  transform: rotate(-1deg);
+  margin-bottom: 4px;
+}
+.hero-eyebrow{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.72rem;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+  margin-bottom:8px;
+  display: block;
+}
+.hero-title{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:clamp(1.75rem,4vw,2.5rem);
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:#fff;
+  line-height:1.1;
+  margin-bottom:10px;
+}
+.hero-sub{
+  font-size:.92rem;
+  color:rgba(255,255,255,.78);
+  line-height:1.7;
+  max-width:480px;
+  margin-bottom:20px;
+}
+.hero-badges{display:flex;flex-wrap:wrap;gap:7px;}
+.badge{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.7rem;font-weight:500;
+  letter-spacing: .04em;
+  padding:4px 11px;
+  border-radius: var(--r-pill, 20px);
+  display:inline-flex;align-items:center;gap:4px;
+}
+.badge-groen{background:rgba(34,168,94,.25);color:#9eecbb;}
+.badge-grijs{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
+
+/* DIVIDER */
+.divider{
+  height: 3px;
+  background: linear-gradient(90deg, var(--c-green-glow, #22a85e), var(--c-orange-deep));
+}
+
+/* READING-FRAME */
+.main{
+  max-width:760px;
+  margin:0 auto;
+  padding: var(--s8, 56px) var(--s7, 40px) var(--s9, 88px);
+}
+
+/* SECTIES */
+.sectie{margin-bottom: var(--s8, 56px);}
+.sectie:last-child{margin-bottom:0;}
+.sectie-kop{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:1.15rem;font-weight:800;
+  letter-spacing:-.02em;
+  color: var(--fg-primary);
+  margin-bottom:16px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--line-subtle);
+  display:flex;align-items:center;gap:10px;
+  scroll-margin-top:64px;
+}
+.kop-nr{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.68rem;font-weight:500;
+  min-width:22px;height:22px;
+  border-radius:50%;
+  background: var(--c-green);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+/* TEKST */
+p{
+  font-size:.95rem;
+  color: var(--fg-secondary);
+  margin-bottom:12px;
+  line-height:1.78;
+}
+p:last-child{margin-bottom:0;}
+ul,ol{
+  padding-left:18px;margin-bottom:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+li{
+  font-size:.92rem;
+  color: var(--fg-secondary);
+  line-height:1.72;
+}
+a{
+  color: var(--c-orange-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+a:hover{ color: #b94613; }
+strong{font-weight:600; color: var(--fg-primary);}
+
+/* CONTACTBLOK */
+.contactblok{
+  background: var(--green-bg);
+  border:1px solid rgba(26,122,72,.2);
+  border-left:3px solid var(--c-green);
+  border-radius:0 var(--r-md, 10px) var(--r-md, 10px) 0;
+  padding:16px 20px;margin:12px 0;
+}
+.contactblok-label{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.68rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+  color: var(--c-green);
+  margin-bottom:6px;
+}
+.contactblok p{
+  font-size:.9rem;
+  color: var(--fg-secondary);
+  margin-bottom:4px;
+}
+
+/* COOKIE-TABEL */
+.cookie-tabel{
+  width:100%;
+  border-collapse:collapse;
+  margin:16px 0;
+  background: var(--bg-surface);
+  border:1px solid var(--line-subtle);
+  border-radius: var(--r-md, 10px);
+  overflow:hidden;
+  font-size:.86rem;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.cookie-tabel th{
+  background: var(--c-cream-warm, #fdfaf6);
+  text-align:left;
+  padding:10px 14px;
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-weight:500;
+  color: var(--fg-secondary);
+  border-bottom:1px solid var(--line-subtle);
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+}
+.cookie-tabel td{
+  padding:11px 14px;
+  border-bottom:1px solid var(--line-subtle);
+  color: var(--fg-secondary);
+  vertical-align:top;
+  line-height:1.6;
+  font-size:.86rem;
+}
+.cookie-tabel tr:last-child td{border-bottom:none;}
+.cookie-tabel .cat-pill{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.7rem;
+  font-weight:500;
+  padding:2px 9px;
+  border-radius: var(--r-pill, 999px);
+  white-space:nowrap;
+  letter-spacing:.03em;
+}
+.cookie-tabel .pill-noodzakelijk{ background:#e8f5ee; color: var(--c-green); }
+.cookie-tabel .pill-functioneel { background:#e8f0fc; color:#1756a8; }
+.cookie-tabel .pill-analytics   { background: var(--accent-bg); color: var(--c-orange-deep); }
+
+/* INSTELLINGEN-KNOP */
+.cc-prefs-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background: var(--c-orange-deep);
+  color:#fff;
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size:.9rem; font-weight:600;
+  border:none;
+  padding:10px 20px;
+  border-radius: var(--r-pill, 999px);
+  cursor:pointer;
+  margin: 8px 0 4px;
+  transition: background var(--t-fast, .15s), transform var(--t-fast, .1s);
+}
+.cc-prefs-btn:hover{ background:#b94613; transform: translateY(-1px); }
+.cc-prefs-btn:focus-visible{ outline: 2px solid var(--c-ink); outline-offset:2px; }
+
+/* INFO-BLOK (orange) */
+.info{
+  background: var(--accent-soft, rgba(224,92,26,.08));
+  border:1px solid rgba(224,92,26,.18);
+  border-left: 3px solid var(--c-orange-deep);
+  border-radius:0 var(--r-md, 10px) var(--r-md, 10px) 0;
+  padding:14px 18px;
+  margin:16px 0;
+  font-size:.9rem;
+  color: var(--fg-secondary);
+  line-height:1.7;
+}
+.info strong{ color: var(--fg-primary); }
+
+/* FOOTER */
+.footer{
+  background: var(--c-green-deep);
+  padding: var(--s5, 20px) var(--s7, 40px);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.footer-logo{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:.9rem;font-weight:700;
+  color:rgba(255,255,255,.5);
+  letter-spacing: -.02em;
+}
+.footer-logo span{ color: var(--c-orange); }
+.footer-links{
+  display:flex;gap:16px;
+  list-style:none;
+  flex-wrap: wrap;
+}
+.footer-links a, .footer-links button{
+  font-size:.78rem;
+  color:rgba(255,255,255,.45);
+  text-decoration:none;
+  transition: color var(--t-fast, .15s);
+  background:none; border:none; padding:0; cursor:pointer;
+  font-family: var(--font-body, 'Outfit', sans-serif);
+}
+.footer-links a:hover, .footer-links button:hover{ color: var(--c-orange); }
+.footer-disc{
+  font-size:.7rem;
+  color:rgba(255,255,255,.3);
+}
+.footer-tagline{
+  font-size: .76rem;
+  color: rgba(255,255,255,.4);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-orange-deep);
+  outline-offset: 2px;
+}
+
+@media(max-width:768px){
+  .header,.hero,.main,.footer{padding-left:16px;padding-right:16px;}
+  .main{padding-top:32px;padding-bottom:52px;}
+  .hero-badges{flex-direction:column;gap:5px;}
+  .cookie-tabel{font-size:.78rem;}
+  .cookie-tabel th, .cookie-tabel td{padding:8px 10px;}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="logo" href="index.html">intern<span class="logo-ly">ly</span></a>
+  <a class="back" href="index.html" onclick="if(document.referrer)event.preventDefault(),history.back()">← Terug</a>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-script-eyebrow">cookies</span>
+    <div class="hero-eyebrow">Cookiebeleid</div>
+    <h1 class="hero-title">Welke cookies we gebruiken</h1>
+    <p class="hero-sub">Internly gebruikt zo min mogelijk cookies. Alleen de noodzakelijke staan altijd aan; voor de rest vragen we eerst je toestemming.</p>
+    <div class="hero-badges">
+      <span class="badge badge-groen">✓ AVG-compliant</span>
+      <span class="badge badge-grijs">Versie 1.0 · mei 2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<main class="main">
+
+  <!-- 1. WAT ZIJN COOKIES -->
+  <section class="sectie" id="wat">
+    <h2 class="sectie-kop"><span class="kop-nr">1</span>Wat zijn cookies?</h2>
+    <p>Cookies zijn kleine tekstbestandjes die websites in je browser opslaan. Ze worden gebruikt om dingen te onthouden — bijvoorbeeld dat je ingelogd bent, welke taal je gekozen hebt, of of je een banner al hebt gezien. Vergelijkbare technieken zoals <strong>localStorage</strong> en <strong>sessionStorage</strong> doen hetzelfde, maar dan binnen je browser zelf. In dit cookiebeleid behandelen we beide.</p>
+    <p>Internly gebruikt cookies en browseropslag voor drie doelen: het platform laten werken, het taalvertaalsysteem laten functioneren en begrijpen hoe het platform gebruikt wordt zodat we het kunnen verbeteren. Voor alles behalve het noodzakelijke vragen we eerst je toestemming.</p>
+  </section>
+
+  <!-- 2. WELKE COOKIES -->
+  <section class="sectie" id="welke">
+    <h2 class="sectie-kop"><span class="kop-nr">2</span>Welke cookies gebruikt Internly?</h2>
+    <p>Hieronder staat de volledige lijst. We gebruiken <strong>geen</strong> tracking-cookies, <strong>geen</strong> advertentiecookies en <strong>geen</strong> Google Analytics.</p>
+    <table class="cookie-tabel">
+      <thead>
+        <tr>
+          <th>Naam</th>
+          <th>Categorie</th>
+          <th>Doel</th>
+          <th>Bewaartermijn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>internly_cc</code></td>
+          <td><span class="cat-pill pill-noodzakelijk">Noodzakelijk</span></td>
+          <td>Slaat jouw cookie-keuze op zodat we de banner niet elke keer opnieuw tonen.</td>
+          <td>12 maanden</td>
+        </tr>
+        <tr>
+          <td><code>sb-*-auth-token</code><br>(Supabase)</td>
+          <td><span class="cat-pill pill-noodzakelijk">Noodzakelijk</span></td>
+          <td>Houdt je ingelogd en bewaart je sessie. Zonder deze cookie kan het platform je niet herkennen.</td>
+          <td>Sessie / tot uitloggen</td>
+        </tr>
+        <tr>
+          <td><code>internly_lang</code><br>(localStorage)</td>
+          <td><span class="cat-pill pill-functioneel">Functioneel</span></td>
+          <td>Onthoudt jouw taalvoorkeur zodat de pagina automatisch in jouw taal opent bij een volgend bezoek.</td>
+          <td>12 maanden</td>
+        </tr>
+        <tr>
+          <td>Google Translate<br>(<code>googtrans</code> en gerelateerd)</td>
+          <td><span class="cat-pill pill-functioneel">Functioneel</span></td>
+          <td>Vertaalt pagina-inhoud via Google Translate. Wordt alleen geladen wanneer je hiervoor toestemming geeft.</td>
+          <td>Sessie</td>
+        </tr>
+        <tr>
+          <td><code>internly_telemetry</code></td>
+          <td><span class="cat-pill pill-analytics">Analytics</span></td>
+          <td>Anonieme platform-gebruiksdata om te begrijpen hoe het platform gebruikt wordt. Blijft binnen Internly, niet gedeeld met derden.</td>
+          <td>Sessie</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="info">
+      <p><strong>Externe partijen die cookies kunnen plaatsen wanneer jij dat toestaat:</strong> Google Translate (Google Ireland Limited). Zie ons <a href="privacybeleid.html#derden">privacybeleid</a> voor de volledige lijst van derde partijen waar persoonsgegevens mee worden gedeeld.</p>
+    </div>
+  </section>
+
+  <!-- 3. TOESTEMMING WIJZIGEN -->
+  <section class="sectie" id="wijzigen">
+    <h2 class="sectie-kop"><span class="kop-nr">3</span>Toestemming wijzigen of intrekken</h2>
+    <p>Je kunt jouw cookie-voorkeuren altijd opnieuw bekijken en wijzigen. We bewaren niets dat je niet hebt geaccepteerd, en we vragen niet opnieuw zolang je keuze geldt — maar je mag altijd terugkomen.</p>
+    <button type="button" class="cc-prefs-btn"
+      onclick="window.InternlyConsent && window.InternlyConsent.showPreferences()">
+      ⚙️ Cookie-instellingen wijzigen
+    </button>
+    <p>Klik op deze knop om de voorkeuren-paneel te openen. Je kunt ook onderaan elke pagina op de link <strong>Cookie-instellingen</strong> klikken.</p>
+    <p>Wil je álle cookies wissen? Dat kan in je browser zelf — bij Chrome, Firefox, Safari en Edge zit dit onder Instellingen → Privacy → Browsegegevens wissen. Daarna toont Internly de cookie-banner opnieuw zodra je terugkomt.</p>
+  </section>
+
+  <!-- 4. CONTACT -->
+  <section class="sectie" id="contact">
+    <h2 class="sectie-kop"><span class="kop-nr">4</span>Vragen?</h2>
+    <div class="contactblok">
+      <div class="contactblok-label">Cookies & Privacy</div>
+      <p><strong>Sasubo Holding B.V.</strong></p>
+      <p>Appelgaard 48, 4033 JD Lienden</p>
+      <p>KVK: 80201822</p>
+      <p>E-mail: <a href="mailto:data@internly.pro">data@internly.pro</a></p>
+      <p style="margin-top:8px">Lees ons volledige <a href="privacybeleid.html">privacybeleid</a> voor meer details over hoe we omgaan met persoonsgegevens. Vragen of klachten over cookies kun je ook indienen bij de <a href="https://www.autoriteitpersoonsgegevens.nl/klacht-indienen" target="_blank" rel="noopener noreferrer">Autoriteit Persoonsgegevens</a>.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">intern<span>ly</span></div>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">Over ons</a></li>
+    <li><a href="privacybeleid.html">Privacyverklaring</a></li>
+    <li><a href="algemene-voorwaarden.html">Algemene voorwaarden</a></li>
+    <li><a href="cookiebeleid.html" aria-current="page">Cookiebeleid</a></li>
+    <li><button type="button" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences()">Cookie-instellingen</button></li>
+  </ul>
+  <div class="footer-disc">Internly.pro is onderdeel van Sasubo Holding B.V. · Cookiebeleid v1.0 · Mei 2026</div>
+  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+</footer>
+
+<script src="js/utils.js"></script>
+<script src="js/consent.js" defer></script>
+
+</body>
+</html>

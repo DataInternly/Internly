@@ -1588,7 +1588,7 @@ footer {
     <div class="not-for-eyebrow">eerlijk gezegd</div>
     <h2 class="not-for-h2">Internly is <em>niet</em> voor iedereen.</h2>
     <ul class="not-for-list">
-      <li class="lp-rev">Ben je een bedrijf dat radiostilte normaal vindt? Dan ga je Internly haten.</li>
+      <li class="lp-rev">Ben je een bedrijf dat radiostilte normaal vindt? Dan is Internly niet voor jou.</li>
       <li class="lp-rev lp-d1">Ben je een school die signalen liever niet ziet? Dan zit je hier verkeerd.</li>
       <li class="lp-rev lp-d2">Ben je een student die ghosting al heeft geaccepteerd? Dan hebben wij niets te bieden.</li>
     </ul>
@@ -1801,6 +1801,9 @@ footer {
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
+      <li><a href="algemene-voorwaarden.html">Algemene voorwaarden</a></li>
+      <li><a href="cookiebeleid.html">Cookiebeleid</a></li>
+      <li><a href="#" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences(); return false;">Cookie-instellingen</a></li>
       <li><a href="spelregels.html">Spelregels</a></li>
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
@@ -1819,8 +1822,11 @@ footer {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/consent.js" defer></script>
 <script>
   // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+  // Shim blijft actief wanneer analytics-consent geweigerd is, zodat code
+  // die _fCtx._guard aanroept niet crasht.
   window._fCtx = {
     _init: function(p) {
       console.warn('[telemetry] js/telemetry.js niet geladen, ' +
@@ -1830,8 +1836,26 @@ footer {
     _guard: function() { return true; },
     blockIfFilled: function() { return false; }
   };
+
+  // CC-2: js/telemetry.js laadt alleen achter analytics-consent.
+  // InternlyConsent regelt het wachten op consent en het opnieuw afvuren
+  // wanneer een gebruiker zijn keuze later wijzigt.
+  function _internlyLoadTelemetry() {
+    if (document.querySelector('script[data-internly-tel]')) return;
+    const s = document.createElement('script');
+    s.src = 'js/telemetry.js';
+    s.dataset.internlyTel = '1';
+    document.head.appendChild(s);
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.InternlyConsent) return;
+    if (window.InternlyConsent.hasConsent('analytics')) {
+      _internlyLoadTelemetry();
+    } else {
+      window.InternlyConsent.onAccept('analytics', _internlyLoadTelemetry);
+    }
+  });
 </script>
-<script src="js/telemetry.js"></script>
 
 <script>
 // ── AUTH GATE ── ingelogde users → rol-pagina, niet-ingelogd → marketing ──
@@ -1954,23 +1978,16 @@ async function schrijfInHero() {
   btn.textContent = 'Bezig…';
 
   try {
-    const res = await fetch(
-      'https://qoxgbkbnjsycodcqqmft.supabase.co/rest/v1/waitlist',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ email, source: window.location.pathname })
-      }
-    );
+    // H1 fix 1 mei 2026: gedeelde window.db i.p.v. inline anon key
+    if (!window.db) throw new Error('Supabase client niet beschikbaar');
+    const { error } = await window.db
+      .from('waitlist')
+      .insert({ email, source: window.location.pathname });
 
     btn.disabled    = false;
     btn.textContent = 'Schrijf je in →';
 
-    if (res.ok || res.status === 409) {
+    if (!error || error.code === '23505') {
       document.getElementById('hero-wl-form').style.display    = 'none';
       document.getElementById('hero-wl-success').style.display = 'block';
     } else {
@@ -2025,23 +2042,16 @@ async function schrijfInHero() {
     btn.textContent = 'Bezig…';
 
     try {
-      const res = await fetch(
-        'https://qoxgbkbnjsycodcqqmft.supabase.co/rest/v1/waitlist',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ email, source: window.location.pathname })
-        }
-      );
+      // H1 fix 1 mei 2026: gedeelde window.db i.p.v. inline anon key
+      if (!window.db) throw new Error('Supabase client niet beschikbaar');
+      const { error } = await window.db
+        .from('waitlist')
+        .insert({ email, source: window.location.pathname });
 
       btn.disabled    = false;
       btn.textContent = 'Houd me op de hoogte →';
 
-      if (res.ok || res.status === 409) {
+      if (!error || error.code === '23505') {
         document.getElementById('wl-form').style.display    = 'none';
         document.getElementById('wl-success').style.display = 'block';
         setTimeout(sluitPopup, 3000);

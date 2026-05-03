@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FF7E42">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+<title>Algemene voorwaarden — Internly</title>
+<meta name="description" content="De algemene voorwaarden van het Internly-platform voor bedrijven, scholen en begeleiders.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Outfit:wght@400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   Subpage archetype (algemene voorwaarden) — identieke stijl als
+   privacybeleid.html. Globale tokens uit css/style.css.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root{
+  --green:    var(--c-green);
+  --green-mid:var(--c-green-glow);
+  --green-bg: #e8f5ee;
+  --deep:     #0b2416;
+  --dark:     var(--c-green-deep);
+  --accent:   var(--c-orange-deep);
+  --accent-bg:#fdf0e8;
+  --ink:      var(--c-ink);
+  --ink2:     var(--fg-secondary);
+  --ink3:     var(--fg-tertiary);
+  --bg:       var(--bg-page);
+  --bg2:      #eceae4;
+  --white:    var(--bg-surface);
+  --bd:       var(--line-subtle);
+  --bd2:      var(--line-default);
+  --r:        var(--r-md, 10px);
+  --rsm:      var(--r-sm, 7px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size:15px;line-height:1.75;
+  background: var(--bg-page);
+  color: var(--fg-primary);
+  -webkit-font-smoothing:antialiased;
+}
+
+.header{
+  background: rgba(244,243,239,.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-subtle);
+  padding:13px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.logo{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:1.2rem;font-weight:800;letter-spacing:-.03em;
+  color: var(--c-green-deep);
+  text-decoration:none;
+}
+.logo-ly{ color: var(--c-orange-deep); }
+.back{
+  font-size:.85rem;
+  color: var(--fg-tertiary);
+  text-decoration:none;
+  display:flex;align-items:center;gap:5px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill, 999px);
+  transition: color var(--t-fast, .12s), background var(--t-fast, .12s);
+}
+.back:hover{
+  color: var(--fg-primary);
+  background: var(--c-cream);
+}
+
+.hero{
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
+    linear-gradient(148deg,#1e8a52 0%,#1a7a48 42%,#145e38 100%);
+  padding: var(--s8, 80px) var(--s7, 40px) var(--s7, 60px);
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  background-size: 200px 200px;
+  opacity: .035;
+  mix-blend-mode: overlay;
+  pointer-events:none;
+}
+.hero-inner{position:relative;z-index:1;max-width:640px;}
+.hero-script-eyebrow{
+  font-family: var(--font-script, 'Caveat', cursive);
+  font-size: 1.2rem;
+  color: rgba(255,126,66,.95);
+  display: inline-block;
+  transform: rotate(-1deg);
+  margin-bottom: 4px;
+}
+.hero-eyebrow{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.72rem;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+  margin-bottom:8px;
+  display: block;
+}
+.hero-title{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:clamp(1.75rem,4vw,2.5rem);
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:#fff;
+  line-height:1.1;
+  margin-bottom:10px;
+}
+.hero-sub{
+  font-size:.92rem;
+  color:rgba(255,255,255,.78);
+  line-height:1.7;
+  max-width:480px;
+  margin-bottom:20px;
+}
+.hero-badges{display:flex;flex-wrap:wrap;gap:7px;}
+.badge{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.7rem;font-weight:500;
+  letter-spacing: .04em;
+  padding:4px 11px;
+  border-radius: var(--r-pill, 20px);
+  display:inline-flex;align-items:center;gap:4px;
+}
+.badge-groen{background:rgba(34,168,94,.25);color:#9eecbb;}
+.badge-grijs{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
+
+.divider{
+  height: 3px;
+  background: linear-gradient(90deg, var(--c-green-glow, #22a85e), var(--c-orange-deep));
+}
+
+.main{
+  max-width:760px;
+  margin:0 auto;
+  padding: var(--s8, 56px) var(--s7, 40px) var(--s9, 88px);
+}
+
+.sectie{margin-bottom: var(--s8, 56px);}
+.sectie:last-child{margin-bottom:0;}
+.sectie-kop{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:1.15rem;font-weight:800;
+  letter-spacing:-.02em;
+  color: var(--fg-primary);
+  margin-bottom:16px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--line-subtle);
+  display:flex;align-items:center;gap:10px;
+  scroll-margin-top:64px;
+}
+.kop-nr{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.68rem;font-weight:500;
+  min-width:22px;height:22px;
+  border-radius:50%;
+  background: var(--c-green);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+p{
+  font-size:.95rem;
+  color: var(--fg-secondary);
+  margin-bottom:12px;
+  line-height:1.78;
+}
+p:last-child{margin-bottom:0;}
+ul,ol{
+  padding-left:18px;margin-bottom:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+li{
+  font-size:.92rem;
+  color: var(--fg-secondary);
+  line-height:1.72;
+}
+a{
+  color: var(--c-orange-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+a:hover{ color: #b94613; }
+strong{font-weight:600; color: var(--fg-primary);}
+
+/* DEFINITIE-LIJST */
+.deflijst{display:grid;grid-template-columns: 180px 1fr;gap:8px 16px;margin:14px 0;}
+.deflijst dt{
+  font-weight:600;
+  color: var(--fg-primary);
+  font-size:.92rem;
+}
+.deflijst dd{
+  font-size:.92rem;
+  color: var(--fg-secondary);
+  line-height:1.7;
+}
+
+.contactblok{
+  background: var(--green-bg);
+  border:1px solid rgba(26,122,72,.2);
+  border-left:3px solid var(--c-green);
+  border-radius:0 var(--r-md, 10px) var(--r-md, 10px) 0;
+  padding:16px 20px;margin:12px 0;
+}
+.contactblok-label{
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size:.68rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+  color: var(--c-green);
+  margin-bottom:6px;
+}
+.contactblok p{
+  font-size:.9rem;
+  color: var(--fg-secondary);
+  margin-bottom:4px;
+}
+
+.info{
+  background: var(--accent-soft, rgba(224,92,26,.08));
+  border:1px solid rgba(224,92,26,.18);
+  border-left: 3px solid var(--c-orange-deep);
+  border-radius:0 var(--r-md, 10px) var(--r-md, 10px) 0;
+  padding:14px 18px;
+  margin:16px 0;
+  font-size:.9rem;
+  color: var(--fg-secondary);
+  line-height:1.7;
+}
+.info strong{ color: var(--fg-primary); }
+
+.footer{
+  background: var(--c-green-deep);
+  padding: var(--s5, 20px) var(--s7, 40px);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.footer-logo{
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size:.9rem;font-weight:700;
+  color:rgba(255,255,255,.5);
+  letter-spacing: -.02em;
+}
+.footer-logo span{ color: var(--c-orange); }
+.footer-links{
+  display:flex;gap:16px;
+  list-style:none;
+  flex-wrap: wrap;
+}
+.footer-links a, .footer-links button{
+  font-size:.78rem;
+  color:rgba(255,255,255,.45);
+  text-decoration:none;
+  transition: color var(--t-fast, .15s);
+  background:none; border:none; padding:0; cursor:pointer;
+  font-family: var(--font-body, 'Outfit', sans-serif);
+}
+.footer-links a:hover, .footer-links button:hover{ color: var(--c-orange); }
+.footer-disc{
+  font-size:.7rem;
+  color:rgba(255,255,255,.3);
+}
+.footer-tagline{
+  font-size: .76rem;
+  color: rgba(255,255,255,.4);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-orange-deep);
+  outline-offset: 2px;
+}
+
+@media(max-width:768px){
+  .header,.hero,.main,.footer{padding-left:16px;padding-right:16px;}
+  .main{padding-top:32px;padding-bottom:52px;}
+  .hero-badges{flex-direction:column;gap:5px;}
+  .deflijst{grid-template-columns: 1fr;gap:2px 0;}
+  .deflijst dt{margin-top:6px;}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="logo" href="index.html">intern<span class="logo-ly">ly</span></a>
+  <a class="back" href="index.html" onclick="if(document.referrer)event.preventDefault(),history.back()">← Terug</a>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-script-eyebrow">de afspraken</span>
+    <div class="hero-eyebrow">Algemene voorwaarden</div>
+    <h1 class="hero-title">Hoe we samenwerken</h1>
+    <p class="hero-sub">De voorwaarden voor het gebruik van het Internly-platform door bedrijven, scholen en begeleiders. Studenten betalen nooit en hoeven deze voorwaarden niet te aanvaarden.</p>
+    <div class="hero-badges">
+      <span class="badge badge-groen">✓ Nederlands recht</span>
+      <span class="badge badge-grijs">Versie 1.0 · mei 2026</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<main class="main">
+
+  <!-- 1. DEFINITIES -->
+  <section class="sectie" id="definities">
+    <h2 class="sectie-kop"><span class="kop-nr">1</span>Definities</h2>
+    <p>In deze algemene voorwaarden wordt verstaan onder:</p>
+    <dl class="deflijst">
+      <dt>Internly</dt>
+      <dd>Het stageplatform <a href="https://internly.pro">internly.pro</a>, geëxploiteerd door Sasubo Holding B.V.</dd>
+      <dt>Sasubo Holding</dt>
+      <dd>Sasubo Holding B.V., gevestigd te Lienden, ingeschreven bij de Kamer van Koophandel onder nummer 80201822.</dd>
+      <dt>Platform</dt>
+      <dd>De software, website en bijbehorende diensten beschikbaar via internly.pro en aanverwante subdomeinen.</dd>
+      <dt>Gebruiker</dt>
+      <dd>Iedere natuurlijke of rechtspersoon die een account aanmaakt op het Platform — bedrijf, school, begeleider of student.</dd>
+      <dt>Klant</dt>
+      <dd>De Gebruiker die een betaald Abonnement afsluit (bedrijf, school of begeleider). Studenten zijn nooit Klant.</dd>
+      <dt>Abonnement</dt>
+      <dd>De betaalde overeenkomst tussen Klant en Sasubo Holding op basis waarvan toegang wordt verleend tot premium-functionaliteit.</dd>
+      <dt>Diensten</dt>
+      <dd>De functies van het Platform: matching tussen studenten en bedrijven, begeleidingstools, evaluatie- en rapportagefuncties, en aanverwante services.</dd>
+    </dl>
+  </section>
+
+  <!-- 2. TOEPASSELIJKHEID -->
+  <section class="sectie" id="toepasselijkheid">
+    <h2 class="sectie-kop"><span class="kop-nr">2</span>Toepasselijkheid</h2>
+    <p>Deze algemene voorwaarden gelden voor elk gebruik van het Platform en voor elk Abonnement dat met Sasubo Holding wordt gesloten. Door een account aan te maken of een Abonnement af te sluiten verklaart de Gebruiker zich akkoord met deze voorwaarden.</p>
+    <p>Afwijkingen van deze voorwaarden zijn uitsluitend geldig wanneer schriftelijk overeengekomen tussen Klant en Sasubo Holding. Algemene voorwaarden van de Klant worden uitdrukkelijk van de hand gewezen.</p>
+    <p>Sasubo Holding kan deze voorwaarden eenzijdig wijzigen. Wijzigingen worden minimaal 30 dagen vóór ingang per e-mail aan actieve Gebruikers gecommuniceerd. Bij voortgezet gebruik na de ingangsdatum geldt instemming met de nieuwe voorwaarden. Zie verder artikel 9.</p>
+  </section>
+
+  <!-- 3. GEBRUIK VAN HET PLATFORM -->
+  <section class="sectie" id="gebruik">
+    <h2 class="sectie-kop"><span class="kop-nr">3</span>Gebruik van het platform</h2>
+    <p>Toegelaten gebruik:</p>
+    <ul>
+      <li>Het zoeken, plaatsen of begeleiden van stages binnen Nederland.</li>
+      <li>Het communiceren met andere Gebruikers via de daarvoor bestemde berichtenfunctie.</li>
+      <li>Het bijhouden van voortgang, evaluaties en rapportages voor stages waarbij de Gebruiker direct betrokken is.</li>
+    </ul>
+    <p>De Gebruiker zal het Platform niet gebruiken voor:</p>
+    <ul>
+      <li>Discriminatie op basis van afkomst, religie, geslacht, seksuele voorkeur, leeftijd of handicap.</li>
+      <li>Het versturen van ongevraagde commerciële berichten (spam) aan andere Gebruikers.</li>
+      <li>Het scrapen, automatisch ophalen of bulk-downloaden van data.</li>
+      <li>Onrechtmatig handelen, intimidatie, het delen van valse identiteiten of het misbruiken van het platform voor andere doeleinden dan stage-bemiddeling en -begeleiding.</li>
+      <li>Het plaatsen van content die in strijd is met de Spelregels (zie <a href="spelregels.html">spelregels.html</a>).</li>
+    </ul>
+    <p>Sasubo Holding behoudt het recht om accounts te schorsen of te beëindigen bij overtreding van deze regels, zonder restitutie van reeds betaalde bedragen wanneer de overtreding ernstig is.</p>
+  </section>
+
+  <!-- 4. ABONNEMENT EN BETALING -->
+  <section class="sectie" id="betaling">
+    <h2 class="sectie-kop"><span class="kop-nr">4</span>Abonnement en betaling</h2>
+    <p>Tariefstructuur en plannen staan op <a href="pricing.html">pricing.html</a>. De daar genoemde prijzen zijn in euro's exclusief BTW. Het Abonnement gaat in op de dag van de eerste succesvolle betaling.</p>
+    <p>Betalingen worden uitgevoerd via Mollie B.V. (Nederlandse betaaldienstverlener, gereguleerd door De Nederlandsche Bank). Sasubo Holding ontvangt nooit creditcard- of bankgegevens; deze worden direct door Mollie verwerkt en versleuteld bewaard.</p>
+    <p>Facturen worden digitaal aangeleverd in het accountdashboard van de Klant. De Klant kan hiervan een CSV-export downloaden. Op verzoek wordt een PDF-factuur per e-mail toegestuurd.</p>
+    <p>Bij een mislukte betaling probeert Mollie automatisch tot drie keer te incasseren. Lukt dat niet, dan wordt het Abonnement op <em>past_due</em> gezet. De Klant ontvangt hierover bericht. Wordt de openstaande betaling niet binnen 14 dagen voldaan, dan kan Sasubo Holding het Abonnement schorsen of beëindigen.</p>
+  </section>
+
+  <!-- 5. AANSPRAKELIJKHEID -->
+  <section class="sectie" id="aansprakelijkheid">
+    <h2 class="sectie-kop"><span class="kop-nr">5</span>Aansprakelijkheid</h2>
+    <p>Sasubo Holding spant zich in om het Platform 24/7 beschikbaar te houden, maar garandeert geen ononderbroken beschikbaarheid. Onderhoud, externe storingen of incidenten kunnen tijdelijke uitval veroorzaken.</p>
+    <p>Sasubo Holding is uitsluitend aansprakelijk voor directe schade die het rechtstreekse gevolg is van toerekenbare tekortkoming in de nakoming van de Diensten. Aansprakelijkheid voor indirecte schade (waaronder gederfde winst, gemiste opdrachten, reputatieschade en gevolgschade) is uitgesloten.</p>
+    <p>De totale aansprakelijkheid van Sasubo Holding per gebeurtenis of reeks van samenhangende gebeurtenissen is beperkt tot het bedrag dat de Klant in de drie maanden voorafgaand aan de schade-veroorzakende gebeurtenis aan abonnementsgelden heeft betaald, met een absoluut maximum van € 1.000.</p>
+    <p>Sasubo Holding is geen partij bij de stage-overeenkomst tussen student, bedrijf en/of school. Verplichtingen uit de stage zelf — zoals stagevergoeding, verzekering, begeleiding op de werkvloer of de juistheid van een eindbeoordeling — vallen onder de verantwoordelijkheid van de betrokken partijen, niet onder die van Sasubo Holding.</p>
+    <div class="info">
+      <p><strong>Trust Score en bedrijfsbeoordelingen.</strong> Internly toont indicatoren over bedrijven op basis van platform-data en gebruikersreviews. Deze zijn een hulpmiddel, geen garantie. Sasubo Holding is niet aansprakelijk voor beslissingen die uitsluitend zijn gebaseerd op deze indicatoren.</p>
+    </div>
+  </section>
+
+  <!-- 6. INTELLECTUEEL EIGENDOM -->
+  <section class="sectie" id="ip">
+    <h2 class="sectie-kop"><span class="kop-nr">6</span>Intellectueel eigendom</h2>
+    <p>Alle intellectuele eigendomsrechten op het Platform — inclusief broncode, ontwerp, logo's, teksten en functionaliteit — berusten uitsluitend bij Sasubo Holding of haar licentiegevers. Niets in deze voorwaarden draagt deze rechten over aan de Gebruiker.</p>
+    <p>De Gebruiker behoudt zijn eigen rechten op content die hij op het Platform plaatst (vacature-omschrijvingen, profielteksten, evaluaties). Door content te plaatsen verleent de Gebruiker aan Sasubo Holding een wereldwijde, royaltyvrije licentie om die content op het Platform te tonen, op te slaan en te gebruiken voor het leveren van de Diensten.</p>
+    <p>Het kopiëren, herdistribueren of commercieel exploiteren van Platform-content of Platform-functionaliteit zonder voorafgaande schriftelijke toestemming is verboden.</p>
+  </section>
+
+  <!-- 7. PERSOONSGEGEVENS -->
+  <section class="sectie" id="persoonsgegevens">
+    <h2 class="sectie-kop"><span class="kop-nr">7</span>Verwerking persoonsgegevens</h2>
+    <p>Op het gebruik van het Platform is het <a href="privacybeleid.html">privacybeleid</a> van toepassing. Sasubo Holding handelt als verwerkingsverantwoordelijke voor de gegevens die zij in het kader van de Diensten verwerkt.</p>
+    <p>Voor zakelijke Klanten die persoonsgegevens van hun studenten of medewerkers via het Platform verwerken, treedt Sasubo Holding op als verwerker. In dat geval geldt aanvullend de verwerkersovereenkomst die op aanvraag beschikbaar is via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
+    <p>Cookies en browseropslag worden beschreven in het <a href="cookiebeleid.html">cookiebeleid</a>.</p>
+  </section>
+
+  <!-- 8. DUUR EN OPZEGGING -->
+  <section class="sectie" id="opzegging">
+    <h2 class="sectie-kop"><span class="kop-nr">8</span>Duur en opzegging</h2>
+    <p>Een Abonnement loopt voor onbepaalde tijd, met de gekozen factureringsperiode (maandelijks of jaarlijks). Zonder opzegging wordt het Abonnement aan het einde van elke periode stilzwijgend verlengd.</p>
+    <p>De Klant kan het Abonnement opzeggen met inachtneming van een opzegtermijn van 30 dagen, schriftelijk per e-mail naar <a href="mailto:hallo@internly.pro">hallo@internly.pro</a> of via de opzegfunctie in het accountdashboard. Reeds voldane bedragen worden niet pro rata gerestitueerd.</p>
+    <p>Sasubo Holding kan het Abonnement met onmiddellijke ingang beëindigen bij ernstige overtreding van deze voorwaarden, bij faillissement of surseance van betaling van de Klant, of wanneer voortzetting in redelijkheid niet meer van Sasubo Holding kan worden verlangd.</p>
+    <p>Na beëindiging van het Abonnement worden persoonsgegevens conform het privacybeleid binnen 90 dagen verwijderd of geanonimiseerd, behalve waar wettelijke bewaartermijnen iets anders voorschrijven (zoals fiscale bewaartermijn van 7 jaar voor facturen).</p>
+  </section>
+
+  <!-- 9. WIJZIGINGEN -->
+  <section class="sectie" id="wijzigingen">
+    <h2 class="sectie-kop"><span class="kop-nr">9</span>Wijzigingen</h2>
+    <p>Sasubo Holding kan deze voorwaarden, het Platform en de Diensten van tijd tot tijd wijzigen. Materiële wijzigingen worden minimaal 30 dagen vóór ingang per e-mail aan actieve Klanten gecommuniceerd.</p>
+    <p>Tarieven kunnen jaarlijks worden geïndexeerd op basis van de CBS-consumentenprijsindex. Aanpassingen boven die indexatie worden 30 dagen vooraf aangekondigd. Klant heeft in dat geval het recht het Abonnement te beëindigen tegen de datum waarop de prijswijziging ingaat, zonder opzegtermijn.</p>
+    <p>De actuele versie van deze voorwaarden staat altijd op <a href="https://internly.pro/algemene-voorwaarden.html">internly.pro/algemene-voorwaarden.html</a>.</p>
+  </section>
+
+  <!-- 10. RECHT EN GESCHILLEN -->
+  <section class="sectie" id="recht">
+    <h2 class="sectie-kop"><span class="kop-nr">10</span>Toepasselijk recht en geschillen</h2>
+    <p>Op deze voorwaarden en op alle overeenkomsten tussen Sasubo Holding en de Gebruiker is uitsluitend Nederlands recht van toepassing. De toepasselijkheid van het Weens Koopverdrag (CISG) wordt uitgesloten.</p>
+    <p>Geschillen die voortvloeien uit of verband houden met deze voorwaarden of de Diensten worden bij uitsluiting voorgelegd aan de bevoegde rechter in het Arrondissement Gelderland, locatie Arnhem, tenzij dwingendrechtelijke bepalingen anders voorschrijven.</p>
+    <p>Vóór een gerechtelijke procedure spannen partijen zich in om het geschil onderling op te lossen. Klant kan klachten indienen via <a href="mailto:hallo@internly.pro">hallo@internly.pro</a>; Sasubo Holding reageert binnen 10 werkdagen.</p>
+
+    <div class="contactblok" style="margin-top:24px;">
+      <div class="contactblok-label">Sasubo Holding B.V.</div>
+      <p>Appelgaard 48, 4033 JD Lienden</p>
+      <p>KVK: 80201822</p>
+      <p>BTW: NL861608944B01</p>
+      <p>E-mail: <a href="mailto:hallo@internly.pro">hallo@internly.pro</a></p>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">intern<span>ly</span></div>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">Over ons</a></li>
+    <li><a href="privacybeleid.html">Privacyverklaring</a></li>
+    <li><a href="algemene-voorwaarden.html" aria-current="page">Algemene voorwaarden</a></li>
+    <li><a href="cookiebeleid.html">Cookiebeleid</a></li>
+    <li><button type="button" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences()">Cookie-instellingen</button></li>
+  </ul>
+  <div class="footer-disc">Internly.pro is onderdeel van Sasubo Holding B.V. · Algemene voorwaarden v1.0 · Mei 2026</div>
+  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+</footer>
+
+<script src="js/utils.js"></script>
+<script src="js/consent.js" defer></script>
+
+</body>
+</html>

@@ -862,10 +862,15 @@
     <a href="https://internly.pro/blog">Blog</a>
     <a href="mailto:hallo@internly.pro">Contact</a>
     <a href="auth.html">Inloggen</a>
+    <a href="privacybeleid.html">Privacybeleid</a>
+    <a href="algemene-voorwaarden.html">Algemene voorwaarden</a>
+    <a href="cookiebeleid.html">Cookiebeleid</a>
+    <a href="#" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences(); return false;">Cookie-instellingen</a>
   </div>
   <div class="footer-copy">© 2026 Sasubo Holding B.V. — Alle rechten voorbehouden</div>
   <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
 </footer>
+<script src="js/consent.js" defer></script>
 
 
 <!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
@@ -952,10 +957,9 @@
 (function() {
   if (!localStorage.getItem('internly_waitlist_seen')) {
     setTimeout(async function() {
-      const _client = window.supabase.createClient(
-        'https://qoxgbkbnjsycodcqqmft.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg'
-      );
+      // H1 fix 1 mei 2026: gebruik gedeelde window.db (geen inline credentials)
+      const _client = window.db;
+      if (!_client) { toonPopup(); return; }
       const { data: { session } } = await _client.auth.getSession();
       if (!session) toonPopup();
     }, 8000);
@@ -990,10 +994,8 @@
     btn.disabled    = true;
     btn.textContent = 'Bezig…';
 
-    const client = window.supabase.createClient(
-      'https://qoxgbkbnjsycodcqqmft.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg'
-    );
+    // H1 fix 1 mei 2026: gebruik gedeelde window.db
+    const client = window.db;
 
     const { error } = await client
       .from('waitlist')
@@ -1041,10 +1043,8 @@
     btn.disabled    = true;
     btn.textContent = 'Bezig…';
 
-    const client = window.supabase.createClient(
-      'https://qoxgbkbnjsycodcqqmft.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg'
-    );
+    // H1 fix 1 mei 2026: gebruik gedeelde window.db
+    const client = window.db;
     const { error } = await client
       .from('waitlist')
       .insert({ email, source: window.location.pathname });

@@ -407,6 +407,7 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/consent.js" defer></script>
 <script src="js/telemetry.js"></script>
 </head>
 <body>
@@ -722,6 +723,30 @@ function goToAuth() {
 
 
 </script>
+
+<!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
+<footer class="kb-shared-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">intern<span>ly</span></div>
+    <ul class="footer-links">
+      <li><a href="about.html">Over ons</a></li>
+      <li><a href="kennisbank.html">Kennisbank</a></li>
+      <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="pricing.html">Prijzen</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="privacybeleid.html">Privacybeleid</a></li>
+      <li><a href="algemene-voorwaarden.html">Algemene voorwaarden</a></li>
+      <li><a href="cookiebeleid.html">Cookiebeleid</a></li>
+      <li><a href="#" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences(); return false;">Cookie-instellingen</a></li>
+      <li><a href="spelregels.html">Spelregels</a></li>
+      <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
+      <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+  </div>
+</footer>
 
 </body>
 </html>

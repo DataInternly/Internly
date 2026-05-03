@@ -419,7 +419,7 @@ p { line-height: 1.7; }
 <!-- ── Topbar ── -->
 <div class="topbar">
   <a class="t-logo" href="index.html">intern<span>ly</span></a>
-  <a class="t-back" href="#" onclick="history.back();return false;">← Terug</a>
+  <a class="t-back" href="index.html" onclick="if(typeof goBack==='function'){goBack('index.html');return false;}">← Terug</a>
 </div>
 
 <!-- ── Hero ── -->
@@ -603,6 +603,9 @@ p { line-height: 1.7; }
   <div class="footer-logo">intern<span>ly</span></div>
   <ul class="footer-links">
     <li><a href="privacybeleid.html">Privacybeleid</a></li>
+    <li><a href="algemene-voorwaarden.html">Algemene voorwaarden</a></li>
+    <li><a href="cookiebeleid.html">Cookiebeleid</a></li>
+    <li><a href="#" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences(); return false;">Cookie-instellingen</a></li>
     <li><a href="spelregels.html">Spelregels</a></li>
     <li><a href="about.html">Over ons</a></li>
     <li><a href="mailto:hallo@internly.pro">Contact</a></li>
@@ -611,5 +614,7 @@ p { line-height: 1.7; }
   <p class="footer-tagline">Gebouwd door mensen die het zelf hebben meegemaakt.</p>
 </footer>
 
+<script src="js/utils.js"></script>
+<script src="js/consent.js" defer></script>
 </body>
 </html>
