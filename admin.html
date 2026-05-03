@@ -17,7 +17,34 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     :root {
       /* Pagina-aliassen → globale tokens (css/style.css) */
@@ -262,6 +289,14 @@
       <button class="nav-btn"        data-screen="trust"      onclick="show('trust')">⭐ Trust overrides</button>
       <button class="nav-btn"        data-screen="waitlist"   onclick="show('waitlist')">📋 Waitlist</button>
       <button class="nav-btn"        data-screen="bundeling"  onclick="show('bundeling')">🔗 Bundelverzoeken</button>
+      <button class="nav-btn"        data-screen="verificaties" onclick="show('verificaties')">
+        🔍 Verificaties
+        <span id="badge-verificaties"
+          style="background:#e05c1a;color:#fff;
+          font-size:.68rem;font-weight:600;
+          padding:1px 6px;border-radius:10px;
+          margin-left:4px;display:none">0</span>
+      </button>
     </div>
   </nav>
 
@@ -318,6 +353,23 @@
       <div id="bundeling-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
     </div>
 
+    <!-- ── VERIFICATIES — Worldwide 1 mei 2026 ── -->
+    <div class="screen" id="screen-verificaties">
+      <div style="margin-bottom:1.25rem">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;
+          font-size:1.1rem;font-weight:600;margin-bottom:.25rem">
+          Bedrijfsverificaties
+        </div>
+        <div style="font-size:.85rem;color:#7a8799">
+          Handmatige verificaties voor EU (DE) en niet-EU bedrijven
+        </div>
+      </div>
+      <div id="verificaties-list">
+        <div style="color:#7a8799;font-size:.9rem;padding:2rem 0;
+          text-align:center">Laden...</div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -339,10 +391,11 @@
     const btn = document.querySelector(`[data-screen="${name}"]`);
     if (btn) btn.classList.add('active');
 
-    if (name === 'flagged')    loadFlaggedReviews();
-    if (name === 'trust')      loadTrustOverrides();
-    if (name === 'waitlist')   loadWaitlist();
-    if (name === 'bundeling')  loadBundelVerzoeken();
+    if (name === 'flagged')      loadFlaggedReviews();
+    if (name === 'trust')        loadTrustOverrides();
+    if (name === 'waitlist')     loadWaitlist();
+    if (name === 'bundeling')    loadBundelVerzoeken();
+    if (name === 'verificaties') loadVerificaties();
   }
 
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -750,6 +803,217 @@
     }
   }
 
+  // ── Verificaties — Worldwide 1 mei 2026 ──────────────────────────────────
+  async function loadVerificaties() {
+    const list = document.getElementById('verificaties-list');
+    const badge = document.getElementById('badge-verificaties');
+    if (!list) return;
+
+    const { data, error } = await db
+      .from('company_profiles')
+      .select(
+        'profile_id, bedrijfsnaam, sector, country, ' +
+        'company_type, vat_number, tax_id, ' +
+        'verification_status, verification_doc, ' +
+        'vat_last_attempt_at, verified_at, rejection_reason, ' +
+        'profiles!company_profiles_profile_id_fkey(email)'
+      )
+      .in('verification_status', ['pending', 'rejected'])
+      .order('vat_last_attempt_at', { ascending: true });
+
+    if (error) {
+      list.innerHTML =
+        `<div style="color:#b82020">Laadfout: ${escapeHtml(error.message)}</div>`;
+      return;
+    }
+
+    const pending = (data || []).filter(
+      c => c.verification_status === 'pending');
+
+    if (badge) {
+      badge.textContent = pending.length;
+      badge.style.display = pending.length > 0 ? '' : 'none';
+    }
+
+    if (!data || data.length === 0) {
+      list.innerHTML =
+        `<div style="color:#7a8799;font-size:.9rem;
+          padding:2rem 0;text-align:center">
+          Geen openstaande verificaties ✓
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = data.map(c => `
+      <div style="background:#fff;border:1px solid
+        rgba(13,21,32,.09);border-radius:10px;
+        padding:1.1rem 1.25rem;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;
+          align-items:flex-start;gap:.75rem;margin-bottom:.75rem">
+          <div>
+            <div style="font-weight:600;font-size:.95rem;
+              color:#0d1520;margin-bottom:.2rem">
+              ${escapeHtml(c.bedrijfsnaam || 'Naamloos bedrijf')}
+            </div>
+            <div style="font-size:.78rem;color:#7a8799">
+              ${escapeHtml(c.profiles?.email || '')} ·
+              ${escapeHtml(c.country || '?')} ·
+              ${c.company_type === 'eu' ? 'EU' :
+                c.company_type === 'worldwide' ? 'Internationaal' : 'NL'}
+            </div>
+          </div>
+          <span style="font-size:.75rem;font-weight:500;
+            padding:3px 10px;border-radius:10px;flex-shrink:0;
+            ${c.verification_status === 'pending'
+              ? 'background:#fdf3e0;color:#a06010'
+              : 'background:#fdeaea;color:#b82020'}">
+            ${c.verification_status === 'pending'
+              ? '⏳ In behandeling' : '✕ Afgewezen'}
+          </span>
+        </div>
+
+        ${c.vat_number ? `
+          <div style="font-size:.82rem;color:#3a4455;
+            margin-bottom:.4rem">
+            BTW: <strong>${escapeHtml(c.vat_number)}</strong>
+          </div>` : ''}
+
+        ${c.tax_id ? `
+          <div style="font-size:.82rem;color:#3a4455;
+            margin-bottom:.4rem">
+            Tax ID: <strong>${escapeHtml(c.tax_id)}</strong>
+          </div>` : ''}
+
+        ${c.verification_doc ? `
+          <div style="margin-bottom:.65rem">
+            <button data-doc-path="${escapeHtml(c.verification_doc)}"
+              onclick="loadVerifyDoc(this.dataset.docPath)"
+              style="font-size:.8rem;color:#1756a8;
+              background:none;border:none;cursor:pointer;
+              text-decoration:underline;padding:0">
+              📄 Bekijk document
+            </button>
+          </div>` : `
+          <div style="font-size:.78rem;color:#7a8799;
+            margin-bottom:.65rem;font-style:italic">
+            Geen document geüpload
+          </div>`}
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;
+          align-items:center">
+          <button onclick="adminVerify('${c.profile_id}', 'approve')"
+            style="padding:7px 16px;background:#e8f5ee;
+            color:#0f5c36;border:1px solid rgba(26,122,72,.2);
+            border-radius:8px;font-size:.82rem;font-weight:500;
+            cursor:pointer">
+            ✓ Goedkeuren
+          </button>
+          <button onclick="adminVerify('${c.profile_id}', 'reject')"
+            style="padding:7px 16px;background:#fdeaea;
+            color:#b82020;border:1px solid rgba(184,32,32,.15);
+            border-radius:8px;font-size:.82rem;font-weight:500;
+            cursor:pointer">
+            ✕ Afwijzen
+          </button>
+        </div>
+
+        ${c.rejection_reason ? `
+          <div style="margin-top:.65rem;font-size:.78rem;
+            color:#b82020;background:#fdeaea;padding:.5rem .75rem;
+            border-radius:6px">
+            Afwijzingsreden: ${escapeHtml(c.rejection_reason)}
+          </div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  async function loadVerifyDoc(path) {
+    try {
+      const { data, error } = await db.storage
+        .from('verification-docs')
+        .createSignedUrl(path, 3600);
+      if (error) throw error;
+      window.open(data.signedUrl, '_blank');
+    } catch (err) {
+      notify('Document kon niet worden geladen: '
+        + (err.message || 'Onbekende fout'), false);
+    }
+  }
+
+  async function adminVerify(companyId, action) {
+    const isApprove = action === 'approve';
+    let reason = null;
+
+    if (!isApprove) {
+      reason = prompt(
+        'Reden voor afwijzing (wordt getoond aan bedrijf):');
+      if (reason === null) return; // cancelled
+      if (!reason.trim()) {
+        notify('Geef een reden op voor afwijzing', false);
+        return;
+      }
+    }
+
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) return;
+
+    const update = isApprove
+      ? {
+          verification_status: 'verified',
+          verified_at:         new Date().toISOString(),
+          verified_by:         session.user.id,
+          rejection_reason:    null
+        }
+      : {
+          verification_status: 'rejected',
+          rejection_reason:    reason.trim(),
+          verified_by:         session.user.id
+        };
+
+    const { error } = await db
+      .from('company_profiles')
+      .update(update)
+      .eq('profile_id', companyId);
+
+    if (error) {
+      notify('Fout: ' + error.message, false);
+      return;
+    }
+
+    // Log de actie
+    await db.from('verification_log').insert({
+      company_id:   companyId,
+      action:       isApprove ? 'manual_approved' : 'manual_rejected',
+      performed_by: session.user.id,
+      notes:        isApprove
+        ? 'Handmatig goedgekeurd door admin'
+        : `Afgewezen: ${reason}`,
+      created_at: new Date().toISOString()
+    });
+
+    // Stuur notificatie naar bedrijf
+    await db.from('notifications').insert({
+      user_id:    companyId,
+      type:       isApprove
+        ? 'verification_approved'
+        : 'verification_rejected',
+      ref_type:   'company',
+      message:    isApprove
+        ? 'Je bedrijf is geverifieerd. Vacatures zijn nu zichtbaar voor studenten.'
+        : `Verificatie afgewezen: ${reason}`,
+      read:       false,
+      created_at: new Date().toISOString()
+    });
+
+    notify(isApprove
+      ? `✓ ${companyId.slice(0,8)}... geverifieerd`
+      : `✕ Verificatie afgewezen`
+    );
+
+    // Herlaad lijst
+    await loadVerificaties();
+  }
+
   function copyEmail(email) {
     navigator.clipboard.writeText(email).then(() => notify('Email gekopieerd: ' + email)).catch(() => notify('Kopiëren mislukt'));
   }
@@ -802,6 +1066,8 @@
 
     currentAdmin = user;
     loadStats();
+    // Worldwide 1 mei 2026 — populeer verificatie-badge bij init
+    loadVerificaties();
   });
 
   // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep

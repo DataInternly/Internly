@@ -16,7 +16,34 @@
   <script src="js/supabase.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/optimistic.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     /* ═══════════════════════════════════════════════════════════════
@@ -190,6 +217,12 @@
 
   <div class="layout">
     <main class="main">
+      <div class="page-back-row" style="max-width:none;margin:0 0 12px;padding:0;">
+        <button class="page-back-btn" type="button" onclick="goBack()" aria-label="Terug">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <span>Terug</span>
+        </button>
+      </div>
       <div class="page-head">
         <div class="page-eyebrow">Mijn aanvragen</div>
         <div class="page-title" style="display:flex;align-items:center;gap:6px;">Mijn Sollicitaties<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg statussen en Stage Hub">ⓘ<span class="info-pop"><strong>Statussen:</strong><br>✓ Uitgenodigd — het bedrijf wil je spreken.<br>⏳ In behandeling — je aanvraag wordt beoordeeld.<br>✕ Afgewezen — het bedrijf gaat niet verder.<br><br>Klik op <strong>Stage Hub →</strong> bij een actieve stage om je persoonlijke werkruimte te openen.</span></span></div>
@@ -239,10 +272,24 @@
       invited:   'uitgenodigd',
       rejected:  'afgewezen',
       accepted:  'uitgenodigd',
+      active:    'uitgenodigd',
+      ended:     'uitgenodigd',
       wacht:      'wacht',
       uitgenodigd:'uitgenodigd',
       afgewezen:  'afgewezen',
     };
+
+    // BOL Fix 2 — status labels per rol (student-perspectief)
+    function statusLabelStudent(status) {
+      const labels = {
+        pending:  '⏳ Wacht op reactie',
+        accepted: '✓ Uitgenodigd',
+        active:   '🎯 Stage loopt',
+        rejected: '✕ Niet geselecteerd',
+        ended:    '✓ Stage afgerond'
+      };
+      return labels[status] || status;
+    }
 
     // Per-application review rating state — keyed by unique app card id
     const reviewRatings = {};
@@ -369,8 +416,10 @@
         const appId      = 'app-' + (app.id || idx);
 
         let statusTag = '';
+        const _rawStatus = app.status; // BOL Fix 2: gebruik raw DB-status voor label
         if (app._status === 'uitgenodigd') {
-          statusTag = `<span class="tag green">✓ Uitgenodigd</span>`;
+          const _label = statusLabelStudent(_rawStatus);
+          statusTag = `<span class="tag green">${_label}</span>`;
         } else if (app._status === 'wacht') {
           const _respDays  = vacature.response_days;
           const _daysSince = created ? Math.floor((Date.now() - new Date(created).getTime()) / 86400000) : null;
@@ -382,9 +431,9 @@
           const _bewaakt = !_respDays
             ? `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Internly bewaakt de reactietermijn voor je. Je ontvangt een melding zodra er nieuws is.</div>`
             : '';
-          statusTag = `<span class="tag neutral">⏳ In behandeling</span>${_deadlineInfo}${_bewaakt}`;
+          statusTag = `<span class="tag neutral">${statusLabelStudent('pending')}</span>${_deadlineInfo}${_bewaakt}`;
         } else if (app._status === 'afgewezen') {
-          statusTag = `<span class="tag red">✕ Afgewezen</span><div style="background:var(--bg2,#f4f6f9);border-radius:var(--radius-sm,8px);padding:8px 12px;margin-top:6px;border-left:3px solid var(--ink3,#7a8799);font-size:.8rem;color:var(--ink2,#374151);line-height:1.55;">💙 Dit zegt niets over jou als kandidaat.</div>`;
+          statusTag = `<span class="tag red">${statusLabelStudent('rejected')}</span><div style="background:var(--bg2,#f4f6f9);border-radius:var(--radius-sm,8px);padding:8px 12px;margin-top:6px;border-left:3px solid var(--ink3,#7a8799);font-size:.8rem;color:var(--ink2,#374151);line-height:1.55;">💙 Dit zegt niets over jou als kandidaat.</div>`;
         }
 
         const detailLink = app.internship_id

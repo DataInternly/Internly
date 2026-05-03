@@ -17,7 +17,34 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     /* ═══════════════════════════════════════════════════════════════
        Lijst archetype (matches) — swipe-card variant.
@@ -752,11 +779,15 @@
         const other   = profileMap[otherId] || {};
         const init    = (other.naam || '?').charAt(0).toUpperCase();
         const name    = escapeHtml(other.naam || 'Onbekend');
-        return `<div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(13,21,32,.07);">
-          <div style="width:40px;height:40px;border-radius:50%;background:#e05c1a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;flex-shrink:0;">${escapeHtml(init)}</div>
+        // Buddy kleurcodering — backlog 30 apr 2026
+        return `<div style="display:flex;align-items:center;gap:14px;padding:14px 12px;border-bottom:1px solid rgba(13,21,32,.07);border-left:3px solid #7c3aed;background:#faf7ff;border-radius:0 6px 6px 0;margin-bottom:6px">
+          <div style="width:40px;height:40px;border-radius:50%;background:#ede9fe;color:#7c3aed;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;flex-shrink:0;">${escapeHtml(init)}</div>
           <div>
-            <div style="font-weight:600;color:#0d1520;font-size:.92rem;">${name}</div>
-            <div style="font-size:.75rem;color:#6b7280;">Buddy · Verbonden via Internly</div>
+            <div style="font-weight:600;color:#0d1520;font-size:.92rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              ${name}
+              <span style="background:#ede9fe;color:#7c3aed;font-size:.72rem;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block">Buddy</span>
+            </div>
+            <div style="font-size:.75rem;color:#6b7280;">Verbonden via Internly</div>
           </div>
         </div>`;
       }).join('');

@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/consent.js" defer></script>
   <style>
     /* ── Reset + tokens ───────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1040,35 +1042,61 @@
       </div>
 
       <div class="hero-right">
-        <svg class="world-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="World map with active locations in Europe">
-          <!-- Continents (simplified) -->
-          <path class="world-continent" d="M40,55 Q70,40 110,48 Q140,55 138,90 Q130,128 95,130 Q60,125 50,100 Q42,80 40,55 Z"/>
-          <path class="world-continent" d="M95,140 Q120,135 128,165 Q132,200 110,225 Q88,222 92,185 Q90,160 95,140 Z"/>
-          <path class="world-continent" d="M165,60 Q200,52 232,68 Q238,90 218,108 Q188,112 170,98 Q162,80 165,60 Z"/>
-          <path class="world-continent" d="M195,118 Q228,112 235,148 Q230,188 212,205 Q188,200 185,165 Q182,135 195,118 Z"/>
-          <path class="world-continent" d="M232,52 Q300,42 355,65 Q368,108 322,138 Q260,135 238,112 Q225,82 232,52 Z"/>
-          <path class="world-continent" d="M325,178 Q352,172 372,184 Q378,200 352,208 Q325,202 325,178 Z"/>
-          <path class="world-continent" d="M50,215 Q200,210 350,215 Q360,228 200,232 Q40,228 50,215 Z"/>
+<svg class="world-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="World map with active locations">
 
-          <!-- Arc lines between cities -->
-          <path class="world-arc" d="M195,88 Q190,75 185,90"/>
-          <path class="world-arc" d="M195,88 Q198,72 200,85"/>
+  <!-- Continents -->
+  <path class="world-continent" d="M40,55 Q70,40 110,48 Q140,55 138,90 Q130,128 95,130 Q60,125 50,100 Q42,80 40,55 Z"/>
+  <path class="world-continent" d="M95,140 Q120,135 128,165 Q132,200 110,225 Q88,222 92,185 Q90,160 95,140 Z"/>
+  <path class="world-continent" d="M165,60 Q200,52 232,68 Q238,90 218,108 Q188,112 170,98 Q162,80 165,60 Z"/>
+  <path class="world-continent" d="M195,118 Q228,112 235,148 Q230,188 212,205 Q188,200 185,165 Q182,135 195,118 Z"/>
+  <path class="world-continent" d="M232,52 Q300,42 355,65 Q368,108 322,138 Q260,135 238,112 Q225,82 232,52 Z"/>
+  <path class="world-continent" d="M325,178 Q352,172 372,184 Q378,200 352,208 Q325,202 325,178 Z"/>
+  <path class="world-continent" d="M50,215 Q200,210 350,215 Q360,228 200,232 Q40,228 50,215 Z"/>
 
-          <!-- Amsterdam -->
-          <circle class="pulse-ring" cx="195" cy="88" r="4"/>
-          <circle cx="195" cy="88" r="3.5" fill="#FF7E42"/>
-          <text class="city-label" x="195" y="76" text-anchor="middle">Amsterdam</text>
+  <!-- Arc lines -->
+  <path class="world-arc" d="M178,86 Q130,55 85,88"/>
+  <path class="world-arc" d="M208,84 Q268,60 318,82"/>
+  <path class="world-arc" d="M195,88 Q140,50 85,88" style="animation-delay:.4s"/>
+  <path class="world-arc" d="M318,82 Q260,58 195,88" style="animation-delay:.8s"/>
 
-          <!-- London -->
-          <circle class="pulse-ring delay-1" cx="178" cy="86" r="4"/>
-          <circle cx="178" cy="86" r="3.5" fill="#FF7E42"/>
-          <text class="city-label" x="170" y="100" text-anchor="end">London</text>
+  <!-- New York -->
+  <circle class="pulse-ring" cx="85" cy="88" r="4"/>
+  <circle class="pulse-ring delay-1" cx="85" cy="88" r="4"/>
+  <circle cx="85" cy="88" r="3.5" fill="#FF7E42"/>
+  <text class="city-label" x="85" y="78" text-anchor="middle">New York</text>
 
-          <!-- Berlin -->
-          <circle class="pulse-ring delay-2" cx="208" cy="84" r="4"/>
-          <circle cx="208" cy="84" r="3.5" fill="#FF7E42"/>
-          <text class="city-label" x="218" y="80" text-anchor="start">Berlin</text>
-        </svg>
+  <!-- São Paulo -->
+  <circle class="pulse-ring delay-2" cx="108" cy="175" r="4"/>
+  <circle cx="108" cy="175" r="3" fill="#FF7E42" opacity="0.85"/>
+  <text class="city-label" x="108" y="188" text-anchor="middle">São Paulo</text>
+
+  <!-- London -->
+  <circle class="pulse-ring delay-1" cx="178" cy="86" r="4"/>
+  <circle cx="178" cy="86" r="3.5" fill="#FF7E42"/>
+  <text class="city-label" x="168" y="100" text-anchor="end">London</text>
+
+  <!-- Amsterdam -->
+  <circle class="pulse-ring" cx="195" cy="88" r="4"/>
+  <circle cx="195" cy="88" r="3.5" fill="#FF7E42"/>
+  <text class="city-label" x="195" y="76" text-anchor="middle">Amsterdam</text>
+
+  <!-- Berlin -->
+  <circle class="pulse-ring delay-2" cx="208" cy="84" r="4"/>
+  <circle cx="208" cy="84" r="3.5" fill="#FF7E42"/>
+  <text class="city-label" x="218" y="80" text-anchor="start">Berlin</text>
+
+  <!-- Beijing -->
+  <circle class="pulse-ring delay-1" cx="318" cy="82" r="4"/>
+  <circle class="pulse-ring" cx="318" cy="82" r="4" style="animation-delay:1.2s"/>
+  <circle cx="318" cy="82" r="3.5" fill="#FF7E42"/>
+  <text class="city-label" x="318" y="72" text-anchor="middle">Beijing</text>
+
+  <!-- Singapore -->
+  <circle class="pulse-ring delay-2" cx="308" cy="138" r="4"/>
+  <circle cx="308" cy="138" r="3" fill="#FF7E42" opacity="0.85"/>
+  <text class="city-label" x="318" y="150" text-anchor="start">Singapore</text>
+
+</svg>
       </div>
     </div>
   </header>
@@ -1653,17 +1681,20 @@
   </script>
 
   <script>
-    // ── Worldwide waitlist — inline Supabase client ────────
-    // AUDIT NOTE: Bedward P2 known pattern — fase 2 cleanup
-    // pending. Same approach as index.html + about.html.
+    // ── Worldwide waitlist — gedelegeerd aan js/supabase.js ──
+    // Bedward P2 cleanup — 30 apr 2026.
+    // Geen inline credentials meer; gebruikt window.db (centraal
+    // gemaakt in js/supabase.js). Fallback: window.__SUPABASE_ANON_KEY
+    // is publiek per design en alleen actief als window.db ontbreekt.
     // ────────────────────────────────────────────────────────
     (function() {
-      const SUPA_URL = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
-      const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFveGdia2JuanN5Y29kY3FxbWZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MTg4OTUsImV4cCI6MjA5MTM5NDg5NX0.XpfdNGwTUG7uzuM0wifeXrws-hok_Ta7H5MyNZMZPzg';
+      const SUPA_URL_FALLBACK = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
 
-      const _db = window.supabase
-        ? window.supabase.createClient(SUPA_URL, SUPA_KEY)
-        : null;
+      const _db = window.db
+        ? window.db
+        : (window.supabase && window.__SUPABASE_ANON_KEY)
+          ? window.supabase.createClient(SUPA_URL_FALLBACK, window.__SUPABASE_ANON_KEY)
+          : null;
 
       window.wwSignup = async function() {
         const input  = document.getElementById('ww-email-input');

@@ -24,11 +24,41 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/profileView.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/account.js"></script>
   <script src="js/buddy.js"></script>
   <script src="js/swipes.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -76,10 +106,6 @@
 
     /* ── Shell ── */
     .shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
-
-    /* ── Welcome ── */
-    .welcome-head { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 600; color: #0d1520; margin-bottom: 4px; }
-    .welcome-sub  { font-size: .88rem; color: #6b7280; margin-bottom: 20px; }
 
     /* ── Pauze-banner ── */
     .pause-banner {
@@ -154,6 +180,17 @@
       font-family: 'Outfit', sans-serif; font-size: .88rem; color: #0d1520;
       background: #fff; outline: none; transition: border-color .15s; box-sizing: border-box;
     }
+    .profile-field input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      padding: 0;
+      margin: 0;
+      flex-shrink: 0;
+      accent-color: #1a7a48;
+      cursor: pointer;
+      border-radius: 3px;
+    }
     .profile-field input:focus,
     .profile-field select:focus,
     .profile-field textarea:focus { border-color: var(--c-buddy-purple); }
@@ -203,9 +240,12 @@
     .bc-date { font-size: .72rem; color: #9ca3af; }
 
     /* ── Pending requests ── */
+    /* Student kleurcodering — backlog 30 apr 2026: groene hue voor student in buddy-interface */
     .req-card {
-      border: 1px solid rgba(109,40,217,.2); border-radius: 12px;
-      padding: 12px 14px; margin-bottom: 8px; background: #faf8ff;
+      border: 1px solid rgba(13,21,32,.09);
+      border-left: 3px solid #1a7a48;
+      border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 8px; background: #f7fbf8;
     }
     .req-who   { font-size: .88rem; font-weight: 500; color: #0d1520; margin-bottom: 4px; }
     .req-msg   { font-size: .78rem; color: #6b7280; margin-bottom: 8px; font-style: italic; }
@@ -264,9 +304,12 @@
     }
   </style>
 </head>
-<body>
+<body data-role="gepensioneerd" data-auth-pending="true">
 
 <div class="notif" id="notif"></div>
+
+<!-- ── Role-aware top navigation header (RUN2 — 1 mei 2026) ── -->
+<header id="role-header" class="role-header"></header>
 
 <!-- ── Topbar ── -->
 <div class="topbar">
@@ -283,14 +326,32 @@
 
 <div class="shell">
 
-  <div class="welcome-head" id="welcomeMsg">Welkom</div>
-  <div class="welcome-sub">Jouw overzicht als buddy-vrijwilliger bij Internly.</div>
+  <!-- ════ Section: OVERZICHT (default visible — RUN2/RUN4 1 mei 2026) ════ -->
+  <section id="section-overzicht" class="dashboard-section" data-section="overzicht">
+
+  <!-- Greeting hero (RUN4) -->
+  <div class="overz-greeting" id="overz-greeting">
+    <div class="overz-greeting-text" id="overz-greeting-text">Goedemorgen</div>
+    <div class="overz-greeting-sub"  id="overz-greeting-sub">Een ogenblik...</div>
+  </div>
+
+  <!-- Identity card (RUN4) -->
+  <div class="overz-identity" id="overz-identity">
+    <!-- gerenderd door renderBuddyIdentityCard() -->
+  </div>
+
+  <!-- Section divider (RUN4) -->
+  <div class="overz-section-label">Instellingen</div>
 
   <!-- Pauze-banner (zichtbaar als paused = true) -->
   <div class="pause-banner" id="pauseBanner">
     <span>⏸ Je matching staat op pauze — nieuwe studenten kunnen je nu niet vinden.</span>
     <button class="btn-sm btn-primary" onclick="togglePause()">Hervatten</button>
   </div>
+
+  </section>
+  <!-- ════ Section: MATCHES (RUN2 1 mei 2026) ════ -->
+  <section id="section-matches" class="dashboard-section" data-section="matches" hidden>
 
   <!-- ── Openstaande verzoeken ── -->
   <div class="card" id="requestsCard" style="display:none;">
@@ -306,6 +367,98 @@
     </div>
   </div>
 
+  <!-- Studenten die een buddy zoeken — Tinder-style deck — 1 mei 2026 -->
+  <div class="card" id="buddy-seekers-section">
+    <div class="card-label">
+      Studenten die een buddy zoeken
+    </div>
+    <p style="font-size:.82rem;color:#6b7280;
+      margin-bottom:.85rem;line-height:1.55">
+      Swipe rechts of klik 💜 om contact te maken.
+      Swipe links of klik ✕ om over te slaan.
+    </p>
+
+    <div id="buddy-deck-loading"
+      style="text-align:center;padding:1.5rem 0;
+      color:#9ca3af;font-size:.85rem">
+      Laden...
+    </div>
+
+    <div id="buddy-deck-empty"
+      style="display:none;text-align:center;padding:2rem 0">
+      <div style="font-size:2rem;margin-bottom:.6rem">🎓</div>
+      <div style="font-size:.88rem;font-weight:500;
+        color:#6b7280;margin-bottom:.35rem">
+        Nog geen studenten beschikbaar
+      </div>
+      <div style="font-size:.76rem;color:#9ca3af;
+        line-height:1.55;max-width:220px;margin:0 auto">
+        Studenten die een buddy zoeken verschijnen hier
+        zodra ze hun profiel hebben bijgewerkt.
+      </div>
+    </div>
+
+    <div id="buddy-deck-done"
+      style="display:none;text-align:center;padding:2rem 0">
+      <div style="font-size:2rem;margin-bottom:.6rem">✨</div>
+      <div style="font-size:.88rem;font-weight:500;
+        color:#6b7280;margin-bottom:.35rem">
+        Dat waren alle studenten voor nu
+      </div>
+      <div style="font-size:.76rem;color:#9ca3af;
+        margin-bottom:1rem">
+        Kom later terug voor nieuwe studenten.
+      </div>
+      <button onclick="reloadBuddyDeck()"
+        style="padding:8px 20px;
+        background:var(--c-buddy-purple-bg,#ede9fe);
+        color:var(--c-buddy-purple,#7c3aed);
+        border:1px solid rgba(124,58,237,.2);
+        border-radius:8px;font-family:'Outfit',sans-serif;
+        font-size:.83rem;cursor:pointer">
+        Opnieuw laden
+      </button>
+    </div>
+
+    <div id="buddy-deck-wrap"
+      style="display:none;position:relative;height:300px;
+      margin-bottom:.85rem;touch-action:none">
+    </div>
+
+    <div id="buddy-deck-actions"
+      style="display:none;justify-content:center;
+      gap:1.5rem;padding:.25rem 0">
+      <button onclick="deckAction('pass')"
+        title="Overslaan"
+        style="width:52px;height:52px;border-radius:50%;
+        background:#fff;border:1.5px solid #e5e7eb;
+        font-size:1.2rem;cursor:pointer;
+        display:flex;align-items:center;
+        justify-content:center;
+        box-shadow:0 2px 8px rgba(13,21,32,.07);
+        transition:transform .1s">
+        ✕
+      </button>
+      <button onclick="deckAction('like')"
+        title="Buddy worden"
+        style="width:62px;height:62px;border-radius:50%;
+        background:linear-gradient(135deg,
+          var(--c-buddy-purple,#7c3aed),#6d28d9);
+        border:none;font-size:1.4rem;cursor:pointer;
+        display:flex;align-items:center;
+        justify-content:center;color:#fff;
+        box-shadow:0 4px 16px rgba(124,58,237,.3);
+        transition:transform .1s">
+        💜
+      </button>
+    </div>
+
+    <div id="buddy-deck-counter"
+      style="display:none;text-align:center;
+      font-size:.72rem;color:#9ca3af;margin-top:.3rem">
+    </div>
+  </div>
+
   <!-- ── Interesse in jou ── -->
   <div class="card" id="incoming-likes-section" style="display:none">
     <div class="card-label">Interesse in jou</div>
@@ -313,12 +466,64 @@
     <div id="incoming-likes-list"></div>
   </div>
 
-  <!-- ── Mijn profiel (uitgebreid) ── -->
-  <div class="card">
-    <div class="card-label">Mijn profiel</div>
-    <form id="buddy-profile-form" onsubmit="event.preventDefault(); saveBuddyProfile(collectBuddyProfileData(this))">
+  </section>
+  <!-- ════ Section: PROFIEL (RUN2 1 mei 2026) ════ -->
+  <section id="section-profiel" class="dashboard-section" data-section="profiel" hidden>
 
-      <div class="profile-field">
+  <!-- Saved-view container — gerenderd door renderProfileView() -->
+  <div id="buddy-profile-saved-view" class="dashboard-card-wrap"></div>
+
+  <!-- ── Mijn profiel — overzicht (LEGACY, hidden via showBuddyOverzicht) ── -->
+  <div class="card" id="buddy-profile-overzicht" style="display:none">
+    <div class="card-label">Mijn profiel</div>
+    <div id="buddy-overzicht-body"></div>
+    <button type="button" class="profile-save-btn"
+      onclick="showBuddyForm()" style="margin-top:18px;">
+      Profiel bewerken
+    </button>
+  </div>
+
+  <!-- ── Mijn profiel (uitgebreid) ── -->
+  <div class="card" id="buddy-profile-form-card" hidden>
+    <div class="card-label">Mijn profiel</div>
+    <form id="buddy-profile-form" onsubmit="handleBuddyProfileSubmit(event)">
+
+      <div id="avatar-picker-container"></div>
+
+      <!-- ─── Pitch (tagline) ─── -->
+      <div class="profile-field" style="margin-top:14px;">
+        <label for="bp-pitch">Korte tagline</label>
+        <input type="text"
+               id="bp-pitch"
+               name="pitch"
+               maxlength="160"
+               placeholder="Bijvoorbeeld: 'Klankbord uit de zorg voor jongeren die hun pad zoeken.'">
+        <div class="avail-note">Eén zin die direct laat zien wat je biedt. Max 160 tekens.</div>
+      </div>
+
+      <!-- ─── Achtergrond (loopbaan) ─── -->
+      <div class="profile-field" style="margin-top:14px;">
+        <label for="bp-achtergrond">Loopbaan</label>
+        <textarea id="bp-achtergrond"
+                  name="achtergrond"
+                  rows="4"
+                  maxlength="1000"
+                  placeholder="Welk werk deed je voor je pensioen? Begin bij hoofdlijnen, niet bij CV-details."></textarea>
+        <div class="avail-note">Iets feitelijks. Wat heb je gedaan in je werkende leven? Max 1000 tekens.</div>
+      </div>
+
+      <!-- ─── Bio (motivatie) ─── -->
+      <div class="profile-field" style="margin-top:14px;">
+        <label for="bp-bio">Wat ik te bieden heb</label>
+        <textarea id="bp-bio"
+                  name="bio"
+                  rows="5"
+                  maxlength="2000"
+                  placeholder="Hoe wil je een student steunen? Niet wat je weet, maar hoe je luistert. Eerlijk en in jouw woorden."></textarea>
+        <div class="avail-note">Persoonlijker. Wat voor klankbord ben je? Max 2000 tekens.</div>
+      </div>
+
+      <div class="profile-field" style="margin-top:14px;">
         <label>Kennisgebieden</label>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
           <label style="display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:400;">
@@ -420,14 +625,19 @@
     </form>
   </div>
 
+  </section>
+  <!-- ════ Section: OVERZICHT vervolg (Worldwide + privacy + account + beschikbaarheid) ════ -->
+  <section class="dashboard-section" data-section="overzicht">
+
   <!-- ── Internly Worldwide (internationale studenten) ── -->
-  <div class="card">
-    <div class="card-label">Internly Worldwide</div>
-    <p class="intl-section-desc">
-      Internationale studenten zoeken ook buddy-begeleiding. Zet dit aan als je
-      beschikbaar bent voor een internationale stagiair en geef de talen aan
-      die je spreekt.
-    </p>
+  <div class="setting-card" id="card-worldwide">
+    <div class="setting-card-head">
+      <div class="setting-card-icon">🌍</div>
+      <div class="setting-card-text">
+        <div class="setting-card-title">Internly Worldwide</div>
+        <div class="setting-card-desc">Open je voor internationale studenten die hulp zoeken bij hun stage in Nederland.</div>
+      </div>
+    </div>
 
     <div class="toggle-row">
       <div>
@@ -447,8 +657,14 @@
   </div>
 
   <!-- ── Privacy & instellingen ── -->
-  <div class="card">
-    <div class="card-label">Privacy &amp; instellingen</div>
+  <div class="setting-card" id="card-privacy">
+    <div class="setting-card-head">
+      <div class="setting-card-icon">🔒</div>
+      <div class="setting-card-text">
+        <div class="setting-card-title">Privacy &amp; instellingen</div>
+        <div class="setting-card-desc">Bepaal hoe zichtbaar je bent en pauzeer matching wanneer het je uitkomt.</div>
+      </div>
+    </div>
 
     <div class="toggle-row">
       <div>
@@ -470,10 +686,30 @@
   </div>
 
   <!-- ── Account ── -->
-  <div class="card">
-    <div class="card-label">⚙️ Account</div>
+  <div class="setting-card" id="card-account">
+    <div class="setting-card-head">
+      <div class="setting-card-icon">⚙️</div>
+      <div class="setting-card-text">
+        <div class="setting-card-title">Account</div>
+        <div class="setting-card-desc">Persoonlijke gegevens, e-mailadres en abonnementsbeheer.</div>
+      </div>
+    </div>
     <div id="account-container"></div>
   </div>
+
+  <!-- ── Beschikbaarheid voor afspraken (RUN4 — verplaatst van buiten .shell naar binnen) ── -->
+  <div class="setting-card setting-card-full" id="card-availability">
+    <div class="setting-card-head">
+      <div class="setting-card-icon">📅</div>
+      <div class="setting-card-text">
+        <div class="setting-card-title">Beschikbaarheid voor afspraken</div>
+        <div class="setting-card-desc">Geef per dag en uur aan wanneer je beschikbaar bent voor een gesprek. Studenten zien dit bij het plannen van een meeting via de chat.</div>
+      </div>
+    </div>
+    <div id="ical-container"></div>
+  </div>
+
+  </section>
 
 </div><!-- /shell -->
 
@@ -494,6 +730,133 @@ function showLoading(containerId, tekst) {
 }
 
 function signOut() { performLogout(); }
+
+// ════ RUN2 — Form submit met withSaveLock (anti double-submit) ════
+async function handleBuddyProfileSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const data = collectBuddyProfileData(form);
+  if (typeof withSaveLock === 'function') {
+    await withSaveLock(submitBtn, async () => {
+      await saveBuddyProfile(data);
+    });
+  } else {
+    await saveBuddyProfile(data);
+  }
+}
+window.handleBuddyProfileSubmit = handleBuddyProfileSubmit;
+
+// ════ RUN4 — Identity-card renderer voor Overzicht-tab ════
+function renderBuddyIdentityCard(buddyProfile, profile) {
+  const container = document.getElementById('overz-identity');
+  if (!container || !buddyProfile) return;
+
+  const naam = buddyProfile.naam || profile?.naam || '—';
+  const stad = buddyProfile.stad || '';
+  const leeftijd = buddyProfile.leeftijd ? `${buddyProfile.leeftijd} jaar` : '';
+  const beschb = buddyProfile.grove_beschikbaarheid || 'beschikbaarheid niet ingesteld';
+  const pitch = buddyProfile.pitch || '';
+  const tags = (buddyProfile.kennis_gebieden || []).slice(0, 3);
+
+  const metaParts = ['Buddy', leeftijd, stad, beschb].filter(Boolean);
+  const metaHtml = metaParts.map((p, i) =>
+    i === 0 ? `<strong>${escapeHtml(p)}</strong>` : escapeHtml(p)
+  ).join(' · ');
+
+  let avatarInner;
+  if (buddyProfile.avatar_key && typeof getAvatarSvg === 'function') {
+    avatarInner = getAvatarSvg(buddyProfile.avatar_key, naam, 'lg');
+  } else {
+    const initials = naam.split(' ').map(s => s[0] || '').slice(0,2).join('').toUpperCase() || '?';
+    avatarInner = `<div class="overz-avatar-initials">${escapeHtml(initials)}</div>`;
+  }
+
+  container.innerHTML = `
+    <div class="overz-identity-card">
+      <div class="overz-avatar-block">
+        <div class="overz-avatar-circle">
+          ${avatarInner}
+          <div class="overz-avatar-edit" title="Avatar wijzigen" id="overz-avatar-edit">✏</div>
+        </div>
+        <a class="overz-avatar-link" href="javascript:void(0)" id="overz-avatar-link">Stickerkeuze wijzigen</a>
+      </div>
+      <div class="overz-summary-block">
+        <div class="overz-summary-name">${escapeHtml(naam)}</div>
+        <div class="overz-summary-meta">${metaHtml}</div>
+        ${pitch ? `<div class="overz-summary-pitch">"${escapeHtml(pitch)}"</div>` : ''}
+        ${tags.length ? `<div class="overz-summary-tags">${tags.map(t =>
+          `<span class="overz-summary-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+        <a class="overz-summary-link" href="javascript:void(0)" onclick="showSection('profiel')">
+          Bekijk volledig profiel →
+        </a>
+      </div>
+    </div>
+  `;
+
+  // Wire avatar edit + link → naar profiel-tab edit-mode
+  const editBtn = document.getElementById('overz-avatar-edit');
+  const editLink = document.getElementById('overz-avatar-link');
+  const goToEdit = () => {
+    showSection('profiel');
+    setTimeout(() => {
+      const formCard = document.getElementById('buddy-profile-form-card');
+      const savedView = document.getElementById('buddy-profile-saved-view');
+      if (formCard && savedView) {
+        savedView.hidden = true;
+        formCard.hidden = false;
+        formCard.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+  if (editBtn) editBtn.addEventListener('click', goToEdit);
+  if (editLink) editLink.addEventListener('click', goToEdit);
+}
+window.renderBuddyIdentityCard = renderBuddyIdentityCard;
+
+// ════ RUN2 — Section-switcher voor top-nav ════
+function getActiveSection() {
+  const hash = (window.location.hash || '').replace('#section-', '');
+  return ['matches','profiel'].includes(hash) ? hash : 'overzicht';
+}
+
+function showSection(sectionId) {
+  if (!['overzicht','matches','profiel'].includes(sectionId)) sectionId = 'overzicht';
+  document.querySelectorAll('.dashboard-section').forEach(s => {
+    s.hidden = (s.dataset.section !== sectionId);
+  });
+  // Re-render header zodat juiste tab actief is
+  if (typeof renderRoleHeader === 'function') {
+    renderRoleHeader('gepensioneerd', sectionId, {
+      profile: { naam: window.__currentUser?.naam || '' }
+    });
+  }
+  // URL hash bijwerken
+  if (sectionId === 'overzicht') {
+    history.replaceState(null, '', window.location.pathname);
+  } else {
+    history.replaceState(null, '', '#section-' + sectionId);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.showSection = showSection;
+
+function initSectionFromHash() {
+  showSection(getActiveSection());
+}
+window.addEventListener('hashchange', initSectionFromHash);
+
+// Vang nav-clicks op data-tab anchors voor we de browser laten navigeren
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('a[data-tab]');
+  if (!link) return;
+  const tab = link.dataset.tab;
+  if (['overzicht','matches','profiel'].includes(tab)) {
+    e.preventDefault();
+    showSection(tab);
+  }
+  // anders (berichten, notities) — gewone navigatie naar externe pagina
+});
 
 // ── Pairs (active couplings) ───────────────────────────────────────────────
 
@@ -549,6 +912,9 @@ async function loadPairs() {
       console.warn('[buddy-dash] student_profiles batch-fetch fout:', spErr.message);
     }
   }
+
+  // Expose count voor renderProfileView (RUN2 — saved-view stats)
+  window.BUDDY_PAIRS_COUNT = activePairs.length;
 
   renderPairs();
 }
@@ -646,12 +1012,14 @@ function renderRequests() {
     const reqId = String(r.id || '').replace(/[^a-zA-Z0-9\-]/g, '');
     const name  = escapeHtml(r.sender?.naam || 'Student');
     const isIntl = r.student_type === 'international';
-    const badge = isIntl
+    const intlBadge = isIntl
       ? '<span class="badge-worldwide">🌍 Internly Worldwide</span>'
       : '';
+    // Student kleurcodering — backlog 30 apr 2026
+    const studentBadge = '<span style="background:#e8f5ee;color:#1a7a48;font-size:.72rem;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block">Student</span>';
     return `
       <div class="req-card">
-        ${badge ? `<div class="req-badge-row">${badge}</div>` : ''}
+        <div class="req-badge-row">${studentBadge}${intlBadge}</div>
         <div class="req-who">${name} vraagt een buddy-koppeling aan</div>
         ${r.message ? `<div class="req-msg">&ldquo;${escapeHtml(r.message)}&rdquo;</div>` : ''}
         <div class="req-btns">
@@ -931,6 +1299,7 @@ window.addEventListener('unhandledrejection', function(e) {
     e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
+    if (typeof markAuthReady === 'function') markAuthReady();
     window.location.replace('auth.html?expired=1');
   }
 });
@@ -944,7 +1313,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 1. Auth guard
   const { data: { user } } = await db.auth.getUser();
-  if (!user) { window.location.href = 'auth.html'; return; }
+  if (!user) {
+    if (typeof markAuthReady === 'function') markAuthReady();
+    window.location.href = 'auth.html'; return;
+  }
   currentUser = user;
 
   // 2. Role check — alleen gepensioneerde buddies mogen dit dashboard zien
@@ -956,6 +1328,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (!profile || profile.role !== 'gepensioneerd') {
     // Verkeerde rol — doorsturen naar juiste dashboard
+    if (typeof markAuthReady === 'function') markAuthReady();
     window.location.replace(
       typeof getRoleLanding === 'function'
         ? getRoleLanding(profile?.role || 'gepensioneerd')
@@ -964,15 +1337,29 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // RUN7 Cat 3 — auth-check geslaagd, body kan zichtbaar
+  if (typeof markAuthReady === 'function') markAuthReady();
+
   // 2b. AccountModule render — pas nu draaien, buddy-rol bevestigd
   window._currentUserId = user.id;
+  window.__currentUser  = { id: user.id, naam: profile.naam || '' };
   AccountModule.renderAccountScreen('account-container', 'nl');
 
-  // 3. Welkomstgroet
+  // 2c. Top-nav header renderen (RUN2 — 1 mei 2026)
+  if (typeof renderRoleHeader === 'function') {
+    await renderRoleHeader('gepensioneerd', getActiveSection(), {
+      profile: { naam: profile.naam || '' }
+    });
+  }
+
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
+  if (typeof maybeShowWelcomeOverlay === 'function') {
+    maybeShowWelcomeOverlay(user.id, 'gepensioneerd', profile.naam, null);
+  }
+
+  // 3. Welkomstgroet — alleen topbarUser; greeting via overz-greeting (RUN4)
   const naam = profile.naam || user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Buddy';
-  const h = new Date().getHours();
-  const greeting = h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
-  document.getElementById('welcomeMsg').textContent = `${greeting}, ${naam}`;
   document.getElementById('topbarUser').textContent = naam;
 
   // 4. Waitlist profiel ophalen (voor sector/expertise)
@@ -984,11 +1371,85 @@ window.addEventListener('DOMContentLoaded', async () => {
     .maybeSingle();
   waitlistRow = wl;
 
-  // 5. Buddy-profiel laden (buddy_profiles tabel) + naam zichtbaar maken
-  await loadBuddyProfile();
+  // Avatar picker — vanmiddag fix 30 apr 2026 (PENDING MIGRATION: buddy_queue avatar_key save niet actief)
+  if (typeof renderAvatarPicker === 'function') {
+    const _curAvKey = wl?.avatar_key || null;
+    window._internlyAvatarKey = _curAvKey;
+    renderAvatarPicker('avatar-picker-container', _curAvKey,
+      (key) => { window._internlyAvatarKey = key; });
+  }
+
+  // 5. Buddy-profiel laden — RUN2: volledige fetch incl. nieuwe velden
+  let bpRow = null;
+  try {
+    const { data: buddyData } = await db
+      .from('buddy_profiles')
+      .select('profile_id, naam, pitch, bio, achtergrond, kennis_gebieden, specialiteiten, grove_beschikbaarheid, postcode, stad, leeftijd, talen, foto_url, active, open_to_international, avatar_key')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    bpRow = buddyData || null;
+  } catch (e) {
+    console.warn('[buddy-dash] buddy_profiles fetch fout:', e?.message || e);
+  }
+
+  // Pre-vul edit form (drie nieuwe velden + bestaande)
+  if (bpRow && typeof prefillBuddyForm === 'function') {
+    prefillBuddyForm(bpRow);
+  } else if (bpRow && typeof loadBuddyProfile === 'function') {
+    // Fallback: oude loadBuddyProfile als prefillBuddyForm niet bestaat
+    await loadBuddyProfile();
+  }
+
+  // Bepaal of profiel "ingevuld" is — gebruikt voor saved-view auto-render
+  const bpFilled = !!bpRow && (
+    !!bpRow.pitch ||
+    !!bpRow.bio ||
+    !!bpRow.achtergrond ||
+    (Array.isArray(bpRow.kennis_gebieden) && bpRow.kennis_gebieden.length > 0) ||
+    (Array.isArray(bpRow.specialiteiten)  && bpRow.specialiteiten.length  > 0) ||
+    !!bpRow.grove_beschikbaarheid
+  );
+
+  // Render saved-view (renderProfileView via showBuddyOverzicht).
+  // Als profile leeg: form-card tonen, anders saved-view tonen.
+  if (bpFilled && typeof showBuddyOverzicht === 'function') {
+    // Fallback naam uit profiles als buddy_profiles.naam ontbreekt
+    if (!bpRow.naam) bpRow.naam = profile.naam || '';
+    showBuddyOverzicht(bpRow);
+  } else {
+    // Lege state — toon form-card direct
+    const fc = document.getElementById('buddy-profile-form-card');
+    if (fc) { fc.hidden = false; fc.style.display = ''; }
+  }
+
+  // ════ RUN4 — Render Overzicht greeting + identity-card ════
+  const _greetingNaam = (bpRow?.naam) || profile?.naam || '';
+  const greetingEl    = document.getElementById('overz-greeting-text');
+  const greetingSubEl = document.getElementById('overz-greeting-sub');
+  if (greetingEl) {
+    greetingEl.textContent = (typeof getDaypartGreeting === 'function')
+      ? getDaypartGreeting(_greetingNaam)
+      : `Welkom, ${_greetingNaam}`;
+  }
+  if (greetingSubEl) {
+    const _dateStr = new Date().toLocaleDateString('nl-NL', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
+    greetingSubEl.textContent = _dateStr;
+  }
+  if (typeof renderBuddyIdentityCard === 'function' && bpRow) {
+    // bpRow.naam fallback al gezet hierboven
+    if (!bpRow.naam) bpRow.naam = profile?.naam || '';
+    renderBuddyIdentityCard(bpRow, profile);
+  }
 
   // 6. Pairs + requests laden
   await Promise.all([loadPairs(), loadPendingRequests()]);
+
+  // Buddy seekers discovery — 1 mei 2026
+  if (typeof loadBuddySeekers === 'function') {
+    loadBuddySeekers();
+  }
 
   // 7. Prefs (anoniem, pauze)
   await _loadPrefs();
@@ -1005,16 +1466,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 10. Beschikbaarheid voor afspraken (uur-rooster via InternlyCalendar)
   InternlyCalendar.render('ical-container', db, user.id);
+
+  // 11. Section-switcher initialiseren (RUN2 — toont juiste section per URL hash)
+  initSectionFromHash();
 });
 </script>
 
-<!-- ── BESCHIKBAARHEID VOOR AFSPRAKEN ─────────────────────────────────────── -->
-<div style="max-width:680px;margin:0 auto;padding:0 16px 2.5rem">
-  <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c-buddy-purple);margin-bottom:4px;">Jouw planning</div>
-  <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;color:#0d1520;margin-bottom:6px;">Beschikbaarheid voor afspraken</div>
-  <p style="font-size:.88rem;color:#6b7280;margin-bottom:12px;">Geef per dag en uur aan wanneer je beschikbaar bent voor een gesprek. Studenten zien dit bij het plannen van een meeting via de chat.</p>
-  <div id="ical-container"></div>
-</div>
+<!-- Beschikbaarheid is verplaatst naar binnen .shell als setting-card (RUN4) -->
 
 <script src="js/calendar.js"></script>
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>

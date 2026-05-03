@@ -19,7 +19,34 @@
   <script src="js/profanity.js"></script>
   <script src="js/reviews.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     /* ═══════════════════════════════════════════════════════════════
@@ -836,11 +863,61 @@ function render(v, source) {
       ${v.trust_grade === 'C' ? '<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-bottom:12px;border-left:3px solid var(--red,#b82020);">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>' : ''}
       <div class="btn-row">
         <button class="btn-save" id="saveBtn"
-          onclick="handleSave()"
+          onclick="openMotivatieModal()"
           ${already ? 'disabled' : ''}>
-          ${already ? '✓ Opgeslagen' : '🔖 Opslaan voor later'}
+          ${already ? '✓ Opgeslagen' : '🔖 Solliciteer →'}
         </button>
         <a href="discover.html" class="btn-back-detail">← Terug naar overzicht</a>
+      </div>
+
+      <!-- ── Motivatiebrief modal — BOL Fix 30 apr 2026 ── -->
+      <div id="motivatie-modal" style="display:none;
+        position:fixed;inset:0;background:rgba(13,21,32,.45);
+        z-index:9000;align-items:center;justify-content:center;
+        padding:1rem">
+        <div style="background:#fff;border-radius:12px;
+          padding:1.5rem;max-width:480px;width:100%">
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif;
+            font-size:1rem;font-weight:600;margin-bottom:.75rem">
+            Vertel waarom je hier wil stage lopen
+          </h3>
+          <p style="font-size:.82rem;color:#7a8799;
+            margin-bottom:.85rem;line-height:1.55">
+            Een korte motivatie verhoogt je kans op een reactie. Max. 300 tekens.
+          </p>
+          <textarea id="motivatie-input"
+            maxlength="300" rows="4"
+            placeholder="Bijv: Ik reageer op deze stageplek omdat..."
+            oninput="updateMotivatieCount()"
+            style="width:100%;padding:.65rem .85rem;
+            border:1.5px solid rgba(13,21,32,.12);
+            border-radius:8px;font-family:'Outfit',sans-serif;
+            font-size:.88rem;resize:none;box-sizing:border-box"></textarea>
+          <div style="display:flex;justify-content:space-between;
+            align-items:center;margin-top:.4rem;
+            font-size:.75rem;color:#7a8799">
+            <span id="motivatie-count">0 / 300</span>
+            <span style="font-style:italic">Optioneel</span>
+          </div>
+          <div style="display:flex;gap:.5rem;
+            justify-content:flex-end;margin-top:1rem">
+            <button onclick="sluitMotivatieModal()"
+              style="padding:8px 16px;border-radius:8px;
+              background:#eceae4;border:none;cursor:pointer;
+              font-family:'Outfit',sans-serif;font-size:.85rem;
+              color:#3a4455">
+              Annuleren
+            </button>
+            <button id="verstuur-btn"
+              onclick="verstuurSollicitatie()"
+              style="padding:8px 20px;border-radius:8px;
+              background:#e05c1a;color:#fff;border:none;
+              cursor:pointer;font-family:'Outfit',sans-serif;
+              font-size:.85rem;font-weight:500">
+              Verstuur sollicitatie →
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -850,7 +927,35 @@ function render(v, source) {
   window.__currentSource   = source;
 }
 
-async function handleSave() {
+// ── Motivatiebrief modal-flow — BOL Fix 30 apr 2026 ───────────────────────────
+function openMotivatieModal() {
+  const m = document.getElementById('motivatie-modal');
+  if (!m) return;
+  m.style.display = 'flex';
+  const input = document.getElementById('motivatie-input');
+  if (input) input.focus();
+}
+
+function sluitMotivatieModal() {
+  const m = document.getElementById('motivatie-modal');
+  if (m) m.style.display = 'none';
+}
+
+function updateMotivatieCount() {
+  const input = document.getElementById('motivatie-input');
+  const counter = document.getElementById('motivatie-count');
+  if (!input || !counter) return;
+  counter.textContent = input.value.length + ' / 300';
+}
+
+function verstuurSollicitatie() {
+  const input = document.getElementById('motivatie-input');
+  const motivatie = (input?.value || '').trim();
+  sluitMotivatieModal();
+  handleSave(motivatie);
+}
+
+async function handleSave(motivatieText) {
   if (isApplying()) {
     notify('Je hebt al een sollicitatie in behandeling — wacht even');
     return;
@@ -858,6 +963,7 @@ async function handleSave() {
   setApplying(true);
   const v      = window.__currentVacature;
   const source = window.__currentSource;
+  const motivatie = (typeof motivatieText === 'string') ? motivatieText : '';
   if (!v) { setApplying(false); return; }
 
   const btn = document.getElementById('saveBtn');
@@ -915,6 +1021,19 @@ async function handleSave() {
           _dbOk = false;
         }
       }
+
+      // BOL Fix: motivatie wordt lokaal bewaard (geen 'motivatie' kolom in
+      // applications). Bij eerste chat-opening na acceptatie wordt deze
+      // automatisch als eerste bericht verstuurd. Zie chat.html init-flow.
+      if (motivatie && _dbOk) {
+        try {
+          localStorage.setItem(
+            'internly_motiv_pending_internship_' + v.id,
+            motivatie
+          );
+        } catch (_) { /* private mode of quota — niet-blokkerend */ }
+      }
+
       btn.textContent = '✓ Opgeslagen in profiel';
       notify(
         _dbOk
@@ -951,6 +1070,18 @@ async function handleSave() {
       } catch (insertErr) {
         console.error('Application insert onverwachte fout:', insertErr?.message || 'onbekende fout');
         _dbOk = false;
+      }
+
+      // BOL Fix: motivatie wordt lokaal bewaard (geen 'motivatie' kolom in
+      // applications). Bij eerste chat-opening na acceptatie wordt deze
+      // automatisch als eerste bericht verstuurd. Zie chat.html init-flow.
+      if (motivatie && _dbOk) {
+        try {
+          localStorage.setItem(
+            'internly_motiv_pending_posting_' + v.id,
+            motivatie
+          );
+        } catch (_) { /* private mode of quota — niet-blokkerend */ }
       }
 
       btn.textContent = '✓ Opgeslagen in profiel';
@@ -1023,6 +1154,50 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   render(data, source);
+
+  // ── JobPosting structured data voor Google for Jobs ──
+  // 1 mei 2026 — Sprint Tickoff FIX 4. Helpt organische SEO-indexering
+  // voor /vacature-detail?id=...&source=... shareable URLs.
+  try {
+    const _vest = data.vestigingen || {};
+    const _city = _vest.stad || data.stad || data.locatie || 'Nederland';
+    const _street = _vest.adres || '';
+    const _orgName = data.company_name || 'Internly partner';
+    const _desc = (data.description || '').trim() || (data.title || 'Stageplaats bij ' + _orgName);
+    const jobPostingLd = {
+      "@context": "https://schema.org/",
+      "@type": "JobPosting",
+      "title": data.title || "Stage",
+      "description": _desc,
+      "datePosted": data.created_at || new Date().toISOString(),
+      "employmentType": "INTERN",
+      "hiringOrganization": {
+        "@type": "Organization",
+        "name": _orgName,
+        "sameAs": "https://internly.pro"
+      },
+      "jobLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": _street,
+          "addressLocality": _city,
+          "addressCountry": "NL"
+        }
+      },
+      "directApply": true
+    };
+    if (data.start_date) jobPostingLd.jobStartDate = data.start_date;
+    if (data.application_deadline) jobPostingLd.validThrough = data.application_deadline;
+    if (data.sector) jobPostingLd.industry = data.sector;
+    const ldScript = document.createElement('script');
+    ldScript.type = 'application/ld+json';
+    ldScript.textContent = JSON.stringify(jobPostingLd);
+    document.head.appendChild(ldScript);
+  } catch (ldErr) {
+    console.warn('[seo] JobPosting JSON-LD injectie mislukt:', ldErr.message);
+  }
+  // ─────────────────────────────────────────────────────
 
   // ── Reviews sectie (alleen voor company postings met een bedrijfs-ID) ──
   if (source === 'internship_postings' && data.created_by) {

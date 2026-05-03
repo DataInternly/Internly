@@ -16,11 +16,40 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/milestones.js"></script>
   <script src="js/account.js"></script>
   <script src="js/push.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     :root {
       /* Pagina-aliassen → globale tokens (css/style.css) */
@@ -526,7 +555,7 @@
     }
   </style>
 </head>
-<body>
+<body data-auth-pending="true">
 <div class="notif" id="notif"></div>
 
 <!-- CONFIRM MODAL -->
@@ -655,9 +684,6 @@
         <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
           <span class="nav-icon">💬</span> Berichten
         </button>
-        <button class="nav-btn" id="nav-stagehub" onclick="window.location.href='match-dashboard.html'">
-          <span class="nav-icon">📊</span> Stage Hub
-        </button>
       </div>
 
       <div class="sidebar-section">
@@ -689,7 +715,7 @@
     <!-- ── DASHBOARD ── -->
     <div class="screen active" id="screen-dashboard">
       <div class="page-title">Schooldashboard</div>
-      <p class="page-sub" id="dashboardSub">Stageoverzicht voor jouw cohort</p>
+      <p class="page-sub" id="dashboardSub">Ongelijkheid zit in de stilte. Internly maakt het zichtbaar.</p>
 
       <div id="referral-banner" style="
         background:var(--amber-bg,#fdf3e0);
@@ -929,6 +955,9 @@
       <div id="school-view-form">
       <div class="form-card">
         <div class="form-section-title">Schoolinformatie</div>
+
+        <div id="avatar-picker-container"></div>
+
         <div class="field-row">
           <div class="field">
             <label>Schoolnaam</label>
@@ -1123,8 +1152,13 @@ document.addEventListener('click', e => {
 // ── Auth ──
 async function loadUser() {
   const { data: { user } } = await db.auth.getUser();
-  if (!user) { window.location.href = 'auth.html'; return; }
+  if (!user) {
+    if (typeof markAuthReady === 'function') markAuthReady();
+    window.location.href = 'auth.html'; return;
+  }
   currentUser = user;
+  // RUN7 Cat 3 — auth-check geslaagd, body kan zichtbaar
+  if (typeof markAuthReady === 'function') markAuthReady();
   const email = user.email || '';
   const name = getDisplayName(user);
   const initials2 = name.slice(0, 2).toUpperCase();
@@ -1299,13 +1333,13 @@ async function loadStudenten() {
   if (bundleActive) {
     q = db
       .from('student_profiles')
-      .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
+      .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id, avatar_key')
       .in('opleiding', subRow.bundled_opleidingen)
       .order('created_at', { ascending: false });
   } else {
     q = db
       .from('student_profiles')
-      .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id')
+      .select('naam, opleiding, school, jaar, beschikbaar_vanaf, opdracht_domein, profile_id, avatar_key')
       .eq('school', _schoolNaamFilter)
       .order('created_at', { ascending: false });
   }
@@ -1457,6 +1491,17 @@ function progressColor(p) {
   return p > 60 ? 'var(--green)' : p > 30 ? 'var(--amber)' : 'var(--red)';
 }
 
+// BOL Fix 2 — status labels per rol (school-perspectief, raw DB status)
+function statusLabelSchool(status) {
+  const labels = {
+    pending:  '👁 Sollicitatie',
+    accepted: '✓ Actief',
+    active:   '🎯 Stage loopt',
+    ended:    '✓ Afgerond'
+  };
+  return labels[status] || '—';
+}
+
 function renderStudentenRows(cid, data, milestoneMap = {}) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
@@ -1467,7 +1512,15 @@ function renderStudentenRows(cid, data, milestoneMap = {}) {
     const eNaam    = escapeHtml(s.naam);
     const eBedrijf = escapeHtml(s.bedrijf || '');
     const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
-    const faseLabel = { 'actief': 'Stage loopt', 'risico': '⚠ Let op', 'zoekend': 'Zoekend' }[s.status] || '';
+    // BOL Fix 2 — status labels per rol (school-perspectief)
+    // school-dashboard gebruikt afgeleide statussen (zoekend/actief/risico)
+    // op basis van progress%, niet rauwe DB-status. statusLabelSchool() blijft
+    // beschikbaar voor toekomstige flows die met DB-status werken.
+    const faseLabel = {
+      'actief':  '🎯 Stage loopt',
+      'risico':  '⚠ Stage loopt — let op',
+      'zoekend': '👁 Sollicitatie'
+    }[s.status] || '';
 
     // Milestone bevestigingsbadge — CC Instructie 2
     let pendingBtn = '';
@@ -1486,7 +1539,12 @@ function renderStudentenRows(cid, data, milestoneMap = {}) {
 
     return `
     <div class="student-row">
-      <div class="avatar">${escapeHtml(initials(s.naam))}</div>
+      <div class="avatar-wrap" style="flex-shrink:0">
+        ${typeof getAvatarSvg === 'function' && s.avatar_key
+          ? `<div style="width:36px;height:36px;border-radius:50%;overflow:hidden">${getAvatarSvg(s.avatar_key, s.naam || '', 'sm')}</div>`
+          : `<div class="avatar">${escapeHtml(initials(s.naam || ''))}</div>`
+        }
+      </div>
       <div class="sr-info">
         <div class="sr-name">${eNaam}</div>
         <div class="sr-meta">${escapeHtml(s.opleiding)} · Jaar ${escapeHtml(String(s.jaar ?? ''))}${eBedrijf ? ' — ' + eBedrijf : ''}</div>
@@ -2062,6 +2120,7 @@ async function saveProfiel() {
     locatie:       locatie || null,
     contactpersoon: contact || null,
     opleidingen:   opleidingen ? opleidingen.split(',').map(o => o.trim()).filter(Boolean) : [],
+    avatar_key:    window._internlyAvatarKey || null,
   }, { onConflict: 'profile_id' });
 
   btn.disabled = false; btn.textContent = 'Profiel opslaan →';
@@ -2278,6 +2337,7 @@ window.addEventListener('unhandledrejection', function(e) {
     e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
+    if (typeof markAuthReady === 'function') markAuthReady();
     window.location.replace('auth.html?expired=1');
   }
 });
@@ -2465,7 +2525,10 @@ async function loadSchoolLinkedStudents(userId) {
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
-  if (!user) { window.location.href = 'auth.html'; return; }
+  if (!user) {
+    if (typeof markAuthReady === 'function') markAuthReady();
+    window.location.href = 'auth.html'; return;
+  }
 
   // Rolcheck — alleen school-gebruikers mogen dit dashboard zien
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
@@ -2477,6 +2540,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         : 'auth.html'
     );
     return;
+  }
+
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
+  if (typeof maybeShowWelcomeOverlay === 'function') {
+    const { data: _wcProf } = await db.from('profiles').select('naam').eq('id', user.id).maybeSingle();
+    maybeShowWelcomeOverlay(user.id, 'school', _wcProf?.naam, null);
   }
 
   (function handlePaymentReturn() {
@@ -2531,6 +2601,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     set('p-contact',     sp.contactpersoon);
     set('p-opleidingen', Array.isArray(sp.opleidingen) ? sp.opleidingen.join(', ') : (sp.opleidingen || ''));
     toonSchoolOverzicht(sp);
+  }
+
+  // Avatar picker — vanmiddag fix 30 apr 2026
+  if (typeof renderAvatarPicker === 'function') {
+    const _curAvKey = sp?.avatar_key || null;
+    window._internlyAvatarKey = _curAvKey;
+    renderAvatarPicker('avatar-picker-container', _curAvKey,
+      (key) => { window._internlyAvatarKey = key; });
   }
 
   if (!localStorage.getItem('internly_push_asked') && 'Notification' in window) {

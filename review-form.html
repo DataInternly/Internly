@@ -19,7 +19,34 @@
   <script src="js/profanity.js"></script>
   <script src="js/reviews.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     :root {
@@ -171,7 +198,7 @@
 <div class="notif" id="notif"></div>
 
 <div class="topbar">
-  <a href="discover.html" class="logo">intern<span>ly</span></a>
+  <a href="index.html" onclick="event.preventDefault();smartHomeRedirect();" class="logo" style="cursor:pointer">intern<span>ly</span></a>
 </div>
 
 <div class="page-wrap">
@@ -377,5 +404,26 @@ window.addEventListener('DOMContentLoaded', async () => {
   formEl.style.display  = '';
 });
 </script>
+
+<!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
+<footer class="kb-shared-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">intern<span>ly</span></div>
+    <ul class="footer-links">
+      <li><a href="about.html">Over ons</a></li>
+      <li><a href="kennisbank.html">Kennisbank</a></li>
+      <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="pricing.html">Prijzen</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="privacybeleid.html">Privacybeleid</a></li>
+      <li><a href="spelregels.html">Spelregels</a></li>
+      <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
+      <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+  </div>
+</footer>
 </body>
 </html>

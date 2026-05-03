@@ -40,6 +40,8 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/account.js"></script>
   <script src="js/toast.js"></script>
   <script>
@@ -54,7 +56,34 @@
       blockIfFilled: function() { return false; }
     };
   </script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     :root {
       --green:       #1a7a48;
@@ -846,6 +875,9 @@
 
       <div class="form-card">
         <div class="form-section-title">Personal</div>
+
+        <div id="avatar-picker-container"></div>
+
         <div class="field">
           <label>Full name</label>
           <input type="text" id="p-naam" maxlength="100" placeholder="Your full name">
@@ -1111,6 +1143,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = user;
     document.getElementById('userEmail').textContent = user.email || '';
 
+    // Welkom overlay — eenmalig na eerste login
+    // welcome-overlay.js — 1 mei 2026
+    if (typeof maybeShowWelcomeOverlay === 'function') {
+      maybeShowWelcomeOverlay(
+        user.id,
+        'student',
+        _iSp?.naam || '',
+        { bbl: false, international: true }
+      );
+    }
+
     // Telemetry init — zie CLAUDE.md voor codenames
     _fCtx._init('intl-student');
 
@@ -1197,6 +1240,18 @@ async function loadProfile() {
     populateDocHub(); // re-populate to show LA count
     renderTimeline();
     await loadVacancies();
+
+    // Avatar picker — vanmiddag fix 30 apr 2026
+    if (typeof renderAvatarPicker === 'function') {
+      const _curAvKey = studentProfile?.avatar_key || null;
+      window._internlyAvatarKey = _curAvKey;
+      renderAvatarPicker('avatar-picker-container', _curAvKey,
+        (key) => { window._internlyAvatarKey = key; });
+    }
+
+    if (studentProfile?.naam) {
+      showInternationalOverzicht(studentProfile);
+    }
   } catch (err) {
     console.error('[intl-dash] loadProfile exception:', err?.message || err);
     notify('Profile could not be loaded.', false);
@@ -1206,6 +1261,64 @@ async function loadProfile() {
 function setVal(id, v) {
   const el = document.getElementById(id);
   if (el) el.value = v == null ? '' : v;
+}
+
+function showInternationalOverzicht(data) {
+  const fields = [
+    { label: 'Name', value: data.naam || '—' },
+    { label: 'Student type', value: data.student_type || 'international' },
+    { label: 'Nationality', value: data.nationality || '—' },
+    { label: 'Home university', value: data.home_university || '—' },
+    { label: 'Study level', value: data.study_level || '—' },
+    { label: 'Study field', value: data.study_field || '—' }
+  ].filter(f => f.value && f.value !== '—');
+
+  const card = document.createElement('div');
+  card.id = 'intl-profile-view';
+  card.style.cssText = `
+    background:#fff;border:1px solid rgba(13,21,32,.09);
+    border-radius:12px;padding:1.5rem;margin-bottom:1rem;
+  `;
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:600;color:#0d1520">
+        Your profile
+      </div>
+      <button onclick="showInternationalForm()"
+        style="display:inline-flex;align-items:center;gap:.4rem;padding:7px 16px;background:#eceae4;color:#3a4455;border:1px solid rgba(13,21,32,.12);border-radius:8px;cursor:pointer;font-size:.85rem;font-family:'Outfit',sans-serif">
+        ✏️ Edit
+      </button>
+    </div>
+    ${fields.map(f => `
+      <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid rgba(13,21,32,.06);font-size:.9rem">
+        <span style="color:#7a8799">${f.label}</span>
+        <span style="font-weight:500;color:#0d1520">${f.value}</span>
+      </div>`).join('')}
+  `;
+
+  const formContainer = document.getElementById('p-naam')
+    ?.closest('.form-card')
+    || document.getElementById('p-naam')
+    ?.closest('[class*="tab"]')
+    || document.getElementById('p-naam')
+    ?.parentElement?.parentElement;
+
+  if (!formContainer) return;
+  formContainer.style.display = 'none';
+
+  const existing = document.getElementById('intl-profile-view');
+  if (existing) existing.remove();
+  formContainer.parentElement?.insertBefore(card, formContainer);
+}
+
+function showInternationalForm() {
+  document.getElementById('intl-profile-view')?.remove();
+  const formContainer = document.getElementById('p-naam')
+    ?.closest('.form-card')
+    || document.getElementById('p-naam')?.closest('[class*="tab"]')
+    || document.getElementById('p-naam')
+    ?.parentElement?.parentElement;
+  if (formContainer) formContainer.style.display = '';
 }
 
 async function saveProfile() {
@@ -1230,7 +1343,8 @@ async function saveProfile() {
     study_level:            document.getElementById('p-study-level').value || null,
     study_field:            document.getElementById('p-study-field').value.trim() || null,
     languages_spoken:       languagesSpoken.slice(),
-    work_auth_type:         document.getElementById('p-work-auth').value || null
+    work_auth_type:         document.getElementById('p-work-auth').value || null,
+    avatar_key:             window._internlyAvatarKey || null
   };
 
   try {
@@ -1256,6 +1370,14 @@ async function saveProfile() {
     updateCompletionBar();
     renderTimeline();
     applyDiscoverGate();
+    showInternationalOverzicht({
+      naam: studentProfile.naam,
+      student_type: studentProfile.student_type,
+      nationality: studentProfile.nationality,
+      home_university: studentProfile.home_university,
+      study_level: studentProfile.study_level,
+      study_field: studentProfile.study_field
+    });
   } catch (err) {
     btn.disabled = false; btn.textContent = 'Save profile';
     console.error('[intl-dash] saveProfile exception:', err?.message || err);
@@ -2215,5 +2337,26 @@ async function signOut() {
 
 // notify() and escapeHtml() come from js/utils.js — do not redefine here.
 </script>
+
+<!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
+<footer class="kb-shared-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">intern<span>ly</span></div>
+    <ul class="footer-links">
+      <li><a href="about.html">Over ons</a></li>
+      <li><a href="kennisbank.html">Kennisbank</a></li>
+      <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="pricing.html">Prijzen</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="privacybeleid.html">Privacybeleid</a></li>
+      <li><a href="spelregels.html">Spelregels</a></li>
+      <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
+      <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+  </div>
+</footer>
 </body>
 </html>

@@ -16,9 +16,38 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/buddy.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     /* ═══════════════════════════════════════════════════════════════
        Dashboard archetype — student-profielformulier + overzicht.
@@ -765,6 +794,8 @@
     <div class="section-title">Wie ben jij?</div>
     <p class="section-sub">Je basisgegevens. Bedrijven zien je naam, opleiding en beschikbaarheid.</p>
 
+    <div id="avatar-picker-container"></div>
+
     <div class="field">
       <label>Naam <span class="req">*</span></label>
       <input type="text" id="naam" maxlength="100" placeholder="Voornaam Achternaam">
@@ -1053,6 +1084,27 @@
     <div class="field">
       <label>Tools, frameworks of theorie <span class="hint">optioneel</span></label>
       <input type="text" id="methode_beschrijving" maxlength="200" placeholder="Bijv. 'SWOT, Google Analytics, Design Thinking'">
+    </div>
+    <div class="form-field" style="margin-top:1rem">
+      <label style="display:flex;align-items:center;
+        gap:.75rem;cursor:pointer;padding:.85rem 1rem;
+        background:#faf7f3;border:1px solid
+        rgba(13,21,32,.09);border-radius:10px">
+        <input type="checkbox" id="zoekt-buddy"
+          style="width:18px;height:18px;flex-shrink:0;
+          accent-color:#7c3aed;cursor:pointer;margin:0">
+        <div>
+          <div style="font-size:.9rem;font-weight:500;
+            color:#0d1520">
+            Ik zoek een buddy
+          </div>
+          <div style="font-size:.78rem;color:#7a8799;
+            margin-top:2px">
+            Gepensioneerde professionals kunnen jou dan
+            vinden om mee te sparren over je stage.
+          </div>
+        </div>
+      </label>
     </div>
     <div class="form-nav">
       <button class="btn-back" onclick="prev(5)">← Terug</button>
@@ -1410,6 +1462,10 @@ function populateForm(data) {
     if (el && data[id] != null) el.value = data[id];
   });
 
+  // zoekt_buddy toggle — backlog 30 apr 2026
+  const _zb = document.getElementById('zoekt-buddy');
+  if (_zb) _zb.checked = !!(data?.zoekt_buddy);
+
   // Select fields
   ['jaar','duur','opdracht_domein','onderwijsniveau'].forEach(id => {
     const el = document.getElementById(id);
@@ -1509,6 +1565,8 @@ async function submitProfile() {
     methode_type:              fd.methode_type || null,
     methode_beschrijving:      document.getElementById('methode_beschrijving').value.trim() || null,
     bbl_mode:                  newBblMode,
+    avatar_key:                window._internlyAvatarKey || null,
+    zoekt_buddy:               document.getElementById('zoekt-buddy')?.checked || false,
   };
 
   const { error } = await db.from('student_profiles').upsert(payload, { onConflict: 'profile_id' });
@@ -1612,6 +1670,25 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (existing?.onderwijsniveau === 'MBO_BOL') {
     window.location.replace('bol-profile.html');
     return;
+  }
+
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
+  if (typeof maybeShowWelcomeOverlay === 'function') {
+    maybeShowWelcomeOverlay(
+      user.id,
+      'student',
+      existing?.naam || '',
+      null
+    );
+  }
+
+  // Avatar picker — vanmiddag fix 30 apr 2026
+  if (typeof renderAvatarPicker === 'function') {
+    const _curAvKey = existing?.avatar_key || null;
+    window._internlyAvatarKey = _curAvKey;
+    renderAvatarPicker('avatar-picker-container', _curAvKey,
+      (key) => { window._internlyAvatarKey = key; });
   }
 
   if (existing) {

@@ -33,7 +33,34 @@
       blockIfFilled: function() { return false; }
     };
   </script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     /* Pagina-specifieke vars — globale tokens komen uit css/style.css */
     :root {
@@ -980,18 +1007,18 @@ async function doLogin() {
         // resolveStudentDashboard checks naam in _sp:
         //   BBL + naam null/empty → bbl-profile.html (onboarding)
         //   BBL + naam filled     → bbl-hub.html
-        window.location.href = resolveStudentDashboard({ role: 'student' }, _sp);
+        window.location.replace(resolveStudentDashboard({ role: 'student' }, _sp));
       } else {
         // Onboarding-guard: student zonder profiel → profiel-form
-        // OPEN VRAAG (30 apr 2026): mogelijk conflict met canon B2 —
-        // zie stap 4 deliverable. Identiek patroon als discover.html:1406.
-        window.location.href = 'student-profile.html';
+        // Resolved 2026-04-30 (CC Instruction B): identiek patroon
+        // als discover.html:1406 — geen conflict met canon B2.
+        window.location.replace('student-profile.html');
       }
     } else if (role === 'school' && _intlSchool) {
       // International school → eigen dashboard
-      window.location.href = 'international-school-dashboard.html';
+      window.location.replace('international-school-dashboard.html');
     } else {
-      window.location.href = getRoleLanding(role, false);
+      window.location.replace(getRoleLanding(role, false));
     }
   }, 1000);
 

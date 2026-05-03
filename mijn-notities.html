@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mijn notities — Internly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { background: var(--bg, #f4f3ef); }
+  .notities-app {
+    max-width: 1100px;
+    margin: 28px auto 80px;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .notities-page-head {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 12px;
+  }
+  .notities-page-head h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink, #0d1520);
+    letter-spacing: -.02em;
+    margin-bottom: 4px;
+  }
+  .notities-page-sub { font-size: .92rem; color: var(--ink3, #7a8799); }
+
+  .notities-list-pane {
+    background: white;
+    border: 1px solid var(--border, rgba(13,21,32,.09));
+    border-radius: 12px;
+    overflow: hidden;
+    position: sticky; top: 80px;
+  }
+  .notities-list-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border, rgba(13,21,32,.09));
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .notities-list-title {
+    font-size: .78rem; font-weight: 600;
+    color: var(--ink3, #7a8799);
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .notities-new-btn {
+    background: #7c3aed; color: white; border: none;
+    padding: 7px 14px; border-radius: 20px;
+    font-family: 'Outfit', sans-serif; font-size: .82rem; font-weight: 500;
+    cursor: pointer; transition: background .12s;
+  }
+  .notities-new-btn:hover { background: #5b21b6; }
+  .notities-list { max-height: 70vh; overflow-y: auto; }
+  .notitie-item {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border, rgba(13,21,32,.09));
+    cursor: pointer; transition: background .12s;
+  }
+  .notitie-item:last-child { border-bottom: none; }
+  .notitie-item:hover { background: #f5f3ff; }
+  .notitie-item.active {
+    background: #ede9fe;
+    border-left: 3px solid #7c3aed;
+    padding-left: 15px;
+  }
+  .notitie-title {
+    font-size: .92rem; font-weight: 500;
+    color: var(--ink, #0d1520);
+    margin-bottom: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .notitie-preview {
+    font-size: .8rem; color: var(--ink3, #7a8799);
+    line-height: 1.4; overflow: hidden;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .notitie-time {
+    font-size: .72rem; color: var(--ink3, #7a8799); margin-top: 6px;
+  }
+
+  .notities-editor-pane {
+    background: white;
+    border: 1px solid var(--border, rgba(13,21,32,.09));
+    border-radius: 12px;
+    padding: 28px 32px;
+    min-height: 60vh;
+    display: flex; flex-direction: column;
+  }
+  .notities-editor-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+    color: var(--ink3, #7a8799); font-size: .8rem;
+  }
+  .notities-delete-btn {
+    background: none;
+    border: 1px solid var(--border, rgba(13,21,32,.09));
+    color: var(--ink3, #7a8799);
+    padding: 5px 12px; border-radius: 8px;
+    font-size: .78rem; cursor: pointer; transition: all .12s;
+  }
+  .notities-delete-btn:hover {
+    color: #b82020; border-color: rgba(184,32,32,.3);
+  }
+  .notities-editor-title {
+    width: 100%; border: none; outline: none;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.4rem; font-weight: 600;
+    color: var(--ink, #0d1520);
+    background: transparent; padding: 0; margin-bottom: 12px;
+    caret-color: #7c3aed;
+  }
+  .notities-editor-body {
+    width: 100%; flex: 1;
+    border: none; outline: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem; line-height: 1.7;
+    color: var(--ink2, #3a4455);
+    background: transparent; resize: none;
+    caret-color: #7c3aed;
+  }
+
+  .notities-empty {
+    text-align: center; padding: 48px 24px;
+    color: var(--ink3, #7a8799);
+  }
+  .notities-empty-icon { font-size: 2.4rem; margin-bottom: 12px; opacity: .4; }
+  .notities-empty-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.05rem; color: var(--ink2, #3a4455); margin-bottom: 4px;
+  }
+
+  .notities-privacy {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    padding: 16px 24px;
+    font-size: .82rem; color: var(--ink3, #7a8799);
+    line-height: 1.55;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .notities-privacy strong { color: var(--ink2, #3a4455); font-weight: 500; }
+
+  @media (max-width: 760px) {
+    .notities-app { grid-template-columns: 1fr; }
+    .notities-list-pane { position: static; max-height: 320px; }
+    .notities-editor-pane { padding: 20px 22px; }
+  }
+</style>
+</head>
+<body data-role="gepensioneerd">
+
+<header id="role-header" class="role-header"></header>
+
+<div class="page-back-row">
+  <button class="page-back-btn" type="button" onclick="goBack()" aria-label="Terug">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span>Terug</span>
+  </button>
+</div>
+
+<div class="notities-page-head">
+  <h1>Mijn notities</h1>
+  <div class="notities-page-sub">Een privé plek voor je gedachten, ideeën en reflecties.</div>
+</div>
+
+<div class="notities-app">
+  <aside class="notities-list-pane">
+    <div class="notities-list-head">
+      <span class="notities-list-title">Notities</span>
+      <button class="notities-new-btn" id="notitie-new-btn">+ Nieuwe</button>
+    </div>
+    <div class="notities-list" id="notities-list"></div>
+  </aside>
+
+  <main class="notities-editor-pane" id="notities-editor">
+    <div class="notities-empty" id="notities-empty">
+      <div class="notities-empty-icon">📓</div>
+      <div class="notities-empty-title">Nog geen notitie geopend</div>
+      <div>Klik op een notitie links of maak een nieuwe.</div>
+    </div>
+  </main>
+</div>
+
+<div class="notities-privacy">
+  <span style="color:#7c3aed">🔒</span>
+  <div>
+    <strong>Alleen voor jou zichtbaar.</strong>
+    Deze notities zijn privé en worden niet gedeeld met studenten, scholen, bedrijven of andere buddies. Bij het verwijderen van je account worden ze permanent gewist.
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/consent.js" defer></script>
+<script src="js/roles.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/toast.js"></script>
+<script>
+(async () => {
+  // ── Auth + role-guard ──
+  const hasRole = await requireRole('gepensioneerd');
+  if (!hasRole) return;
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) { window.location.replace('auth.html'); return; }
+
+  const { data: profile } = await db.from('profiles')
+    .select('id, role, naam').eq('id', user.id).maybeSingle();
+
+  window.__currentUser = profile;
+  window.__currentRole = profile?.role || 'gepensioneerd';
+
+  // ── Render header ──
+  if (typeof renderRoleHeader === 'function') {
+    await renderRoleHeader('gepensioneerd', 'notities', {
+      profile: { naam: profile?.naam || '' }
+    });
+  }
+
+  // ── State ──
+  let notes = [];
+  let activeId = null;
+  let saveTimer = null;
+
+  // ── Load notes ──
+  async function loadNotes() {
+    const { data, error } = await db.from('buddy_notes')
+      .select('id, title, content, created_at, updated_at')
+      .eq('buddy_id', user.id)
+      .order('updated_at', { ascending: false });
+    if (error) { console.error('Load failed', error); notify('Notities laden mislukt'); return; }
+    notes = data || [];
+    renderList();
+    if (notes.length > 0 && !activeId) {
+      openNote(notes[0].id);
+    }
+  }
+
+  // ── Render list ──
+  function renderList() {
+    const listEl = document.getElementById('notities-list');
+    if (notes.length === 0) {
+      listEl.innerHTML = '<div style="padding:24px 18px;color:#7a8799;font-size:.85rem;text-align:center">Nog geen notities. Klik op + Nieuwe.</div>';
+      return;
+    }
+    listEl.innerHTML = notes.map(n => `
+      <div class="notitie-item ${n.id === activeId ? 'active' : ''}" data-id="${n.id}">
+        <div class="notitie-title">${escapeHtml(n.title || 'Zonder titel')}</div>
+        <div class="notitie-preview">${escapeHtml((n.content || '').slice(0, 140))}</div>
+        <div class="notitie-time">${formatRelative(n.updated_at)}</div>
+      </div>
+    `).join('');
+    // Wire clicks
+    listEl.querySelectorAll('.notitie-item').forEach(el => {
+      el.addEventListener('click', () => openNote(el.dataset.id));
+    });
+  }
+
+  // ── Open note in editor ──
+  function openNote(id) {
+    activeId = id;
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    const editor = document.getElementById('notities-editor');
+    editor.innerHTML = `
+      <div class="notities-editor-meta">
+        <span>Laatst bewerkt · ${formatRelative(note.updated_at)}</span>
+        <button class="notities-delete-btn" id="notitie-del-btn">Verwijderen</button>
+      </div>
+      <input type="text" class="notities-editor-title" id="notitie-title" value="${escapeHtml(note.title || '')}" placeholder="Titel">
+      <textarea class="notities-editor-body" id="notitie-body" placeholder="Begin met schrijven...">${escapeHtml(note.content || '')}</textarea>
+    `;
+    renderList(); // update active highlight
+
+    document.getElementById('notitie-title').addEventListener('input', scheduleSave);
+    document.getElementById('notitie-body').addEventListener('input', scheduleSave);
+    document.getElementById('notitie-del-btn').addEventListener('click', deleteActive);
+  }
+
+  // ── Save with debounce ──
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveActive, 800);
+  }
+
+  async function saveActive() {
+    if (!activeId) return;
+    const title = document.getElementById('notitie-title')?.value?.trim() || null;
+    const content = document.getElementById('notitie-body')?.value?.trim() || null;
+    const { error } = await db.from('buddy_notes')
+      .update({ title, content })
+      .eq('id', activeId)
+      .eq('buddy_id', user.id);
+    if (error) { console.error('Save failed', error); notify('Opslaan mislukt'); return; }
+    // Update local copy
+    const idx = notes.findIndex(n => n.id === activeId);
+    if (idx >= 0) {
+      notes[idx].title = title;
+      notes[idx].content = content;
+      notes[idx].updated_at = new Date().toISOString();
+      // Re-sort by updated_at
+      notes.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      renderList();
+    }
+  }
+
+  // ── New note ──
+  async function createNote() {
+    const { data, error } = await db.from('buddy_notes')
+      .insert({ buddy_id: user.id, title: 'Nieuwe notitie', content: '' })
+      .select()
+      .single();
+    if (error) { console.error('Create failed', error); notify('Aanmaken mislukt'); return; }
+    notes.unshift(data);
+    activeId = data.id;
+    renderList();
+    openNote(data.id);
+    setTimeout(() => document.getElementById('notitie-title')?.select(), 100);
+  }
+
+  // ── Delete ──
+  async function deleteActive() {
+    if (!activeId) return;
+    if (!confirm('Deze notitie verwijderen?')) return;
+    const { error } = await db.from('buddy_notes')
+      .delete()
+      .eq('id', activeId)
+      .eq('buddy_id', user.id);
+    if (error) { console.error('Delete failed', error); notify('Verwijderen mislukt'); return; }
+    notes = notes.filter(n => n.id !== activeId);
+    activeId = null;
+    document.getElementById('notities-editor').innerHTML = `
+      <div class="notities-empty">
+        <div class="notities-empty-icon">📓</div>
+        <div class="notities-empty-title">Notitie verwijderd</div>
+        <div>Klik op een andere notitie of maak een nieuwe.</div>
+      </div>`;
+    if (notes.length > 0) {
+      openNote(notes[0].id);
+    }
+    renderList();
+  }
+
+  // ── Helpers ──
+  function formatRelative(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = (now - d) / 1000;
+    if (diff < 60) return 'zojuist';
+    if (diff < 3600) return `${Math.floor(diff/60)} min geleden`;
+    if (diff < 86400) return `vandaag · ${d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}`;
+    if (diff < 172800) return `gisteren · ${d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}`;
+    return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  }
+
+  // ── Wire events ──
+  document.getElementById('notitie-new-btn').addEventListener('click', createNote);
+
+  // Save before unload
+  window.addEventListener('beforeunload', () => {
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveActive();
+    }
+  });
+
+  // ── Initial load ──
+  await loadNotes();
+})();
+</script>
+
+<!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
+<footer class="kb-shared-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">intern<span>ly</span></div>
+    <ul class="footer-links">
+      <li><a href="about.html">Over ons</a></li>
+      <li><a href="kennisbank.html">Kennisbank</a></li>
+      <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="pricing.html">Prijzen</a></li>
+      <li><a href="faq.html">FAQ</a></li>
+      <li><a href="privacybeleid.html">Privacybeleid</a></li>
+      <li><a href="spelregels.html">Spelregels</a></li>
+      <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
+      <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -15,9 +15,37 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
   <script src="js/animations/match-celebrate.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -92,6 +120,8 @@
     }
     .conv-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); border-color: #d1d5db; }
     .conv-card.has-unread { border-color: #1a7a48; }
+    /* Buddy kleurcodering — backlog 30 apr 2026 */
+    .conv-card.type-buddy { border-left: 3px solid #7c3aed; }
 
     .conv-avatar {
       width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
@@ -99,7 +129,7 @@
       font-family: 'Bricolage Grotesque', sans-serif; font-size: .9rem; font-weight: 700;
     }
     .conv-avatar.type-bedrijf  { background: #e8f5ee; color: #1a7a48; }
-    .conv-avatar.type-buddy    { background: #eff6ff; color: #1e40af; }
+    .conv-avatar.type-buddy    { background: #ede9fe; color: #7c3aed; }
     .conv-avatar.type-school   { background: #fff7ed; color: #c2410c; }
     .conv-avatar.type-begeleider { background: #f5f3ff; color: #6d28d9; }
 
@@ -111,7 +141,7 @@
       padding: 2px 7px; border-radius: 50px; white-space: nowrap; flex-shrink: 0;
     }
     .conv-badge.type-bedrijf   { background: #e8f5ee; color: #1a7a48; }
-    .conv-badge.type-buddy     { background: #eff6ff; color: #1e40af; }
+    .conv-badge.type-buddy     { background: #ede9fe; color: #7c3aed; }
     .conv-badge.type-school    { background: #fff7ed; color: #c2410c; }
     .conv-badge.type-begeleider { background: #f5f3ff; color: #6d28d9; }
 
@@ -228,6 +258,13 @@
 
 <div class="notif" id="notif"></div>
 <div id="student-header"></div>
+
+<div class="page-back-row">
+  <button class="page-back-btn" type="button" onclick="goBack()" aria-label="Terug">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span>Terug</span>
+  </button>
+</div>
 
 <main class="page-wrap">
   <h1 class="page-title">Mijn Berichten</h1>
@@ -357,19 +394,23 @@
 
   function _convCardHtml(conv) {
     const tc      = convTypeClass(conv._type);
-    const init    = escapeHtml(avatarInitials(conv._otherName));
     const name    = escapeHtml(conv._otherName || 'Onbekend');
     const preview = escapeHtml((conv._lastMsg || 'Nog geen berichten').slice(0, 60));
     const time    = escapeHtml(formatRelativeTime(conv._lastTime));
     const unread  = conv._unread || 0;
+
+    // RUN3 — gebruik sticker als avatar_key gezet, anders fallback initialen
+    const avatarInner = (conv._otherAvatarKey && typeof getAvatarSvg === 'function')
+      ? getAvatarSvg(conv._otherAvatarKey, conv._otherName, 'sm')
+      : escapeHtml(avatarInitials(conv._otherName));
 
     const href = conv._buddyPairId
       ? `chat.html?buddy_pair_id=${encodeURIComponent(conv._buddyPairId)}`
       : `chat.html?match=${encodeURIComponent(conv._matchId)}`;
 
     return `
-      <div class="conv-card${unread > 0 ? ' has-unread' : ''}" onclick="window.location.href='${escapeHtml(href)}'">
-        <div class="conv-avatar type-${tc}">${init}</div>
+      <div class="conv-card type-${tc}${unread > 0 ? ' has-unread' : ''}" onclick="window.location.href='${escapeHtml(href)}'">
+        <div class="conv-avatar type-${tc}">${avatarInner}</div>
         <div class="conv-body">
           <div class="conv-top">
             <span class="conv-name">${name}</span>
@@ -385,18 +426,27 @@
   }
 
   function _emptyStateHtml() {
-    const begBtnHtml = (!_isBBL && !_hasBegeleider)
+    const _role = window.__currentRole || 'student';
+    const _isStudent = _role === 'student';
+    const begBtnHtml = (_isStudent && !_isBBL && !_hasBegeleider)
       ? `<button class="empty-cta-btn tertiary" onclick="openBegeleiderModal()">+ Voeg begeleider toe</button>`
       : '';
+    // Buddy-rol krijgt aangepaste CTA — geen "Vind een stage" maar terug naar dashboard
+    const ctaHtml = _isStudent
+      ? `<a href="/discover.html" class="empty-cta-btn primary">Vind een stage</a>
+         <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>
+         ${begBtnHtml}`
+      : `<a href="/buddy-dashboard.html" class="empty-cta-btn primary">Terug naar dashboard</a>`;
+    const subText = _isStudent
+      ? 'Zodra je matcht met een bedrijf, buddy of school verschijnen ze hier.'
+      : 'Zodra een student je verzoek accepteert verschijnen jullie gesprekken hier.';
     return `
       <div class="empty-state">
         <div class="empty-icon">💬</div>
         <div class="empty-title">Hier komen straks je gesprekken te staan.</div>
-        <div class="empty-sub">Zodra je matcht met een bedrijf, buddy of school verschijnen ze hier.</div>
+        <div class="empty-sub">${subText}</div>
         <div class="empty-ctas">
-          <a href="/discover.html" class="empty-cta-btn primary">Vind een stage</a>
-          <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>
-          ${begBtnHtml}
+          ${ctaHtml}
         </div>
       </div>`;
   }
@@ -420,12 +470,15 @@
     if (!requests || requests.length === 0) { section.style.display = 'none'; return; }
     section.style.display = 'block';
     list.innerHTML = requests.map(r => {
-      const init = escapeHtml(avatarInitials(r._fromName));
       const name = escapeHtml(r._fromName || 'Onbekend');
       const sub  = r._fromRole === 'school' ? 'School' : 'Begeleider';
+      // RUN3 — sticker indien beschikbaar
+      const avatarInner = (r._fromAvatarKey && typeof getAvatarSvg === 'function')
+        ? getAvatarSvg(r._fromAvatarKey, r._fromName, 'sm')
+        : escapeHtml(avatarInitials(r._fromName));
       return `
         <div class="request-card" id="req-${escapeHtml(String(r.id))}" data-match-type="${escapeHtml(r.type || '')}" data-match-id="${escapeHtml(String(r.id))}">
-          <div class="request-avatar">${init}</div>
+          <div class="request-avatar">${avatarInner}</div>
           <div class="request-info">
             <div class="request-name">${name}</div>
             <div class="request-sub">${escapeHtml(sub)} wil jouw begeleider zijn</div>
@@ -543,19 +596,22 @@
       .limit(1)
       .maybeSingle();
     _hasBegeleider = !!anyBegeleider;
+    // RUN3 — begeleider-link alleen voor BOL-studenten
+    const _isStudent = (window.__currentRole || 'student') === 'student';
     document.getElementById('addBegeleiderLink').style.display =
-      (!_isBBL && !_hasBegeleider) ? 'inline-flex' : 'none';
+      (_isStudent && !_isBBL && !_hasBegeleider) ? 'inline-flex' : 'none';
 
     // 5. Pending verzoeken enrichen met profielnamen
     if (pendingReqs?.length > 0) {
       const fromIds = pendingReqs.map(r => r.party_a);
       const { data: fromProfiles } = await db.from('profiles')
-        .select('id, naam, role').in('id', fromIds);
+        .select('id, naam, role, avatar_key').in('id', fromIds);
       const profileMap = Object.fromEntries((fromProfiles || []).map(p => [p.id, p]));
       const enrichedReqs = pendingReqs.map(r => ({
         ...r,
         _fromName: profileMap[r.party_a]?.naam || 'Onbekend',
         _fromRole: profileMap[r.party_a]?.role || 'begeleider',
+        _fromAvatarKey: profileMap[r.party_a]?.avatar_key || null,
       }));
       renderRequests(enrichedReqs);
     } else {
@@ -617,7 +673,7 @@
     });
 
     const { data: otherProfiles } = await db.from('profiles')
-      .select('id, naam, role').in('id', [...otherIds]);
+      .select('id, naam, role, avatar_key').in('id', [...otherIds]);
     const otherMap = Object.fromEntries((otherProfiles || []).map(p => [p.id, p]));
 
     // 9. Samenvoegen
@@ -639,14 +695,15 @@
       const other = otherMap[otherId] || {};
       const lm = lastMsgMap[c.id];
       return {
-        id:           c.id,
-        _matchId:     c.match_id || null,
-        _buddyPairId: c.buddy_pair_id || null,
-        _type:        type,
-        _otherName:   other.naam || 'Onbekend',
-        _lastMsg:     lm?.content || '',
-        _lastTime:    lm?.created_at || null,
-        _unread:      unreadMap[c.id] || 0,
+        id:             c.id,
+        _matchId:       c.match_id || null,
+        _buddyPairId:   c.buddy_pair_id || null,
+        _type:          type,
+        _otherName:     other.naam || 'Onbekend',
+        _otherAvatarKey: other.avatar_key || null,
+        _lastMsg:       lm?.content || '',
+        _lastTime:      lm?.created_at || null,
+        _unread:        unreadMap[c.id] || 0,
       };
     }).filter(Boolean);
 
@@ -699,7 +756,7 @@
 
     // Profiles (school of begeleider)
     const { data: profs } = await db.from('profiles')
-      .select('id, naam, role')
+      .select('id, naam, role, avatar_key')
       .in('role', ['school', 'begeleider'])
       .ilike('naam', `%${q}%`)
       .limit(10);
@@ -779,19 +836,44 @@
   // ── Init ─────────────────────────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', async () => {
-    const hasRole = await requireRole('student');
+    // RUN3 — role-aware: student én gepensioneerd toegelaten
+    const hasRole = await requireRole('student', 'gepensioneerd');
     if (!hasRole) return;
 
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;
 
-    // BBL-check
-    const { data: sp } = await db.from('student_profiles')
-      .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
-    _isBBL = sp?.bbl_mode === true;
+    // Profielgegevens + rol cachen voor UI-keuzes
+    const { data: prof } = await db
+      .from('profiles')
+      .select('role, naam')
+      .eq('id', user.id)
+      .maybeSingle();
+    const userRole = prof?.role || 'student';
+    window.__currentRole = userRole;
+    window.__currentUser = { id: user.id, naam: prof?.naam || '' };
+    document.body.dataset.role = userRole;
 
-    await renderStudentHeader({ activeTab: 'berichten' });
+    // BBL-check (alleen relevant voor studenten)
+    if (userRole === 'student') {
+      const { data: sp } = await db.from('student_profiles')
+        .select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+      _isBBL = sp?.bbl_mode === true;
+    } else {
+      _isBBL = false;
+    }
+
+    // RUN3 — rol-aware top-nav header (renderRoleHeader uit Run 1)
+    if (typeof renderRoleHeader === 'function') {
+      await renderRoleHeader(userRole, 'berichten', {
+        profile: { naam: prof?.naam || '' }
+      });
+    } else if (typeof renderStudentHeader === 'function') {
+      // Fallback: oude student-header (mocht renderRoleHeader missen)
+      await renderStudentHeader({ activeTab: 'berichten' });
+    }
+
     await loadAll();
   });
 </script>

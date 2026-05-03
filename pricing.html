@@ -408,7 +408,33 @@ body {
 <script src="js/supabase.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/consent.js" defer></script>
-<script src="js/telemetry.js"></script>
+<script>
+(function() {
+  function _loadTel() {
+    var s = document.createElement('script');
+    s.src = 'js/telemetry.js';
+    s.setAttribute('data-internly-tel', '1');
+    document.head.appendChild(s);
+  }
+  if (typeof window.InternlyConsent !== 'undefined') {
+    if (window.InternlyConsent.hasConsent('analytics')) {
+      _loadTel();
+    } else {
+      window.InternlyConsent.onAccept('analytics', _loadTel);
+    }
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.InternlyConsent !== 'undefined') {
+        if (window.InternlyConsent.hasConsent('analytics')) {
+          _loadTel();
+        } else {
+          window.InternlyConsent.onAccept('analytics', _loadTel);
+        }
+      }
+    });
+  }
+})();
+</script>
 </head>
 <body>
 
@@ -663,7 +689,7 @@ function showSection(audience) {
   if (p === 'school' || p === 'begeleider') showSection(p);
 })();
 
-// ── Checkout (stub — Mollie-integratie volgt) ─────────────────────────────────
+// ── Mollie checkout flow — create-checkout Edge Function actief ─────────────
 
 async function startCheckout(plan) {
   const { data: { session } } = await db.auth.getSession();

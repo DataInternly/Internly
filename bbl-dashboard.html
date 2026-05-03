@@ -24,7 +24,34 @@
   <script src="js/supabase.js"></script>
   <script src="js/account.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -531,6 +558,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. Auth guard
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
+
+  // Role guard — Bundel A 30 apr 2026
+  const { data: _bblProf } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!_bblProf || _bblProf.role !== 'student') {
+    window.location.replace(
+      typeof getRoleLanding === 'function'
+        ? getRoleLanding(_bblProf?.role || 'student')
+        : 'auth.html'
+    );
+    return;
+  }
 
   // 2. BBL-check
   const { data: sp, error: spErr } = await db

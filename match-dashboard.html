@@ -15,15 +15,44 @@
   <link rel="stylesheet" href="css/style.css" />
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
+  <script src="js/avatar.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
           integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
           crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/milestones.js"></script>
   <script src="js/account.js"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     /* ── Design tokens ───────────────────────────────────────────── */
     :root {
@@ -2490,6 +2519,16 @@ const CAN = {
     updateLeerdoel: false, editStageplan: false,
     inviteSchool: false,
     viewLog: true, viewScores: true
+  },
+  begeleider: {
+    // Read-only — same as school
+    // Hub fix 2026-04-30
+    addTask: false, editTask: false, deleteTask: false, checkTask: false,
+    addDeadline: false, editDeadline: false,
+    addReflectie: false, editReflectie: false,
+    updateLeerdoel: false, editStageplan: false,
+    inviteSchool: false,
+    viewLog: true, viewScores: true
   }
 };
 
@@ -2778,6 +2817,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const mappedRole = roleMap[dbRole];
       if (mappedRole) {
         // Profile guard — audit fix 2026-04-30
+        let _spForWelcome = null;
         if (mappedRole === 'student') {
           const { data: sp } = await db.from('student_profiles')
             .select('naam').eq('profile_id', user.id).maybeSingle();
@@ -2785,7 +2825,20 @@ window.addEventListener('DOMContentLoaded', async () => {
             window.location.replace('student-profile.html');
             return;
           }
+          _spForWelcome = sp;
         }
+
+        // Welkom overlay — eenmalig na eerste login (alleen student)
+        // welcome-overlay.js — 1 mei 2026
+        if (mappedRole === 'student' && typeof maybeShowWelcomeOverlay === 'function') {
+          maybeShowWelcomeOverlay(
+            user.id,
+            'student',
+            _spForWelcome?.naam || '',
+            null
+          );
+        }
+
         startHub(mappedRole);
 
         // Wire back button to the right dashboard
@@ -2826,7 +2879,7 @@ async function loadMatchFromDB(user) {
     // 1. Load match record + vacature name via FK join
     const { data: matchRow, error: matchErr } = await db
       .from('matches')
-      .select('id, party_a, party_b, roc_profile_id, completion_status, internship_postings(title)')
+      .select('id, party_a, party_b, roc_profile_id, praktijkbegeleider_profile_id, completion_status, internship_postings(title)')
       .eq('id', MATCH_ID)
       .maybeSingle();
 
@@ -2845,6 +2898,7 @@ async function loadMatchFromDB(user) {
     } else {
       const { data: prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
       if (prof?.role === 'school') role = 'school';
+      else if (prof?.role === 'begeleider' && matchRow.praktijkbegeleider_profile_id === user.id) role = 'begeleider';
     }
 
     if (!role) {
@@ -2858,16 +2912,17 @@ async function loadMatchFromDB(user) {
     const backBtn  = document.getElementById('back-to-dash');
     if (demoBtn) demoBtn.style.display = 'none';
     if (backBtn) {
-      if (role === 'bedrijf') { backBtn.href = 'company-dashboard.html'; backBtn.style.display = ''; }
-      if (role === 'school')  { backBtn.href = 'school-dashboard.html';  backBtn.style.display = ''; }
-      if (role === 'student') { backBtn.href = 'matches.html';           backBtn.style.display = ''; }
+      if (role === 'bedrijf')    { backBtn.href = 'company-dashboard.html';    backBtn.style.display = ''; }
+      if (role === 'school')     { backBtn.href = 'school-dashboard.html';     backBtn.style.display = ''; }
+      if (role === 'student')    { backBtn.href = 'matches.html';              backBtn.style.display = ''; }
+      if (role === 'begeleider') { backBtn.href = 'begeleider-dashboard.html'; backBtn.style.display = ''; }
     }
     if (role === 'bedrijf') buildStudentSwitcher(user.id, MATCH_ID);
     if (role === 'school')  buildSchoolSwitcher(user.id, MATCH_ID);
 
     // 3. Load student + company names in parallel
     const [studentRes, companyRes] = await Promise.all([
-      db.from('student_profiles').select('naam, opleiding, jaar').eq('profile_id', matchRow.party_a).maybeSingle(),
+      db.from('student_profiles').select('naam, opleiding, jaar, avatar_key').eq('profile_id', matchRow.party_a).maybeSingle(),
       db.from('company_profiles').select('bedrijfsnaam, sector').eq('profile_id', matchRow.party_b).maybeSingle()
     ]);
 
@@ -2876,6 +2931,7 @@ async function loadMatchFromDB(user) {
       match.student.name      = s.naam      || match.student.name;
       match.student.opleiding = s.opleiding || match.student.opleiding;
       match.student.avatar    = (s.naam || match.student.name).trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+      match.student.avatarKey = s.avatar_key || null; // RUN3 — avatar sweep
     }
 
     if (companyRes.data) {
@@ -3206,7 +3262,7 @@ function renderOverzicht() {
               <div class="card-title">Stagegegevens</div>
               <div class="card-sub">${escapeHtml(match.company.duur)} · ${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}</div>
             </div>
-            <div class="avatar" style="background:var(--blue-bg);color:var(--blue);">${match.student.avatar}</div>
+            <div class="avatar" style="background:${match.student.avatarKey ? 'transparent' : 'var(--blue-bg)'};color:var(--blue);overflow:hidden;">${match.student.avatarKey && typeof getAvatarSvg === 'function' ? getAvatarSvg(match.student.avatarKey, match.student.name, 'md') : match.student.avatar}</div>
           </div>
           <div style="margin-bottom:10px;">
             ${match.company.tags.map(t => `<span class="tag neutral" style="margin-right:4px;margin-bottom:4px;">${escapeHtml(t)}</span>`).join('')}
@@ -3742,9 +3798,9 @@ function renderVoortgang() {
       Reflectie toevoegen
     </button>` : '';
 
-  const schoolReadOnly = hubState.role === 'school' ? `
+  const schoolReadOnly = (hubState.role === 'school' || hubState.role === 'begeleider') ? `
     <div style="background:var(--blue-bg);border:1.5px solid #bfdbfe;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;color:var(--blue);">
-      Je bekijkt de voortgang als schoolbegeleider. Beoordelingen zijn alleen-lezen.
+      Je bekijkt de voortgang als ${hubState.role === 'begeleider' ? 'praktijkbegeleider' : 'schoolbegeleider'}. Beoordelingen zijn alleen-lezen.
     </div>` : '';
 
   // Milestone tracker (CC Instructie 2) — boven leerdoelen
@@ -4607,12 +4663,12 @@ function formatDateShort(dateStr) {
 function renderStageplan() {
   const sp = hubState.stageplan;
   const editable = can('editStageplan');
-  const readonly = hubState.role === 'school';
+  const readonly = hubState.role === 'school' || hubState.role === 'begeleider';
 
   const readonlyBanner = readonly ? `
     <div class="sp-readonly-note">
       <span style="font-size:1rem;">🏫</span>
-      Je bekijkt het stageplan als schoolbegeleider — alleen lezen.
+      Je bekijkt het stageplan als ${hubState.role === 'begeleider' ? 'praktijkbegeleider' : 'schoolbegeleider'} — alleen lezen.
     </div>` : '';
 
   const saveBtn = editable ? `

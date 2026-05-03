@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
+<script src="js/consent.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/kb.js"></script>
@@ -126,16 +127,16 @@
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
-  await renderKBHeader('kb-header');
-
+// RUN — kennisbank-artikel.html → redirect naar kennisbank.html?artikel=
+// Mock-build heeft de detail-overlay binnen kennisbank.html geïntegreerd
+// 1 mei 2026
+document.addEventListener('DOMContentLoaded', () => {
   const slug = new URLSearchParams(window.location.search).get('slug');
-  if (!slug) {
+  if (slug) {
+    window.location.replace('kennisbank.html?artikel=' + encodeURIComponent(slug));
+  } else {
     window.location.replace('kennisbank.html');
-    return;
   }
-
-  await loadAndRenderArticle(slug);
 });
 </script>
 

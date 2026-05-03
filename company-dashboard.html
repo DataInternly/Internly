@@ -16,6 +16,8 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/milestones.js"></script>
   <script src="js/account.js"></script>
   <script src="js/push.js"></script>
@@ -24,7 +26,34 @@
   <script src="js/swipes.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/optimistic.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <style>
     :root {
       /* Pagina-aliassen → globale tokens (css/style.css) */
@@ -505,7 +534,7 @@
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
   </style>
 </head>
-<body>
+<body data-auth-pending="true">
 <div class="notif" id="notif"></div>
 
 <!-- CONFIRM MODAL -->
@@ -629,8 +658,32 @@
           <span class="nav-icon">💬</span> Berichten
           <span class="nav-badge" id="badge-unread" style="display:none">0</span>
         </button>
-        <button class="nav-btn" id="nav-stagehub" onclick="window.location.href='match-dashboard.html'">
-          <span class="nav-icon">📊</span> Stage Hub
+
+        <!-- Verificatie-waarschuwing — Worldwide 1 mei 2026 -->
+        <div id="sidebar-verify-warn"
+          style="display:none;margin:.75rem .75rem 0;
+          background:rgba(255,126,66,.12);
+          border:1px solid rgba(255,126,66,.25);
+          border-radius:8px;padding:.65rem .85rem">
+          <div style="font-size:.76rem;font-weight:500;
+            color:#FF7E42;margin-bottom:.2rem">
+            ⚠ Bedrijf niet geverifieerd
+          </div>
+          <div style="font-size:.7rem;
+            color:rgba(255,255,255,.55);line-height:1.45">
+            Vacatures zijn pas zichtbaar na verificatie.
+          </div>
+          <button onclick="show('profiel')"
+            style="margin-top:.45rem;font-size:.72rem;
+            color:#FF7E42;background:none;border:none;
+            cursor:pointer;padding:0;text-decoration:underline">
+            Verifieer nu →
+          </button>
+        </div>
+
+        <button class="nav-btn" id="nav-studenten" onclick="show('studenten')">
+          <span class="nav-icon">👥</span> Mijn studenten
+          <span class="nav-badge" id="badge-studenten" style="display:none">0</span>
         </button>
         <button class="nav-btn" onclick="gotoDiscoverGated()">
           <span class="nav-icon">🔍</span> Zoek stagiairs
@@ -685,7 +738,7 @@
     <!-- ── DASHBOARD ── -->
     <div class="screen active" id="screen-dashboard">
       <div class="page-title">Dashboard</div>
-      <p class="page-sub">Overzicht van jouw recruitmentactiviteit op Internly</p>
+      <p class="page-sub">Eenvoudig voor jou. Eerlijk voor de student.</p>
 
       <div id="referral-banner" style="
         background:var(--amber-bg,#fdf3e0);
@@ -917,6 +970,15 @@
       </div>
     </div>
 
+    <!-- ── MIJN STUDENTEN — Hub fix 2026-04-30 ── -->
+    <div class="screen" id="screen-studenten">
+      <div class="page-title">Mijn studenten</div>
+      <p class="page-sub">Actieve stages — open de Stage Hub per student</p>
+      <div id="studenten-list">
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
+      </div>
+    </div>
+
     <!-- ── BERICHTEN ── -->
     <div class="screen" id="screen-berichten">
       <div class="page-title">Berichten</div>
@@ -1031,6 +1093,9 @@
 
       <div class="form-card">
         <div class="form-section-title">Bedrijfsinformatie</div>
+
+        <div id="avatar-picker-container"></div>
+
         <div class="field-row">
           <div class="field">
             <label>Bedrijfsnaam</label>
@@ -1051,6 +1116,151 @@
             <input type="text" id="p-website" maxlength="200" placeholder="https://...">
           </div>
         </div>
+
+        <!-- ── Worldwide verificatie — 1 mei 2026 ── -->
+        <div class="divider" style="margin:1.25rem 0"></div>
+        <div style="font-size:.75rem;font-weight:600;
+          letter-spacing:.07em;text-transform:uppercase;
+          color:#7a8799;margin-bottom:.85rem">
+          Verificatie & internationale aanwezigheid
+        </div>
+
+        <!-- Bedrijfstype -->
+        <div class="profile-field">
+          <label for="p-company-type">Bedrijfstype</label>
+          <select id="p-company-type"
+            onchange="handleCompanyTypeChange(this.value)"
+            style="width:100%;padding:9px 12px;
+            border:1.5px solid #e2e8f0;border-radius:8px;
+            font-family:'Outfit',sans-serif;font-size:.88rem;
+            color:#0d1520;background:#fff;outline:none">
+            <option value="nl">🇳🇱 Nederlands bedrijf (KvK)</option>
+            <option value="eu">🇪🇺 EU-bedrijf (BTW-nummer)</option>
+            <option value="worldwide">🌍 Internationaal bedrijf</option>
+          </select>
+        </div>
+
+        <!-- Land (verborgen voor NL) -->
+        <div class="profile-field" id="field-country"
+          style="display:none">
+          <label for="p-country">Land</label>
+          <select id="p-country"
+            style="width:100%;padding:9px 12px;
+            border:1.5px solid #e2e8f0;border-radius:8px;
+            font-family:'Outfit',sans-serif;font-size:.88rem;
+            color:#0d1520;background:#fff;outline:none">
+            <option value="">— Selecteer land —</option>
+            <option value="BE">🇧🇪 België</option>
+            <option value="DE">🇩🇪 Duitsland</option>
+            <option value="FR">🇫🇷 Frankrijk</option>
+            <option value="GB">🇬🇧 Verenigd Koninkrijk</option>
+            <option value="ES">🇪🇸 Spanje</option>
+            <option value="IT">🇮🇹 Italië</option>
+            <option value="PL">🇵🇱 Polen</option>
+            <option value="SE">🇸🇪 Zweden</option>
+            <option value="DK">🇩🇰 Denemarken</option>
+            <option value="AT">🇦🇹 Oostenrijk</option>
+            <option value="CH">🇨🇭 Zwitserland</option>
+            <option value="US">🇺🇸 Verenigde Staten</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="AU">🇦🇺 Australië</option>
+            <option value="SG">🇸🇬 Singapore</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="CN">🇨🇳 China</option>
+            <option value="IN">🇮🇳 India</option>
+            <option value="BR">🇧🇷 Brazilië</option>
+            <option value="ZA">🇿🇦 Zuid-Afrika</option>
+            <option value="OTHER">🌍 Overig</option>
+          </select>
+        </div>
+
+        <!-- BTW-nummer (EU) -->
+        <div class="profile-field" id="field-vat"
+          style="display:none">
+          <label for="p-vat">BTW-nummer</label>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input type="text" id="p-vat"
+              placeholder="bv. NL123456789B01 of DE123456789"
+              maxlength="20"
+              style="flex:1;padding:9px 12px;
+              border:1.5px solid #e2e8f0;border-radius:8px;
+              font-family:'Outfit',sans-serif;font-size:.88rem;
+              color:#0d1520;background:#fff;outline:none">
+            <button type="button" id="btn-vat-verify"
+              onclick="startVatVerification()"
+              style="padding:9px 16px;background:#1a7a48;
+              color:#fff;border:none;border-radius:8px;
+              font-family:'Outfit',sans-serif;font-size:.85rem;
+              font-weight:500;cursor:pointer;white-space:nowrap;
+              flex-shrink:0">
+              Verifieer →
+            </button>
+          </div>
+          <div id="vat-verify-status"
+            style="margin-top:.5rem;font-size:.8rem;
+            color:#7a8799;min-height:1.2em"></div>
+        </div>
+
+        <!-- Tax ID (non-EU) -->
+        <div class="profile-field" id="field-taxid"
+          style="display:none">
+          <label for="p-taxid">Tax ID / Registration Number</label>
+          <input type="text" id="p-taxid"
+            placeholder="bv. EIN, CRN, ABN — afhankelijk van land"
+            maxlength="50"
+            style="width:100%;padding:9px 12px;
+            border:1.5px solid #e2e8f0;border-radius:8px;
+            font-family:'Outfit',sans-serif;font-size:.88rem;
+            color:#0d1520;background:#fff;outline:none">
+        </div>
+
+        <!-- Document upload (non-EU + manual) -->
+        <div class="profile-field" id="field-doc"
+          style="display:none">
+          <label>Bedrijfsdocument</label>
+          <p style="font-size:.78rem;color:#7a8799;
+            margin-bottom:.5rem;line-height:1.5">
+            Upload een uittreksel KvK, certificate of incorporation
+            of belastingregistratie (PDF, JPG, PNG — max 5MB).
+          </p>
+          <input type="file" id="p-verify-doc"
+            accept=".pdf,.jpg,.jpeg,.png"
+            style="font-size:.82rem;color:#3a4455">
+          <div id="doc-upload-status"
+            style="margin-top:.4rem;font-size:.78rem;
+            color:#7a8799;min-height:1em"></div>
+        </div>
+
+        <!-- Verificatiestatus badge -->
+        <div id="verification-badge-section"
+          style="margin-top:.85rem">
+        </div>
+
+        <!-- Extra opties -->
+        <div class="profile-field">
+          <label>Stageopties</label>
+          <div style="display:flex;flex-direction:column;gap:8px;
+            margin-top:4px">
+            <label style="display:flex;align-items:center;gap:.6rem;
+              font-size:.88rem;font-weight:400;cursor:pointer">
+              <input type="checkbox" id="p-remote"
+                style="width:16px;height:16px;accent-color:#1a7a48;
+                flex-shrink:0;margin:0">
+              Remote / hybride stage mogelijk
+            </label>
+            <label style="display:flex;align-items:center;gap:.6rem;
+              font-size:.88rem;font-weight:400;cursor:pointer">
+              <input type="checkbox" id="p-erasmus"
+                style="width:16px;height:16px;accent-color:#1a7a48;
+                flex-shrink:0;margin:0">
+              Erasmus+ studenten welkom
+            </label>
+          </div>
+        </div>
+
+        <div class="divider" style="margin:1.25rem 0"></div>
+        <!-- ── Einde Worldwide verificatie ── -->
+
         <div class="field">
           <label>Beschrijving</label>
           <textarea id="p-desc" maxlength="2000" placeholder="Wie zijn jullie? Wat doen jullie? Waarom is een stage bij jullie waardevol?"></textarea>
@@ -1236,8 +1446,13 @@ document.addEventListener('click', e => {
 // ── Auth ──
 async function loadUser() {
   const { data: { user } } = await db.auth.getUser();
-  if (!user) { window.location.href = 'auth.html'; return; }
+  if (!user) {
+    if (typeof markAuthReady === 'function') markAuthReady();
+    window.location.href = 'auth.html'; return;
+  }
   currentUser = user;
+  // RUN7 Cat 3 — auth-check geslaagd, body kan zichtbaar
+  if (typeof markAuthReady === 'function') markAuthReady();
 
   const email = user.email || '';
   const name  = getDisplayName(user);
@@ -1311,6 +1526,7 @@ function show(id) {
   if (id === 'postings')  renderList('all-postings', postings);
   if (id === 'dashboard') { renderList('recent-postings', postings.slice(0, 3)); updateStats(); }
   if (id === 'matches')   loadCompanyMatches();
+  if (id === 'studenten') loadCompanyStudenten();
   if (id === 'berichten') loadBerichten();
   if (id === 'reviews')   loadReviews();
   if (id === 'esg')         renderESG();
@@ -1574,8 +1790,15 @@ async function loadCompanyMatches() {
       }
     }
 
-    const statusLabel = { pending: 'In behandeling', accepted: 'Geaccepteerd', rejected: 'Afgewezen', active: 'Actief' };
-    const statusCls   = { pending: 'neutral', accepted: 'green', rejected: 'red', active: 'green' };
+    // BOL Fix 2 — status labels per rol (bedrijf-perspectief)
+    const statusLabel = {
+      pending:  '📩 Nieuwe aanmelding',
+      accepted: '✓ Geaccepteerd',
+      active:   '🎯 Stage loopt',
+      rejected: '✕ Afgewezen',
+      ended:    '✓ Stage afgerond'
+    };
+    const statusCls   = { pending: 'neutral', accepted: 'green', rejected: 'red', active: 'green', ended: 'green' };
 
     const hasBusiness = await hasActivePlan('company_business');
     el.innerHTML = matchRows
@@ -1635,6 +1858,135 @@ async function loadCompanyMatches() {
   } catch(e) {
     console.error('loadCompanyMatches fout:', e?.message || 'onbekende fout');
     el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ── Mijn studenten badge — Bundel A 30 apr 2026 ──────────────────────────────
+function updateStudentenBadge(count) {
+  const badge = document.getElementById('badge-studenten');
+  if (!badge) return;
+  if (count && count > 0) {
+    badge.textContent = String(count);
+    badge.style.display = '';
+  } else {
+    badge.textContent = '0';
+    badge.style.display = 'none';
+  }
+}
+
+async function loadStudentenBadge(userId) {
+  try {
+    const { count, error } = await db
+      .from('matches')
+      .select('id', { count: 'exact', head: true })
+      .eq('party_b', userId)
+      .in('status', ['accepted', 'active']);
+    if (error) {
+      console.warn('[loadStudentenBadge] count fout:', error.message);
+      return;
+    }
+    updateStudentenBadge(count || 0);
+  } catch (e) {
+    console.warn('[loadStudentenBadge] fout:', e?.message || e);
+  }
+}
+
+// ── Mijn studenten screen — Hub fix 2026-04-30 ────────────────────────────────
+async function loadCompanyStudenten() {
+  const el = document.getElementById('studenten-list');
+  if (!el) return;
+  if (!currentUser) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>';
+    return;
+  }
+  el.innerHTML = '<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>';
+
+  try {
+    const { data: matchRows, error } = await db
+      .from('matches')
+      .select(
+        'id, party_a, status, created_at,' +
+        'internship_postings(title, company_name)'
+      )
+      .eq('party_b', currentUser.id)
+      .in('status', ['accepted', 'active'])
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    updateStudentenBadge((matchRows || []).length);
+
+    if (!matchRows || matchRows.length === 0) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="es-icon">🎓</span>
+          <p class="es-primary">Nog geen actieve stages.</p>
+          <p class="es-secondary">Studenten verschijnen hier zodra je een sollicitatie hebt geaccepteerd.</p>
+          <button onclick="show('matches')" class="es-cta">Bekijk matches</button>
+        </div>`;
+      return;
+    }
+
+    const studentIds = matchRows.map(m => m.party_a).filter(Boolean);
+    const matchIds   = matchRows.map(m => m.id);
+
+    const [studentsRes, milestonesRes] = await Promise.all([
+      db.from('student_profiles')
+        .select('profile_id, naam, opleiding, jaar, avatar_url')
+        .in('profile_id', studentIds),
+      db.from('stage_milestones')
+        .select('match_id, status, weight')
+        .in('match_id', matchIds)
+    ]);
+
+    const studentMap = {};
+    (studentsRes.data || []).forEach(s => { studentMap[s.profile_id] = s; });
+
+    const msMap = {};
+    (milestonesRes.data || []).forEach(m => {
+      if (!msMap[m.match_id]) msMap[m.match_id] = [];
+      msMap[m.match_id].push(m);
+    });
+
+    el.innerHTML = matchRows.map(m => {
+      const student = studentMap[m.party_a] || {};
+      const naam     = student.naam     || 'Student';
+      const opleiding = student.opleiding || '—';
+      const jaar     = student.jaar ? 'Jaar ' + student.jaar : '';
+      const ms       = msMap[m.id] || [];
+      const pct      = (typeof calcProgress === 'function') ? calcProgress(ms) : 0;
+      const confirmed = ms.filter(x => x.status === 'bevestigd').length;
+      const total     = ms.length || 8;
+
+      const initials = naam.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
+      const avatarHtml = student.avatar_url
+        ? `<img src="${escapeHtml(student.avatar_url)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0">`
+        : `<div style="width:48px;height:48px;border-radius:50%;background:#e8f5ee;color:#1a7a48;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.95rem;flex-shrink:0">${escapeHtml(initials)}</div>`;
+
+      const barColor = pct >= 80 ? '#1a7a48' : pct >= 40 ? '#e05c1a' : '#7a8799';
+
+      return `
+        <div class="card student-hub-card" style="margin-bottom:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+          ${avatarHtml}
+          <div style="flex:1;min-width:200px">
+            <div style="font-weight:600;color:var(--ink);font-size:.95rem;margin-bottom:2px">${escapeHtml(naam)}</div>
+            <div style="font-size:.82rem;color:var(--ink3);margin-bottom:8px">${escapeHtml(opleiding)}${jaar ? ' · ' + jaar : ''}</div>
+            <div style="height:6px;background:#eceae4;border-radius:3px;overflow:hidden;margin-bottom:4px;max-width:280px">
+              <div style="height:100%;width:${pct}%;background:${barColor};border-radius:3px"></div>
+            </div>
+            <div style="font-size:.74rem;color:var(--ink3)">${confirmed} van ${total} mijlpalen — ${pct}%</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:center">
+            <a href="chat.html?match=${escapeHtml(m.id)}"
+               style="font-size:.82rem;color:var(--green);font-weight:700;text-decoration:none;background:var(--green-bg);padding:7px 14px;border-radius:20px">💬 Chat</a>
+            <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
+               style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:7px 14px;border-radius:20px">📊 Stage Hub →</a>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    console.warn('[loadCompanyStudenten] fout:', e?.message || e);
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Kon studenten niet laden — probeer opnieuw</div>`;
   }
 }
 
@@ -2410,6 +2762,197 @@ function updateProfileCompleteness() {
   hint.innerHTML = `Profiel <strong>${filled}/${fields.length}</strong> compleet — vul <em>${missing.join(', ')}</em> in voor een hogere Trust Score.`;
 }
 
+// ── Worldwide verificatie UI ──────────────────────────
+// 1 mei 2026
+
+function handleCompanyTypeChange(type) {
+  const fieldCountry = document.getElementById('field-country');
+  const fieldVat     = document.getElementById('field-vat');
+  const fieldTaxId   = document.getElementById('field-taxid');
+  const fieldDoc     = document.getElementById('field-doc');
+
+  // Reset visibility
+  [fieldCountry, fieldVat, fieldTaxId, fieldDoc].forEach(
+    el => { if (el) el.style.display = 'none'; }
+  );
+
+  if (type === 'eu') {
+    if (fieldCountry) fieldCountry.style.display = '';
+    if (fieldVat)     fieldVat.style.display = '';
+  } else if (type === 'worldwide') {
+    if (fieldCountry) fieldCountry.style.display = '';
+    if (fieldTaxId)   fieldTaxId.style.display = '';
+    if (fieldDoc)     fieldDoc.style.display = '';
+  }
+  // NL: geen extra velden
+}
+
+async function startVatVerification() {
+  const vatInput = document.getElementById('p-vat');
+  const statusEl = document.getElementById('vat-verify-status');
+  const btn      = document.getElementById('btn-vat-verify');
+
+  if (!vatInput || !statusEl || !btn) return;
+
+  const vatNumber = vatInput.value.trim();
+  if (!vatNumber) {
+    statusEl.textContent = 'Vul een BTW-nummer in.';
+    statusEl.style.color = '#b82020';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifiëren...';
+  statusEl.textContent = '⏳ VIES wordt geraadpleegd...';
+  statusEl.style.color = '#7a8799';
+
+  try {
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) throw new Error('Niet ingelogd');
+
+    const res = await fetch(
+      'https://qoxgbkbnjsycodcqqmft.supabase.co/functions/v1/vat-verify',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          vat_number:          vatNumber,
+          company_profile_id:  session.user.id
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.status === 429) {
+      statusEl.textContent =
+        `⏰ ${data.error || 'Rate limit bereikt'}`;
+      statusEl.style.color = '#a06010';
+      return;
+    }
+
+    if (data.valid && data.status === 'verified') {
+      statusEl.innerHTML =
+        `✓ Geverifieerd via VIES${data.name ? ' — ' + escapeHtml(data.name) : ''}`;
+      statusEl.style.color = '#1a7a48';
+      renderVerificationBadge('verified');
+    } else if (data.status === 'pending') {
+      statusEl.textContent =
+        data.message || '⏳ Handmatige verificatie gestart.';
+      statusEl.style.color = '#a06010';
+      renderVerificationBadge('pending');
+      // Toon document upload voor manual-flow
+      const fieldDoc = document.getElementById('field-doc');
+      if (fieldDoc) fieldDoc.style.display = '';
+    } else {
+      statusEl.textContent =
+        data.error || 'Verificatie mislukt. Probeer opnieuw.';
+      statusEl.style.color = '#b82020';
+    }
+
+  } catch (err) {
+    statusEl.textContent =
+      'Verbindingsfout. Controleer je internetverbinding.';
+    statusEl.style.color = '#b82020';
+    console.error('[vat-verify] fout:', err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verifieer →';
+  }
+}
+
+async function uploadVerificationDoc() {
+  const fileInput = document.getElementById('p-verify-doc');
+  const statusEl  = document.getElementById('doc-upload-status');
+
+  if (!fileInput?.files?.length) return null;
+
+  const file = fileInput.files[0];
+  if (file.size > 5 * 1024 * 1024) {
+    if (statusEl) {
+      statusEl.textContent = 'Bestand te groot (max 5MB).';
+      statusEl.style.color = '#b82020';
+    }
+    return null;
+  }
+
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return null;
+
+  const fileName = `${session.user.id}/${Date.now()}_${file.name}`;
+
+  try {
+    const { data, error } = await db.storage
+      .from('verification-docs')
+      .upload(fileName, file, { upsert: true });
+
+    if (error) throw error;
+
+    if (statusEl) {
+      statusEl.textContent = '✓ Document geüpload';
+      statusEl.style.color = '#1a7a48';
+    }
+
+    // Sla pad op in company_profiles
+    await db.from('company_profiles')
+      .update({ verification_doc: data.path })
+      .eq('profile_id', session.user.id);
+
+    return data.path;
+
+  } catch (err) {
+    if (statusEl) {
+      statusEl.textContent = 'Upload mislukt. Probeer opnieuw.';
+      statusEl.style.color = '#b82020';
+    }
+    console.error('[doc-upload] fout:', err);
+    return null;
+  }
+}
+
+function renderVerificationBadge(status) {
+  const section = document.getElementById(
+    'verification-badge-section');
+  if (!section) return;
+
+  const config = {
+    verified:   {
+      bg: '#e8f5ee', color: '#0f5c36', border: '#1a7a48',
+      text: '✓ Bedrijf geverifieerd',
+      sub: 'Je vacatures zijn zichtbaar voor studenten.'
+    },
+    pending:    {
+      bg: '#fdf3e0', color: '#a06010', border: '#e6a817',
+      text: '⏳ Verificatie in behandeling',
+      sub: 'Je ontvangt bericht zodra je bedrijf is goedgekeurd.'
+    },
+    rejected:   {
+      bg: '#fdeaea', color: '#b82020', border: '#e04040',
+      text: '✕ Verificatie afgewezen',
+      sub: 'Bekijk de reden hieronder en upload een nieuw document.'
+    },
+    unverified: {
+      bg: '#f4f3ef', color: '#7a8799', border: '#d4d2cc',
+      text: '⚪ Nog niet geverifieerd',
+      sub: 'Verifieer je bedrijf om vacatures zichtbaar te maken.'
+    }
+  };
+
+  const c = config[status] || config.unverified;
+  section.innerHTML = `
+    <div style="background:${c.bg};
+      border:1px solid ${c.border};border-radius:8px;
+      padding:.85rem 1rem;margin-top:.5rem">
+      <div style="font-size:.88rem;font-weight:500;
+        color:${c.color};margin-bottom:.2rem">${c.text}</div>
+      <div style="font-size:.78rem;color:#7a8799;
+        line-height:1.5">${c.sub}</div>
+    </div>`;
+}
+
 // ── Save profile ──
 async function saveProfile() {
   if (!currentUser) { notify('Niet ingelogd'); return; }
@@ -2417,16 +2960,30 @@ async function saveProfile() {
   btn.disabled = true; btn.textContent = 'Opslaan…';
 
   const { error } = await db.from('company_profiles').upsert({
-    profile_id:   currentUser.id,
-    bedrijfsnaam: document.getElementById('p-naam').value.trim() || null,
-    sector:       document.getElementById('p-sector').value.trim() || null,
-    size:         document.getElementById('p-size').value.trim() || null,
-    website:      document.getElementById('p-website').value.trim() || null,
-    beschrijving: document.getElementById('p-desc').value.trim() || null,
+    profile_id:      currentUser.id,
+    bedrijfsnaam:    document.getElementById('p-naam').value.trim() || null,
+    sector:          document.getElementById('p-sector').value.trim() || null,
+    size:            document.getElementById('p-size').value.trim() || null,
+    website:         document.getElementById('p-website').value.trim() || null,
+    beschrijving:    document.getElementById('p-desc').value.trim() || null,
+    avatar_key:      window._internlyAvatarKey || null,
+    company_type:    document.getElementById('p-company-type')?.value || 'nl',
+    country:         document.getElementById('p-country')?.value || 'NL',
+    vat_number:      document.getElementById('p-vat')?.value?.trim()?.toUpperCase()?.replace(/[\s.\-]/g,'') || null,
+    tax_id:          document.getElementById('p-taxid')?.value?.trim()?.slice(0,50) || null,
+    remote_possible: document.getElementById('p-remote')?.checked ?? true,
+    accepts_erasmus: document.getElementById('p-erasmus')?.checked ?? false,
   }, { onConflict: 'profile_id' });
 
   btn.disabled = false; btn.textContent = 'Profiel opslaan →';
   if (error) { console.error('[company] profiel opslaan fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
+
+  // Upload verification doc indien geselecteerd — Worldwide 1 mei 2026
+  const _docInput = document.getElementById('p-verify-doc');
+  if (_docInput?.files?.length) {
+    await uploadVerificationDoc();
+  }
+
   notify('✓ Profiel opgeslagen');
   toonBedrijfOverzicht({
     bedrijfsnaam: document.getElementById('p-naam').value.trim()    || null,
@@ -2801,6 +3358,7 @@ window.addEventListener('unhandledrejection', function(e) {
     e.reason.message?.includes('JWT expired')
   )) {
     sessionStorage.clear();
+    if (typeof markAuthReady === 'function') markAuthReady();
     window.location.replace('auth.html?expired=1');
   }
 });
@@ -2832,7 +3390,10 @@ function initReferralBanner() {
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
-  if (!user) { window.location.href = 'auth.html'; return; }
+  if (!user) {
+    if (typeof markAuthReady === 'function') markAuthReady();
+    window.location.href = 'auth.html'; return;
+  }
 
   // Rolcheck — alleen bedrijf-gebruikers mogen dit dashboard zien
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
@@ -2844,6 +3405,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         : 'auth.html'
     );
     return;
+  }
+
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
+  if (typeof maybeShowWelcomeOverlay === 'function') {
+    const { data: _wcProf } = await db.from('profiles').select('naam').eq('id', user.id).maybeSingle();
+    maybeShowWelcomeOverlay(user.id, 'bedrijf', _wcProf?.naam, null);
   }
 
   (function handlePaymentReturn() {
@@ -2919,10 +3487,64 @@ window.addEventListener('DOMContentLoaded', async () => {
     set('p-size',    cp.size);
     set('p-website', cp.website);
     set('p-desc',    cp.beschrijving);
+
+    // Worldwide verification fields — 1 mei 2026
+    const _typeEl = document.getElementById('p-company-type');
+    if (_typeEl && cp?.company_type) {
+      _typeEl.value = cp.company_type;
+      handleCompanyTypeChange(cp.company_type);
+    }
+
+    const _countryEl = document.getElementById('p-country');
+    if (_countryEl && cp?.country) {
+      _countryEl.value = cp.country;
+    }
+
+    const _vatEl = document.getElementById('p-vat');
+    if (_vatEl && cp?.vat_number) {
+      _vatEl.value = cp.vat_number;
+    }
+
+    const _taxEl = document.getElementById('p-taxid');
+    if (_taxEl && cp?.tax_id) {
+      _taxEl.value = cp.tax_id;
+    }
+
+    const _remoteEl = document.getElementById('p-remote');
+    if (_remoteEl) {
+      _remoteEl.checked = cp?.remote_possible ?? true;
+    }
+
+    const _erasmusEl = document.getElementById('p-erasmus');
+    if (_erasmusEl) {
+      _erasmusEl.checked = cp?.accepts_erasmus ?? false;
+    }
+
+    // Render verification badge op basis van huidige status
+    if (typeof renderVerificationBadge === 'function') {
+      renderVerificationBadge(cp?.verification_status || 'unverified');
+    }
+
+    // Sidebar verification warning
+    const _warn = document.getElementById('sidebar-verify-warn');
+    if (_warn) {
+      _warn.style.display =
+        (cp?.verification_status !== 'verified') ? '' : 'none';
+    }
+
     toonBedrijfOverzicht(cp);
   }
 
+  // Avatar picker — vanmiddag fix 30 apr 2026
+  if (typeof renderAvatarPicker === 'function') {
+    const _curAvKey = cp?.avatar_key || null;
+    window._internlyAvatarKey = _curAvKey;
+    renderAvatarPicker('avatar-picker-container', _curAvKey,
+      (key) => { window._internlyAvatarKey = key; });
+  }
+
   loadUnreadBadge(user.id);
+  loadStudentenBadge(user.id);
   herberekeningTrustScore(user.id);
 
   // ── Dashboard ESG stat (background load, non-blocking) ──

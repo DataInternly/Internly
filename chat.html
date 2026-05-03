@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
+  <script src="js/avatar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
   <script src="js/profanity.js"></script>
@@ -20,7 +21,34 @@
           integrity="sha384-gGElBOlmyIGNVOeetC2Q0EHG2IzuLtq7wBSnFgnkDTB/yzjOi6HwHkyt8xjsy7SU"
           crossorigin="anonymous"></script>
   <script src="js/toast.js"></script>
-  <script src="js/telemetry.js"></script>
+  <script src="js/consent.js" defer></script>
+  <script>
+  (function() {
+    function _loadTel() {
+      var s = document.createElement('script');
+      s.src = 'js/telemetry.js';
+      s.setAttribute('data-internly-tel', '1');
+      document.head.appendChild(s);
+    }
+    if (typeof window.InternlyConsent !== 'undefined') {
+      if (window.InternlyConsent.hasConsent('analytics')) {
+        _loadTel();
+      } else {
+        window.InternlyConsent.onAccept('analytics', _loadTel);
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.InternlyConsent !== 'undefined') {
+          if (window.InternlyConsent.hasConsent('analytics')) {
+            _loadTel();
+          } else {
+            window.InternlyConsent.onAccept('analytics', _loadTel);
+          }
+        }
+      });
+    }
+  })();
+  </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -452,9 +480,12 @@
 <!-- TOPBAR -->
 <div class="topbar">
   <a href="matches.html" class="back-btn">← Terug</a>
-  <div class="topbar-match-info">
-    <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
-    <div class="topbar-match-sub" id="topbarMatchSub"></div>
+  <div class="topbar-match-info chat-topbar-meta">
+    <div class="chat-topbar-avatar" id="chatTopbarAvatar" aria-hidden="true"></div>
+    <div class="chat-topbar-meta-text">
+      <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
+      <div class="topbar-match-sub" id="topbarMatchSub"></div>
+    </div>
   </div>
   <a id="match-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
   <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:var(--fg-tertiary,#6b8070);text-decoration:none;padding:5px 4px;">Privacy</a>
@@ -505,6 +536,18 @@
     </div>
   </div>
 
+  <!-- ── Chat templates panel — BOL Fix 30 apr 2026 ── -->
+  <div id="chat-templates" style="display:none;
+    background:#faf7f3;border:1px solid rgba(13,21,32,.09);
+    border-radius:8px;padding:.85rem;margin:0 12px .5rem">
+    <div style="font-size:.72rem;font-weight:600;
+      letter-spacing:.07em;text-transform:uppercase;
+      color:#7a8799;margin-bottom:.6rem">
+      Sjablonen
+    </div>
+    <div id="chat-templates-list" style="display:flex;flex-direction:column;gap:6px"></div>
+  </div>
+
   <div class="input-bar">
     <button class="emoji-btn" id="emojiBtn"
             onclick="toggleEmojiPicker()"
@@ -514,6 +557,13 @@
             onclick="openMinesweeperInvite()"
             aria-label="Mijnenveger spelen"
             title="Mijnenveger starten">💣</button>
+    <button id="templates-btn"
+            onclick="toggleTemplates()"
+            title="Gebruik een sjabloon"
+            aria-label="Berichtsjablonen"
+            style="padding:8px 10px;border-radius:8px;
+            background:none;border:1px solid rgba(13,21,32,.12);
+            cursor:pointer;font-size:.9rem;flex-shrink:0">📋</button>
     <div id="emoji-picker-container" style="display:none"></div>
     <textarea
       class="msg-textarea"
@@ -980,12 +1030,22 @@
     if (otherPartyId) {
       const { data: profile } = await db
         .from('profiles')
-        .select('naam, name, email')
+        .select('naam, name, email, avatar_key')
         .eq('id', otherPartyId)
         .maybeSingle();
       if (profile) {
         otherPartyName  = getDisplayName(profile) || 'Gesprekspartner'; // SPRINT5 NOTE: getDisplayName checkt naam en email maar niet profile.name; 'Gesprekspartner' onbereikbaar (getDisplayName geeft altijd string)
         otherPartyEmail = profile.email || '';
+        // RUN7 Cat 8 — avatar in topbar
+        const _avSlot = document.getElementById('chatTopbarAvatar');
+        if (_avSlot) {
+          if (profile.avatar_key && typeof getAvatarSvg === 'function') {
+            _avSlot.innerHTML = getAvatarSvg(profile.avatar_key, otherPartyName, 'sm');
+          } else {
+            const _init = (otherPartyName || '?').split(' ').map(s => s[0] || '').slice(0,2).join('').toUpperCase();
+            _avSlot.innerHTML = `<div class="chat-topbar-avatar-initials">${escapeHtml(_init)}</div>`;
+          }
+        }
       }
     }
 
@@ -1020,6 +1080,120 @@
     subscribeMeetingNotifications();
     if (otherPartyId) {
       InternlyCalendar.renderChatButton(otherPartyId, otherPartyEmail, otherPartyName, 'sendBtn', db, currentUser.id, matchId);
+    }
+
+    // BOL Fix: motivatie-prefill bij eerste chat-opening (student kant)
+    await maybePostPendingMotivatie(mId);
+  }
+
+  // ── Chat templates — BOL Fix 30 apr 2026 ─────────────────────────────
+  const CHAT_TEMPLATES = {
+    student: [
+      {
+        title: 'Uitnodiging gesprek bevestigen',
+        text:  'Hallo, bedankt voor de uitnodiging! Ik bevestig graag het gesprek. Zijn er nog dingen die ik moet voorbereiden of meenemen?'
+      },
+      {
+        title: 'Vraag stellen over stage',
+        text:  'Hallo, ik heb een vraag over de stageplek. Kunt u mij meer vertellen over [onderwerp]?'
+      },
+      {
+        title: 'Beschikbaarheid doorgeven',
+        text:  'Hallo, ik ben beschikbaar op:\n[dag 1]: [tijdstip]\n[dag 2]: [tijdstip]\n[dag 3]: [tijdstip]\nWelk moment past u het beste?'
+      }
+    ],
+    bedrijf: [
+      {
+        title: 'Uitnodiging kennismakingsgesprek',
+        text:  'Hallo [naam], bedankt voor je interesse in een stageplek bij ons. We willen je graag uitnodigen voor een kennismakingsgesprek. Kunnen we [dag] om [tijdstip] afspreken?'
+      },
+      {
+        title: 'Extra informatie vragen',
+        text:  'Hallo [naam], bedankt voor je sollicitatie. We hebben je profiel bekeken en willen graag meer weten over [onderwerp]. Kun je ons daar meer over vertellen?'
+      },
+      {
+        title: 'Afwijzing met terugkoppeling',
+        text:  'Hallo [naam], bedankt voor je sollicitatie bij ons. Na zorgvuldige overweging hebben we besloten om met een andere kandidaat verder te gaan. We wensen je veel succes bij je verdere zoektocht.'
+      }
+    ]
+  };
+
+  function loadChatTemplates(role) {
+    const list = document.getElementById('chat-templates-list');
+    const btn  = document.getElementById('templates-btn');
+    if (!list) return;
+    const tpls = CHAT_TEMPLATES[role];
+    if (!tpls || !tpls.length) {
+      // Geen sjablonen voor deze rol — verberg knop
+      if (btn) btn.style.display = 'none';
+      return;
+    }
+    list.innerHTML = tpls.map(t => `
+      <button onclick="useTemplate(this)"
+        data-text="${escapeHtml(t.text)}"
+        style="text-align:left;padding:.5rem .75rem;
+        background:#fff;border:1px solid rgba(13,21,32,.09);
+        border-radius:6px;cursor:pointer;font-size:.82rem;
+        color:#3a4455;line-height:1.45;width:100%">
+        ${escapeHtml(t.title)}
+      </button>`).join('');
+  }
+
+  function toggleTemplates() {
+    const panel = document.getElementById('chat-templates');
+    if (!panel) return;
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function useTemplate(btn) {
+    const input = document.getElementById('msgInput');
+    if (!input) return;
+    input.value = btn.dataset.text || '';
+    input.focus();
+    toggleTemplates(); // close panel
+    input.dispatchEvent(new Event('input'));
+  }
+
+  // ── Pending-motivatie auto-post — BOL Fix 30 apr 2026 ────────────────
+  async function maybePostPendingMotivatie(mId) {
+    if (!convId || !currentUser) return;
+    try {
+      // Alleen student aan party_a kant heeft pending motivatie geschreven
+      const { data: matchRow } = await db.from('matches')
+        .select('party_a, posting_id').eq('id', mId).maybeSingle();
+      if (!matchRow) return;
+      if (matchRow.party_a !== currentUser.id) return; // alleen student
+      if (!matchRow.posting_id) return;
+
+      const storageKey = 'internly_motiv_pending_posting_' + matchRow.posting_id;
+      let motivatie = null;
+      try { motivatie = localStorage.getItem(storageKey); } catch (_) {}
+      if (!motivatie) return;
+
+      // Alleen posten als er nog geen berichten zijn (eerste opening)
+      const { count: existingCount } = await db.from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('conversation_id', convId);
+      if (existingCount && existingCount > 0) {
+        // Te laat — opruimen zonder posten
+        try { localStorage.removeItem(storageKey); } catch (_) {}
+        return;
+      }
+
+      const body = '💬 Motivatie student: ' + motivatie;
+      const { error: insErr } = await db.from('messages').insert({
+        conversation_id: convId,
+        sender_id:       currentUser.id,
+        content:         body
+      });
+      if (insErr) {
+        console.warn('[motivatie auto-post] insert fout:', insErr.message);
+        return;
+      }
+      try { localStorage.removeItem(storageKey); } catch (_) {}
+      await loadMessages();
+    } catch (e) {
+      console.warn('[motivatie auto-post] fout:', e?.message || e);
     }
   }
 
@@ -1243,7 +1417,7 @@
 
       const { data: profile } = await db
         .from('profiles')
-        .select('naam, role')
+        .select('naam, role, avatar_key')
         .eq('id', otherPartyId)
         .maybeSingle();
 
@@ -1282,14 +1456,16 @@
             onmouseout="this.style.boxShadow='none'">
             <div style="
               width:42px; height:42px; border-radius:50%;
-              background:${unread ? '#e8f5ee' : '#f4f3ef'};
+              background:${(profile?.avatar_key && typeof getAvatarSvg === 'function') ? 'transparent' : (unread ? '#e8f5ee' : '#f4f3ef')};
               display:flex; align-items:center; justify-content:center;
               font-family:'Bricolage Grotesque',sans-serif;
               font-size:.9rem; font-weight:700;
               color:${unread ? '#1a7a48' : '#6b7280'};
-              flex-shrink:0;
+              flex-shrink:0; overflow:hidden;
             ">
-              ${escapeHtml((profile?.naam || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2))}
+              ${(profile?.avatar_key && typeof getAvatarSvg === 'function')
+                ? getAvatarSvg(profile.avatar_key, profile?.naam || '', 'md')
+                : escapeHtml((profile?.naam || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2))}
             </div>
             <div style="flex:1; min-width:0;">
               <div style="
@@ -1349,8 +1525,12 @@
     otherPartyName = other?.naam || 'Buddy';
     otherPartyEmail = null;
 
-    // 4. Topbar invullen
-    document.getElementById('topbarMatchName').textContent = otherPartyName;
+    // 4. Topbar invullen — buddy kleurcodering (backlog 30 apr 2026)
+    const _topName = document.getElementById('topbarMatchName');
+    if (_topName) {
+      _topName.innerHTML = escapeHtml(otherPartyName) +
+        ' <span style="background:#ede9fe;color:#7c3aed;font-size:.7rem;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block;margin-left:6px;vertical-align:middle">Buddy</span>';
+    }
     document.getElementById('topbarMatchSub').textContent  = 'Buddy-chat · ' + (pair.type || 'gepensioneerd');
     // Stage Hub-pil verbergen — niet van toepassing bij buddy-chat
     const stageHubLink = document.getElementById('match-hub-topbar-link');
@@ -1435,6 +1615,9 @@
         return;
       }
     }
+
+    // BOL Fix 3: chat templates per rol
+    loadChatTemplates(_profRow?.role);
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
