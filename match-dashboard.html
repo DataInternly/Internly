@@ -2056,8 +2056,8 @@
     </button>
 
     <div class="hub-topbar-stage">
-      <div class="hub-topbar-stage-name">Stage Wetenschapscommunicatie</div>
-      <div class="hub-topbar-stage-meta">NIOZ Zeewetenschappen · 1 mrt – 31 aug 2026</div>
+      <div class="hub-topbar-stage-name">Jouw actieve stage</div>
+      <div class="hub-topbar-stage-meta"></div>
     </div>
 
     <div class="hub-topbar-right">
@@ -2843,7 +2843,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         // Wire back button to the right dashboard
         const backBtn = document.getElementById('back-to-dash');
-        const backTargets = { student: 'matches.html', bedrijf: 'company-dashboard.html', school: 'school-dashboard.html' };
+        const backTargets = { student: 'student-home.html', bedrijf: 'company-dashboard.html', school: 'school-dashboard.html' };
         if (backBtn && backTargets[mappedRole]) {
           backBtn.href = backTargets[mappedRole];
           backBtn.style.display = '';
@@ -2914,7 +2914,7 @@ async function loadMatchFromDB(user) {
     if (backBtn) {
       if (role === 'bedrijf')    { backBtn.href = 'company-dashboard.html';    backBtn.style.display = ''; }
       if (role === 'school')     { backBtn.href = 'school-dashboard.html';     backBtn.style.display = ''; }
-      if (role === 'student')    { backBtn.href = 'matches.html';              backBtn.style.display = ''; }
+      if (role === 'student')    { backBtn.href = 'student-home.html';         backBtn.style.display = ''; }
       if (role === 'begeleider') { backBtn.href = 'begeleider-dashboard.html'; backBtn.style.display = ''; }
     }
     if (role === 'bedrijf') buildStudentSwitcher(user.id, MATCH_ID);

@@ -77,7 +77,8 @@ function resolveStudentDashboard(profile, studentProfile) {
   if (studentProfile.student_type === 'international') {
     return 'international-student-dashboard.html';
   }
-  return 'match-dashboard.html';
+  // BOL/HBO/WO student → welkomstpagina (Stage Hub blijft bereikbaar via match-link)
+  return 'student-home.html';
 }
 
 window.Internly = window.Internly || {};
