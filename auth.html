@@ -905,7 +905,7 @@ async function doSetNewPassword() {
 
 // ── Login ──
 async function doLogin() {
-  if (_fCtx.blockIfFilled('login submit')) {
+  if (typeof _fCtx !== 'undefined' && _fCtx.blockIfFilled && _fCtx.blockIfFilled('login submit')) {
     showError('Er is iets misgegaan — probeer het opnieuw.');
     return;
   }
@@ -1031,7 +1031,7 @@ async function doLogin() {
 
 // ── Register ──
 async function doRegister() {
-  if (_fCtx.blockIfFilled('register submit')) {
+  if (typeof _fCtx !== 'undefined' && _fCtx.blockIfFilled && _fCtx.blockIfFilled('register submit')) {
     showError('Er is iets misgegaan — probeer het opnieuw.');
     return;
   }
@@ -1278,10 +1278,10 @@ window.addEventListener('unhandledrejection', function(e) {
 
 window.addEventListener('DOMContentLoaded', async () => {
   // Telemetry init — zie CLAUDE.md voor codenames
-  _fCtx._init('auth');
+  if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('auth');
 
   // Honeypot: plant verborgen valkuil-veld in login-container.
-  _fCtx._plant(document.getElementById('form-login'));
+  if (typeof _fCtx !== 'undefined' && _fCtx._plant) _fCtx._plant(document.getElementById('form-login'));
 
   // Al ingelogd? Toon panel met optie naar dashboard of ander account.
   const { data: { user } } = await db.auth.getUser();

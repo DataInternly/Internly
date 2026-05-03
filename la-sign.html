@@ -388,7 +388,7 @@ function _partyLabel(p) {
 // ════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
   // Telemetry init — zie CLAUDE.md voor codenames
-  _fCtx._init('la-sign');
+  if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('la-sign');
 
   const params = new URLSearchParams(window.location.search);
   const token = (params.get('token') || '').trim();
@@ -574,7 +574,7 @@ function renderSignForm(la, tokenRow) {
 
   // Plant honeypot in het sign-formulier (post-render)
   const form = document.getElementById('sign-form');
-  if (form) _fCtx._plant(form);
+  if (form && typeof _fCtx !== 'undefined' && _fCtx._plant) _fCtx._plant(form);
 }
 
 function updateSignBtn() {
@@ -593,7 +593,7 @@ async function signAgreement() {
 
   // Honeypot guard — blokkeer bots die het verborgen veld invullen.
   // _guard returnt true bij OK, false als de honeypot getriggerd is.
-  if (!_fCtx._guard('la-sign')) return;
+  if (typeof _fCtx !== 'undefined' && _fCtx._guard && !_fCtx._guard('la-sign')) return;
 
   const btn = document.getElementById('signBtn');
   const errBox = document.getElementById('signError');

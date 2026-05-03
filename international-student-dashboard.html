@@ -1155,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Telemetry init — zie CLAUDE.md voor codenames
-    _fCtx._init('intl-student');
+    if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('intl-student');
 
     initLangsInput();
     await loadProfile();
@@ -2240,7 +2240,7 @@ function renderBuddySection() {
 
   // Plant honeypot in het buddy-aanvraag formulier (post-render)
   const form = document.getElementById('buddy-request-form');
-  if (form) _fCtx._plant(form);
+  if (form && typeof _fCtx !== 'undefined' && _fCtx._plant) _fCtx._plant(form);
 }
 
 function renderBuddyCardItem(b) {
@@ -2286,7 +2286,7 @@ async function requestBuddy(buddyId) {
 
   // Honeypot guard — blokkeer bots die het verborgen veld invullen.
   // _guard returnt true bij OK, false als de honeypot getriggerd is.
-  if (!_fCtx._guard('buddy-request')) return;
+  if (typeof _fCtx !== 'undefined' && _fCtx._guard && !_fCtx._guard('buddy-request')) return;
 
   const msgEl = document.getElementById('msg-' + buddyId);
   const message = msgEl?.value.trim() || null;
