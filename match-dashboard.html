@@ -85,15 +85,15 @@
       --orange-dk:   #e05c1a;
       --orange-bg:   #fff2eb;
       /* Party colors */
-      --student:     #1756a8;
-      --student-bg:  #e8f0fc;
+      --student:     #1a7a48;
+      --student-bg:  #e8f5ee;
       --bedrijf:     #1a7a48;
       --bedrijf-bg:  #e8f5ee;
       --school:      #a06010;
       --school-bg:   #fdf3e0;
       /* Semantic aliases (kept for backward compat) */
-      --blue:        #1756a8;
-      --blue-bg:     #e8f0fc;
+      --blue:        #1a7a48;
+      --blue-bg:     #e8f5ee;
       --green:       #1a7a48;
       --green-bg:    #e8f5ee;
       --amber:       #a06010;
@@ -233,6 +233,46 @@
       gap: 16px;
     }
 
+    /* Stage context-strip — toont stage-naam dynamisch onder student-header */
+    .hub-context-strip {
+      position: sticky;
+      top: 54px;
+      z-index: 95;
+      background: rgba(26,122,72,.06);
+      border-bottom: 1px solid rgba(26,122,72,.15);
+      padding: .55rem 1.25rem;
+    }
+    .hcs-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: .82rem;
+      color: var(--ink2, #374151);
+    }
+    .hcs-label {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink3, #6b7280);
+      margin-right: .35rem;
+    }
+    .hcs-name { font-weight: 600; color: var(--ink, #0d1520); }
+    .hcs-bedrijf { color: var(--ink3, #6b7280); margin-left: auto; }
+
+    /* Student-modus: toon student-header (TYPE B), verberg multi-role topbar.
+       Sidebar offset wordt aangepast aan student-header height (54px). */
+    body[data-role="student"] #hub-topbar { display: none; }
+    body[data-role="student"] .hub-layout { padding-top: 0; }
+    body[data-role="student"] #sidebar {
+      top: 54px;
+      height: calc(100vh - 54px);
+    }
+    /* Andere rollen: student-header verbergen, hub-topbar tonen */
+    body:not([data-role="student"]) #student-header { display: none; }
+
     #hamburger-btn {
       display: none;
       width: var(--sidebar-w);
@@ -259,7 +299,7 @@
       width: var(--sidebar-w);
       height: 100%;
       padding: 0 20px;
-      background: var(--ink);
+      background: linear-gradient(180deg, #1a7a48 0%, #0f5c36 100%);
       flex-shrink: 0;
     }
 
@@ -351,7 +391,7 @@
       left: 0;
       width: var(--sidebar-w);
       height: calc(100vh - var(--topbar-h));
-      background: var(--ink);
+      background: linear-gradient(180deg, #1a7a48 0%, #0f5c36 100%);
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -2043,7 +2083,11 @@
 <!-- ══ App shell ════════════════════════════════════════════════════════════ -->
 <div id="app-shell">
 
-  <!-- Topbar -->
+  <!-- Student header — TYPE B (renderStudentHeader vult dit voor role==='student') -->
+  <div id="student-header"></div>
+
+  <!-- Multi-role topbar — bedrijf/school/begeleider/demo-modus.
+       Voor role==='student' verbergt CSS dit element via body[data-role]. -->
   <header id="hub-topbar">
     <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="hub-topbar-logo" style="cursor:pointer">Internly<span>.</span></a>
 
@@ -2055,11 +2099,6 @@
       </svg>
     </button>
 
-    <div class="hub-topbar-stage">
-      <div class="hub-topbar-stage-name">Jouw actieve stage</div>
-      <div class="hub-topbar-stage-meta"></div>
-    </div>
-
     <div class="hub-topbar-right">
       <span id="role-badge-display" class="role-badge"></span>
       <select id="student-switcher" class="student-switcher-select" style="display:none;" onchange="switchStudent(this.value)" aria-label="Wissel student"></select>
@@ -2067,6 +2106,17 @@
       <button class="role-switch-btn" id="demo-switch-btn" onclick="switchRole()">Wissel rol</button>
     </div>
   </header>
+
+  <!-- Stage context-strip — toont stage-naam + bedrijfsnaam dynamisch (gevuld door loadMatchFromDB) -->
+  <div class="hub-context-strip" id="hub-context-strip" style="display:none">
+    <div class="hcs-inner">
+      <div class="hcs-stage">
+        <span class="hcs-label">Stage</span>
+        <span class="hcs-name" id="hub-stage-naam">—</span>
+      </div>
+      <div class="hcs-bedrijf" id="hub-bedrijf-naam">—</div>
+    </div>
+  </div>
 
   <!-- Sidebar overlay (mobile) -->
   <div id="sidebar-overlay" onclick="closeSidebar()"></div>
@@ -2137,13 +2187,6 @@
         Afspraken
         <span id="sidebar-badge-afspraken" class="sidebar-badge" style="display:none"></span>
         <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Afspraken">ⓘ<span class="info-pop">Plan gesprekken in met je bedrijfsbegeleider of schoolbegeleider. Alle partijen zien de afspraken en kunnen nieuwe toevoegen.</span></span>
-      </button>
-      <button class="sidebar-item" data-tab="matchpool" onclick="switchTab('matchpool')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
-        Matchpool
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Matchpool">ⓘ<span class="info-pop">Bekijk beschikbare bedrijven, scholen en buddy's. Zet voorbeeldprofielen aan om te zien hoe de pool eruitziet.</span></span>
       </button>
       <button class="sidebar-item" data-tab="account" onclick="switchTab('account')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2544,8 +2587,15 @@ function roleName() {
 
 function startHub(role) {
   hubState.role = role;
+  document.body.dataset.role = role;
   document.getElementById('role-picker').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
+
+  // Student krijgt TYPE B header (renderStudentHeader). Andere rollen behouden #hub-topbar.
+  if (role === 'student' && typeof renderStudentHeader === 'function') {
+    renderStudentHeader({ activeTab: 'hub' });
+  }
+
   updateRoleBadge();
   updateSidebarUser();
   updateTakenBadge();
@@ -2952,11 +3002,13 @@ async function loadMatchFromDB(user) {
       if (schoolRow?.schoolnaam) match.school.name = schoolRow.schoolnaam;
     }
 
-    // Update topbar with real match info
-    const topbarStage = document.querySelector('.hub-topbar-stage-name');
-    const topbarMeta  = document.querySelector('.hub-topbar-stage-meta');
-    if (topbarStage) topbarStage.textContent = match.company.vacature;
-    if (topbarMeta)  topbarMeta.textContent  = match.company.name + ' · ' + match.company.start + ' – ' + match.company.eind;
+    // Update context-strip met match-data (vervangt voorheen hardcoded hub-topbar-stage)
+    const stageEl   = document.getElementById('hub-stage-naam');
+    const bedrijfEl = document.getElementById('hub-bedrijf-naam');
+    const contextStrip = document.getElementById('hub-context-strip');
+    if (stageEl)   stageEl.textContent   = match.company.vacature;
+    if (bedrijfEl) bedrijfEl.textContent = match.company.name + ' · ' + match.company.start + ' – ' + match.company.eind;
+    if (contextStrip) contextStrip.style.display = '';
 
     // 4. Set global auth state for DB meeting ops
     currentUser = user;
@@ -3114,7 +3166,6 @@ function switchTab(tab) {
     taken:       renderTaken,
     voortgang:   renderVoortgang,
     afspraken:   renderAfspraken,
-    matchpool:   renderMatchpool,
     account:     renderAccountTab,
   };
   const tabHtml = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';

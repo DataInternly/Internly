@@ -864,15 +864,10 @@
       _isBBL = false;
     }
 
-    // RUN3 — rol-aware top-nav header (renderRoleHeader uit Run 1)
-    if (typeof renderRoleHeader === 'function') {
-      await renderRoleHeader(userRole, 'berichten', {
-        profile: { naam: prof?.naam || '' }
-      });
-    } else if (typeof renderStudentHeader === 'function') {
-      // Fallback: oude student-header (mocht renderRoleHeader missen)
-      await renderStudentHeader({ activeTab: 'berichten' });
-    }
+    // Rol-aware top-nav header — werkt voor student én gepensioneerd
+    await renderRoleHeader(userRole, 'berichten', {
+      profile: { naam: prof?.naam || '' }
+    });
 
     await loadAll();
   });
