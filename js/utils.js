@@ -795,6 +795,12 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
   const profileHref = bblMode ? '/bbl-profile.html' : '/student-profile.html';
   const logoHref    = bblMode ? '/bbl-hub.html' : '/discover.html';
 
+  // Role-pill: BOL/BBL-differentiatie in header. International-detectie vereist
+  // student_type uit student_profiles en valt buiten scope van NAV-00A
+  // (zou functiesignatuur uitbreiden — follow-up).
+  const _rolLabel = bblMode ? '🔧 BBL' : '🎯 BOL';
+  const _rolClass = bblMode ? 'role-pill--bbl' : 'role-pill--student';
+
   const bolNav = `
     <a href="/match-dashboard.html"    class="${activeTab === 'hub'           ? 'active' : ''}">Mijn Stage Hub</a>
     <a href="/matchpool.html"          class="${activeTab === 'matchpool'     ? 'active' : ''}">Matchpool</a>
@@ -812,6 +818,7 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
   return `
     <header class="student-header">
       <a href="${logoHref}" class="student-header-logo">intern<span style="color:#e05c1a">ly</span></a>
+      <span class="role-pill ${_rolClass}">${_rolLabel}</span>
       <nav class="student-nav">
         ${bblMode ? bblNav : bolNav}
         <a href="${buddyHref}" class="buddy-tab ${activeTab === 'buddy' ? 'active' : ''}">${escapeHtml(buddyLabel)}</a>

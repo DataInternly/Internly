@@ -154,6 +154,16 @@
   --dark-green:   #0f5c36;
   --accent:       #FF7E42;
   --accent-dark:  #e05c1a;
+  /* WCAG AA contrast (1 mei 2026 — Sprint 1 FIX B):
+     wit-op-#FF7E42 = 2.7:1 = AA-fail. Nieuwe --accent-bg
+     familie levert ≥4.5:1 voor witte tekst op solid buttons
+     en bell-count, terwijl de oude --accent intact blijft
+     voor decoratieve toepassingen (logo span, nav underline,
+     glow-shadows). Zie css-comment-blok lijn 6-13. */
+  --accent-bg:        #c14a0e;  /* wit-op = 5.1:1 — AA pass */
+  --accent-bg-hover:  #a83d08;  /* hover-state, donkerder */
+  --accent-tint:      #fdf0e8;  /* lichte fill voor cards */
+  --accent-on-white:  #c14a0e;  /* alias voor tekst-op-wit */
   --text:         #ffffff;
   --bg:           #f4f3ef;
   --white:        #ffffff;
@@ -286,7 +296,7 @@ body {
 }
 
 .btn-demo {
-  background: var(--accent);
+  background: var(--accent-bg);
   color: #fff;
   padding: 16px 52px;
   font-size: 1.2rem;
@@ -362,8 +372,8 @@ body {
   border-radius: var(--radius-sm, 8px);
 }
 
-.btn-primary  { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: var(--accent-dark); }
+.btn-primary  { background: var(--accent-bg); color: #fff; }
+.btn-primary:hover { background: var(--accent-bg-hover); }
 
 .btn-ghost {
   background: transparent;
@@ -559,7 +569,7 @@ body                  { top: 0 !important; position: static !important; }
 .bell-count {
   position: absolute;
   top: 0; right: 0;
-  background: #FF7E42;
+  background: var(--accent-bg);
   color: #fff;
   font-size: .62rem;
   font-weight: 700;
@@ -1345,6 +1355,21 @@ button {
   min-height: 44px;
 }
 
+/* ── Brand polish — caret + text-selection (1 mei 2026 Sprint Tickoff) ──── */
+input:not([type="hidden"]),
+textarea,
+select {
+  caret-color: var(--accent);
+}
+::selection {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
+::-moz-selection {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
+
 /* ── Keyboard focus indicator (WCAG 2.1 AA) ──────────────────────────────── */
 :focus-visible {
   outline: 3px solid var(--accent, #FF7E42);
@@ -1445,14 +1470,14 @@ button {
 }
 .btn-pass:hover { border-color: #b82020; color: #b82020; background: #fdeaea; }
 .btn-like {
-  padding: 13px 32px; background: #FF7E42; color: #fff;
+  padding: 13px 32px; background: var(--accent-bg); color: #fff;
   border: none; border-radius: 50px;
   font-family: 'Outfit', sans-serif; font-size: .95rem; font-weight: 600;
   cursor: pointer; box-shadow: 0 4px 14px rgba(255,126,66,.35);
   transition: background .15s, transform .1s, box-shadow .15s;
   min-height: unset;
 }
-.btn-like:hover { background: #e05c1a; box-shadow: 0 6px 18px rgba(255,126,66,.45); }
+.btn-like:hover { background: var(--accent-bg-hover); box-shadow: 0 6px 18px rgba(255,126,66,.45); }
 .btn-like:active { transform: scale(.97); }
 
 /* ── Swipe empty states ──────────────────────────────────────────────────── */
@@ -1544,7 +1569,7 @@ button {
 .student-header .notif-bell:hover { background: rgba(13,21,32,.06); }
 .student-header .bell-count {
   position: absolute; top: 2px; right: 2px;
-  background: #e05c1a; color: #fff;
+  background: var(--accent-bg); color: #fff;
   font-size: .6rem; font-weight: 700;
   min-width: 16px; height: 16px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
@@ -1562,6 +1587,32 @@ button {
   .student-nav a { font-size: .8rem; }
   .student-header { padding: 0 14px; }
 }
+
+/* ── Role-pill — persistente rol-indicator in header ──────────────────────── */
+/* Gedeelde definitie. Gebruikt door student-header (utils.js) en bedoeld als
+   migratie-target voor inline .role-pill in company/school/begeleider-dashboard. */
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.4;
+  user-select: none;
+}
+.role-pill--student    { background: rgba(23,86,168,.10);  color: #1756a8; }
+.role-pill--bbl        { background: rgba(26,122,72,.10);  color: var(--c-green); }
+.role-pill--intl       { background: rgba(23,86,168,.10);  color: #1756a8; }
+.role-pill--bedrijf    { background: rgba(26,122,72,.10);  color: var(--c-green); }
+.role-pill--school     { background: rgba(160,96,16,.10);  color: #a06010; }
+.role-pill--buddy      { background: rgba(109,40,217,.10); color: var(--c-buddy-purple); }
+.role-pill--begeleider { background: rgba(13,21,32,.08);   color: #3a4455; }
 
 /* ──────────────────────────────────────────────────────────────────────────
    ACCOUNT MODULE — gedeeld over alle dashboards (js/account.js)
@@ -1657,7 +1708,7 @@ button {
   width: 100%;
   padding: 10px 12px;
   font-family: var(--font-body, 'Outfit', sans-serif);
-  font-size: .92rem;
+  font-size: 1rem;
   color: var(--ink, #0d1520);
   background: var(--white, #fff);
   border: 1px solid #d1d5db;
@@ -1887,4 +1938,620 @@ label.req::after {
   color: var(--fg-tertiary, #7a8799);
   margin-bottom: 1rem;
 }
+
+/* ─── Buddy Overzicht layout (RUN4 1 mei 2026) ─── */
+.overz-greeting {
+  max-width: 1100px;
+  margin: 8px auto 24px;
+  padding: 0 4px;
+}
+.overz-greeting-text {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  font-weight: 600;
+  color: var(--ink, #0d1520);
+  letter-spacing: -.02em;
+  margin-bottom: 6px;
+}
+.overz-greeting-sub {
+  font-size: .92rem;
+  color: var(--ink3, #7a8799);
+}
+.overz-identity {
+  max-width: 1100px;
+  margin: 0 auto 32px;
+}
+.overz-identity-card {
+  background: var(--white, #fff);
+  border: 1px solid var(--border, rgba(13,21,32,.09));
+  border-radius: 14px;
+  padding: 28px 32px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(124,58,237,.04);
+}
+.overz-avatar-block {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.overz-avatar-circle {
+  width: 110px; height: 110px; border-radius: 50%;
+  background: var(--bg2, #ecebe5);
+  border: 4px solid white;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.overz-avatar-circle svg { width: 100%; height: 100%; }
+.overz-avatar-initials {
+  color: white; font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600; font-size: 2.2rem;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.overz-avatar-edit {
+  position: absolute; bottom: -2px; right: -2px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: white; border: 2px solid #7c3aed; color: #7c3aed;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: .8rem;
+}
+.overz-avatar-edit:hover { background: #7c3aed; color: white; }
+.overz-avatar-link {
+  font-size: .78rem; color: var(--ink3, #7a8799);
+  text-decoration: none; cursor: pointer;
+}
+.overz-avatar-link:hover { color: #7c3aed; }
+.overz-summary-block { min-width: 0; }
+.overz-summary-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem; font-weight: 700;
+  color: var(--ink, #0d1520);
+  letter-spacing: -.01em; margin-bottom: 2px;
+}
+.overz-summary-meta {
+  font-size: .88rem; color: var(--ink3, #7a8799); margin-bottom: 14px;
+}
+.overz-summary-meta strong { color: #5b21b6; font-weight: 500; }
+.overz-summary-pitch {
+  font-size: .98rem; color: var(--ink2, #3a4455);
+  line-height: 1.6; margin-bottom: 16px; font-style: italic;
+}
+.overz-summary-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px;
+}
+.overz-summary-tag {
+  background: #f5f3ff; color: #5b21b6;
+  font-size: .8rem; padding: 4px 11px; border-radius: 20px; font-weight: 500;
+}
+.overz-summary-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .88rem; color: #7c3aed; text-decoration: none;
+  font-weight: 500; cursor: pointer; transition: gap .15s;
+}
+.overz-summary-link:hover { gap: 9px; }
+
+.overz-section-label {
+  max-width: 1100px;
+  margin: 8px auto 16px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem; font-weight: 600;
+  color: var(--ink, #0d1520); letter-spacing: -.01em;
+}
+
+/* Setting-card wrapper (RUN4) */
+.setting-card {
+  background: var(--white, #fff);
+  border: 1px solid var(--border, rgba(13,21,32,.09));
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 12px;
+  transition: border-color .12s;
+}
+.setting-card:hover { border-color: rgba(124,58,237,.25); }
+.setting-card-head {
+  display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;
+}
+.setting-card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: #f5f3ff; color: #5b21b6;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.setting-card-text { flex: 1; min-width: 0; }
+.setting-card-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem; font-weight: 600;
+  color: var(--ink, #0d1520); margin-bottom: 2px;
+}
+.setting-card-desc {
+  font-size: .82rem; color: var(--ink3, #7a8799); line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .overz-identity-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 24px 22px;
+  }
+  .overz-summary-tags, .overz-summary-link { justify-content: center; }
+  .overz-summary-meta strong { display: block; margin-bottom: 4px; }
+}
+
+/* Fade-up animation (RUN4) */
+@keyframes overz-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.overz-greeting, .overz-identity, .overz-section-label, .setting-card {
+  animation: overz-fade-up .35s ease both;
+}
+.overz-identity { animation-delay: .05s; }
+.overz-section-label { animation-delay: .12s; }
+.setting-card:nth-of-type(1) { animation-delay: .15s; }
+.setting-card:nth-of-type(2) { animation-delay: .18s; }
+.setting-card:nth-of-type(3) { animation-delay: .21s; }
+.setting-card:nth-of-type(4) { animation-delay: .24s; }
+
+/* ─── Dashboard sections (RUN2 1 mei 2026 — buddy section-switcher) ─── */
+.dashboard-section[hidden] { display: none !important; }
+.dashboard-section { animation: dashboard-fade-in .2s ease-out; }
+@keyframes dashboard-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Role-aware top header (RUN2.5 1 mei 2026 — z-index 110 boven topbar) ─── */
+.role-header {
+  background: var(--white, #fff);
+  border-bottom: 1px solid var(--border, rgba(13,21,32,.09));
+  padding: 8px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 110;
+}
+.role-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.role-header-nav {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.role-header-nav::-webkit-scrollbar { display: none; }
+.role-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.role-nav-item {
+  padding: 10px 14px;
+  font-size: .9rem;
+  color: var(--ink2, #3a4455);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+}
+.role-nav-item:hover {
+  background: var(--bg2, #ecebe5);
+  color: var(--ink, #0d1520);
+}
+.role-nav-item.active {
+  background: var(--ink, #0d1520);
+  color: white;
+  font-weight: 500;
+}
+.role-nav-item.active:hover {
+  background: var(--ink, #0d1520);
+}
+.role-nav-item.disabled {
+  color: var(--ink3, #7a8799);
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.role-nav-icon {
+  font-size: 1.05rem;
+  display: inline-flex;
+}
+.role-nav-label { line-height: 1; }
+.role-nav-badge {
+  background: var(--bg2, #ecebe5);
+  color: var(--ink3, #7a8799);
+  font-size: .6rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.role-header-bell,
+.role-header-back,
+.role-header-logout {
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .82rem;
+  cursor: pointer;
+  color: var(--ink3, #7a8799);
+  transition: background .15s, color .15s;
+}
+.role-header-bell:hover,
+.role-header-back:hover,
+.role-header-logout:hover {
+  background: var(--bg2, #ecebe5);
+  color: var(--ink, #0d1520);
+}
+.role-header-bell-count {
+  display: inline-block;
+  background: #b82020;
+  color: white;
+  font-size: .65rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 3px;
+}
+.role-header-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  background: var(--bg2, #ecebe5);
+  border-radius: 20px;
+}
+.role-header-chip-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  font-size: .72rem;
+}
+.role-header-chip-name {
+  font-size: .82rem;
+  color: var(--ink2, #3a4455);
+}
+
+/* Buddy-specific tint via body[data-role="gepensioneerd"] */
+body[data-role="gepensioneerd"] .role-nav-item.active {
+  background: #7c3aed;
+  color: white;
+}
+body[data-role="gepensioneerd"] .role-nav-item.active:hover {
+  background: #5b21b6;
+}
+body[data-role="gepensioneerd"] .role-header-bell-count { background: #5b21b6; }
+
+@media (max-width: 720px) {
+  .role-header { padding: 6px 12px; }
+  .role-nav-item { padding: 9px 11px; font-size: .85rem; gap: 5px; }
+  .role-nav-icon { font-size: 1rem; }
+  .role-header-chip-name { display: none; }
+  .role-header-back { display: none; }
+}
+@media (max-width: 480px) {
+  .role-nav-label { display: none; }
+  .role-nav-item { padding: 9px 12px; }
+  .role-nav-badge { display: none; }
+}
+
+/* ─── ProfileView — saved-view kaart (1 mei 2026 — RUN1 Foundation) ─── */
+.pv-card {
+  background: var(--white, #fff);
+  border: 1px solid var(--border, rgba(13,21,32,.09));
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.04);
+}
+.pv-strip {
+  background: linear-gradient(135deg, var(--accent-tint) 0%, var(--accent-light) 100%);
+  padding: 36px 32px 24px;
+  text-align: center;
+}
+.pv-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%);
+  margin: 0 auto;
+  border: 4px solid white;
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.pv-avatar svg { width: 100%; height: 100%; }
+.pv-avatar-initials {
+  color: white;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  font-size: 2.4rem;
+}
+.pv-avatar-edit {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: .85rem;
+}
+.pv-avatar-edit:hover { background: var(--accent); color: white; }
+.pv-name {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink, #0d1520);
+  margin-top: 16px;
+  letter-spacing: -.01em;
+}
+.pv-role {
+  font-size: .85rem;
+  color: var(--accent-deep);
+  margin-top: 2px;
+  font-weight: 500;
+}
+.pv-location {
+  font-size: .85rem;
+  color: var(--ink3, #7a8799);
+  margin-top: 6px;
+}
+.pv-tagline {
+  font-style: italic;
+  font-size: .92rem;
+  color: var(--ink2, #3a4455);
+  margin-top: 10px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+.pv-body { padding: 28px 32px 16px; }
+.pv-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  border-top: 1px solid var(--border, rgba(13,21,32,.09));
+  border-bottom: 1px solid var(--border, rgba(13,21,32,.09));
+  margin-bottom: 24px;
+}
+.pv-stat {
+  text-align: center;
+  padding: 14px 8px;
+  border-right: 1px solid var(--border, rgba(13,21,32,.09));
+}
+.pv-stat:last-child { border-right: none; }
+.pv-stat-val {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink, #0d1520);
+  line-height: 1.1;
+}
+.pv-stat-label {
+  font-size: .72rem;
+  color: var(--ink3, #7a8799);
+  margin-top: 4px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.pv-section { margin-bottom: 20px; }
+.pv-section:last-child { margin-bottom: 0; }
+.pv-section-label {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--ink3, #7a8799);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.pv-section-text {
+  font-size: .95rem;
+  color: var(--ink2, #3a4455);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+.pv-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.pv-tag {
+  font-size: .82rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.pv-actions {
+  padding: 16px 32px 28px;
+  text-align: right;
+  border-top: 1px solid var(--border, rgba(13,21,32,.09));
+}
+.pv-edit-btn {
+  background: var(--white, #fff);
+  border: 1px solid var(--border, rgba(13,21,32,.09));
+  color: var(--ink2, #3a4455);
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .12s;
+}
+.pv-edit-btn:hover {
+  border-color: var(--accent, #7c3aed);
+  color: var(--accent, #7c3aed);
+}
+.pv-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--ink3, #7a8799);
+}
+
+@media (max-width: 640px) {
+  .pv-strip { padding: 28px 22px 18px; }
+  .pv-body { padding: 22px 22px 14px; }
+  .pv-actions { padding: 14px 22px 22px; }
+  .pv-avatar { width: 100px; height: 100px; }
+  .pv-avatar-initials { font-size: 2rem; }
+  .pv-stats { grid-template-columns: 1fr; }
+  .pv-stat { border-right: none; border-bottom: 1px solid var(--border, rgba(13,21,32,.09)); }
+  .pv-stat:last-child { border-bottom: none; }
+}
 .form-req-note strong { color: var(--accent, #e05c1a); }
+
+/* ─── Anti-flicker (RUN7 Cat 3) ─── opt-in via body[data-auth-pending].
+   Body wordt onzichtbaar tot requireRole() de check completeert.
+   Fallback animation forceert opacity 1 na 300ms zodat pagina nooit
+   permanent zwart blijft als JS faalt of auth-check hangt. */
+body[data-auth-pending="true"] {
+  opacity: 0;
+  animation: revealBody 0s linear 300ms forwards;
+}
+body[data-auth-ready="true"] {
+  opacity: 1;
+  animation: none;
+}
+@keyframes revealBody {
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-auth-pending="true"] {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* ─── Page-back button (RUN7 Cat 5 — mijn-* pagina's back-affordance) ─── */
+.page-back-btn {
+  background: transparent;
+  border: 1px solid var(--border, rgba(13,21,32,.09));
+  color: var(--ink2, #3a4455);
+  cursor: pointer;
+  padding: 6px 12px 6px 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .82rem;
+  text-decoration: none;
+  transition: background .12s, border-color .12s;
+}
+.page-back-btn:hover {
+  background: var(--bg2, #ecebe5);
+  border-color: var(--border2, rgba(13,21,32,.16));
+  color: var(--ink, #0d1520);
+}
+.page-back-btn svg { flex-shrink: 0; }
+.page-back-row {
+  max-width: 1100px;
+  margin: 16px auto 0;
+  padding: 0 20px;
+}
+
+/* ─── Chat topbar avatar (RUN7 Cat 8 — avatar slot naast naam) ─── */
+.chat-topbar-meta { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.chat-topbar-meta-text { min-width: 0; flex: 1; }
+.chat-topbar-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(0,0,0,.05);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.chat-topbar-avatar svg, .chat-topbar-avatar img { width: 100%; height: 100%; display: block; }
+.chat-topbar-avatar-initials {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700; font-size: 14px;
+  color: var(--ink, #0d1520);
+}
+
+/* ─── Shared footer (RUN7 Cat 6 — gemigreerd uit index.html
+   inline-styles. Tijdelijk gedeeld; vervang door renderFooter()
+   wanneer Backlog #8 wordt opgepakt). ─── */
+footer.kb-shared-footer {
+  background: var(--c-green-deep, #0f5c36);
+  color: rgba(255,255,255,.6);
+  padding: 16px 16px 12px;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.kb-shared-footer .footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+.kb-shared-footer .footer-brand {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: .92rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.5);
+}
+.kb-shared-footer .footer-brand span { color: var(--c-orange-deep, #e05c1a); }
+.kb-shared-footer .footer-links {
+  display: flex;
+  list-style: none;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0;
+  margin: 0;
+}
+.kb-shared-footer .footer-links a {
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  font-size: .76rem;
+  transition: color .15s;
+}
+.kb-shared-footer .footer-links a:hover { color: var(--c-orange-deep, #e05c1a); }
+.kb-shared-footer .footer-copy {
+  font-size: .68rem;
+  color: rgba(255,255,255,.3);
+}
+.kb-shared-footer .footer-tagline {
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  font-size: .7rem;
+  color: rgba(255,255,255,.35);
+}
