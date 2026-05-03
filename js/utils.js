@@ -661,7 +661,7 @@ function getNotifText(n) {
 
 const HEADER_NAV_BY_ROLE = {
   student: [
-    { id: 'stagehub',     label: 'Mijn Stage Hub', href: 'student-profile.html',     icon: '🎯' },
+    { id: 'home',         label: 'Home',            href: 'student-home.html',        icon: '🏠' },
     { id: 'matchpool',    label: 'Matchpool',       href: 'matchpool.html',           icon: '🌊' },
     { id: 'vacatures',    label: 'Vacatures',       href: 'discover.html',            icon: '🔍' },
     { id: 'sollicitaties',label: 'Sollicitaties',   href: 'mijn-sollicitaties.html',  icon: '📋' },

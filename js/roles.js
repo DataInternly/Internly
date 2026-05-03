@@ -63,7 +63,7 @@ const ROLE_DETECTION_COLUMNS = {
 // ═══════════════════════════════════════════════════════════════
 function resolveStudentDashboard(profile, studentProfile) {
   if (!profile || profile.role !== 'student') return null;
-  if (!studentProfile) return 'match-dashboard.html';
+  if (!studentProfile) return 'bol-profile.html';
   if (studentProfile?.bbl_mode === true) {
     // Onboarding guard: only redirect to profile-setup
     // if naam is explicitly null or empty string.

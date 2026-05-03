@@ -750,7 +750,7 @@
     const hasValidRole = await requireRole('student');
     if (!hasValidRole) return;
 
-    await renderStudentHeader({ activeTab: isBuddyView ? 'buddy' : 'matches' });
+    await renderStudentHeader({ activeTab: isBuddyView ? 'buddy' : 'matchpool' });
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;

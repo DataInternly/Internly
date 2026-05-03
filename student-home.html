@@ -198,6 +198,9 @@
   <script>
   (async () => {
     try {
+      const hasValidRole = await requireRole('student');
+      if (!hasValidRole) return;
+
       const { data: { user } } = await db.auth.getUser();
       if (!user) { window.location.replace('auth.html'); return; }
 
@@ -219,8 +222,6 @@
       document.getElementById('sh-meta').textContent =
         [sp.opleiding, sp.school].filter(Boolean).join(' · ') || 'Internly · Jouw stageplek';
 
-      await renderStudentHeader({ activeTab: 'home' });
-
       const velden = ['naam','opleiding','school'].filter(k => sp[k]);
       const pct = Math.round((velden.length / 3) * 100);
       if (pct < 100) {
@@ -229,14 +230,23 @@
         document.getElementById('sh-progress-wrap').style.display = '';
       }
 
-      const { data: match } = await db
-        .from('matches')
-        .select('id, internship_postings(title, company_name)')
-        .eq('party_a', user.id)
-        .in('status', ['active', 'accepted'])
-        .limit(1)
-        .maybeSingle();
+      // Parallel: header rendering + actieve match + sollicitatie-teller.
+      // Drie onafhankelijke calls — geen sequentiële afhankelijkheid.
+      const [, matchRes, solRes] = await Promise.all([
+        renderStudentHeader({ activeTab: 'home' }),
+        db.from('matches')
+          .select('id, internship_postings(title, company_name)')
+          .eq('party_a', user.id)
+          .eq('status', 'accepted')
+          .limit(1)
+          .maybeSingle(),
+        db.from('matches')
+          .select('id', { count: 'exact', head: true })
+          .eq('party_a', user.id)
+          .in('status', ['pending','accepted']),
+      ]);
 
+      const match = matchRes?.data;
       if (match) {
         const stageEl = document.getElementById('sh-hub-stage');
         const posting = match.internship_postings;
@@ -249,12 +259,7 @@
           'match-dashboard.html?match=' + match.id;
       }
 
-      const { count: solCount } = await db
-        .from('matches')
-        .select('id', { count: 'exact', head: true })
-        .eq('party_a', user.id)
-        .in('status', ['pending','accepted']);
-
+      const solCount = solRes?.count || 0;
       if (solCount > 0) {
         document.getElementById('sh-sol-sub').textContent =
           solCount + ' openstaande sollicitatie' + (solCount !== 1 ? 's' : '');
