@@ -25,6 +25,27 @@ const ROLE_LANDING = {
   admin:        'admin.html',
 };
 
+// ── PUBLIC_PAGES — pagina's waar SIGNED_OUT geen redirect mag triggeren ──
+// Bron-van-waarheid voor "publieke pagina ja/nee" — ook gebruikt door
+// _isPublicPage() helper. Bijwerken bij elke nieuwe publieke pagina (CC-2:
+// algemene-voorwaarden.html en cookiebeleid.html toegevoegd).
+const PUBLIC_PAGES = [
+  'index.html', 'about.html', 'kennisbank.html', 'kennisbank-artikel.html',
+  'privacybeleid.html', 'algemene-voorwaarden.html', 'cookiebeleid.html',
+  'spelregels.html', 'faq.html', 'hoe-het-werkt.html', 'pricing.html',
+  'stagebegeleiding.html', '404.html', 'auth.html', 'internly-worldwide.html',
+  'la-sign.html', 'preview.html', 'esg-rapportage.html', 'esg-export.html',
+  'internly_simulator.html'
+];
+function _isPublicPage() {
+  const path = window.location.pathname;
+  if (path === '/' || path === '') return true;
+  const currentPage = path.split('/').pop() || 'index.html';
+  return PUBLIC_PAGES.includes(currentPage);
+}
+window.PUBLIC_PAGES  = PUBLIC_PAGES;
+window._isPublicPage = _isPublicPage;
+
 function getRoleLanding(role, bblMode = false) {
   // Wrapper for two canon mechanisms:
   //   - resolveStudentDashboard (js/roles.js) for student-routing
@@ -101,12 +122,65 @@ window.getRoleLanding    = getRoleLanding;
 let __cachedUserRole = null;
 let __cachedUserId   = null;
 
+// ── _waitForSession — race-fix voor session-restore ──
+// Supabase v2 herstelt de sessie asynchroon uit localStorage. Bij verse
+// page-load kan getSession()/getUser() null teruggeven vóórdat
+// _recoverAndRefresh klaar is, met als gevolg een onterechte redirect
+// naar auth.html. Deze helper resolved zodra:
+//   - Supabase het INITIAL_SESSION event vuurt (sessie geladen)
+//   - of getSession() nu al een sessie heeft (cache-hit)
+//   - of een hard timeout van 3s om hangen te voorkomen
+// Singleton — eenmalige cost per page-load.
+let __sessionReadyPromise = null;
+function _waitForSession() {
+  if (__sessionReadyPromise) return __sessionReadyPromise;
+  __sessionReadyPromise = new Promise((resolve) => {
+    const client = (typeof db !== 'undefined') ? db
+                 : (typeof supabase !== 'undefined') ? supabase
+                 : null;
+    if (!client?.auth) { resolve(null); return; }
+
+    let resolved = false;
+    let sub = null;
+    const _resolve = (session) => {
+      if (resolved) return;
+      resolved = true;
+      try { sub?.unsubscribe(); } catch (_) {}
+      resolve(session);
+    };
+
+    // 1. Luister naar het auth-state-change event voor INITIAL_SESSION
+    try {
+      const result = client.auth.onAuthStateChange((event, session) => {
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          _resolve(session);
+        }
+      });
+      sub = result?.data?.subscription || null;
+    } catch (e) {
+      console.warn('[_waitForSession] onAuthStateChange failed:', e?.message || e);
+    }
+
+    // 2. Fallback — sessie kan al beschikbaar zijn (warm tab)
+    client.auth.getSession()
+      .then(({ data: { session } }) => { if (session) _resolve(session); })
+      .catch(() => {});
+
+    // 3. Hard timeout — voorkom hangen op edge-cases
+    setTimeout(() => _resolve(null), 3000);
+  });
+  return __sessionReadyPromise;
+}
+window.awaitSession = _waitForSession;
+
 async function fetchUserRole() {
   try {
     const client = (typeof db !== 'undefined') ? db
                  : (typeof supabase !== 'undefined') ? supabase
                  : null;
     if (!client) return null;
+    // Wacht op session-restore vóór de eerste auth-check (race-fix CC-3)
+    await _waitForSession();
     const { data: { user } } = await client.auth.getUser();
     if (!user) { __cachedUserRole = null; __cachedUserId = null; return null; }
     if (__cachedUserId === user.id && __cachedUserRole) return __cachedUserRole;
@@ -122,6 +196,23 @@ async function fetchUserRole() {
   }
 }
 
+// RUN7 Cat 3 — anti-flicker helper: maakt body zichtbaar na auth-check.
+// Aanroepbaar vanuit pagina's die inline auth-checks doen (geen requireRole).
+function markAuthReady() {
+  if (document.body) {
+    delete document.body.dataset.authPending;
+    document.body.dataset.authReady = 'true';
+  }
+}
+window.markAuthReady = markAuthReady;
+
+/**
+ * @deprecated Use guardPage() for new code. Kept for backwards-compat with
+ * 6 existing callers (chat, discover, matches, mijn-berichten, mijn-notities,
+ * mijn-sollicitaties) that haven't been migrated yet.
+ *
+ * Original auth guard — checks role, redirects on failure.
+ */
 async function requireRole(...allowedRoles) {
   const validRoles = [
     'student', 'bedrijf', 'school',
@@ -129,15 +220,131 @@ async function requireRole(...allowedRoles) {
   ];
   const invalid = allowedRoles.filter(r => !validRoles.includes(r));
   if (invalid.length > 0) { console.error('[requireRole] onbekende rol(len):', invalid); return false; }
-  const role = await fetchUserRole();
-  if (!role) { window.location.replace('auth.html'); return false; }
-  if (!allowedRoles.includes(role)) {
-    console.warn('[requireRole] user rol', role, 'niet in toegestane', allowedRoles);
-    window.location.replace(getRoleLanding(role));
-    return false;
+  // RUN7 Cat 3 — anti-flicker: helper om body zichtbaar te maken na auth-check
+  const _markReady = markAuthReady;
+  try {
+    const role = await fetchUserRole();
+    if (!role) {
+      _markReady();
+      window.location.replace('auth.html');
+      return false;
+    }
+    if (!allowedRoles.includes(role)) {
+      console.warn('[requireRole] user rol', role, 'niet in toegestane', allowedRoles);
+      _markReady();
+      window.location.replace(getRoleLanding(role));
+      return false;
+    }
+    _markReady();
+    return true;
+  } catch (err) {
+    // Bij onverwachte fout: maak body sowieso zichtbaar zodat error niet onzichtbaar is
+    _markReady();
+    throw err;
   }
-  return true;
 }
+
+/**
+ * Centralized auth guard for protected pages — successor to requireRole.
+ * Encapsulates: body anti-flicker state, getSession (fast), role-check,
+ * redirect-on-fail, exception-safety. Use on every protected page as first
+ * action in your init flow.
+ *
+ * Usage:
+ *   const auth = await guardPage('gepensioneerd');
+ *   if (!auth) return; // redirect already happened
+ *   const { user, profile, role } = auth;
+ *
+ * @param {string|string[]} allowedRoles - role names that may access this page
+ * @param {object} [options]
+ * @param {boolean} [options.useSession=true] - getSession() fast vs getUser() verified
+ * @param {string} [options.fallbackUrl='auth.html'] - where to redirect on no-user
+ * @returns {Promise<{user, profile, role}|null>}
+ */
+async function guardPage(allowedRoles, options) {
+  options = options || {};
+  const useSession  = options.useSession !== false; // default true
+  const fallbackUrl = options.fallbackUrl || 'auth.html';
+  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+  // Anti-flicker: mark pending if not already
+  if (document.body && !document.body.dataset.authReady) {
+    document.body.dataset.authPending = 'true';
+  }
+
+  // Internal helper — guarantees body becomes visible on every exit path
+  const _markReady = () => {
+    if (document.body) {
+      delete document.body.dataset.authPending;
+      document.body.dataset.authReady = 'true';
+    }
+  };
+
+  try {
+    const client = (typeof db !== 'undefined' && db) ||
+                   (typeof supabase !== 'undefined' && supabase) ||
+                   null;
+    if (!client) {
+      _markReady();
+      window.location.replace('index.html');
+      return null;
+    }
+
+    // Step 0: wait for Supabase session-restore — race-fix CC-3
+    await _waitForSession();
+
+    // Step 1: check session (fast — local storage, no network unless expired)
+    let user = null;
+    if (useSession) {
+      const { data: sd } = await client.auth.getSession();
+      user = sd && sd.session ? sd.session.user : null;
+    } else {
+      const { data: ud } = await client.auth.getUser();
+      user = ud ? ud.user : null;
+    }
+
+    if (!user) {
+      _markReady();
+      window.location.replace(fallbackUrl);
+      return null;
+    }
+
+    // Step 2: fetch profile + role
+    const { data: profile } = await client
+      .from('profiles')
+      .select('id, role, naam')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!profile || !profile.role) {
+      _markReady();
+      window.location.replace(fallbackUrl);
+      return null;
+    }
+
+    // Step 3: role check
+    if (!roles.includes(profile.role)) {
+      _markReady();
+      const landing = (typeof getRoleLanding === 'function')
+        ? getRoleLanding(profile.role)
+        : 'index.html';
+      window.location.replace(landing);
+      return null;
+    }
+
+    // Success
+    _markReady();
+    return { user, profile, role: profile.role };
+
+  } catch (err) {
+    console.error('[guardPage] Auth-check failed:', err);
+    _markReady(); // Always reveal body, even on error
+    window.location.replace(fallbackUrl);
+    return null;
+  }
+}
+
+window.guardPage = guardPage;
 
 
 function getDisplayName(user) {
@@ -148,6 +355,22 @@ function getDisplayName(user) {
   if (email && typeof email === 'string' && email.includes('@')) return email.split('@')[0];
   return 'Gebruiker';
 }
+
+/**
+ * Geef passende begroeting o.b.v. lokale tijd.
+ * @param {string} naam - voornaam of volledige naam
+ * @returns {string} bv "Goedemorgen, Jan van der Berg"
+ */
+function getDaypartGreeting(naam) {
+  const u = new Date().getHours();
+  let greeting;
+  if (u >= 6 && u < 12)       greeting = 'Goedemorgen';
+  else if (u >= 12 && u < 18) greeting = 'Goedemiddag';
+  else if (u >= 18 && u < 23) greeting = 'Goedenavond';
+  else                        greeting = 'Welkom terug';
+  return naam ? `${greeting}, ${naam}` : greeting;
+}
+window.getDaypartGreeting = getDaypartGreeting;
 
 // Ga terug naar vorige pagina; val terug op fallbackHref als er geen history is.
 // Respecteert de authenticatie: logt NIET uit.
@@ -183,6 +406,9 @@ async function performLogout() {
 }
 
 // Cache invalideren bij auth-state-change (laadt nadat alle scripts klaar zijn)
+// CC-3: SIGNED_OUT triggert nu ook een redirect naar auth.html zolang we
+// op een beschermde pagina staan. Op publieke pagina's blijft de
+// gebruiker waar hij is (bv. logout vanaf about.html).
 window.addEventListener('load', () => {
   const client = (typeof db !== 'undefined') ? db
                : (typeof supabase !== 'undefined') ? supabase
@@ -192,6 +418,10 @@ window.addEventListener('load', () => {
       if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         __cachedUserRole = null;
         __cachedUserId   = null;
+        __sessionReadyPromise = null; // reset zodat volgende login opnieuw wacht
+        if (!_isPublicPage()) {
+          window.location.replace('auth.html');
+        }
       }
     });
   }
@@ -273,6 +503,41 @@ function escapeHtml(str) {
     .replace(/'/g,  '&#39;');
 }
 
+/**
+ * Disable a button or trigger element while an async operation runs.
+ * Re-enables on success or error. Use to prevent double-submit.
+ *
+ * @example
+ * await withSaveLock(submitBtn, async () => {
+ *   await saveProfile(data);
+ * });
+ *
+ * @param {HTMLElement|null} trigger - button to disable, or null for no-op
+ * @param {Function} fn - async function to execute while locked
+ * @returns {Promise<*>} whatever fn returns
+ */
+async function withSaveLock(trigger, fn) {
+  if (!trigger) return fn();
+  const wasDisabled = trigger.disabled;
+  const originalText = trigger.textContent;
+  trigger.disabled = true;
+  trigger.dataset.saving = '1';
+  // Optional UX: show "Bezig..." if button has text content
+  if (originalText && !trigger.querySelector('*')) {
+    trigger.textContent = 'Bezig...';
+  }
+  try {
+    return await fn();
+  } finally {
+    trigger.disabled = wasDisabled;
+    delete trigger.dataset.saving;
+    if (originalText && !trigger.querySelector('*')) {
+      trigger.textContent = originalText;
+    }
+  }
+}
+window.withSaveLock = withSaveLock;
+
 // ── NL datum-formaat ──────────────────────────────────────────────────────────
 function formatNLDate(dateStr) {
   if (!dateStr) return '';
@@ -334,7 +599,30 @@ const VALID_NOTIFICATION_TYPES = [
   'bundeling_denied',
   'milestone_submitted',
   'milestone_confirmed',
+  'verification_approved',
+  'verification_rejected',
+  'verification_pending',
 ];
+
+// Worldwide company verification — shared contract
+// 7/11 principe: één definitie voor alle locaties
+// 1 mei 2026
+const VERIFICATION_STATES = Object.freeze({
+  UNVERIFIED: 'unverified',
+  PENDING:    'pending',
+  VERIFIED:   'verified',
+  REJECTED:   'rejected'
+});
+
+const VERIFICATION_LABELS_NL = Object.freeze({
+  unverified: '⚪ Niet geverifieerd',
+  pending:    '⏳ In behandeling',
+  verified:   '✓ Geverifieerd',
+  rejected:   '✕ Afgewezen'
+});
+
+window.VERIFICATION_STATES    = VERIFICATION_STATES;
+window.VERIFICATION_LABELS_NL = VERIFICATION_LABELS_NL;
 
 function getNotifText(n) {
   switch (n.type) {
@@ -362,9 +650,131 @@ function getNotifText(n) {
     case 'school_referral':         return n.message || 'Je school heeft een doorverwijzing voor je gestuurd.';
     case 'milestone_submitted':     return 'Nieuwe stap ingediend — bevestig in je dashboard.';
     case 'milestone_confirmed':     return 'Een mijlpaal in je stagevoortgang is bevestigd.';
+    case 'verification_approved':   return '✓ Je bedrijf is geverifieerd — vacatures zijn nu zichtbaar voor studenten';
+    case 'verification_rejected':   return '✕ Verificatie afgewezen — bekijk de reden in je profiel';
+    case 'verification_pending':    return '⏳ Verificatie in behandeling — je ontvangt bericht binnen 48 uur';
     default:                        return n.message || 'Nieuwe melding';
   }
 }
+
+/* ─── Role-aware top navigation header ─── */
+
+const HEADER_NAV_BY_ROLE = {
+  student: [
+    { id: 'stagehub',     label: 'Mijn Stage Hub', href: 'student-profile.html',     icon: '🎯' },
+    { id: 'matchpool',    label: 'Matchpool',       href: 'matchpool.html',           icon: '🌊' },
+    { id: 'vacatures',    label: 'Vacatures',       href: 'discover.html',            icon: '🔍' },
+    { id: 'sollicitaties',label: 'Sollicitaties',   href: 'mijn-sollicitaties.html',  icon: '📋' },
+    { id: 'berichten',    label: 'Berichten',       href: 'mijn-berichten.html',      icon: '💬' },
+    { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
+    { id: 'buddy',        label: 'Buddy',           href: 'matches.html?type=buddy',  icon: '🤝' },
+  ],
+  gepensioneerd: [
+    { id: 'overzicht',    label: 'Overzicht',       href: '#section-overzicht', icon: '🏠' },
+    { id: 'matches',      label: 'Mijn matches',    href: '#section-matches',   icon: '🤝' },
+    { id: 'berichten',    label: 'Mijn berichten',  href: 'mijn-berichten.html', icon: '💬' },
+    { id: 'notities',     label: 'Mijn notities',   href: 'mijn-notities.html',  icon: '📓' },
+    { id: 'profiel',      label: 'Mijn profiel',    href: '#section-profiel',   icon: '👤' },
+  ],
+  // Toekomstige rollen krijgen hier hun eigen nav-config.
+  // company / school behouden hun bestaande sidebar-pattern.
+};
+
+/**
+ * Render een rol-aware top-nav header in de container met id `role-header`.
+ * Backwards-compatible: als die container niet bestaat, gebruikt `student-header`.
+ *
+ * @param {string} role - 'student' | 'gepensioneerd' | etc.
+ * @param {string} activeTab - id van het actieve nav-item
+ * @param {object} opts
+ * @param {string} [opts.containerId='role-header'] - DOM target id
+ * @param {object} [opts.profile] - profielinfo voor profile-chip
+ * @param {boolean} [opts.showNotifBell=true]
+ * @param {boolean} [opts.showBack=true]
+ * @param {boolean} [opts.showLogout=true]
+ */
+async function renderRoleHeader(role, activeTab, opts = {}) {
+  const items = HEADER_NAV_BY_ROLE[role];
+  if (!items) {
+    console.warn('renderRoleHeader: unknown role', role);
+    return;
+  }
+  const containerId = opts.containerId || 'role-header';
+  let container = document.getElementById(containerId);
+  if (!container) {
+    // Backwards-compat: probeer student-header
+    container = document.getElementById('student-header');
+    if (!container) {
+      console.warn('renderRoleHeader: no container element');
+      return;
+    }
+  }
+
+  const showNotif  = opts.showNotifBell !== false;
+  const showBack   = opts.showBack !== false;
+  const showLogout = opts.showLogout !== false;
+  const profile    = opts.profile || {};
+
+  // Build nav HTML
+  const navHtml = items.map(item => {
+    const cls = [
+      'role-nav-item',
+      activeTab === item.id ? 'active' : '',
+      item.disabled ? 'disabled' : '',
+    ].filter(Boolean).join(' ');
+    const href = item.disabled ? 'javascript:void(0)' : item.href;
+    const aria = item.disabled ? ' aria-disabled="true"' : '';
+    const badge = item.comingSoon ? ' <span class="role-nav-badge">binnenkort</span>' : '';
+    return `<a href="${href}" class="${cls}"${aria} data-tab="${item.id}">
+      <span class="role-nav-icon">${item.icon || ''}</span>
+      <span class="role-nav-label">${escapeHtml(item.label)}</span>${badge}
+    </a>`;
+  }).join('');
+
+  // Build chip + actions
+  const initials = (profile.naam || '?').split(' ').map(s => s[0] || '').slice(0,2).join('').toUpperCase();
+  const chipHtml = profile.naam
+    ? `<div class="role-header-chip">
+         <div class="role-header-chip-avatar">${initials}</div>
+         <span class="role-header-chip-name">${escapeHtml(profile.naam)}</span>
+       </div>`
+    : '';
+
+  const notifHtml = showNotif
+    ? `<button class="role-header-bell" id="role-notif-bell" title="Notificaties">🔔<span class="role-header-bell-count" id="role-bell-count" hidden>0</span></button>`
+    : '';
+  const backHtml = showBack
+    ? `<button class="role-header-back" onclick="goBack()" title="Terug">←</button>`
+    : '';
+  const logoutHtml = showLogout
+    ? `<button class="role-header-logout" onclick="performLogout()" title="Uitloggen">Uit</button>`
+    : '';
+
+  container.innerHTML = `
+    <div class="role-header-inner">
+      <nav class="role-header-nav">${navHtml}</nav>
+      <div class="role-header-actions">
+        ${notifHtml}${chipHtml}${backHtml}${logoutHtml}
+      </div>
+    </div>
+  `;
+
+  // Wire notif-bell unread-count if available
+  if (showNotif && typeof Internly?.getUnreadTotal === 'function') {
+    try {
+      const total = await Internly.getUnreadTotal();
+      const countEl = document.getElementById('role-bell-count');
+      if (countEl && total > 0) {
+        countEl.textContent = total;
+        countEl.hidden = false;
+      }
+    } catch (e) {
+      console.warn('renderRoleHeader: unread fetch failed', e);
+    }
+  }
+}
+window.renderRoleHeader = renderRoleHeader;
+window.HEADER_NAV_BY_ROLE = HEADER_NAV_BY_ROLE;
 
 // ── Shared student header ─────────────────────────────────────────────────────
 // Rendert de student-header voor bol en bbl pagina's.

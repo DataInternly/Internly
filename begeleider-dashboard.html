@@ -16,6 +16,9 @@
   <script src="js/roles.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/welcome-overlay.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/telemetry.js"></script>
   <style>
@@ -437,6 +440,10 @@
     <span class="mt-icon">👤</span>
     <span>Profiel</span>
   </button>
+  <button class="mt-tab" id="mt-account" onclick="show('account')">
+    <span class="mt-icon">⚙️</span>
+    <span>Account</span>
+  </button>
 </nav>
 
 <div class="layout">
@@ -464,6 +471,9 @@
         <span class="sidebar-label">Account</span>
         <button class="nav-btn" id="nav-profiel" onclick="show('profiel')">
           <span class="nav-icon">👤</span> Profiel
+        </button>
+        <button class="nav-btn" id="nav-account" onclick="show('account')">
+          <span class="nav-icon">⚙️</span> Instellingen
         </button>
         <a href="pricing.html" class="nav-btn" style="text-decoration:none">
           <span class="nav-icon">💳</span> Abonnement
@@ -612,6 +622,9 @@
 
       <div class="form-card">
         <div class="form-section-title">Persoonlijke gegevens</div>
+
+        <div id="avatar-picker-container"></div>
+
         <div class="field">
           <label>Naam <span style="color:var(--orange)">*</span></label>
           <input type="text" id="p-naam" placeholder="Jouw naam">
@@ -640,6 +653,13 @@
       </div>
     </div>
 
+    <!-- ── ACCOUNT ── -->
+    <div class="screen" id="screen-account">
+      <div class="page-title">Instellingen</div>
+      <div class="page-sub">Contactgegevens, abonnement, factuurhistorie en account</div>
+      <div id="account-container"></div>
+    </div>
+
   </main>
 </div>
 
@@ -656,6 +676,7 @@
 <script>
 
 // ── Screen switching ─────────────────────────────────────────────────────────
+let _accountRendered = false;
 function show(screen) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -669,6 +690,25 @@ function show(screen) {
 
   const mt = document.getElementById('mt-' + screen);
   if (mt) mt.classList.add('active');
+
+  // Lazy-load AccountModule bij eerste opening van het Instellingen-scherm.
+  // window._currentUserId wordt gezet door loadUser() (zie regel ~1420).
+  if (screen === 'account' && !_accountRendered) {
+    if (window.AccountModule && window._currentUserId) {
+      _accountRendered = true;
+      AccountModule.renderAccountScreen('account-container', 'nl');
+    } else {
+      // Probeer opnieuw zodra loadUser klaar is
+      const poll = setInterval(() => {
+        if (window.AccountModule && window._currentUserId) {
+          clearInterval(poll);
+          _accountRendered = true;
+          AccountModule.renderAccountScreen('account-container', 'nl');
+        }
+      }, 200);
+      setTimeout(() => clearInterval(poll), 5000);
+    }
+  }
 }
 
 // hasActivePlan() is defined in js/supabase.js
@@ -776,15 +816,52 @@ async function loadSubscription(userId) {
 
 // ── Load students ─────────────────────────────────────────────────────────────
 async function loadStudents(userId, maxStudents) {
-  // Students link to a begeleider via student_profiles fields.
-  // Query student_profiles where begeleider_profile_id = userId (field may not exist yet).
-  // Graceful fallback to empty state if column is missing.
-  const { data: students, error } = await db
-    .from('student_profiles')
-    .select('profile_id, naam, opleiding, sector')
-    .eq('begeleider_profile_id', userId);
+  // Hub fix 2026-04-30: gebruik matches.praktijkbegeleider_profile_id
+  // (begeleider_profile_id bestaat niet in student_profiles)
+  const { data: matchRows, error: matchErr } = await db
+    .from('matches')
+    .select(
+      'id, party_a, status, created_at,' +
+      'internship_postings(title, company_name)'
+    )
+    .eq('praktijkbegeleider_profile_id', userId)
+    .in('status', ['accepted', 'active']);
 
-  const count = (!error && students) ? students.length : 0;
+  if (matchErr) {
+    console.warn('[begeleider] matches laden fout:', matchErr.message);
+  }
+
+  const studentIds = (matchRows || []).map(m => m.party_a).filter(Boolean);
+
+  let students = [];
+  if (studentIds.length > 0) {
+    const { data: spRows, error: spErr } = await db
+      .from('student_profiles')
+      .select('profile_id, naam, opleiding, jaar, sector, avatar_url')
+      .in('profile_id', studentIds);
+    if (spErr) {
+      console.warn('[begeleider] student_profiles laden fout:', spErr.message);
+    }
+    students = spRows || [];
+  }
+
+  const studentMap = {};
+  students.forEach(s => { studentMap[s.profile_id] = s; });
+
+  // Combine match + student data for rendering
+  const enriched = (matchRows || []).map(m => ({
+    matchId:   m.id,
+    status:    m.status,
+    posting:   m.internship_postings,
+    profile_id: m.party_a,
+    naam:      studentMap[m.party_a]?.naam      || 'Onbekend',
+    opleiding: studentMap[m.party_a]?.opleiding || '',
+    jaar:      studentMap[m.party_a]?.jaar      || '',
+    sector:    studentMap[m.party_a]?.sector    || '',
+    avatar_url: studentMap[m.party_a]?.avatar_url || null
+  }));
+
+  const count = enriched.length;
 
   // Update stat
   const statEl = document.getElementById('statActief');
@@ -815,7 +892,7 @@ async function loadStudents(userId, maxStudents) {
   const listEl = document.getElementById('studentList');
   if (!listEl) return;
 
-  if (error || !students || students.length === 0) {
+  if (enriched.length === 0) {
     listEl.innerHTML = `
       <div class="empty">
         <span class="empty-icon">🤝</span>
@@ -826,14 +903,24 @@ async function loadStudents(userId, maxStudents) {
     return;
   }
 
-  listEl.innerHTML = students.map(s => {
-    const initials = (s.naam || '??').slice(0, 2).toUpperCase();
+  listEl.innerHTML = enriched.map(m => {
+    const initials = (m.naam || '??').slice(0, 2).toUpperCase();
+    const meta = [m.opleiding, m.jaar ? 'Jaar ' + m.jaar : '', m.sector]
+      .filter(Boolean).map(escapeHtml).join(' · ');
+    const hubLink = m.matchId
+      ? `<a href="match-dashboard.html?match=${escapeHtml(m.matchId)}"
+           style="font-size:.8rem;color:#1a7a48;
+                  text-decoration:none;font-weight:500">
+           📊 Stage Hub →
+         </a>`
+      : '';
     return `
       <div class="student-row">
         <div class="avatar">${escapeHtml(initials)}</div>
         <div class="sr-info">
-          <div class="sr-name">${escapeHtml(s.naam || 'Onbekend')}</div>
-          <div class="sr-meta">${escapeHtml(s.opleiding || '')}${s.sector ? ' · ' + escapeHtml(s.sector) : ''}</div>
+          <div class="sr-name">${escapeHtml(m.naam || 'Onbekend')}</div>
+          <div class="sr-meta">${meta}</div>
+          ${hubLink}
         </div>
       </div>`;
   }).join('');
@@ -883,6 +970,57 @@ async function loadOpenTasks(userId) {
 }
 
 // ── Save profile ──────────────────────────────────────────────────────────────
+function showBegeleiderOverzicht(data) {
+  const fields = [
+    { label: 'Naam', value: data.naam || '—' },
+    { label: 'Sector / vakgebied', value: data.sector || '—' }
+  ];
+
+  const card = document.createElement('div');
+  card.id = 'begeleider-profile-view';
+  card.style.cssText = `
+    background:#fff;border:1px solid rgba(13,21,32,.09);
+    border-radius:12px;padding:1.5rem;margin-bottom:1rem;
+  `;
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:600;color:#0d1520">
+        Jouw profiel
+      </div>
+      <button onclick="showBegeleiderForm()"
+        style="display:inline-flex;align-items:center;gap:.4rem;padding:7px 16px;background:#eceae4;color:#3a4455;border:1px solid rgba(13,21,32,.12);border-radius:8px;cursor:pointer;font-size:.85rem;font-family:'Outfit',sans-serif">
+        ✏️ Bewerken
+      </button>
+    </div>
+    ${fields.map(f => `
+      <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid rgba(13,21,32,.06);font-size:.9rem">
+        <span style="color:#7a8799">${f.label}</span>
+        <span style="font-weight:500;color:#0d1520">${f.value}</span>
+      </div>`).join('')}
+  `;
+
+  const formContainer = document.getElementById('p-naam')
+    ?.closest('.form-card') || document.getElementById('p-naam')
+    ?.closest('.card') || document.getElementById('p-naam')
+    ?.parentElement?.parentElement;
+
+  if (!formContainer) return;
+  formContainer.style.display = 'none';
+
+  const existing = document.getElementById('begeleider-profile-view');
+  if (existing) existing.remove();
+  formContainer.parentElement?.insertBefore(card, formContainer);
+}
+
+function showBegeleiderForm() {
+  document.getElementById('begeleider-profile-view')?.remove();
+  const formContainer = document.getElementById('p-naam')
+    ?.closest('.form-card') || document.getElementById('p-naam')
+    ?.closest('.card') || document.getElementById('p-naam')
+    ?.parentElement?.parentElement;
+  if (formContainer) formContainer.style.display = '';
+}
+
 async function saveProfiel() {
   const naam   = document.getElementById('p-naam')?.value.trim();
   const sector = document.getElementById('p-sector')?.value;
@@ -894,7 +1032,11 @@ async function saveProfiel() {
 
   const { error } = await db
     .from('profiles')
-    .update({ naam, sector })
+    .update({
+      naam,
+      sector,
+      avatar_key: window._internlyAvatarKey || null
+    })
     .eq('id', user.id);
 
   if (error) {
@@ -906,6 +1048,7 @@ async function saveProfiel() {
     document.getElementById('userAvatar').textContent = naam.slice(0, 2).toUpperCase();
     document.getElementById('topbarUser').textContent = naam;
     document.getElementById('welcomeMsg').textContent = 'Welkom terug, ' + naam;
+    showBegeleiderOverzicht({ naam, sector });
   }
 }
 
@@ -1118,6 +1261,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. Auth guard
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
+  window._currentUserId = user.id; // CC-3: AccountModule contract
 
   // 2. Role guard — only begeleider accounts
   const { data: profile } = await db
@@ -1129,6 +1273,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (!profile || profile.role !== 'begeleider') {
     window.location.href = 'auth.html';
     return;
+  }
+
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
+  if (typeof maybeShowWelcomeOverlay === 'function') {
+    maybeShowWelcomeOverlay(user.id, 'begeleider', profile.naam, null);
   }
 
   // 3. Plan guard — must have at least begeleider_starter
@@ -1156,6 +1306,18 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (naamInput)   naamInput.value   = profile.naam   || '';
   if (emailInput)  emailInput.value  = profile.email  || user.email || '';
   if (sectorInput) sectorInput.value = profile.sector || '';
+
+  if (profile.naam) {
+    showBegeleiderOverzicht({ naam: profile.naam, sector: profile.sector });
+  }
+
+  // Avatar picker — vanmiddag fix 30 apr 2026 (PENDING MIGRATION: profiles tabel heeft avatar_key nog niet)
+  if (typeof renderAvatarPicker === 'function') {
+    const _curAvKey = profile?.avatar_key || null;
+    window._internlyAvatarKey = _curAvKey;
+    renderAvatarPicker('avatar-picker-container', _curAvKey,
+      (key) => { window._internlyAvatarKey = key; });
+  }
 
   // 6. Load subscription (returns maxStudents)
   const { maxStudents = 30 } = await loadSubscription(user.id);
