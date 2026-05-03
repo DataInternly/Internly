@@ -127,16 +127,65 @@
 </main>
 
 <script>
-// RUN — kennisbank-artikel.html → redirect naar kennisbank.html?artikel=
-// Mock-build heeft de detail-overlay binnen kennisbank.html geïntegreerd
-// 1 mei 2026
+// kennisbank-artikel.html — slug-routing met blog-placeholder fallback (3 mei 2026)
+// 1. Voor 5 blog-referenced slugs zonder kb_articles DB-row: toon inline placeholder
+// 2. Voor alle andere slugs: redirect naar kennisbank.html?artikel= (bestaand pattern)
+//
+// Placeholder-content wordt in vervolgsessie vervangen door echte kb_articles rows.
+const _BLOG_PLACEHOLDER_ARTIKELEN = {
+  'rechten-als-stagiair': {
+    titel: 'Jouw rechten als stagiair',
+    subtitel: 'Wat je wettelijk en contractueel mag verwachten',
+    body: 'Dit artikel is binnenkort beschikbaar. Het behandelt onder andere: stageovereenkomst, onkostenvergoeding, werktijden, begeleiding en wat te doen bij conflict.'
+  },
+  'wat-is-stagepact': {
+    titel: 'Wat is het Stagepact MBO 2023–2027?',
+    subtitel: 'De afspraken tussen overheid, scholen en werkgevers uitgelegd',
+    body: 'Dit artikel is binnenkort beschikbaar. Het Stagepact is een convenant tussen OCW, scholen, werkgevers en studentenorganisaties met afspraken over begeleiding, vergoeding en stagediscriminatie.'
+  },
+  'stagevergoeding-checken': {
+    titel: 'Stagevergoeding checken',
+    subtitel: 'Hoe hoog mag jouw vergoeding zijn en wat zijn je rechten?',
+    body: 'Dit artikel is binnenkort beschikbaar. We leggen uit hoe je per sector kunt nagaan wat een gangbare vergoeding is, en welke onkostenvergoeding sowieso wettelijk verplicht is.'
+  },
+  'ghosting-melden': {
+    titel: 'Ghosting melden',
+    subtitel: 'Wat je kunt doen als een bedrijf niet reageert',
+    body: 'Dit artikel is binnenkort beschikbaar. We bespreken hoe je escaleert, waar je een melding kunt doen, en hoe Internly zelf bedrijven aanspreekt op responsgedrag via de Trust Score.'
+  },
+  'trust-score-uitleg': {
+    titel: 'Hoe werkt de Trust Score?',
+    subtitel: 'De betrouwbaarheidsscore van stagebedrijven op Internly',
+    body: 'Dit artikel is binnenkort beschikbaar. De Trust Score is gebaseerd op vier dimensies: responssnelheid, leerdoelopvolging, nakomen van afspraken en begeleiding. We leggen elk onderdeel uit.'
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const slug = new URLSearchParams(window.location.search).get('slug');
-  if (slug) {
-    window.location.replace('kennisbank.html?artikel=' + encodeURIComponent(slug));
-  } else {
+  if (!slug) {
     window.location.replace('kennisbank.html');
+    return;
   }
+
+  const placeholder = _BLOG_PLACEHOLDER_ARTIKELEN[slug];
+  if (placeholder) {
+    // Render inline placeholder zonder Supabase-query
+    document.getElementById('article-title-tag').textContent = placeholder.titel + ' — Internly Kennisbank';
+    document.getElementById('article-meta-desc').setAttribute('content', placeholder.subtitel);
+    document.getElementById('canonical-link').setAttribute('href', 'https://internly.pro/kennisbank-artikel.html?slug=' + encodeURIComponent(slug));
+    document.getElementById('article-title').textContent = placeholder.titel;
+    document.getElementById('article-excerpt').textContent = placeholder.subtitel;
+    document.getElementById('article-body').innerHTML =
+      '<p>' + placeholder.body + '</p>' +
+      '<p style="margin-top:1.5rem;font-size:.88rem;color:#7a8799">' +
+      '<a href="blog.html" style="color:#1a7a48;text-decoration:underline">← Terug naar de blog</a>' +
+      '</p>';
+    document.getElementById('related-section').style.display = 'none';
+    return;
+  }
+
+  // Onbekende slug → bestaand redirect-pattern naar kennisbank.html
+  window.location.replace('kennisbank.html?artikel=' + encodeURIComponent(slug));
 });
 </script>
 

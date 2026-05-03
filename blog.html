@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FF7E42">
+  <meta name="description" content="Actueel nieuws, onderzoek en inzichten over stages in Nederland. Voor studenten, bedrijven en begeleiders die willen weten hoe het er echt voor staat.">
+  <meta property="og:title" content="Blog — Internly">
+  <meta property="og:description" content="Actueel nieuws, onderzoek en inzichten over stages in Nederland.">
+  <meta property="og:image" content="https://internly.pro/og-image.png">
+  <meta property="og:url" content="https://internly.pro/blog.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Internly">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Blog — Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Blog page — gebruikt globale .blog-eyebrow / .blog-pull / .blog-kb-pill /
+       .blog-kb-note uit css/style.css. Layout-classes hier inline met bl-prefix
+       om conflict te vermijden met bestaande .card / .grid / .featured. */
+
+    :root {
+      --bl-ink:    #0d1520;
+      --bl-ink2:   #3a4455;
+      --bl-ink3:   #7a8799;
+      --bl-bg:     #f4f3ef;
+      --bl-bg2:    #eceae4;
+      --bl-white:  #ffffff;
+      --bl-accent: #e05c1a;
+      --bl-accent-bg: #fdf0e8;
+      --bl-green:  #1a7a48;
+      --bl-green-bg: #eaf5ee;
+      --bl-border: rgba(13,21,32,.09);
+      --bl-border2: rgba(13,21,32,.15);
+      --bl-r: 12px;
+      --bl-r-sm: 8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bl-bg); color: var(--bl-ink); font-family: 'Outfit', sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+    /* TOPBAR — match about.html pattern */
+    .bl-topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,243,239,.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--bl-border);
+      height: 60px;
+      padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .bl-logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.3rem; font-weight: 700;
+      color: #0f5c36; letter-spacing: -.03em;
+      text-decoration: none;
+    }
+    .bl-logo span { color: var(--bl-accent); }
+    .bl-nav { display: flex; align-items: center; gap: 28px; }
+    .bl-nav a {
+      color: var(--bl-ink2);
+      text-decoration: none;
+      font-size: .88rem; font-weight: 500;
+      transition: color .15s;
+    }
+    .bl-nav a:hover, .bl-nav a.active { color: var(--bl-accent); }
+    .bl-cta {
+      background: var(--bl-accent);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: .85rem; font-weight: 600;
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .bl-cta:hover { background: #b94613; color: #fff; }
+
+    /* PAGE */
+    .bl-page { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* HERO */
+    .bl-hero { padding: 3rem 0 2.25rem; border-bottom: 1px solid var(--bl-border); margin-bottom: 2.25rem; }
+    .bl-hero h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: clamp(1.75rem, 4vw, 2.6rem);
+      font-weight: 700; letter-spacing: -.025em; line-height: 1.15;
+      color: var(--bl-ink); margin-bottom: .75rem; max-width: 540px;
+    }
+    .bl-hero h1 em { font-style: italic; font-weight: 300; color: var(--bl-ink2); }
+    .bl-hero-sub { font-size: .93rem; color: var(--bl-ink2); line-height: 1.7; max-width: 500px; }
+
+    /* CATEGORIES */
+    .bl-cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2rem; }
+    .bl-cat { padding: 5px 14px; border-radius: 20px; font-size: .78rem; font-weight: 500; border: 1px solid var(--bl-border); background: var(--bl-white); color: var(--bl-ink2); cursor: pointer; text-decoration: none; transition: all .12s; }
+    .bl-cat:hover { border-color: var(--bl-border2); color: var(--bl-ink); }
+    .bl-cat.on { background: var(--bl-ink); color: #fff; border-color: var(--bl-ink); }
+
+    /* FEATURED */
+    .bl-featured { background: var(--bl-white); border: 1px solid var(--bl-border); border-radius: var(--bl-r); display: grid; grid-template-columns: 1fr 220px; margin-bottom: 2rem; overflow: hidden; }
+    @media (max-width: 600px) { .bl-featured { grid-template-columns: 1fr; } .bl-featured-aside { border-top: 1px solid var(--bl-border); border-left: none !important; min-height: 0; padding: 1.25rem; } }
+    .bl-featured-main { padding: 1.75rem 2rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.25rem; }
+    .bl-feat-tag { font-size: .72rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--bl-accent); }
+    .bl-featured-main h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.1rem, 2.2vw, 1.5rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.25; color: var(--bl-ink); margin-bottom: .5rem; }
+    .bl-featured-main p { font-size: .88rem; color: var(--bl-ink2); line-height: 1.65; }
+    .bl-feat-meta { font-size: .77rem; color: var(--bl-ink3); margin-bottom: .65rem; }
+    .bl-btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 16px; border-radius: var(--bl-r-sm); font-size: .84rem; font-weight: 600; text-decoration: none; transition: opacity .15s; width: fit-content; background: var(--bl-accent); color: #fff; }
+    .bl-btn:hover { opacity: .88; color: #fff; }
+    .bl-featured-aside { border-left: 1px solid var(--bl-border); background: var(--bl-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.75rem 1.25rem; text-align: center; gap: .25rem; }
+    .bl-aside-n { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.8rem; font-weight: 700; letter-spacing: -.04em; color: var(--bl-accent); line-height: 1; }
+    .bl-aside-l { font-size: .8rem; color: var(--bl-ink2); line-height: 1.4; max-width: 140px; margin: .15rem auto 0; }
+    .bl-aside-s { font-size: .68rem; color: var(--bl-ink3); margin-top: .4rem; }
+
+    /* SECTION LABEL */
+    .bl-sec-label { font-size: .72rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--bl-ink3); margin-bottom: 1.1rem; display: flex; align-items: center; gap: .65rem; }
+    .bl-sec-label::after { content: ''; flex: 1; height: 1px; background: var(--bl-border); }
+
+    /* GRID + CARDS */
+    .bl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 2.5rem; }
+    .bl-card { background: var(--bl-white); border: 1px solid var(--bl-border); border-radius: var(--bl-r); display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s, transform .12s; overflow: hidden; }
+    .bl-card:hover { border-color: var(--bl-border2); box-shadow: 0 2px 10px rgba(0,0,0,.05); transform: translateY(-1px); }
+    .bl-card-band { height: 3px; flex-shrink: 0; }
+    .bl-band-orange { background: var(--bl-accent); }
+    .bl-band-green  { background: var(--bl-green); }
+    .bl-band-blue   { background: #1756a8; }
+    .bl-card-body { padding: 1.2rem; flex: 1; display: flex; flex-direction: column; }
+    .bl-card-stat { display: flex; align-items: baseline; gap: .3rem; margin-bottom: .75rem; }
+    .bl-sn { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.7rem; font-weight: 700; letter-spacing: -.025em; line-height: 1; }
+    .bl-sn-orange { color: var(--bl-accent); }
+    .bl-sn-green  { color: var(--bl-green); }
+    .bl-sn-blue   { color: #1756a8; }
+    .bl-su { font-size: .78rem; color: var(--bl-ink3); line-height: 1.35; max-width: 130px; }
+    .bl-ctag { display: inline-block; font-size: .7rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; margin-bottom: .55rem; width: fit-content; }
+    .bl-ct-beleid { background: var(--bl-accent-bg); color: var(--bl-accent); }
+    .bl-ct-data   { background: var(--bl-green-bg);  color: var(--bl-green); }
+    .bl-ct-platform { background: rgba(23,86,168,.08); color: #1756a8; }
+    .bl-card-body h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 700; letter-spacing: -.015em; line-height: 1.3; color: var(--bl-ink); margin-bottom: .4rem; }
+    .bl-card-body p { font-size: .83rem; color: var(--bl-ink2); line-height: 1.6; flex: 1; }
+    .bl-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: .9rem; padding-top: .8rem; border-top: 1px solid var(--bl-border); }
+    .bl-c-meta { font-size: .74rem; color: var(--bl-ink3); }
+    .bl-c-link { font-size: .77rem; font-weight: 600; color: var(--bl-accent); }
+
+    /* KB BRIDGE */
+    .bl-kb-bridge { border: 1px solid var(--bl-border); border-left: 3px solid var(--bl-green); border-radius: 0 var(--bl-r) var(--bl-r) 0; background: var(--bl-white); padding: 1.4rem 1.75rem; margin-bottom: 2.5rem; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }
+    @media (max-width: 580px) { .bl-kb-bridge { grid-template-columns: 1fr; } }
+    .bl-kb-bridge-text h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 700; color: var(--bl-ink); margin-bottom: .25rem; }
+    .bl-kb-bridge-text p { font-size: .84rem; color: var(--bl-ink2); line-height: 1.5; }
+    .bl-kb-links { display: flex; flex-direction: column; gap: 5px; min-width: 185px; }
+    .bl-kb-link { display: flex; align-items: center; gap: 7px; font-size: .81rem; color: var(--bl-ink2); text-decoration: none; padding: 6px 10px; border-radius: var(--bl-r-sm); border: 1px solid var(--bl-border); background: var(--bl-bg); transition: border-color .12s, color .12s; font-weight: 500; }
+    .bl-kb-link:hover { border-color: var(--bl-green); color: var(--bl-green); }
+
+    /* ARTICLES */
+    .bl-article { background: var(--bl-white); border: 1px solid var(--bl-border); border-radius: var(--bl-r); overflow: hidden; margin-bottom: 14px; }
+    .bl-art-head { padding: 1.75rem 2.1rem 1.4rem; border-bottom: 1px solid var(--bl-border); }
+    .bl-art-meta-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .75rem; flex-wrap: wrap; }
+    .bl-art-date, .bl-art-time { font-size: .77rem; color: var(--bl-ink3); }
+    .bl-art-head h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(1.15rem, 2.2vw, 1.6rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.22; color: var(--bl-ink); margin-bottom: .6rem; }
+    .bl-art-lead { font-size: .92rem; color: var(--bl-ink2); line-height: 1.7; font-weight: 300; max-width: 620px; }
+    .bl-art-body { padding: 1.6rem 2.1rem 1.75rem; font-size: .91rem; color: var(--bl-ink2); line-height: 1.78; max-width: 680px; }
+    .bl-art-body p { margin-bottom: .95rem; }
+    .bl-art-body strong { color: var(--bl-ink); font-weight: 600; }
+    .bl-art-body h4 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 700; color: var(--bl-ink); margin: 1.4rem 0 .45rem; letter-spacing: -.01em; }
+    .bl-art-foot { padding: .9rem 2.1rem; border-top: 1px solid var(--bl-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .6rem; }
+    .bl-atags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .bl-atag { font-size: .72rem; color: var(--bl-ink3); background: var(--bl-bg2); padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+    .bl-ashare { font-size: .79rem; color: var(--bl-ink3); }
+
+    /* FOOTER */
+    .bl-footer { border-top: 1px solid var(--bl-border); padding: 2.25rem 1.5rem; margin-top: 2rem; }
+    .bl-foot-inner { max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 2.25rem; }
+    @media (max-width: 560px) { .bl-foot-inner { grid-template-columns: 1fr; } }
+    .bl-f-logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 700; color: var(--bl-ink); text-decoration: none; display: inline-block; margin-bottom: .4rem; }
+    .bl-f-logo .g { color: #0f5c36; }
+    .bl-f-logo .o { color: var(--bl-accent); }
+    .bl-foot-brand p { font-size: .81rem; color: var(--bl-ink3); line-height: 1.5; }
+    .bl-foot-col h4 { font-size: .7rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--bl-ink3); margin-bottom: .65rem; }
+    .bl-foot-col a { display: block; font-size: .83rem; color: var(--bl-ink2); text-decoration: none; margin-bottom: .35rem; transition: color .12s; }
+    .bl-foot-col a:hover { color: var(--bl-ink); }
+    .bl-foot-bottom { max-width: 860px; margin: 1.25rem auto 0; padding-top: 1.1rem; border-top: 1px solid var(--bl-border); display: flex; justify-content: space-between; font-size: .74rem; color: var(--bl-ink3); flex-wrap: wrap; gap: .4rem; }
+    .bl-foot-bottom a { color: var(--bl-ink3); text-decoration: none; }
+    .bl-foot-bottom a:hover { color: var(--bl-ink2); }
+  </style>
+</head>
+<body>
+
+<nav class="bl-topbar">
+  <a href="index.html" class="bl-logo">intern<span>ly</span></a>
+  <div class="bl-nav">
+    <a href="discover.html">Stages</a>
+    <a href="kennisbank.html">Kennisbank</a>
+    <a href="blog.html" class="active">Blog</a>
+    <a href="auth.html" class="bl-cta">Inloggen →</a>
+  </div>
+</nav>
+
+<div class="bl-page">
+
+  <!-- HERO -->
+  <section class="bl-hero">
+    <div class="blog-eyebrow">Internly Blog</div>
+    <h1>De stagemarkt,<br><em>zonder sugarcoating</em></h1>
+    <p class="bl-hero-sub">Actueel nieuws, onderzoek en inzichten over stages in Nederland — voor studenten, bedrijven en begeleiders die willen weten hoe het er echt voor staat.</p>
+  </section>
+
+  <!-- CATEGORIES -->
+  <div class="bl-cats">
+    <a href="#" class="bl-cat on">Alle artikelen</a>
+    <a href="#" class="bl-cat">Beleid &amp; wet</a>
+    <a href="#" class="bl-cat">Data &amp; onderzoek</a>
+    <a href="#" class="bl-cat">Voor studenten</a>
+    <a href="#" class="bl-cat">Voor bedrijven</a>
+    <a href="#" class="bl-cat">Voor scholen</a>
+  </div>
+
+  <!-- FEATURED -->
+  <div class="bl-featured">
+    <div class="bl-featured-main">
+      <div>
+        <div class="bl-feat-tag">🔥 Actueel — mei 2026</div>
+        <h2 style="margin-top:.4rem">Stagevergoeding verplicht: wat verandert er voor jou?</h2>
+        <p>Minister Letschert wil vóór de zomer een wetsvoorstel indienen. Slechts 42% van de MBO-studenten ontvangt nu een vergoeding. We leggen uit wat er op tafel ligt en wanneer het effect heeft.</p>
+      </div>
+      <div>
+        <div class="bl-feat-meta">3 mei 2026 · 5 min leestijd · Beleid &amp; wet</div>
+        <a href="#artikel-1" class="bl-btn">Lees artikel →</a>
+      </div>
+    </div>
+    <div class="bl-featured-aside">
+      <div class="bl-aside-n">42%</div>
+      <div class="bl-aside-l">van de MBO-studenten ontvangt een stagevergoeding</div>
+      <div class="bl-aside-s">CBS, maart 2025</div>
+    </div>
+  </div>
+
+  <!-- ARTICLE GRID -->
+  <div class="bl-sec-label">Meer artikelen</div>
+  <div class="bl-grid">
+    <a href="#artikel-2" class="bl-card">
+      <div class="bl-card-band bl-band-orange"></div>
+      <div class="bl-card-body">
+        <div class="bl-card-stat">
+          <span class="bl-sn bl-sn-orange">24%</span>
+          <span class="bl-su">niet-westerse MBO-studenten solliciteert 4× of vaker</span>
+        </div>
+        <span class="bl-ctag bl-ct-data">Data &amp; onderzoek</span>
+        <h3>Stagepact halverwege — de ongemakkelijke balans</h3>
+        <p>Twee jaar na het Stagepact 2023–2027 is de voortgang "onvoldoende". Discriminatie daalt niet snel genoeg, vergoedingen stijgen nauwelijks.</p>
+        <div class="bl-card-foot">
+          <span class="bl-c-meta">2 mei 2026 · 7 min</span>
+          <span class="bl-c-link">Lees meer →</span>
+        </div>
+      </div>
+    </a>
+    <a href="#artikel-3" class="bl-card">
+      <div class="bl-card-band bl-band-green"></div>
+      <div class="bl-card-body">
+        <div class="bl-card-stat">
+          <span class="bl-sn bl-sn-green">77%</span>
+          <span class="bl-su">van stage-sollicitaties eindigt zonder reactie</span>
+        </div>
+        <span class="bl-ctag bl-ct-platform">Platform &amp; tech</span>
+        <h3>Hoe data de ghosting-crisis in de stagemarkt kan oplossen</h3>
+        <p>Bedrijven die niet reageren verdienen het zichtbaar minder kandidaten aan te trekken. De Trust Score is structurele verantwoording.</p>
+        <div class="bl-card-foot">
+          <span class="bl-c-meta">1 mei 2026 · 6 min</span>
+          <span class="bl-c-link">Lees meer →</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- KB BRIDGE -->
+  <div class="bl-kb-bridge">
+    <div class="bl-kb-bridge-text">
+      <h3>📚 Verdiep je in de kennisbank</h3>
+      <p>De blog behandelt het nieuws. De kennisbank geeft de basis. Samen weet je alles wat je nodig hebt voor een goede stage.</p>
+    </div>
+    <div class="bl-kb-links">
+      <a href="kennisbank-artikel.html?slug=rechten-als-stagiair" class="bl-kb-link">⚖️ Jouw rechten als stagiair</a>
+      <a href="kennisbank-artikel.html?slug=wat-is-stagepact" class="bl-kb-link">📋 Wat is het Stagepact?</a>
+      <a href="kennisbank-artikel.html?slug=stagevergoeding-checken" class="bl-kb-link">💶 Stagevergoeding checken</a>
+      <a href="kennisbank-artikel.html?slug=ghosting-melden" class="bl-kb-link">📩 Ghosting melden</a>
+    </div>
+  </div>
+
+  <div class="bl-sec-label">Artikelen</div>
+
+  <!-- ARTIKEL 1 -->
+  <article class="bl-article" id="artikel-1">
+    <div class="bl-art-head">
+      <div class="bl-art-meta-row">
+        <span class="bl-ctag bl-ct-beleid" style="margin:0">Beleid &amp; wet</span>
+        <span class="bl-art-date">3 mei 2026</span>
+        <span class="bl-art-time">· 5 min leestijd</span>
+      </div>
+      <h2>Stagevergoeding verplicht: wat verandert er voor jou?</h2>
+      <p class="bl-art-lead">Na jaren van vrijblijvende afspraken gaat de overheid een streep trekken. Minister Letschert wil vóór de zomer een wetsvoorstel indienen. Maar wat staat er daadwerkelijk op tafel — en wanneer merk je er iets van?</p>
+    </div>
+    <div class="bl-art-body">
+      <p><strong>Slechts 42 procent van de MBO-studenten ontving in 2025 een stagevergoeding.</strong> Bij HBO-studenten was dat 75 procent. Minister Rianne Letschert zei er "eerlijk gezegd van geschrokken" te zijn na een werkbezoek aan het Albeda College, en kondigt een wetsvoorstel aan.</p>
+      <div class="blog-pull">
+        <div class="blog-pull-num">43%</div>
+        <div class="blog-pull-text">van de MBO-studenten met een stage kreeg in 2025 een vergoeding — een stijging van slechts 1 procentpunt ten opzichte van 2024</div>
+        <div class="blog-pull-source">CBS, Kamerbrief Minister Moes, maart 2026</div>
+      </div>
+      <h4>Drie scenario's die op tafel liggen</h4>
+      <p>De ambtelijke verkenning van januari 2026 verkent drie opties. Het eerste scenario koppelt de vergoeding aan een percentage van het minimumloon — bij 20 procent zou een fulltime stagiair circa 500 euro per maand krijgen. Scenario twee kijkt naar het meest voorkomende cao-bedrag. Scenario drie hanteert de mediaan: voor MBO 230 euro, voor HBO 400 euro.</p>
+      <p>MKB-Nederland pleit voor een staffel op basis van studiejaar. Dat klinkt logisch maar maakt de regelgeving complexer.</p>
+      <div class="blog-kb-note">
+        <span class="blog-kb-note-icon">📚</span>
+        <span>Weet je niet of jij recht hebt op een vergoeding? Lees <a href="kennisbank-artikel.html?slug=stagevergoeding-checken" class="blog-kb-pill">💶 Stagevergoeding checken</a> voor een overzicht per sector.</span>
+      </div>
+      <h4>Wanneer merk je er iets van?</h4>
+      <p>Het wetsvoorstel gaat naar de Tweede Kamer vóór de zomer van 2026. Daarna volgen schriftelijke vragenrondes, debatten, en de Eerste Kamer. Experts verwachten dat implementatie minstens tot 2028 duurt.</p>
+      <p>De grootste valkuil is dat stageaanbieders het minimumbedrag uitkeren terwijl ze voorheen meer betaalden. Dat risico onderkent ook de minister.</p>
+      <div class="blog-kb-note">
+        <span class="blog-kb-note-icon">⚖️</span>
+        <span>Je hebt nu al recht op een onkostenvergoeding die minimaal je aantoonbare kosten dekt. Lees <a href="kennisbank-artikel.html?slug=rechten-als-stagiair" class="blog-kb-pill">⚖️ Jouw rechten als stagiair</a>.</span>
+      </div>
+    </div>
+    <div class="bl-art-foot">
+      <div class="bl-atags">
+        <span class="bl-atag">stagevergoeding</span>
+        <span class="bl-atag">MBO</span>
+        <span class="bl-atag">wetsvoorstel</span>
+        <span class="bl-atag">OCW</span>
+      </div>
+      <span class="bl-ashare">Deel dit artikel</span>
+    </div>
+  </article>
+
+  <!-- ARTIKEL 2 -->
+  <article class="bl-article" id="artikel-2">
+    <div class="bl-art-head">
+      <div class="bl-art-meta-row">
+        <span class="bl-ctag bl-ct-data" style="margin:0">Data &amp; onderzoek</span>
+        <span class="bl-art-date">2 mei 2026</span>
+        <span class="bl-art-time">· 7 min leestijd</span>
+      </div>
+      <h2>Stagepact halverwege — de ongemakkelijke balans</h2>
+      <p class="bl-art-lead">In december 2025 stuurde het ministerie van OCW een signaal dat vrijwel niemand negeerde: de voortgang van het Stagepact is onvoldoende. Nieuw CBS-onderzoek toont aan waarom dat geen overdrijving is.</p>
+    </div>
+    <div class="bl-art-body">
+      <p>Het Stagepact MBO 2023–2027 is halverwege. In december 2025 publiceerde het ministerie nieuwe factsheets én een routekaart tegen stagediscriminatie. De boodschap was duidelijk: de vrijwilligheid werkt niet goed genoeg.</p>
+      <div class="blog-pull">
+        <div class="blog-pull-num">1 op 10</div>
+        <div class="blog-pull-text">MBO-studenten ervaart stagediscriminatie bij het zoeken naar een stageplek — een structureel probleem dat nauwelijks daalt</div>
+        <div class="blog-pull-source">CBS Schoolverlatersonderzoek, december 2025</div>
+      </div>
+      <h4>De cijfers die niet liegen</h4>
+      <p>Studenten met een niet-westerse migratieachtergrond moeten significant vaker solliciteren. Bij gelijke kwalificaties is de kans op een uitnodiging substantieel lager als de naam op een migratieachtergrond wijst.</p>
+      <div class="blog-pull green">
+        <div class="blog-pull-num">24%</div>
+        <div class="blog-pull-text">van de MBO-studenten met een niet-westerse achtergrond moet minimaal vier keer solliciteren voor één plek — voor studenten met een Nederlandse achtergrond is dat 8%</div>
+        <div class="blog-pull-source">ROA, Diversiteit op de Werkvloer</div>
+      </div>
+      <h4>Wat werkt, wat niet</h4>
+      <p>KIS identificeerde vijf werkzame mechanismen: elkaar leren kennen, objectief werven, omstanders aanspreken, sociale normen stellen, en bewustwording. In de praktijk richt de aanpak zich te veel op het omgaan met discriminatie nadat het plaatsvindt, in plaats van het structureel voorkomen ervan.</p>
+      <div class="blog-kb-note">
+        <span class="blog-kb-note-icon">📋</span>
+        <span>Wil je weten wat het Stagepact precies belooft? <a href="kennisbank-artikel.html?slug=wat-is-stagepact" class="blog-kb-pill">📋 Wat is het Stagepact?</a> legt alle afspraken uit.</span>
+      </div>
+      <h4>Ghosting als parallelle crisis</h4>
+      <p>Discriminatie is niet de enige klacht. Ghosting door bedrijven na een sollicitatie blijft structureel hoog. Dat kost studievoortgang en vertrouwen in de arbeidsmarkt.</p>
+      <div class="blog-kb-note">
+        <span class="blog-kb-note-icon">📩</span>
+        <span>Je hebt recht op een reactie. Lees wat je kunt doen in <a href="kennisbank-artikel.html?slug=ghosting-melden" class="blog-kb-pill">📩 Ghosting melden</a>.</span>
+      </div>
+    </div>
+    <div class="bl-art-foot">
+      <div class="bl-atags">
+        <span class="bl-atag">stagepact</span>
+        <span class="bl-atag">discriminatie</span>
+        <span class="bl-atag">CBS</span>
+        <span class="bl-atag">MBO</span>
+      </div>
+      <span class="bl-ashare">Deel dit artikel</span>
+    </div>
+  </article>
+
+  <!-- ARTIKEL 3 -->
+  <article class="bl-article" id="artikel-3">
+    <div class="bl-art-head">
+      <div class="bl-art-meta-row">
+        <span class="bl-ctag bl-ct-platform" style="margin:0">Platform &amp; tech</span>
+        <span class="bl-art-date">1 mei 2026</span>
+        <span class="bl-art-time">· 6 min leestijd</span>
+      </div>
+      <h2>Hoe data de ghosting-crisis in de stagemarkt kan oplossen</h2>
+      <p class="bl-art-lead">Bedrijven die studenten laten wachten zonder te reageren trekken daarna gewoon nieuwe sollicitanten aan — want er zijn geen gevolgen. Tot nu.</p>
+    </div>
+    <div class="bl-art-body">
+      <p>Een student solliciteert, wacht twee weken, stuurt een follow-up, wacht nog een week, en hoort nooit meer iets. Ondertussen heeft het bedrijf een nieuwe ronde uitgenodigd. Er zijn geen gevolgen. Geen boete, geen slechte reputatie, geen verlies van kandidaten.</p>
+      <div class="blog-pull">
+        <div class="blog-pull-num">77%</div>
+        <div class="blog-pull-text">van de stage-sollicitaties eindigt zonder reactie van het bedrijf — ghosting is de norm geworden, niet de uitzondering</div>
+        <div class="blog-pull-source">Indeed NL, stagemarkt-onderzoek</div>
+      </div>
+      <h4>Waarom vrijwillige afspraken niet werken</h4>
+      <p>Het Stagepact maakt bedrijven "bewust" van hun verantwoordelijkheid. Maar bewustzijn zonder consequenties verandert gedrag niet structureel. Hotels op Booking.com met een lage score krijgen minder boekingen — dat is geen moreel appèl, dat is een marktmechanisme.</p>
+      <h4>Het mechanisme van de Trust Score</h4>
+      <p>Wanneer responsgedrag van bedrijven zichtbaar wordt voor studenten vóórdat ze solliciteren, verandert de dynamiek. Een bedrijf dat consequent niet reageert krijgt lagere zichtbaarheid voor gemotiveerde kandidaten. Dat is geen punitief systeem — het is informatiesymmetrie.</p>
+      <div class="blog-pull green">
+        <div class="blog-pull-num">3×</div>
+        <div class="blog-pull-text">hogere engagement bij studenten die vooraf de betrouwbaarheidsscore van een bedrijf kunnen zien</div>
+        <div class="blog-pull-source">Intern Internly platform-onderzoek, Q1 2026</div>
+      </div>
+      <h4>Wat dit betekent voor bedrijven die het wél goed doen</h4>
+      <p>De meeste bedrijven reageren wel. Op de huidige stagemarkt zijn zij onzichtbaar goed — geen beloning voor hun inspanning, geen differentiatie ten opzichte van bedrijven die het slechter doen. Data-gedreven reputatiesystemen geven hen hun verdiende voorsprong.</p>
+      <div class="blog-kb-note">
+        <span class="blog-kb-note-icon">⭐</span>
+        <span>Op Internly is elke stageplek voorzien van een score op vier dimensies: responssnelheid, leerdoelopvolging, nakomen van afspraken en begeleiding. <a href="kennisbank-artikel.html?slug=trust-score-uitleg" class="blog-kb-pill">⭐ Hoe werkt de Trust Score?</a></span>
+      </div>
+    </div>
+    <div class="bl-art-foot">
+      <div class="bl-atags">
+        <span class="bl-atag">ghosting</span>
+        <span class="bl-atag">Trust Score</span>
+        <span class="bl-atag">transparantie</span>
+        <span class="bl-atag">data</span>
+      </div>
+      <span class="bl-ashare">Deel dit artikel</span>
+    </div>
+  </article>
+
+</div>
+
+<footer class="bl-footer">
+  <div class="bl-foot-inner">
+    <div class="bl-foot-brand">
+      <a href="index.html" class="bl-f-logo"><span class="g">intern</span><span class="o">ly</span></a>
+      <p>De stagemarkt eerlijker maken door transparantie en wederzijdse verantwoordelijkheid te bouwen. Sasubo Holding B.V.</p>
+    </div>
+    <div class="bl-foot-col">
+      <h4>Blog</h4>
+      <a href="#artikel-1">Stagevergoeding verplicht</a>
+      <a href="#artikel-2">Stagepact halverwege</a>
+      <a href="#artikel-3">Data en ghosting</a>
+    </div>
+    <div class="bl-foot-col">
+      <h4>Kennisbank</h4>
+      <a href="kennisbank-artikel.html?slug=rechten-als-stagiair">Jouw rechten als stagiair</a>
+      <a href="kennisbank-artikel.html?slug=wat-is-stagepact">Wat is het Stagepact?</a>
+      <a href="kennisbank-artikel.html?slug=stagevergoeding-checken">Stagevergoeding checken</a>
+      <a href="kennisbank-artikel.html?slug=ghosting-melden">Ghosting melden</a>
+      <a href="kennisbank-artikel.html?slug=trust-score-uitleg">Wat is de Trust Score?</a>
+    </div>
+  </div>
+  <div class="bl-foot-bottom">
+    <span>© 2026 Sasubo Holding B.V. · KVK 80201822</span>
+    <div style="display:flex;gap:1rem">
+      <a href="privacybeleid.html">Privacy</a>
+      <a href="cookiebeleid.html">Cookies</a>
+      <a href="algemene-voorwaarden.html">Voorwaarden</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/consent.js" defer></script>
+
+</body>
+</html>

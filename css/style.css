@@ -1619,6 +1619,76 @@ select {
 .role-pill--buddy      { background: rgba(109,40,217,.10); color: var(--c-buddy-purple); }
 .role-pill--begeleider { background: rgba(13,21,32,.08);   color: #3a4455; }
 
+/* ── Blog — globale classes voor blog.html (publieke pagina) ──────────────── */
+.blog-eyebrow {
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--c-orange-deep, #e05c1a);
+  margin-bottom: .75rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.blog-eyebrow::before {
+  content: '';
+  width: 16px;
+  height: 2px;
+  background: var(--c-orange-deep, #e05c1a);
+  flex-shrink: 0;
+}
+.blog-pull {
+  border-left: 2px solid var(--c-orange-deep, #e05c1a);
+  padding: .7rem 1rem;
+  margin: 1.2rem 0;
+  background: rgba(224,92,26,.07);
+  border-radius: 0 8px 8px 0;
+}
+.blog-pull.green {
+  border-left-color: var(--c-green, #1a7a48);
+  background: rgba(26,122,72,.07);
+}
+.blog-pull-num {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--c-orange-deep, #e05c1a);
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+.blog-pull.green .blog-pull-num { color: var(--c-green, #1a7a48); }
+.blog-pull-text { font-size: .84rem; color: #3a4455; margin-top: .15rem; line-height: 1.55; }
+.blog-pull-source { font-size: .7rem; color: #7a8799; margin-top: .12rem; }
+.blog-kb-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .77rem;
+  color: var(--c-green, #1a7a48);
+  background: rgba(26,122,72,.10);
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .12s;
+}
+.blog-kb-pill:hover { background: rgba(26,122,72,.18); }
+.blog-kb-note {
+  background: #eceae4;
+  border-radius: 8px;
+  padding: .8rem 1rem;
+  margin: 1rem 0;
+  font-size: .84rem;
+  color: #3a4455;
+  line-height: 1.55;
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+}
+.blog-kb-note-icon { flex-shrink: 0; opacity: .65; }
+
 /* ──────────────────────────────────────────────────────────────────────────
    ACCOUNT MODULE — gedeeld over alle dashboards (js/account.js)
    Toegevoegd 29 april 2026.
