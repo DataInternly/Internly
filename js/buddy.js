@@ -494,7 +494,10 @@ function buddyRenderPairCard(pair, context = 'dashboard') {
     <div class="buddy-card" data-pair-id="${pairId}" data-type="${escapeHtml(pair.type)}">
       <div class="buddy-card__avatar">${initial}</div>
       <div class="buddy-card__info">
-        <div class="buddy-card__name">${name}</div>
+        <div class="buddy-card__name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${name}
+          <span style="background:#ede9fe;color:#7c3aed;font-size:.72rem;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block">Buddy</span>
+        </div>
         <div class="buddy-card__label">${label}</div>
         ${isAnon ? `<div class="buddy-card__anon-note">Identiteit zichtbaar na contract</div>` : ''}
       </div>
@@ -658,27 +661,38 @@ function buddyShowToast(message) {
 
 async function loadBuddyProfile() {
   const form = document.getElementById('buddy-profile-form');
-  if (!form) return;
+  if (!form) return null;
 
   const { data: { user } } = await db.auth.getUser();
-  if (!user) return;
+  if (!user) return null;
 
   const { data: bp, error } = await db
     .from('buddy_profiles')
-    .select('kennis_gebieden, specialiteiten, grove_beschikbaarheid, postcode, stad, leeftijd, active')
+    .select('pitch, achtergrond, bio, avatar_key, kennis_gebieden, specialiteiten, grove_beschikbaarheid, postcode, stad, leeftijd, active')
     .eq('profile_id', user.id)
     .maybeSingle();
 
   if (error) {
     console.warn('[buddy-dash] loadBuddyProfile fout:', error.message);
-    return;
+    return null;
   }
 
   if (bp) populateBuddyProfile(form, bp);
+  return bp;
 }
 
 function populateBuddyProfile(form, data) {
   if (!form || !data) return;
+
+  // RUN2 — drie nieuwe velden
+  const pitch = form.querySelector('#bp-pitch');
+  if (pitch && data.pitch) pitch.value = data.pitch;
+
+  const achtergrond = form.querySelector('#bp-achtergrond');
+  if (achtergrond && data.achtergrond) achtergrond.value = data.achtergrond;
+
+  const bio = form.querySelector('#bp-bio');
+  if (bio && data.bio) bio.value = data.bio;
 
   const kg = data.kennis_gebieden || [];
   form.querySelectorAll('[data-kg]').forEach(cb => { cb.checked = kg.includes(cb.value); });
@@ -702,8 +716,26 @@ function populateBuddyProfile(form, data) {
   if (actief) actief.checked = data.active !== false;
 }
 
+// prefillBuddyForm — RUN2 helper. Wrapper rond populateBuddyProfile +
+// avatar-key sync. Kan globaal worden aangeroepen vanuit init-flow.
+function prefillBuddyForm(data) {
+  const form = document.getElementById('buddy-profile-form');
+  if (!form || !data) return;
+  populateBuddyProfile(form, data);
+  if (data.avatar_key) window._internlyAvatarKey = data.avatar_key;
+}
+window.prefillBuddyForm = prefillBuddyForm;
+
 function collectBuddyProfileData(form) {
+  // Drie nieuwe content-velden (mockup-mapping 1 mei 2026 — RUN2)
+  const pitch       = (form.querySelector('#bp-pitch')?.value       || '').trim();
+  const achtergrond = (form.querySelector('#bp-achtergrond')?.value || '').trim();
+  const bio         = (form.querySelector('#bp-bio')?.value         || '').trim();
+
   return {
+    pitch:                pitch       || null,
+    achtergrond:          achtergrond || null,
+    bio:                  bio         || null,
     kennis_gebieden:      [...form.querySelectorAll('[data-kg]:checked')].map(cb => cb.value),
     specialiteiten:       [...form.querySelectorAll('[data-sp]:checked')].map(cb => cb.value),
     grove_beschikbaarheid: form.querySelector('#bp-grove-beschikbaarheid')?.value || null,
@@ -714,13 +746,65 @@ function collectBuddyProfileData(form) {
   };
 }
 
+// ── Profiel saved-view via renderProfileView (RUN2 — 1 mei 2026) ─────
+// Vervangt de oude inline overzicht-render. Gebruikt js/profileView.js
+// Backwards-compat: oude #buddy-profile-overzicht container blijft hidden.
+function showBuddyOverzicht(buddyProfile) {
+  const matchesCount   = window.BUDDY_PAIRS_COUNT || 0;
+  const savedContainer = document.getElementById('buddy-profile-saved-view');
+  const formCard       = document.getElementById('buddy-profile-form-card');
+  const oudOverzicht   = document.getElementById('buddy-profile-overzicht');
+
+  // Hide oude inline overzicht-card als die nog in de DOM zit
+  if (oudOverzicht) oudOverzicht.style.display = 'none';
+
+  if (savedContainer && typeof renderProfileView === 'function') {
+    renderProfileView(buddyProfile, 'gepensioneerd', savedContainer, {
+      matchesCount,
+      onEdit: () => {
+        savedContainer.hidden = true;
+        if (formCard) {
+          formCard.hidden = false;
+          formCard.style.display = '';
+          formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+    savedContainer.hidden = false;
+    if (formCard) formCard.hidden = true;
+  } else {
+    // Fallback: alleen form tonen als profileView ontbreekt
+    if (formCard) {
+      formCard.hidden = false;
+      formCard.style.display = '';
+    }
+    console.warn('[buddy-dash] renderProfileView ontbreekt — geen saved-view gerenderd');
+  }
+}
+
+function showBuddyForm() {
+  const formCard       = document.getElementById('buddy-profile-form-card');
+  const savedContainer = document.getElementById('buddy-profile-saved-view');
+  if (savedContainer) savedContainer.hidden = true;
+  if (formCard) {
+    formCard.hidden = false;
+    formCard.style.display = '';
+  }
+}
+
 async function saveBuddyProfile(formData) {
   const { data: { user } } = await db.auth.getUser();
   if (!user) { notify('Niet ingelogd', false); return; }
 
+  const payload = {
+    profile_id: user.id,
+    ...formData,
+    avatar_key: window._internlyAvatarKey || null
+  };
+
   const { error } = await db
     .from('buddy_profiles')
-    .upsert({ profile_id: user.id, ...formData }, { onConflict: 'profile_id' });
+    .upsert(payload, { onConflict: 'profile_id' });
 
   if (error) {
     notify('Profiel opslaan mislukt — probeer opnieuw', false);
@@ -728,4 +812,588 @@ async function saveBuddyProfile(formData) {
     return;
   }
   notify('Profiel bijgewerkt!', true);
+
+  // Re-fetch volledig profiel + naam-join voor de saved-view (RUN2)
+  try {
+    const { data: refreshed } = await db
+      .from('buddy_profiles')
+      .select('profile_id, naam, pitch, bio, achtergrond, kennis_gebieden, specialiteiten, grove_beschikbaarheid, postcode, stad, leeftijd, talen, foto_url, active, open_to_international, avatar_key')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    if (refreshed) {
+      // Fallback naam uit profiles als buddy_profiles.naam null
+      if (!refreshed.naam) {
+        const { data: prof } = await db
+          .from('profiles').select('naam').eq('id', user.id).maybeSingle();
+        if (prof?.naam) refreshed.naam = prof.naam;
+      }
+      showBuddyOverzicht(refreshed);
+    } else {
+      showBuddyOverzicht({ ...payload });
+    }
+  } catch (e) {
+    console.warn('[buddy-dash] saved-view re-fetch fout:', e?.message || e);
+    showBuddyOverzicht({ ...payload });
+  }
 }
+
+// ── Buddy → student discovery ────────────────────────
+// 1 mei 2026 — BUDDY_SWIPE_RESEARCH.md Optie A
+
+async function fetchBuddySeekers(userId) {
+  // Load students with zoekt_buddy = true
+  const _baseSelect =
+    'profile_id, naam, opleiding, school, jaar, ' +
+    'beschikbaar_vanaf, opdracht_domein, motivatie, ' +
+    'skills, avatar_url, sector, niveau';
+
+  let spData, spErr;
+
+  try {
+    const res = await db
+      .from('student_profiles')
+      .select(_baseSelect + ', avatar_key')
+      .eq('zoekt_buddy', true)
+      .limit(30);
+    spData = res.data;
+    spErr  = res.error;
+    if (spErr) throw spErr;
+  } catch {
+    // Fallback: avatar_key kolom bestaat mogelijk
+    // nog niet (AVATAR_MIGRATION.sql niet gedraaid)
+    const res = await db
+      .from('student_profiles')
+      .select(_baseSelect)
+      .eq('zoekt_buddy', true)
+      .limit(30);
+    spData = res.data;
+    spErr  = res.error;
+  }
+
+  if (spErr) {
+    console.error('[buddy-seekers] student load fout:',
+      spErr.message);
+    return [];
+  }
+
+  const students = spData || [];
+
+  if (!students || students.length === 0) return [];
+
+  // Filter out students already requested
+  const { data: existing } = await db
+    .from('buddy_requests')
+    .select('receiver_id')
+    .eq('requester_id', userId)
+    .in('receiver_id', students.map(s => s.profile_id));
+
+  const alreadyRequested = new Set(
+    (existing || []).map(r => r.receiver_id)
+  );
+
+  return students.filter(
+    s => !alreadyRequested.has(s.profile_id)
+  );
+}
+
+async function loadBuddySeekers() {
+  const section = document.getElementById(
+    'buddy-seekers-section');
+  const loading = document.getElementById(
+    'buddy-deck-loading');
+
+  if (!section) return;
+
+  const { data: { user } } = await db.auth.getUser();
+  if (!user) return;
+
+  const students = await fetchBuddySeekers(user.id);
+
+  if (loading) loading.style.display = 'none';
+
+  if (students.length === 0) {
+    const emptyEl =
+      document.getElementById('buddy-deck-empty');
+    if (emptyEl) emptyEl.style.display = '';
+    section.style.display = '';
+    return;
+  }
+
+  _deckStudents = students;
+  _deckIndex    = 0;
+  _deckActive   = true;
+  section.style.display = '';
+  _renderDeck();
+}
+
+async function buddyRequestStudent(studentId, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Versturen...';
+  }
+
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) throw new Error('Niet ingelogd');
+
+    // Insert buddy request
+    const { data: req, error } = await db
+      .from('buddy_requests')
+      .insert({
+        requester_id: user.id,
+        receiver_id:  studentId,
+        type:         'gepensioneerd',
+        status:       'pending'
+      })
+      .select('id')
+      .maybeSingle();
+
+    if (error) throw error;
+
+    // Notify student
+    if (typeof createNotification === 'function') {
+      const { data: profRow } = await db
+        .from('profiles')
+        .select('naam')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      await createNotification(
+        studentId,
+        'buddy_request',
+        req?.id || null,
+        'buddy',
+        `${profRow?.naam || 'Een buddy'} wil jouw buddy worden.`
+      );
+    }
+
+    // Remove card with animation
+    const card = document.getElementById(
+      'bsc-' + studentId);
+    if (card) {
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(60px)';
+      setTimeout(() => {
+        card.remove();
+        // Check if list is now empty
+        const list = document.getElementById(
+          'buddy-seekers-list');
+        if (list && list.children.length === 0) {
+          const empty = document.getElementById(
+            'buddy-seekers-empty');
+          if (empty) empty.style.display = '';
+        }
+      }, 250);
+    }
+
+    // Toast
+    if (typeof notify === 'function') {
+      notify('Aanvraag verstuurd! De student ontvangt een melding.');
+    }
+
+  } catch (err) {
+    console.error('[buddy-request] fout:', err.message);
+    if (typeof notify === 'function') {
+      notify('Aanvraag mislukt. Probeer opnieuw.', false);
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '💜 Buddy worden';
+    }
+  }
+}
+
+function buddySkipStudent(studentId) {
+  const card = document.getElementById('bsc-' + studentId);
+  if (!card) return;
+  card.style.opacity = '0';
+  card.style.transform = 'translateX(-40px)';
+  setTimeout(() => {
+    card.remove();
+    const list = document.getElementById(
+      'buddy-seekers-list');
+    if (list && list.children.length === 0) {
+      const empty = document.getElementById(
+        'buddy-seekers-empty');
+      if (empty) empty.style.display = '';
+    }
+  }, 220);
+}
+
+// ═══════════════════════════════════════════════
+// BUDDY SWIPE DECK ENGINE
+// 1 mei 2026
+// Team-reviewed: BUDDY_DECK_AUDIT.md
+// Reuses: fetchBuddySeekers, buddyRequestStudent,
+//         buddySkipStudent (unchanged)
+// ═══════════════════════════════════════════════
+
+// ── Deck state ────────────────────────────────
+let _deckStudents   = [];
+let _deckIndex      = 0;
+// _deckActive: true while user is browsing the deck.
+// Prevents realtime reload from resetting the deck.
+// Resets to false when deck is exhausted or reloaded.
+// Note: skip() writes no DB record — on page reload
+// the buddy will see skipped students again. Intentional.
+let _deckActive     = false;
+// _deckSwiping: mutex to prevent double-insert on
+// rapid taps of the like button.
+let _deckSwiping    = false;
+// _deckAnimating: true during the 200ms fly-out
+// animation after a drag release. Prevents a second
+// drag from starting during the animation.
+let _deckAnimating  = false;
+// AbortController for document-level drag listeners.
+// Replaced on every render, aborted on cleanup.
+let _deckController = null;
+let _deckDragStartX = 0;
+let _deckDragCurX   = 0;
+let _deckIsDragging = false;
+
+function _deckCleanup() {
+  if (_deckController) {
+    _deckController.abort();
+    _deckController = null;
+  }
+}
+
+function _deckSetupListeners() {
+  _deckCleanup();
+  _deckController = new AbortController();
+  const sig = { signal: _deckController.signal };
+
+  document.addEventListener('mousemove', e => {
+    _deckOnMove(e.clientX);
+  }, sig);
+  document.addEventListener('touchmove', e => {
+    if (e.touches[0]) _deckOnMove(e.touches[0].clientX);
+  }, { ...sig, passive: true });
+  document.addEventListener('mouseup',   _deckOnEnd, sig);
+  document.addEventListener('touchend',  _deckOnEnd, sig);
+}
+
+function _buildDeckCard(student, stackPos) {
+  const _esc = typeof escapeHtml === 'function'
+    ? escapeHtml : s => String(s ?? '');
+
+  const initials = ((student.naam || '?')
+    .split(' ').filter(Boolean)
+    .map(w => w[0]).slice(0, 2).join('')
+    .toUpperCase()) || '?';
+
+  const skills = Array.isArray(student.skills)
+    ? student.skills.slice(0, 3) : [];
+
+  const beschikbaar = student.beschikbaar_vanaf
+    ? new Date(student.beschikbaar_vanaf)
+        .toLocaleDateString('nl-NL',
+          { month: 'long', year: 'numeric' })
+    : null;
+
+  // stackPos 0 = top card, 1 = second, 2 = third
+  const rotate  = stackPos * 1.5;
+  const offsetY = stackPos * 5;
+  const zIndex  = 10 - stackPos;
+  const isTop   = stackPos === 0;
+
+  const el = document.createElement('div');
+  el.className         = 'buddy-deck-card';
+  el.dataset.studentId = student.profile_id;
+  el.style.cssText = [
+    'position:absolute', 'inset:0',
+    'background:#fff',
+    'border:1px solid rgba(13,21,32,.09)',
+    'border-radius:14px',
+    'padding:16px 18px',
+    `z-index:${zIndex}`,
+    `transform:rotate(${rotate}deg) translateY(${offsetY}px)`,
+    isTop ? 'cursor:grab' : 'pointer-events:none',
+    'will-change:transform',
+    'transition:none',
+    'overflow:hidden'
+  ].join(';');
+
+  el.innerHTML = `
+    <div class="deck-like-ind" style="position:absolute;
+      top:16px;left:16px;
+      background:var(--c-buddy-purple,#7c3aed);
+      color:#fff;padding:4px 12px;border-radius:8px;
+      font-size:.76rem;font-weight:700;opacity:0;
+      transform:rotate(-15deg);transition:opacity .1s;
+      pointer-events:none">BUDDY! 💜</div>
+    <div class="deck-pass-ind" style="position:absolute;
+      top:16px;right:16px;background:#ef4444;color:#fff;
+      padding:4px 12px;border-radius:8px;font-size:.76rem;
+      font-weight:700;opacity:0;transform:rotate(15deg);
+      transition:opacity .1s;pointer-events:none">
+      SKIP ✕</div>
+
+    <div style="display:flex;align-items:flex-start;
+      gap:10px;margin-bottom:10px">
+      <div style="width:44px;height:44px;border-radius:50%;
+        background:linear-gradient(135deg,#1a7a48,#0f5c36);
+        display:flex;align-items:center;
+        justify-content:center;color:#fff;
+        font-weight:700;font-size:.9rem;flex-shrink:0">
+        ${initials}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Bricolage Grotesque',
+          sans-serif;font-weight:600;font-size:.95rem;
+          color:#0d1520;white-space:nowrap;overflow:hidden;
+          text-overflow:ellipsis">
+          ${_esc(student.naam || 'Student')}
+        </div>
+        <div style="font-size:.76rem;color:#6b7280;
+          margin-top:1px;white-space:nowrap;overflow:hidden;
+          text-overflow:ellipsis">
+          ${_esc(student.opleiding || '')}
+          ${student.jaar ? ' · Jaar ' + student.jaar : ''}
+        </div>
+      </div>
+      <span style="background:#e8f5ee;color:#1a7a48;
+        font-size:.68rem;font-weight:500;padding:2px 8px;
+        border-radius:10px;flex-shrink:0;white-space:nowrap">
+        Zoekt buddy
+      </span>
+    </div>
+
+    ${student.motivatie ? `
+      <p style="font-size:.8rem;color:#374151;
+        line-height:1.5;margin-bottom:8px;
+        display:-webkit-box;-webkit-line-clamp:3;
+        -webkit-box-orient:vertical;overflow:hidden">
+        "${_esc(student.motivatie)}"
+      </p>` : ''}
+
+    <div style="display:flex;flex-wrap:wrap;gap:4px;
+      margin-bottom:${skills.length > 0 ? '6px' : '0'}">
+      ${[
+        student.opdracht_domein
+          ? `<span style="background:#f3f4f6;color:#374151;
+              font-size:.69rem;padding:2px 7px;
+              border-radius:8px">
+              ${_esc(student.opdracht_domein)}</span>`
+          : '',
+        student.school
+          ? `<span style="background:#f3f4f6;color:#374151;
+              font-size:.69rem;padding:2px 7px;
+              border-radius:8px">
+              ${_esc(student.school)}</span>`
+          : '',
+        beschikbaar
+          ? `<span style="background:#e8f5ee;color:#1a7a48;
+              font-size:.69rem;padding:2px 7px;
+              border-radius:8px">
+              📅 ${beschikbaar}</span>`
+          : ''
+      ].join('')}
+    </div>
+
+    ${skills.length > 0 ? `
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${skills.map(s => {
+          const label = typeof s === 'string' ? s
+            : (s?.naam || s?.name || String(s));
+          return `<span style="background:#fdf0e8;
+            color:#b84910;font-size:.68rem;
+            padding:2px 7px;border-radius:8px">
+            ${_esc(label)}</span>`;
+        }).join('')}
+      </div>` : ''}
+  `;
+
+  if (isTop) {
+    el.addEventListener('mousedown', e => {
+      if (_deckAnimating) return;
+      _deckIsDragging = true;
+      _deckDragStartX = e.clientX;
+      _deckDragCurX   = e.clientX;
+      el.style.transition = 'none';
+    });
+    el.addEventListener('touchstart', e => {
+      if (_deckAnimating) return;
+      if (!e.touches[0]) return;
+      _deckIsDragging = true;
+      _deckDragStartX = e.touches[0].clientX;
+      _deckDragCurX   = e.touches[0].clientX;
+      el.style.transition = 'none';
+    }, { passive: true });
+  }
+
+  return el;
+}
+
+function _deckOnMove(x) {
+  if (!_deckIsDragging) return;
+  _deckDragCurX = x;
+  const diff    = x - _deckDragStartX;
+  const topCard =
+    document.querySelector('.buddy-deck-card');
+  if (!topCard) return;
+
+  topCard.style.transform =
+    `translateX(${diff}px) rotate(${diff * 0.06}deg)`;
+
+  const likeInd =
+    topCard.querySelector('.deck-like-ind');
+  const passInd =
+    topCard.querySelector('.deck-pass-ind');
+  const threshold = 35;
+  if (likeInd) likeInd.style.opacity =
+    diff > threshold
+      ? String(Math.min((diff - threshold) / 60, 1))
+      : '0';
+  if (passInd) passInd.style.opacity =
+    diff < -threshold
+      ? String(Math.min((-diff - threshold) / 60, 1))
+      : '0';
+}
+
+function _deckOnEnd() {
+  if (!_deckIsDragging) return;
+  _deckIsDragging = false;
+
+  const diff    = _deckDragCurX - _deckDragStartX;
+  const topCard =
+    document.querySelector('.buddy-deck-card');
+  if (!topCard) return;
+
+  topCard.style.transition = 'transform .22s ease';
+
+  if (diff > 75) {
+    _deckAnimating = true;
+    topCard.style.transform =
+      `translateX(115%) rotate(22deg)`;
+    setTimeout(() => {
+      _deckAnimating = false;
+      deckAction('like');
+    }, 210);
+  } else if (diff < -75) {
+    _deckAnimating = true;
+    topCard.style.transform =
+      `translateX(-115%) rotate(-22deg)`;
+    setTimeout(() => {
+      _deckAnimating = false;
+      deckAction('pass');
+    }, 210);
+  } else {
+    topCard.style.transform =
+      `rotate(0deg) translateY(0)`;
+    const likeInd =
+      topCard.querySelector('.deck-like-ind');
+    const passInd =
+      topCard.querySelector('.deck-pass-ind');
+    if (likeInd) likeInd.style.opacity = '0';
+    if (passInd) passInd.style.opacity = '0';
+  }
+}
+
+function _renderDeck() {
+  const wrap    =
+    document.getElementById('buddy-deck-wrap');
+  const actions =
+    document.getElementById('buddy-deck-actions');
+  const counter =
+    document.getElementById('buddy-deck-counter');
+  const empty   =
+    document.getElementById('buddy-deck-empty');
+  const done    =
+    document.getElementById('buddy-deck-done');
+  const loading =
+    document.getElementById('buddy-deck-loading');
+  if (!wrap) return;
+
+  const remaining = _deckStudents.length - _deckIndex;
+
+  if (remaining <= 0) {
+    wrap.style.display    = 'none';
+    if (actions) actions.style.display = 'none';
+    if (counter) counter.style.display = 'none';
+    if (done)    done.style.display    = '';
+    if (empty)   empty.style.display   = 'none';
+    if (loading) loading.style.display = 'none';
+    _deckActive = false;
+    _deckCleanup();
+    return;
+  }
+
+  if (loading) loading.style.display = 'none';
+  if (empty)   empty.style.display   = 'none';
+  if (done)    done.style.display    = 'none';
+  wrap.style.display    = '';
+  if (actions) actions.style.display = 'flex';
+  if (counter) {
+    counter.style.display = '';
+    counter.textContent   =
+      `${_deckIndex + 1} van ${_deckStudents.length}`;
+  }
+
+  wrap.innerHTML = '';
+  const count = Math.min(3, remaining);
+  for (let i = count - 1; i >= 0; i--) {
+    const s = _deckStudents[_deckIndex + i];
+    if (s) wrap.appendChild(_buildDeckCard(s, i));
+  }
+
+  _deckSetupListeners();
+}
+
+async function deckAction(direction) {
+  if (_deckSwiping) return;
+  _deckSwiping = true;
+
+  const student = _deckStudents[_deckIndex];
+  if (!student) { _deckSwiping = false; return; }
+
+  _deckIndex++;
+  _deckCleanup();
+  _renderDeck();
+
+  try {
+    if (direction === 'like') {
+      await buddyRequestStudent(
+        student.profile_id, null);
+    } else {
+      buddySkipStudent(student.profile_id);
+    }
+  } catch (err) {
+    console.error('[deck] actie fout:', err.message);
+  } finally {
+    _deckSwiping = false;
+  }
+}
+
+async function reloadBuddyDeck() {
+  _deckIndex    = 0;
+  _deckStudents = [];
+  _deckActive   = true;
+  _deckAnimating = false;
+  _deckIsDragging = false;
+  _deckCleanup();
+
+  const els = ['buddy-deck-done', 'buddy-deck-wrap',
+    'buddy-deck-actions', 'buddy-deck-counter',
+    'buddy-deck-empty'];
+  els.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const loading =
+    document.getElementById('buddy-deck-loading');
+  if (loading) loading.style.display = '';
+
+  await loadBuddySeekers();
+}
+
+// ── Window exports — buddy seekers ────────────────────
+window.loadBuddySeekers    = loadBuddySeekers;
+window.buddyRequestStudent = buddyRequestStudent;
+window.buddySkipStudent    = buddySkipStudent;
+window.deckAction          = deckAction;
+window.reloadBuddyDeck     = reloadBuddyDeck;
+
+// ── Window exports — profiel toggle ────────────────────
+window.showBuddyOverzicht = showBuddyOverzicht;
+window.showBuddyForm      = showBuddyForm;
