@@ -367,7 +367,7 @@
       fail = true;
     }
 
-    if (!fail) {
+    if (!fail && window.__INTERNLY_DEBUG) {
       console.log('[match-celebrate] self-test OK — 5 renderers, reduced + motion modes getest');
     }
   }());

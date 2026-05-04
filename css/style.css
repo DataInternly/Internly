@@ -254,6 +254,15 @@ body {
   color: #fff; border-color: rgba(255,255,255,.4);
 }
 
+/* ── Lang-switcher tijdelijk verbergen tot DeepL-sessie ──────────────────────
+   Audit 2026-05-04: knoppen werken alleen via Google Translate plus
+   InternlyConsent functional consent. Verbergen tot DeepL-implementatie.
+   Refactor-spec: TODO_LANG_SWITCHER_CLEANUP.md
+   ────────────────────────────────────────────────────────────────────────── */
+.lang-btn {
+  display: none !important;
+}
+
 /* ── Hero landing ─────────────────────────────────────────────────────────── */
 
 .hero {

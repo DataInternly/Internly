@@ -6,6 +6,15 @@
 // Supabase credentials staan uitsluitend in
 // js/supabase.js — niet hier.
 
+// ── Debug-flag ──────────────────────────────────────────────────────────────
+// Opt-in console-logging tijdens development. Productie default: false.
+// Toggle in DevTools console: window.__INTERNLY_DEBUG = true
+// Self-tests en non-fatal logs guarden zichzelf met deze flag; errors
+// (console.error / console.warn) blijven altijd zichtbaar.
+if (typeof window !== 'undefined' && window.__INTERNLY_DEBUG === undefined) {
+  window.__INTERNLY_DEBUG = false;
+}
+
 // ── Role routing ─────────────────────────────────────────────────────────────
 // ROLE_LANDING — canon voor non-student-routing.
 // Voor student-routing zie resolveStudentDashboard in js/roles.js.
