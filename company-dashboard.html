@@ -571,7 +571,7 @@
   <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="topbar-logo" style="cursor:pointer">intern<span>ly</span></a>
   <div class="topbar-right">
     <a href="company-discover.html" class="topbar-link">Zoek stagiairs</a>
-    <a href="company-dashboard.html" class="topbar-link" style="color:#fff">Dashboard</a>
+    <a href="company-dashboard.html" class="topbar-link" style="color:var(--ink);font-weight:600">Dashboard</a>
     <a href="auth.html" class="topbar-link">Inloggen</a>
     <div class="lang-switcher">
       <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
@@ -711,7 +711,7 @@
         <button class="nav-btn" id="nav-profile" onclick="show('profile')">
           <span class="nav-icon">🏢</span> Bedrijfsprofiel
         </button>
-        <button class="nav-btn" onclick="window.location.href='pricing.html'">
+        <button class="nav-btn" onclick="window.location.href='pricing.html#section-bedrijf'">
           <span class="nav-icon">💳</span> Abonnement
         </button>
         <button class="nav-btn" id="nav-account" onclick="show('account')">
@@ -723,7 +723,7 @@
 
     <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <a href="spelregels.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Spelregels</a>
-    <button class="btn-back" onclick="goBack('discover.html')" title="Vorige pagina">
+    <button class="btn-back" onclick="goBack('company-dashboard.html')" title="Vorige pagina">
       <span class="nav-icon">←</span> Vorige pagina
     </button>
     <button class="btn-logout" onclick="signOut()" title="Uitloggen">
@@ -1553,7 +1553,7 @@ function upgradeCard(requiredPlan) {
       <div style="font-size:2.5rem;">🔒</div>
       <h3 style="font-size:1.25rem;font-weight:700;color:var(--ink);">Beschikbaar vanaf ${label}</h3>
       <p style="color:var(--ink3);max-width:360px;">Upgrade je abonnement om toegang te krijgen tot deze functie.</p>
-      <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;">
+      <button onclick="window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;">
         Bekijk abonnementen
       </button>
     </div>`;
@@ -1662,7 +1662,7 @@ function renderList(cid, data) {
       <span style="font-size:.88rem;color:#c2410c;font-weight:600">
         🔒 Starter: 1 actieve vacature inbegrepen — ${escapeHtml(String(data.length - 1))} vacature${data.length - 1 !== 1 ? 's' : ''} vergrendeld
       </span>
-      <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+      <button onclick="window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
         Upgraden →
       </button>
     </div>`;
@@ -1678,7 +1678,7 @@ function renderList(cid, data) {
       <div style="position:absolute;inset:0;background:rgba(248,249,250,.88);border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2">
         <span style="font-size:1.4rem">🔒</span>
         <span style="font-size:.83rem;color:var(--ink3);font-weight:600">Beschikbaar vanaf Pro</span>
-        <button onclick="event.stopPropagation();window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer;pointer-events:all">
+        <button onclick="event.stopPropagation();window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer;pointer-events:all">
           Upgraden →
         </button>
       </div>` : ''}
@@ -1783,7 +1783,7 @@ async function loadCompanyMatches() {
           <span style="font-size:.88rem;color:#92400e;font-weight:600">
             ⚠️ Je hebt deze maand ${escapeHtml(String(thisMonthCount))} sollicitaties ontvangen — Starter is bedoeld voor max. 5/mnd. Upgrade voor onbeperkte matches.
           </span>
-          <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+          <button onclick="window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
             Upgraden →
           </button>`;
         el.parentNode.insertBefore(banner, el);
@@ -3182,7 +3182,7 @@ async function renderESG() {
         <div style="font-size:.88rem;color:var(--ink3);margin-bottom:1.25rem;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6;">
           Bedrijven op het Pro- of Business-plan krijgen automatisch een overzicht van hun investering in jong talent — klaar voor het CSRD-verslag.
         </div>
-        <a href="pricing.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:9px 20px;background:var(--accent);color:white;border-radius:var(--r-sm);text-decoration:none;font-size:.88rem;font-weight:500;">
+        <a href="pricing.html#section-bedrijf" style="display:inline-flex;align-items:center;gap:.4rem;padding:9px 20px;background:var(--accent);color:white;border-radius:var(--r-sm);text-decoration:none;font-size:.88rem;font-weight:500;">
           Upgraden naar Pro →
         </a>
       </div>`;
@@ -3223,7 +3223,7 @@ async function renderESG() {
       <div class="sec-title" style="margin-top:28px">Exporteren</div>
       <div style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-sm);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <span style="font-size:.88rem;color:var(--ink3)">🔒 Volledige export beschikbaar op Business</span>
-        <a href="pricing.html" style="font-size:.82rem;color:var(--accent);font-weight:600;text-decoration:none">Upgraden naar Business →</a>
+        <a href="pricing.html#section-bedrijf" style="font-size:.82rem;color:var(--accent);font-weight:600;text-decoration:none">Upgraden naar Business →</a>
       </div>`;
   }
 
@@ -3628,7 +3628,7 @@ async function renderVestigingen() {
           Voeg meerdere locaties toe en koppel elke vacature aan de juiste vestiging.
           Studenten zien de vestigingsnaam en locatie op de vacatureskaart.
         </p>
-        <a href="pricing.html" class="btn-primary" style="text-decoration:none;display:inline-block">Upgrade naar Business →</a>
+        <a href="pricing.html#section-bedrijf" class="btn-primary" style="text-decoration:none;display:inline-block">Upgrade naar Business →</a>
       </div>`;
     return;
   }

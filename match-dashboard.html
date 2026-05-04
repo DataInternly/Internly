@@ -692,6 +692,19 @@
       margin-bottom: 8px;
     }
 
+    /* Bedrijf observerend-rol uitleg (audit 2026-05-04 — Item 11) */
+    .bedrijf-empty-state {
+      padding: 1.25rem;
+      background: var(--green-bg);
+      border: 1px solid #cde6d8;
+      border-radius: var(--r-sm);
+      color: var(--ink2);
+      font-size: .9rem;
+      line-height: 1.55;
+      margin: 12px 0 16px;
+    }
+    .bedrijf-empty-state strong { color: var(--ink); }
+
     /* Toast */
     #toast {
       position: fixed;
@@ -2548,10 +2561,13 @@ const CAN = {
     viewLog: true, viewScores: false
   },
   bedrijf: {
-    addTask: true, editTask: true, deleteTask: true, checkTask: true,
-    addDeadline: true, editDeadline: true,
+    // Stage-content: bedrijf is observerend, niet schrijvend
+    addTask: false, editTask: false, deleteTask: false, checkTask: false,
+    addDeadline: false, editDeadline: false,
     addReflectie: false, editReflectie: false,
-    updateLeerdoel: true, editStageplan: true,
+    updateLeerdoel: false,
+    editStageplan: false,
+    // Begeleidings-acties: bedrijf doet wel
     inviteSchool: true,
     viewLog: true, viewScores: true
   },
@@ -3442,6 +3458,11 @@ function renderPlanning() {
   const now2 = new Date(); now2.setHours(0,0,0,0);
   const next = hubState.deadlines.find(d => new Date(d.date + 'T00:00:00') >= now2);
 
+  const bedrijfEmptyState = hubState.role === 'bedrijf' ? `
+    <div class="bedrijf-empty-state">
+      Deadlines worden vastgesteld door de student en school. Bespreek deze samen tijdens kennismakings- of voortgangsgesprekken.
+    </div>` : '';
+
   return `
     <div class="page-head">
       <div>
@@ -3453,6 +3474,8 @@ function renderPlanning() {
         <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">🗓 Kalender</button>
       </div>
     </div>
+
+    ${bedrijfEmptyState}
 
     <div class="grid-2">
       <div>
@@ -3527,6 +3550,11 @@ function renderTaken() {
       Taak toevoegen
     </button>` : '';
 
+  const bedrijfEmptyState = role === 'bedrijf' ? `
+    <div class="bedrijf-empty-state">
+      Hier zie je de taken die de student voor zichzelf heeft opgesteld. Stel jouw verwachtingen via een meeting of de chat.
+    </div>` : '';
+
   return `
     <div class="page-head">
       <div>
@@ -3535,6 +3563,8 @@ function renderTaken() {
       </div>
       ${addBtn}
     </div>
+
+    ${bedrijfEmptyState}
 
     ${partyCounts}
 
@@ -3940,6 +3970,10 @@ function renderVoortgang() {
           <div class="card-head">
             <div class="card-title">Leerdoelen</div>
           </div>
+          ${hubState.role === 'bedrijf' ? `
+            <div class="bedrijf-empty-state">
+              De leerdoelen zijn opgesteld door de student samen met school. Volg de progressie hier en geef tussentijds feedback via de chat.
+            </div>` : ''}
           ${avgBar}
           ${leerdoelenHtml}
         </div>
@@ -3952,6 +3986,10 @@ function renderVoortgang() {
             <div class="card-title">Reflecties</div>
             ${can('addReflectie') && reflTotal > 0 ? `<button type="button" class="btn btn-ghost btn-sm" onclick="exportReflectieverslag()">📄 PDF</button>` : ''}
           </div>
+          ${hubState.role === 'bedrijf' ? `
+            <div class="bedrijf-empty-state">
+              Reflecties zijn de zelfreflectie van de student. Lees mee om de voortgang te volgen, en geef begeleiding via meetings of chat.
+            </div>` : ''}
           ${reflectiesHtml}
         </div>
 
@@ -4714,12 +4752,19 @@ function formatDateShort(dateStr) {
 function renderStageplan() {
   const sp = hubState.stageplan;
   const editable = can('editStageplan');
-  const readonly = hubState.role === 'school' || hubState.role === 'begeleider';
+  // Bedrijf toegevoegd aan readonly (audit 2026-05-04 — Item 11) zodat
+  // field()/sel()-helpers de leesweergave renderen i.p.v. inputs zonder save-knop.
+  const readonly = hubState.role === 'school' || hubState.role === 'begeleider' || hubState.role === 'bedrijf';
 
-  const readonlyBanner = readonly ? `
+  const readonlyBanner = hubState.role === 'school' || hubState.role === 'begeleider' ? `
     <div class="sp-readonly-note">
       <span style="font-size:1rem;">🏫</span>
       Je bekijkt het stageplan als ${hubState.role === 'begeleider' ? 'praktijkbegeleider' : 'schoolbegeleider'} — alleen lezen.
+    </div>` : '';
+
+  const bedrijfBanner = hubState.role === 'bedrijf' ? `
+    <div class="bedrijf-empty-state">
+      Het stageplan wordt door student en school opgesteld. Lees het door en gebruik de inhoud bij begeleiding en evaluatie.
     </div>` : '';
 
   const saveBtn = editable ? `
@@ -4776,8 +4821,10 @@ function renderStageplan() {
   const addDvBtn = !readonly ? `
     <button class="btn btn-ghost btn-sm add-deelvraag" onclick="addDeelvraag()">＋ Deelvraag toevoegen</button>` : '';
 
-  // School annotation
-  const schoolNote = readonly ? `
+  // School annotation — alleen school/begeleider mogen deze noot
+  // schrijven. Bedrijf valt nu ook onder `readonly` (Item 11), dus
+  // expliciete role-check ipv `readonly` ter voorkoming van leak.
+  const schoolNote = (hubState.role === 'school' || hubState.role === 'begeleider') ? `
     <div class="card" style="margin-top:16px">
       <div class="card-head"><div class="card-title">Notitie schoolbegeleider</div></div>
       <textarea class="form-textarea" id="sp-schoolnoot" placeholder="Voeg een notitie toe…">${escapeHtml(sp.schoolnoot || '')}</textarea>
@@ -4796,6 +4843,7 @@ function renderStageplan() {
     </div>
 
     ${readonlyBanner}
+    ${bedrijfBanner}
 
     <div class="grid-2">
       <div>

@@ -479,7 +479,7 @@
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <a href="matches.html" class="back-btn">← Terug</a>
+  <a id="chat-back-btn" href="matches.html" class="back-btn">← Terug</a>
   <div class="topbar-match-info chat-topbar-meta">
     <div class="chat-topbar-avatar" id="chatTopbarAvatar" aria-hidden="true"></div>
     <div class="chat-topbar-meta-text">
@@ -1618,6 +1618,22 @@
 
     // BOL Fix 3: chat templates per rol
     loadChatTemplates(_profRow?.role);
+
+    // Rol-aware terug-knop + mobile-tabs (audit 2026-05-04 — Item 10)
+    // Reden: chat.html is gedeeld over rollen; back-btn en mobile-tabs
+    // wezen voorheen onvoorwaardelijk naar student-pagina's.
+    const _userRole = _profRow?.role;
+    const _backBtn = document.getElementById('chat-back-btn');
+    if (_backBtn) {
+      if (_userRole === 'bedrijf') _backBtn.href = 'company-dashboard.html#matches';
+      else if (_userRole === 'school') _backBtn.href = 'school-dashboard.html';
+      else if (_userRole === 'begeleider') _backBtn.href = 'begeleider-dashboard.html';
+      // student behoudt 'matches.html' default
+    }
+    const _mobileTabs = document.querySelector('.mobile-tabs');
+    if (_mobileTabs && _userRole && _userRole !== 'student') {
+      _mobileTabs.style.display = 'none';
+    }
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
