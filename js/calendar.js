@@ -68,6 +68,8 @@ const InternlyCalendar = (() => {
 .ical-cell.bezet{background:#fdeaea;border-color:#b82020;}
 .ical-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:.85rem;border-top:1px solid rgba(13,21,32,.09);}
 .ical-hint{font-size:.76rem;color:#7a8799;}
+.ical-instruction{font-size:.75rem;color:#7a8799;margin:.35rem 0 .6rem;line-height:1.5;padding:0 2px;}
+.ical-instruction strong{font-style:normal;font-weight:500;color:#3a4455;}
 .ical-save{background:#1a7a48;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:background .12s,transform .1s;}
 .ical-save:hover{background:#155f39;}
 .ical-save:disabled{background:#d1d5db;cursor:not-allowed;}
@@ -162,6 +164,14 @@ const InternlyCalendar = (() => {
             <span class="ical-leg-item"><span class="ical-leg-dot" style="background:#fdeaea;border:1.5px solid #b82020"></span>Bezet</span>
           </div>
         </div>
+        <p class="ical-instruction">
+          💡 Klik op een tijdslot om te wisselen:
+          <strong>leeg</strong> →
+          <strong style="color:#1a7a48">beschikbaar</strong> →
+          <strong style="color:#a06010">voorkeur</strong> →
+          <strong style="color:#b82020">bezet</strong>.
+          Sla op als je klaar bent.
+        </p>
         <div class="ical-grid">
           <table class="ical-table">
             <thead><tr><th></th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
