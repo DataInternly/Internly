@@ -194,6 +194,58 @@ Vóór elke nieuwe Claude Code instructie:
 - about.html + index.html: inline SUPABASE_URL opruimen
 - renderApplications (mijn-sollicitaties.html, ~151 regels) opsplitsen
 - renderESG (company-dashboard.html, ~128 regels) opsplitsen
+- [Tech debt B-1] requireRole-migratie: 19 pagina's met inline auth-check naar `guardPage()`. Tijdsinschatting per sprint 30-90 min. Volgorde zie Auth-architectuur sectie.
+
+## Auth-architectuur (Mei 2026)
+
+Het project bevindt zich in een migratie van inline auth-checks naar één centrale guard helper.
+
+### Huidig beeld
+- **6 pagina's** gebruiken `requireRole()` — werken correct, anti-flicker werkt
+- **19 pagina's** gebruiken inline `db.auth.getUser()` met eigen redirect-logica — geen unified body-state-management, anti-flicker werkt deels
+- **Run 7B (mei 2026)** voegt `guardPage()` helper toe als opvolger
+
+### Migratie-plan
+Pagina's worden in batches gemigreerd van inline-check naar `guardPage()`:
+
+| Sprint | Pagina's | Prio |
+|---|---|---|
+| Run 7C | buddy-dashboard, company-dashboard, school-dashboard | hoog |
+| Run 7D | match-dashboard, bbl-dashboard, bbl-hub | hoog |
+| Run 7E | mijn-berichten, mijn-notities, mijn-sollicitaties, chat | middel |
+| Run 7F | student-profile, bol-profile, bbl-profile, admin | middel |
+| Run 7G | international-* dashboards, begeleider-dashboard, vacature-detail, review-form, discover, matches | laag |
+
+### `guardPage()` API
+
+```js
+const auth = await guardPage('gepensioneerd');
+if (!auth) return; // redirect al gebeurd
+const { user, profile, role } = auth;
+```
+
+Vervangt:
+```js
+const { data: { user } } = await db.auth.getUser();
+if (!user) { window.location.replace('auth.html'); return; }
+const { data: profile } = await db.from('profiles').select('role,naam').eq('id', user.id).maybeSingle();
+if (profile.role !== 'gepensioneerd') { window.location.replace(getRoleLanding(profile.role)); return; }
+```
+
+### Voordelen `guardPage()` vs inline
+- `try/catch` garandeert body-zichtbaarheid op elk exit-path
+- `getSession()` ipv `getUser()` — sneller, minder kans op flits
+- Returned profile + role data — caller hoeft niet opnieuw te query
+- Centraal punt voor toekomstige toevoegingen (bv. tab-sync via onAuthStateChange)
+
+### `requireRole()` is deprecated
+Niet kapot, blijft werken voor 6 bestaande callers. Wordt over tijd ook gemigreerd naar `guardPage()`. Niet vandaag.
+
+### Architectuur-principes
+- Eén pagina, één auth-guard call als eerste handeling in init
+- Body krijgt `data-auth-pending="true"` initieel, helper zet `data-auth-ready="true"` na guard
+- CSS in `style.css` regelt opacity op basis van die attributes (anti-flicker)
+- 300ms CSS-fallback animation zorgt dat pagina nooit permanent zwart blijft als JS faalt
 
 ## Architecturele ketens
 
