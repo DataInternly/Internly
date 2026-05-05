@@ -1777,5 +1777,37 @@
       };
     })();
   </script>
+
+<!-- Run 1.8 — utils.js toegevoegd voor hybrid header (cdn + supabase staan al boven) -->
+<script src="js/utils.js"></script>
+
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users -->
+<script>
+(async () => {
+  try {
+    if (typeof db === 'undefined') return;
+    const { data: { user } } = await db.auth.getUser();
+    if (!user) return;
+    const { data: profile } = await db
+      .from('profiles').select('role, naam').eq('id', user.id).maybeSingle();
+    if (!profile?.role) return;
+    let role = profile.role;
+    if (role === 'student') {
+      const { data: sp } = await db
+        .from('student_profiles').select('bbl_mode').eq('profile_id', user.id).maybeSingle();
+      if (sp?.bbl_mode === true) role = 'student_bbl';
+    }
+    const publicHeader = document.querySelector('header, nav.topbar, .public-header');
+    if (!publicHeader) return;
+    if (typeof renderRoleHeader === 'function') {
+      publicHeader.id = 'role-header';
+      publicHeader.className = 'role-header';
+      await renderRoleHeader(role, null, { profile: { naam: profile.naam || '' } });
+    }
+  } catch (err) {
+    console.warn('[hybrid-header] fallback to public:', err?.message);
+  }
+})();
+</script>
 </body>
 </html>
