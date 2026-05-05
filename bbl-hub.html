@@ -706,6 +706,62 @@
 
 <div class="hub-shell">
 
+  <!-- Run 3 — Welkomstblok BBL student -->
+  <div id="bbl-welcome-anchor"></div>
+  <script>
+    (async () => {
+      if (typeof db === 'undefined') return;
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await db
+        .from('profiles')
+        .select('naam, role')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      const { data: studentProfile } = await db
+        .from('student_profiles')
+        .select('opleiding, jaar, school, opdracht_domein, motivatie, skills, bbl_mode')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+
+      if (!profile || !studentProfile?.bbl_mode) return;
+
+      const data = {
+        naam: profile.naam,
+        opleiding: studentProfile.opleiding,
+        jaar: studentProfile.jaar,
+      };
+
+      const anchor = document.getElementById('bbl-welcome-anchor');
+      if (!anchor) return;
+
+      anchor.innerHTML = renderRoleLanding('student_bbl', data);
+
+      const actions = anchor.querySelector('.rl-actions');
+      if (actions) {
+        actions.innerHTML = `
+          <a href="#section-traject" class="rl-action">
+            <span class="rl-action-icon">📋</span>
+            <span class="rl-action-title">BBL Traject</span>
+            <span class="rl-action-sub">Bekijk je voortgang</span>
+          </a>
+          <a href="matchpool.html?bbl=true" class="rl-action">
+            <span class="rl-action-icon">🎯</span>
+            <span class="rl-action-title">Mijn matches</span>
+            <span class="rl-action-sub">Vind een leerwerkplek</span>
+          </a>
+          <a href="kennisbank.html" class="rl-action">
+            <span class="rl-action-icon">📚</span>
+            <span class="rl-action-title">Kennisbank</span>
+            <span class="rl-action-sub">Tips voor je BBL</span>
+          </a>
+        `;
+      }
+    })();
+  </script>
+
   <!-- ── Contract strip (altijd zichtbaar, klasse wisselt via JS) ── -->
   <div class="contract-strip cs-ok" id="contractStrip">
     <div class="cs-left">

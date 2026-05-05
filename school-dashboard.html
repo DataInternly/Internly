@@ -714,6 +714,62 @@
 
     <!-- ── DASHBOARD ── -->
     <div class="screen active" id="screen-dashboard">
+
+      <!-- Run 3 — Welkomstblok school -->
+      <div id="school-welcome-anchor"></div>
+      <script>
+        (async () => {
+          if (typeof db === 'undefined') return;
+          const { data: { user } } = await db.auth.getUser();
+          if (!user) return;
+
+          const { data: profile } = await db
+            .from('profiles')
+            .select('naam, role')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (!profile || profile.role !== 'school') return;
+
+          const { data: schoolProfile } = await db
+            .from('school_profiles')
+            .select('schoolnaam, contactpersoon, locatie, opleidingen')
+            .eq('profile_id', user.id)
+            .maybeSingle();
+
+          const data = {
+            naam: schoolProfile?.contactpersoon || profile.naam,
+            schoolnaam: schoolProfile?.schoolnaam,
+          };
+
+          const anchor = document.getElementById('school-welcome-anchor');
+          if (!anchor) return;
+
+          anchor.innerHTML = renderRoleLanding('school', data);
+
+          const actions = anchor.querySelector('.rl-actions');
+          if (actions) {
+            actions.innerHTML = `
+              <a href="#section-studenten-actief" class="rl-action">
+                <span class="rl-action-icon">👥</span>
+                <span class="rl-action-title">Studenten op stage</span>
+                <span class="rl-action-sub">Voortgang monitoren</span>
+              </a>
+              <a href="#section-studenten-zoekend" class="rl-action">
+                <span class="rl-action-icon">🔍</span>
+                <span class="rl-action-title">Zoeken nog</span>
+                <span class="rl-action-sub">Help studenten verder</span>
+              </a>
+              <a href="#section-bedrijven" class="rl-action">
+                <span class="rl-action-icon">🏢</span>
+                <span class="rl-action-title">Stagepartners</span>
+                <span class="rl-action-sub">Bekijk Trust Scores</span>
+              </a>
+            `;
+          }
+        })();
+      </script>
+
       <div class="page-title">Schooldashboard</div>
       <p class="page-sub" id="dashboardSub">Ongelijkheid zit in de stilte. Internly maakt het zichtbaar.</p>
 

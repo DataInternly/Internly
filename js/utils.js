@@ -690,7 +690,7 @@ const HEADER_NAV_BY_ROLE = {
   // de canonieke 5-item lijst voor NAV-01 refactor (renderRoleHeader migratie).
   // MAX 5 items (incl. buddy) — Hick's Law contract.
   student_bbl: [
-    { id: 'discover',     label: 'BBL Traject',     href: 'bbl-hub.html',             icon: '🔧' },
+    { id: 'discover',     label: 'Overzicht',       href: 'bbl-hub.html',             icon: '🔧' },
     { id: 'matchpool',    label: 'Matchpool',       href: 'matchpool.html',           icon: '🌊' },
     { id: 'berichten',    label: 'Berichten',       href: 'mijn-berichten.html',      icon: '💬' },
     { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
@@ -803,6 +803,86 @@ async function renderRoleHeader(role, activeTab, opts = {}) {
 window.renderRoleHeader = renderRoleHeader;
 window.HEADER_NAV_BY_ROLE = HEADER_NAV_BY_ROLE;
 
+/* ────────────────────────────────────────────────────────────────────
+   renderRoleLanding(role, profileData) — Run 3 (5 mei 2026)
+   Genereert welkomstblok-HTML voor BBL/bedrijf/school landing.
+   Buddy heeft eigen referentie-implementatie (niet via deze helper).
+
+   role:        'student_bbl' | 'bedrijf' | 'school'
+   profileData: { naam, profile_completeness?, ...rolspecifieke velden }
+
+   Returnt HTML string. Caller is verantwoordelijk voor inserting.
+   Quick actions worden door caller in .rl-actions div gevuld via
+   data-role attribuut (caller-specific markup).
+   ──────────────────────────────────────────────────────────────────── */
+function renderRoleLanding(role, profileData = {}) {
+  const naam = (profileData.naam || '').toString().split('@')[0] || 'daar';
+  const escapedNaam = escapeHtml(naam);
+
+  // Greeting op basis van uur
+  const hour = new Date().getHours();
+  const greeting = hour < 6  ? 'Goedenacht'  :
+                   hour < 12 ? 'Goedemorgen' :
+                   hour < 18 ? 'Goedemiddag' : 'Goedenavond';
+
+  // Datum NL formaat: "dinsdag 5 mei 2026"
+  const datum = new Date().toLocaleDateString('nl-NL', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  // Rol-pill kleuren per spec
+  const rolePillMap = {
+    student_bbl: { color: '#1a7a48', bg: '#e8f5ee', label: 'BBL Student' },
+    bedrijf:     { color: '#0d1520', bg: '#f4f3ef', label: 'Bedrijf' },
+    school:      { color: '#a06010', bg: '#fdf3e0', label: 'School' },
+  };
+  const pill = rolePillMap[role] || rolePillMap.bedrijf;
+
+  // Rolspecifieke meta-regel
+  const metaRegelMap = {
+    student_bbl: profileData.opleiding
+      ? `${escapeHtml(profileData.opleiding)} · jaar ${profileData.jaar || '?'}`
+      : 'Profiel onvolledig',
+    bedrijf:     profileData.sector
+      ? `${escapeHtml(profileData.sector)}${profileData.size ? ' · ' + escapeHtml(profileData.size) : ''}`
+      : 'Profiel onvolledig',
+    school:      profileData.schoolnaam
+      ? escapeHtml(profileData.schoolnaam)
+      : 'Profiel onvolledig',
+  };
+  const meta = metaRegelMap[role] || '';
+
+  // Profile completeness als beschikbaar
+  const completeness = profileData.profile_completeness;
+  const completenessHtml = (typeof completeness === 'number') ? `
+    <div class="rl-completeness">
+      <div class="rl-completeness-label">Profiel ${completeness}% compleet</div>
+      <div class="rl-completeness-bar">
+        <div class="rl-completeness-fill" style="width:${completeness}%"></div>
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <section class="role-landing role-landing-${role}">
+      <div class="rl-greeting">
+        <span class="rl-hello">${greeting} 👋</span>
+        <h1 class="rl-name">${escapedNaam}</h1>
+        <div class="rl-meta-row">
+          <span class="rl-pill" style="background:${pill.bg};color:${pill.color}">${pill.label}</span>
+          <span class="rl-meta">${meta}</span>
+          <span class="rl-date">${datum}</span>
+        </div>
+      </div>
+      ${completenessHtml}
+      <div class="rl-actions" data-role="${role}">
+        <!-- Caller vult quick actions hier in via data-role-aware insert -->
+      </div>
+    </section>
+  `;
+}
+window.renderRoleLanding = renderRoleLanding;
+
 // ── Shared student header ─────────────────────────────────────────────────────
 // Rendert de student-header voor bol en bbl pagina's.
 // Vereist: Supabase client beschikbaar als `db` (gezet door js/supabase.js).
@@ -838,9 +918,9 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
 
   // BBL nav — MAX 5 items (incl. buddy via wrapper). Dashboard verwijderd
   // ten gunste van Matchpool (NAV-00B): bbl-hub.html combineert overzicht +
-  // matches al, en blijft via in-page links bereikbaar vanuit BBL Traject.
+  // matches al, en blijft via in-page links bereikbaar vanuit Overzicht.
   const bblNav = `
-    <a href="/bbl-hub.html"        class="${activeTab === 'discover'    ? 'active' : ''}">BBL Traject</a>
+    <a href="/bbl-hub.html"        class="${activeTab === 'discover'    ? 'active' : ''}">Overzicht</a>
     <a href="/matchpool.html"      class="${activeTab === 'matchpool'   ? 'active' : ''}">Matchpool</a>
     <a href="/mijn-berichten.html" class="${activeTab === 'berichten'   ? 'active' : ''}">Berichten</a>
     <a href="/kennisbank.html"     class="${activeTab === 'kennisbank'  ? 'active' : ''}">Kennisbank</a>`;

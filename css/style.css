@@ -2639,3 +2639,94 @@ footer.kb-shared-footer {
   font-size: .7rem;
   color: rgba(255,255,255,.35);
 }
+
+/* ─── Role landing welcome blocks (Run 3 — 5 mei 2026) ──────────── */
+.role-landing {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--line-subtle, #e8e6e0);
+  border-radius: var(--r-lg, 20px);
+  padding: 32px 40px;
+  margin: 24px auto;
+  max-width: 800px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+@media (max-width: 768px) {
+  .role-landing { padding: 24px 20px; margin: 16px auto; }
+}
+
+.rl-greeting { margin-bottom: 18px; }
+.rl-hello {
+  font-family: var(--font-script, 'Caveat', cursive);
+  font-size: 1.4rem;
+  color: var(--c-orange-deep, #b94613);
+  display: block;
+  margin-bottom: 4px;
+}
+.rl-name {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--fg-primary, #0d1520);
+  letter-spacing: -.02em;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+.rl-meta-row {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  font-size: .85rem;
+}
+.rl-pill {
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: .78rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.rl-meta { color: var(--fg-secondary, #4a5568); }
+.rl-date { color: var(--fg-tertiary, #6b7280); margin-left: auto; }
+@media (max-width: 480px) { .rl-date { margin-left: 0; width: 100%; } }
+
+.rl-completeness { margin: 18px 0; }
+.rl-completeness-label {
+  font-size: .82rem; color: var(--fg-tertiary, #6b7280);
+  margin-bottom: 6px;
+}
+.rl-completeness-bar {
+  height: 6px; background: #f1f1ec; border-radius: 3px; overflow: hidden;
+}
+.rl-completeness-fill {
+  height: 100%; background: var(--c-green, #1a7a48); transition: width .3s;
+}
+
+.rl-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.rl-action {
+  background: var(--c-cream, #f4f3ef);
+  border: 1px solid var(--line-subtle, #e8e6e0);
+  border-radius: var(--r-md, 14px);
+  padding: 14px 16px;
+  text-decoration: none;
+  color: var(--fg-primary, #0d1520);
+  transition: all .15s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.rl-action:hover {
+  border-color: var(--c-orange-deep, #b94613);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.rl-action-icon { font-size: 1.4rem; }
+.rl-action-title { font-weight: 600; font-size: .92rem; }
+.rl-action-sub { font-size: .76rem; color: var(--fg-tertiary, #6b7280); }
+.rl-action .rl-counter {
+  background: var(--c-orange-deep, #b94613);
+  color: #fff;
+  font-size: .7rem; font-weight: 600;
+  padding: 1px 8px; border-radius: 12px;
+  display: inline-block; margin-left: 6px;
+}

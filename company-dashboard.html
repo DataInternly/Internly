@@ -737,6 +737,73 @@
 
     <!-- ── DASHBOARD ── -->
     <div class="screen active" id="screen-dashboard">
+
+      <!-- Run 3 — Welkomstblok bedrijf -->
+      <div id="company-welcome-anchor"></div>
+      <script>
+        (async () => {
+          if (typeof db === 'undefined') return;
+          const { data: { user } } = await db.auth.getUser();
+          if (!user) return;
+
+          const { data: profile } = await db
+            .from('profiles')
+            .select('naam, role')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (!profile || profile.role !== 'bedrijf') return;
+
+          const { data: companyProfile } = await db
+            .from('company_profiles')
+            .select('bedrijfsnaam, sector, size, trust_score, trust_grade')
+            .eq('profile_id', user.id)
+            .maybeSingle();
+
+          // Pending matches counter
+          const { count: pendingCount } = await db
+            .from('matches')
+            .select('id', { count: 'exact', head: true })
+            .eq('party_b', user.id)
+            .eq('status', 'pending');
+
+          const data = {
+            naam: companyProfile?.bedrijfsnaam || profile.naam,
+            sector: companyProfile?.sector,
+            size: companyProfile?.size,
+          };
+
+          const anchor = document.getElementById('company-welcome-anchor');
+          if (!anchor) return;
+
+          anchor.innerHTML = renderRoleLanding('bedrijf', data);
+
+          const actions = anchor.querySelector('.rl-actions');
+          if (actions) {
+            const pendingBadge = pendingCount > 0 ? `<span class="rl-counter">${pendingCount}</span>` : '';
+            const trustScore = companyProfile?.trust_score ?? '?';
+            const trustGrade = companyProfile?.trust_grade ?? '?';
+            actions.innerHTML = `
+              <a href="#section-aanvragen" class="rl-action">
+                <span class="rl-action-icon">📩</span>
+                <span class="rl-action-title">Nieuwe aanvragen${pendingBadge}</span>
+                <span class="rl-action-sub">Reageer op tijd</span>
+              </a>
+              <a href="#section-trust" class="rl-action">
+                <span class="rl-action-icon">⭐</span>
+                <span class="rl-action-title">Trust Score ${trustScore}</span>
+                <span class="rl-action-sub">Graad ${trustGrade}</span>
+              </a>
+              <a href="#section-vacatures" class="rl-action">
+                <span class="rl-action-icon">📌</span>
+                <span class="rl-action-title">Plaats vacature</span>
+                <span class="rl-action-sub">Bereik gemotiveerde studenten</span>
+              </a>
+            `;
+          }
+        })();
+      </script>
+
       <div class="page-title">Dashboard</div>
       <p class="page-sub">Eenvoudig voor jou. Eerlijk voor de student.</p>
 
