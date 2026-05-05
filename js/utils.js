@@ -616,6 +616,112 @@ function findPublicHeader() {
 }
 window.findPublicHeader = findPublicHeader;
 
+// ─────────────────────────────────────────────────
+// ILY-code helpers (Run 5 — 7 mei 2026)
+// Code-format: ILY + 8 cijfers (geen rol-info in code zelf)
+// Pattern B (consent-aware) — accept/reject flow komt in Fase 1
+// ─────────────────────────────────────────────────
+
+/**
+ * Genereer een nieuwe ILY-code (intern gebruik).
+ * Crypto-random voor onvoorspelbaarheid (anti-enumeration).
+ * Format: ILY + 8 cijfers, padded met leading zeros.
+ */
+function _generateILYCodeRaw() {
+  const arr = new Uint32Array(1);
+  window.crypto.getRandomValues(arr);
+  const num = (arr[0] % 100000000).toString().padStart(8, '0');
+  return 'ILY' + num;
+}
+
+/**
+ * Format ILY-code voor display.
+ * "ILY12345678" → "ILY 1234 5678"
+ */
+function formatILYCodeDisplay(code) {
+  if (!code || typeof code !== 'string') return '';
+  const m = code.match(/^ILY([0-9]{4})([0-9]{4})$/);
+  if (!m) return code;
+  return `ILY ${m[1]} ${m[2]}`;
+}
+window.formatILYCodeDisplay = formatILYCodeDisplay;
+
+/**
+ * Valideer en normaliseer ILY-code input.
+ * Accepteert spaties (verwijdert ze) en lowercase (capitalize).
+ * Returns null bij ongeldig.
+ */
+function validateILYCode(input) {
+  if (!input || typeof input !== 'string') return null;
+  const cleaned = input.replace(/\s+/g, '').toUpperCase();
+  if (/^ILY[0-9]{8}$/.test(cleaned)) return cleaned;
+  return null;
+}
+window.validateILYCode = validateILYCode;
+
+/**
+ * Kopieer ILY-code naar klembord met user-feedback.
+ */
+function copyILYCode(code) {
+  if (!code) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(
+      function() {
+        if (typeof notify === 'function') {
+          notify('Code gekopieerd naar klembord', true);
+        }
+      },
+      function() {
+        if (typeof notify === 'function') {
+          notify('Kopiëren mislukt — selecteer handmatig', false);
+        }
+      }
+    );
+  } else if (typeof notify === 'function') {
+    notify('Kopiëren niet ondersteund — selecteer handmatig', false);
+  }
+}
+window.copyILYCode = copyILYCode;
+
+/**
+ * Render ILY-code widget HTML.
+ * @param {string} code — ily_code uit profiles tabel (raw, ILY12345678)
+ * @returns {string} HTML string of '' bij geen code
+ *
+ * Plaats deze HTML waar gewenst op profielpagina's:
+ *   container.innerHTML = renderILYCodeWidget(profile.ily_code);
+ */
+function renderILYCodeWidget(code) {
+  if (!code) return '';
+  const displayCode = formatILYCodeDisplay(code);
+  const escapedRawCode = (typeof escapeHtml === 'function')
+    ? escapeHtml(code).replace(/'/g, '&#39;')
+    : code;
+  const escapedDisplay = (typeof escapeHtml === 'function')
+    ? escapeHtml(displayCode)
+    : displayCode;
+
+  return `
+    <div class="ily-code-widget">
+      <div class="ily-code-label">Jouw Internly-code</div>
+      <div class="ily-code-value">
+        <code class="ily-code-display">${escapedDisplay}</code>
+        <button type="button"
+                class="ily-code-copy"
+                onclick="copyILYCode('${escapedRawCode}')"
+                aria-label="Code kopiëren">
+          📋
+        </button>
+      </div>
+      <div class="ily-code-hint">
+        Deel deze code om gekoppeld te raken aan je school of begeleider.
+        Koppelen wordt mogelijk in een volgende update.
+      </div>
+    </div>
+  `;
+}
+window.renderILYCodeWidget = renderILYCodeWidget;
+
 /**
  * Disable a button or trigger element while an async operation runs.
  * Re-enables on success or error. Use to prevent double-submit.
