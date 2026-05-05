@@ -1118,7 +1118,7 @@ async function doRegister() {
           profile_id:         data.user.id,
           plan:               'begeleider_starter',
           status:             'trial',
-          current_period_end: trialEnd.toISOString(),
+          next_billing_date: trialEnd.toISOString(),
         },
         { onConflict: 'profile_id' }
       );

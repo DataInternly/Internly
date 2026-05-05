@@ -176,13 +176,13 @@ async function hasActivePlan(minPlan = 'company_starter') {
 
     const { data: sub, error } = await client
       .from('subscriptions')
-      .select('plan, status, current_period_end')
+      .select('plan, status, next_billing_date')
       .eq('profile_id', user.id)
       .maybeSingle();
 
     if (error || !sub) return false;
     if (!['active', 'past_due', 'trial'].includes(sub.status)) return false;
-    if (sub.current_period_end && new Date(sub.current_period_end) < new Date()) return false;
+    if (sub.next_billing_date && new Date(sub.next_billing_date) < new Date()) return false;
 
     const tiers = [
       'company_starter',
