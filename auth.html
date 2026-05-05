@@ -920,6 +920,13 @@ async function doLogin() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Inloggen…';
 
+  // Run 1.6: paranoid pre-login cleanup. Voorkomt dat reststate van een
+  // vorige user (saved_vacatures, dismissed-flags, in-memory globals)
+  // achterblijft als deze sessie als andere account inlogt.
+  if (typeof clearUserState === 'function') {
+    clearUserState();
+  }
+
   const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
 
   btn.disabled = false;
@@ -1252,7 +1259,13 @@ function clearMessages() {
 // ── Check of al ingelogd + pre-select rol via URL param ──
 async function switchAccount() {
   await db.auth.signOut();
-  sessionStorage.removeItem('internly_role');
+  // Run 1.6: full state cleanup bij account-wissel — voorheen alleen
+  // sessionStorage.removeItem('internly_role').
+  if (typeof clearUserState === 'function') {
+    clearUserState();
+  } else {
+    sessionStorage.removeItem('internly_role');
+  }
   setApplying(false);
   document.getElementById('alreadyLoggedIn').style.display = 'none';
   document.querySelector('.role-title').style.display = '';

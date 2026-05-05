@@ -8,7 +8,55 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Beschikbaar stellen voor telemetry.js _tel.
 // Volgorde: supabase.js → utils.js → telemetry.js — key is gegarandeerd aanwezig.
 window.__SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ── Run 1.5 v2 Issue 1 — passive client config op publieke pagina's ───────
+   Op publieke pagina's draait Supabase JS v2 default met autoRefreshToken=true.
+   Bij refresh-failure (expired refresh-token, netwerk-glitch) wist de client
+   sb-auth-token uit localStorage → stille uitlog na navigatie terug naar
+   beschermde pagina. Optie A (Barry-keuze): op publieke pagina's de refresh
+   uitschakelen + URL-detect uit. localStorage blijft leesbaar (persistSession=true)
+   zodat getUser() in waitlist (about), subscriptions (pricing) en kb.js
+   blijft werken — alleen geen actieve refresh-poging meer.
+
+   DRY-FLAG: PUBLIC_PAGES dupliceert de array in js/utils.js:41-48. Backlog:
+   consolideer via js/config.js. Niet vandaag — utils.js laadt na supabase.js,
+   geen import mogelijk zonder load-order te breken.
+   ────────────────────────────────────────────────────────────────────────── */
+const _supabaseIsPublicPage = (() => {
+  const path = window.location.pathname;
+  if (path === '/' || path === '') return true;
+  const page = path.split('/').pop() || 'index.html';
+  return [
+    'index.html',
+    'about.html',
+    'kennisbank.html',
+    'kennisbank-artikel.html',
+    'privacybeleid.html',
+    'algemene-voorwaarden.html',
+    'cookiebeleid.html',
+    'spelregels.html',
+    'faq.html',
+    'hoe-het-werkt.html',
+    'pricing.html',
+    'stagebegeleiding.html',
+    '404.html',
+    'auth.html',
+    'internly-worldwide.html',
+    'la-sign.html',
+    'preview.html',
+    'esg-rapportage.html',
+    'esg-export.html',
+    'internly_simulator.html'
+  ].includes(page);
+})();
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    autoRefreshToken:   !_supabaseIsPublicPage,
+    persistSession:     true,
+    detectSessionInUrl: !_supabaseIsPublicPage,
+  }
+});
 window.db = db;
 
 // Gedeelde constante voor het notification-type bij meeting-uitnodigingen.
@@ -19,6 +67,52 @@ const MEETING_NOTIFICATION_TYPE = 'new_meeting';
    Removed dead helpers: getCurrentUser(), signUp(), getInternships(),
    applyToInternship() — each page uses its own inline db client.
    ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── STATE CLEANUP (Run 1.6) ────────────────────────────────────────────────
+   clearUserState() — verwijdert alle user-bound localStorage + sessionStorage
+   bij logout én pre-login. Voorkomt cross-account data-leak (bv.
+   internly_saved_vacatures van student A zichtbaar voor student B).
+
+   PROTECTED_KEYS blijven staan: cookie-consent, taal, en device-flags die
+   niet account-bound zijn.
+
+   Ontworpen op basis van Run 1.6 storage-inventarisatie:
+   - User-bound met _<userId> suffix: bbl_reflectie_draft, ld, ld_toelichting,
+     bbl_reflecties, bbl_bedrijf, student_postcode, buddy_optin, welcomed,
+     buddy_anon, buddy_paused
+   - NOT user-bound (cross-leak risk): saved_vacatures, show_vacatures,
+     referral_dismissed, demo_profiles
+   ─────────────────────────────────────────────────────────────────────────── */
+const PROTECTED_KEYS = [
+  'internly_consent',       // AVG cookie-consent — moet blijven
+  'internly_lang',          // UI-taal — device-pref
+  'internly_waitlist_seen', // publieke flag, niet account-bound
+  'internly_push_asked',    // browser-permission flag, device-bound
+];
+
+function clearUserState() {
+  // localStorage: verwijder alle internly_* en buddy_* keys behalve protected
+  const toRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    const isInternly = key.startsWith('internly_') || key.startsWith('buddy_');
+    if (isInternly && !PROTECTED_KEYS.includes(key)) {
+      toRemove.push(key);
+    }
+  }
+  toRemove.forEach(k => localStorage.removeItem(k));
+
+  // sessionStorage: volledig leeg
+  try { sessionStorage.clear(); } catch (_) {}
+
+  // In-memory globals
+  if (typeof window !== 'undefined') {
+    if (window.currentUser)    window.currentUser    = null;
+    if (window.currentProfile) window.currentProfile = null;
+  }
+}
+window.clearUserState = clearUserState;
 
 // Push helpers live in js/push.js — loaded by all app pages that need push.
 // index.html is a public landing page and does not register push notifications.
@@ -49,6 +143,8 @@ function initSessionTimeout() {
                    : (typeof supabase !== 'undefined') ? supabase
                    : null;
       if (client) await client.auth.signOut().catch(() => {});
+      // Run 1.6: state cleanup ook bij idle-timeout
+      try { clearUserState(); } catch (_) {}
       window.location.replace('auth.html?reason=timeout');
     }, SIGNOUT_MS);
   }

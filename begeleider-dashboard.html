@@ -754,6 +754,8 @@ function initSessionTimeout() {
     }, WARN_MS);
     signoutTimeout = setTimeout(async () => {
       await db.auth.signOut().catch(() => {});
+      // Run 1.6: state cleanup ook bij idle-timeout
+      if (typeof clearUserState === 'function') clearUserState();
       window.location.replace('auth.html?reason=timeout');
     }, SIGNOUT_MS);
   }

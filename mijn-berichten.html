@@ -864,8 +864,12 @@
       _isBBL = false;
     }
 
-    // Rol-aware top-nav header — werkt voor student én gepensioneerd
-    await renderRoleHeader(userRole, 'berichten', {
+    // Rol-aware top-nav header — werkt voor student (BOL/BBL) én gepensioneerd
+    // Run 1.5 v2 Issue 3: BBL student hoort student_bbl key (5 items, eigen
+    // nav-config in HEADER_NAV_BY_ROLE) — anders krijgt BBL Daan BOL-header (7
+    // items) wat visueel afwijkt van matchpool waar bbl_mode wel gedetecteerd wordt.
+    const headerRole = (userRole === 'student' && _isBBL) ? 'student_bbl' : userRole;
+    await renderRoleHeader(headerRole, 'berichten', {
       profile: { naam: prof?.naam || '' }
     });
 

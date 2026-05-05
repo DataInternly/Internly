@@ -2332,6 +2332,8 @@ async function signOut() {
   } catch (err) {
     console.error('[intl-dash] signOut fout:', err?.message || err);
   }
+  // Run 1.6: full state cleanup
+  if (typeof clearUserState === 'function') clearUserState();
   window.location.href = 'auth.html';
 }
 

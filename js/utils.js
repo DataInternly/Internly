@@ -402,7 +402,14 @@ async function performLogout() {
     if (!client) throw new Error('geen Supabase client beschikbaar');
     const { error } = await client.auth.signOut();
     if (error) throw error;
-    sessionStorage.clear();
+    // Run 1.6: clearUserState() vervangt losse sessionStorage.clear() en
+    // ruimt óók user-bound localStorage op (saved_vacatures, _<userId>-suffixed
+    // keys, etc.). Voorkomt cross-account leak.
+    if (typeof clearUserState === 'function') {
+      clearUserState();
+    } else {
+      sessionStorage.clear();
+    }
     __cachedUserRole = null;
     __cachedUserId   = null;
     if (typeof setApplying === 'function') { try { setApplying(false); } catch (_) {} }

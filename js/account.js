@@ -132,6 +132,8 @@ const AccountModule = (() => {
     }).eq('id', userId);
     if (error) throw error;
     await db.auth.signOut();
+    // Run 1.6: full state cleanup bij account-deletion verzoek
+    if (typeof clearUserState === 'function') clearUserState();
     notify(nl
       ? 'Verwijderverzoek ingediend — je account wordt binnen 30 dagen verwijderd'
       : 'Deletion request submitted — your account will be deleted within 30 days');

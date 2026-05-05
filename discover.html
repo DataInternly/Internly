@@ -1434,7 +1434,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   await renderStudentHeader({ activeTab: 'discover' });
   if (user) {
-    sessionStorage.setItem('internly_role', 'student'); // sync voor rest van pagina
+    // Run 1 cluster 4.7: sessionStorage forceer verwijderd.
+    // requireRole('student') op regel 1432 redirect non-students al weg, dus
+    // we hoeven de rol hier niet te overschrijven. auth.html zet de echte rol
+    // bij login (regel 963). Cross-pollination naar bedrijf-context bij chat
+    // → mijn-berichten flow is hiermee voorkomen.
 
     currentUser = user;
     // Laad postcode scoped op gebruiker (privacy — gedeeld apparaat)

@@ -401,7 +401,9 @@
   // ── Auth ──────────────────────────────────────────────────────────────────
   async function doSignOut() {
     await db.auth.signOut();
-    sessionStorage.removeItem('internly_role');
+    // Run 1.6: full state cleanup
+    if (typeof clearUserState === 'function') clearUserState();
+    else sessionStorage.removeItem('internly_role');
     setApplying(false);
     window.location.href = 'auth.html';
   }
