@@ -331,3 +331,61 @@ Implementatie: Supabase Edge Function + database trigger op reviews.
 Nooit de vertaaltabel verwijderen.
 Nooit de codenamen in CLAUDE.md vervangen
 door de echte namen — de tabel is de brug.
+
+## ClearUserState helper (Run 1.6)
+
+`js/supabase.js` definieert `clearUserState()` als globale helper voor
+consistente state-cleanup bij logout én pre-login. Voorkomt cross-account
+data-leak (bv. internly_saved_vacatures van student A zichtbaar bij
+student B).
+
+PROTECTED_KEYS — NIET wissen:
+- internly_consent       — AVG cookie-consent
+- internly_lang          — UI-taal preference
+- internly_waitlist_seen — publieke flag (niet account-bound)
+- internly_push_asked    — browser-permission flag (device-bound)
+
+Wanneer aanroepen:
+- ALTIJD na `db.auth.signOut()`
+- ALTIJD vóór `db.auth.signInWithPassword()` (paranoid pre-login clean)
+- Na session-timeout (idle 20 min)
+- Na account-delete (deletion_requested flow)
+
+Patroon — logout:
+```javascript
+await db.auth.signOut();
+clearUserState();
+window.location.href = 'auth.html';
+```
+
+Patroon — pre-login (auth.html doLogin):
+```javascript
+clearUserState();
+const { data, error } = await db.auth.signInWithPassword({ email, password });
+```
+
+Niet handmatig `localStorage.clear()` doen — dat wist ook PROTECTED_KEYS.
+performLogout() in js/utils.js gebruikt clearUserState() automatisch.
+
+## smartHomeRedirect — waar wel en waar niet (Bedward sign-off 5 mei 2026)
+
+**Verboden op publieke pagina's** (Bedward P2):
+- index, about, pricing, kennisbank, kennisbank-artikel, faq, hoe-het-werkt,
+  privacybeleid, spelregels, cookiebeleid, algemene-voorwaarden,
+  stagebegeleiding, internly-worldwide, 404, preview, esg-rapportage,
+  esg-export, internly_simulator
+- Reden: smartHomeRedirect roept `getSession()` aan. Bij refresh-failure
+  triggert SIGNED_OUT en wist sb-auth-token. Op publieke pagina's mag de
+  gebruiker daar niet door uitloggen.
+- Run 1: logo-handlers vervangen door `<a href="index.html">` op
+  about / pricing / faq.
+
+**Toegestaan op ingelogde pagina's** (12 files):
+- admin, bbl-profile, begeleider-dashboard, bol-profile, buddy-dashboard,
+  company-dashboard, company-discover, match-dashboard, review-form,
+  school-dashboard, vacature-detail, international-*
+- Reden: gebruiker is al ingelogd. Logo-klik → smart redirect naar role-
+  landing is gewenst gedrag. SIGNED_OUT zou hier hoe dan ook auth.html
+  triggeren.
+
+Sign-off Bedward 5 mei 2026: acceptabel patroon op ingelogde pagina's.
