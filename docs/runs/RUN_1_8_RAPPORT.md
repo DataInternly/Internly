@@ -147,3 +147,81 @@ opens == closes per file                                      PASS
 ---
 
 **Run 1.8 status: GEÏMPLEMENTEERD — wacht op Barry's smoke-test op localhost en daarna FTP.**
+
+---
+
+## RUN 1.8-bis — Minibar voor sidebar-rollen (5 mei 2026)
+
+**Trigger:** Reid2 ontdekte dat `HEADER_NAV_BY_ROLE` (js/utils.js:678) alleen `student`, `student_bbl`, `gepensioneerd` kent. Voor `bedrijf`/`school`/`begeleider`/`admin` crashte `renderRoleHeader` met `unknown role` warn → fallback naar publieke header → ingelogde user zag "uitgelogd" UI.
+
+**Picard2-beslissing:** Optie B (mini-bar pattern) — sidebar-architectuur op eigen dashboards (Type C/D per spec) blijft intact, op publieke pagina's krijgen sidebar-rollen een minimale strip met logo + naam + rol-pill + Dashboard-link + Logout-knop.
+
+### Implementatie
+
+Hybrid-script in alle 11 publieke pagina's vervangen met versie die rol-splitst:
+
+```js
+const ROLES_WITH_TOPBAR  = ['student', 'student_bbl', 'gepensioneerd'];
+const ROLES_WITH_MINIBAR = ['bedrijf', 'school', 'begeleider', 'admin'];
+
+if (ROLES_WITH_TOPBAR.includes(role)) {
+  // bestaande renderRoleHeader pad
+} else if (ROLES_WITH_MINIBAR.includes(role)) {
+  // mini-bar HTML met logo + naam + rol-pill + Dashboard-link + Logout
+}
+```
+
+**Mini-bar HTML** (inline-styled, donker thema #0d1520, logo links + actie-cluster rechts):
+- Logo intern·ly (klikbaar, linkt naar role-dashboard)
+- Tekst "Ingelogd als [naam]"
+- Rol-pill (Bedrijf / School / Begeleider / Admin)
+- "→ Dashboard" knop (linkt naar role-dashboard)
+- "Uitloggen" button (gebruikt `window.clearUserState()` indien aanwezig)
+
+### Afwijking van plan-spec
+
+Plan-spec topbar-pad gebruikte `{ container: publicHeader }` — werkt niet, `renderRoleHeader` leest `opts.containerId` (string-id), geen DOM-element. Ik gebruik werkende `publicHeader.id = 'role-header'` + default-container-pad zoals in eerste Run 1.8 versie. Geen wijziging aan plan-spec minibar-pad.
+
+### Verificatie
+
+```
+=== ROLES_WITH_TOPBAR + ROLES_WITH_MINIBAR per pagina ===
+all 11 pages: minibar=3 (constant + 2 referenties), topbar=2 (constant + 1 ref)   PASS
+
+=== Script-tag balance ===
+opens == closes per file                                                          PASS
+```
+
+### Files gewijzigd: 11 (identiek aan Run 1.8)
+
+about, pricing, faq, kennisbank, hoe-het-werkt, spelregels, privacybeleid, cookiebeleid, algemene-voorwaarden, esg-rapportage, internly-worldwide.
+
+### Smoke-test toevoeging voor Barry
+
+#### Test 7 — Bedrijf op publieke pagina (Run 1.8-bis specifiek)
+1. Login als bedrijf (bedrijf@internly.pro)
+2. Klik in nav → about.html
+3. **Verwacht:** mini-bar bovenaan met "intern·ly" logo + "Ingelogd als [naam]" + "BEDRIJF" pill + "→ Dashboard" + "Uitloggen"
+4. NIET de publieke header met "Inloggen" knop
+
+#### Test 8 — School op faq
+1. Login als school
+2. Klik faq
+3. **Verwacht:** zelfde mini-bar maar pill = "SCHOOL", Dashboard-link = school-dashboard.html
+
+#### Test 9 — Logout-knop in mini-bar
+1. Klik "Uitloggen" in mini-bar
+2. **Verwacht:** clearUserState() wordt aangeroepen + signOut + redirect naar index.html
+3. localStorage check: internly_*-keys gewist (PROTECTED_KEYS blijven)
+
+### Backlog-toevoegingen (Hotch2-flag, NIET nu fixen)
+
+Buddy-dashboard 400-errors uit productie-smoke:
+- waitlist GET 400 (selectkolommen mismatch?)
+- student_profiles.zoekt_buddy 400
+- profiles.open_to_international kolom bestaat niet
+- student_profiles.niveau kolom bestaat niet
+
+→ Schema-audit nodig op buddy-dashboard.html en js/buddy.js — Run 2 of separate.
+
+**Run 1.8-bis status: GEÏMPLEMENTEERD — wacht op smoke-test 7-9.**

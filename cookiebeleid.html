@@ -504,29 +504,72 @@ strong{font-weight:600; color: var(--fg-primary);}
 <script src="js/utils.js"></script>
 <script src="js/consent.js" defer></script>
 
-<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users -->
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
+     Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
+     (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
 (async () => {
   try {
     if (typeof db === 'undefined') return;
     const { data: { user } } = await db.auth.getUser();
     if (!user) return;
+
     const { data: profile } = await db
       .from('profiles').select('role, naam').eq('id', user.id).maybeSingle();
     if (!profile?.role) return;
+
     let role = profile.role;
     if (role === 'student') {
       const { data: sp } = await db
         .from('student_profiles').select('bbl_mode').eq('profile_id', user.id).maybeSingle();
       if (sp?.bbl_mode === true) role = 'student_bbl';
     }
-    const publicHeader = document.querySelector('header, nav.topbar, .public-header');
+
+    const publicHeader = document.querySelector('.public-header, header');
     if (!publicHeader) return;
-    if (typeof renderRoleHeader === 'function') {
+
+    const ROLES_WITH_TOPBAR  = ['student', 'student_bbl', 'gepensioneerd'];
+    const ROLES_WITH_MINIBAR = ['bedrijf', 'school', 'begeleider', 'admin'];
+
+    if (ROLES_WITH_TOPBAR.includes(role)) {
       publicHeader.id = 'role-header';
       publicHeader.className = 'role-header';
-      await renderRoleHeader(role, null, { profile: { naam: profile.naam || '' } });
+      if (typeof renderRoleHeader === 'function') {
+        await renderRoleHeader(role, null, { profile: { naam: profile.naam || '' } });
+      }
+    } else if (ROLES_WITH_MINIBAR.includes(role)) {
+      const dashboardMap = {
+        bedrijf:    'company-dashboard.html',
+        school:     'school-dashboard.html',
+        begeleider: 'begeleider-dashboard.html',
+        admin:      'admin.html',
+      };
+      const roleLabels = {
+        bedrijf:    'Bedrijf',
+        school:     'School',
+        begeleider: 'Begeleider',
+        admin:      'Admin',
+      };
+      const dash = dashboardMap[role] || 'index.html';
+      const naam = (profile.naam || user.email || '').split('@')[0];
+      const escapedNaam = naam.replace(/[<>"&]/g, c => ({'<':'&lt;','>':'&gt;','"':'&quot;','&':'&amp;'}[c]));
+
+      publicHeader.innerHTML = `
+        <div class="hybrid-minibar" style="display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:#0d1520;color:#fff;font-family:'Outfit',sans-serif;font-size:14px;">
+          <a href="${dash}" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:18px;color:#fff;text-decoration:none;letter-spacing:-.02em;">
+            intern<span style="color:#e05c1a">ly</span>
+          </a>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
+            <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
+            <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
+          </div>
+        </div>
+      `;
+      publicHeader.className = 'hybrid-minibar-wrapper';
     }
+    // role onbekend → publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }
