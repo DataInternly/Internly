@@ -684,6 +684,11 @@ async function loadBuddyProfile() {
 function populateBuddyProfile(form, data) {
   if (!form || !data) return;
 
+  // Run 2 6.7 — naam-input prefill (canonical: profiles.naam)
+  // data.naam komt uit het buddy_profiles SELECT met fallback-cascade upstream
+  const naam = form.querySelector('#bp-naam');
+  if (naam && data.naam) naam.value = data.naam;
+
   // RUN2 — drie nieuwe velden
   const pitch = form.querySelector('#bp-pitch');
   if (pitch && data.pitch) pitch.value = data.pitch;
@@ -727,12 +732,16 @@ function prefillBuddyForm(data) {
 window.prefillBuddyForm = prefillBuddyForm;
 
 function collectBuddyProfileData(form) {
+  // Run 2 6.7 — naam wordt apart afgehandeld in saveBuddyProfile
+  // (canonical UPDATE op profiles, NIET in buddy_profiles upsert payload)
+  const naam        = (form.querySelector('#bp-naam')?.value        || '').trim();
   // Drie nieuwe content-velden (mockup-mapping 1 mei 2026 — RUN2)
   const pitch       = (form.querySelector('#bp-pitch')?.value       || '').trim();
   const achtergrond = (form.querySelector('#bp-achtergrond')?.value || '').trim();
   const bio         = (form.querySelector('#bp-bio')?.value         || '').trim();
 
   return {
+    naam:                 naam        || null,  // separate write target, niet in buddy_profiles upsert
     pitch:                pitch       || null,
     achtergrond:          achtergrond || null,
     bio:                  bio         || null,
@@ -796,9 +805,24 @@ async function saveBuddyProfile(formData) {
   const { data: { user } } = await db.auth.getUser();
   if (!user) { notify('Niet ingelogd', false); return; }
 
+  // Run 2 6.7 — split naam-write: profiles.naam is canonical, niet buddy_profiles
+  const { naam, ...buddyFields } = formData;
+
+  if (naam) {
+    const { error: nameErr } = await db
+      .from('profiles')
+      .update({ naam })
+      .eq('id', user.id);
+    if (nameErr) {
+      notify('Naam opslaan mislukt — probeer opnieuw', false);
+      console.error('[buddy-dash] saveBuddyProfile naam-update fout:', nameErr.message);
+      return;
+    }
+  }
+
   const payload = {
     profile_id: user.id,
-    ...formData,
+    ...buddyFields,
     avatar_key: window._internlyAvatarKey || null
   };
 

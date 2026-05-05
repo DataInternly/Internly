@@ -1637,7 +1637,10 @@
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
-    const buddyPairId = params.get('buddy_pair_id');
+    // Run 2 4.3 — accepteer beide varianten voor legacy-bookmarks
+    // (bbl-hub.html gebruikte voorheen ?buddy_pair= zonder _id; nu gefixt
+    //  maar legacy-links + cached browser-bookmarks moeten blijven werken)
+    const buddyPairId = params.get('buddy_pair_id') || params.get('buddy_pair');
 
     // ── Laag 2: match partij guard (alleen bij directe match URL) ──
     if (matchId && !buddyPairId) {
