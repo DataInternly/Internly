@@ -249,24 +249,8 @@
       document.getElementById('sh-meta').textContent =
         [sp.opleiding, sp.school].filter(Boolean).join(' · ') || 'Internly · Jouw stageplek';
 
-      // Gewogen completeness — verplichte velden tellen mee maar geven geen suggestie.
-      // Optionele velden hebben impact-tekst die als aanvulsuggestie wordt getoond.
-      const _cVelden = [
-        { key: 'naam',            gewicht: 10, impact: null },
-        { key: 'opleiding',       gewicht: 10, impact: null },
-        { key: 'school',          gewicht: 10, impact: null },
-        { key: 'opdracht_domein', gewicht: 30, impact: 'Bepaalt jouw matches' },
-        { key: 'postcode',        gewicht: 15, impact: 'Schakelt reistijd-filter in' },
-        { key: 'motivatie',       gewicht: 15, impact: 'Bedrijven lezen dit als eerste' },
-        { key: 'skills',          gewicht: 10, impact: 'Toont jouw vaardigheden' },
-      ];
-      const _heeftWaarde = (v) => v &&
-        (Array.isArray(v) ? v.length > 0 : String(v).trim().length > 0);
-      const _totaal  = _cVelden.reduce((s, v) => s + v.gewicht, 0);
-      const _behaald = _cVelden
-        .filter(v => _heeftWaarde(sp[v.key]))
-        .reduce((s, v) => s + v.gewicht, 0);
-      const pct = Math.round((_behaald / _totaal) * 100);
+      // Gewogen completeness via centrale helper (js/utils.js).
+      const pct = window.calculateProfileCompleteness('student', sp);
 
       if (pct < 100) {
         document.getElementById('sh-pct').textContent = pct;
@@ -274,12 +258,12 @@
         document.getElementById('sh-progress-wrap').style.display = '';
       }
 
-      const _ontbrekend = _cVelden.filter(v => v.impact && !_heeftWaarde(sp[v.key]));
+      const _ontbrekend = window.getCompletenessSuggestions('student', sp);
       if (_ontbrekend.length > 0) {
         const _sugEl = document.getElementById('sh-suggesties');
         if (_sugEl) {
           _sugEl.style.display = '';
-          _sugEl.innerHTML = _ontbrekend.slice(0, 2).map(v => `
+          _sugEl.innerHTML = _ontbrekend.map(v => `
             <a href="bol-profile.html" class="sh-suggestie">
               <span>+ ${v.impact}</span><span>→</span>
             </a>

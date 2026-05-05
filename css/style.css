@@ -2698,6 +2698,29 @@ footer.kb-shared-footer {
 .rl-completeness-fill {
   height: 100%; background: var(--c-green, #1a7a48); transition: width .3s;
 }
+.rl-completeness-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: .65rem;
+}
+.rl-completeness-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem .85rem;
+  border-radius: 8px;
+  background: rgba(26,122,72,.08);
+  border: 1px solid rgba(26,122,72,.15);
+  text-decoration: none;
+  font-size: .82rem;
+  color: var(--green, #1a7a48);
+  font-weight: 500;
+  transition: background .12s;
+}
+.rl-completeness-suggestion:hover {
+  background: rgba(26,122,72,.15);
+}
 
 .rl-actions {
   display: grid;

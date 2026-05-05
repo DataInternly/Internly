@@ -733,14 +733,21 @@
 
           const { data: schoolProfile } = await db
             .from('school_profiles')
-            .select('schoolnaam, contactpersoon, locatie, opleidingen')
+            .select('schoolnaam, contactpersoon, locatie, opleidingen, avatar_key')
             .eq('profile_id', user.id)
             .maybeSingle();
 
           const data = {
             naam: schoolProfile?.contactpersoon || profile.naam,
             schoolnaam: schoolProfile?.schoolnaam,
+            contactpersoon: schoolProfile?.contactpersoon,
+            locatie: schoolProfile?.locatie,
+            opleidingen: schoolProfile?.opleidingen,
+            avatar_key: schoolProfile?.avatar_key,
           };
+          data.profile_completeness = window.calculateProfileCompleteness('school', data);
+          data.completeness_suggestions = window.getCompletenessSuggestions('school', data);
+          data.profile_edit_url = '#';
 
           const anchor = document.getElementById('school-welcome-anchor');
           if (!anchor) return;

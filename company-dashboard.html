@@ -756,7 +756,7 @@
 
           const { data: companyProfile } = await db
             .from('company_profiles')
-            .select('bedrijfsnaam, sector, size, trust_score, trust_grade')
+            .select('bedrijfsnaam, sector, size, trust_score, trust_grade, website, beschrijving, avatar_key, remote_possible')
             .eq('profile_id', user.id)
             .maybeSingle();
 
@@ -769,9 +769,17 @@
 
           const data = {
             naam: companyProfile?.bedrijfsnaam || profile.naam,
+            bedrijfsnaam: companyProfile?.bedrijfsnaam,
             sector: companyProfile?.sector,
             size: companyProfile?.size,
+            website: companyProfile?.website,
+            beschrijving: companyProfile?.beschrijving,
+            avatar_key: companyProfile?.avatar_key,
+            remote_possible: companyProfile?.remote_possible,
           };
+          data.profile_completeness = window.calculateProfileCompleteness('bedrijf', data);
+          data.completeness_suggestions = window.getCompletenessSuggestions('bedrijf', data);
+          data.profile_edit_url = '#';
 
           const anchor = document.getElementById('company-welcome-anchor');
           if (!anchor) return;

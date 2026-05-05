@@ -520,6 +520,82 @@ function escapeHtml(str) {
 }
 
 /**
+ * Check of een waarde "ingevuld" is voor profile completeness.
+ * Strings: trim niet-leeg. Arrays: minstens 1 item. Numbers: truthy. Boolean: truthy.
+ */
+function _heeftWaarde(v) {
+  if (v === null || v === undefined) return false;
+  if (Array.isArray(v)) return v.length > 0;
+  if (typeof v === 'string') return v.trim().length > 0;
+  return Boolean(v);
+}
+
+/**
+ * Profile completeness wegingen per rol.
+ * Som per rol = 100. opdracht_domein/beschrijving=30 zijn primary drivers.
+ * impact=null voor velden zonder suggestie-CTA (typisch verplicht).
+ */
+const COMPLETENESS_CONFIG = {
+  student: [
+    { key: 'naam',            gewicht: 10, impact: null },
+    { key: 'opleiding',       gewicht: 10, impact: null },
+    { key: 'school',          gewicht: 10, impact: null },
+    { key: 'opdracht_domein', gewicht: 30, impact: 'Bepaalt jouw matches' },
+    { key: 'postcode',        gewicht: 15, impact: 'Schakelt reistijd-filter in' },
+    { key: 'motivatie',       gewicht: 15, impact: 'Bedrijven lezen dit als eerste' },
+    { key: 'skills',          gewicht: 10, impact: 'Toont jouw vaardigheden' },
+  ],
+  bedrijf: [
+    { key: 'bedrijfsnaam',    gewicht: 10, impact: null },
+    { key: 'sector',          gewicht: 15, impact: null },
+    { key: 'size',            gewicht: 10, impact: 'Studenten zien jouw schaal' },
+    { key: 'website',         gewicht: 15, impact: 'Vergroot vertrouwen' },
+    { key: 'beschrijving',    gewicht: 30, impact: 'Studenten lezen dit als eerste' },
+    { key: 'avatar_key',      gewicht: 10, impact: 'Logo verhoogt herkenbaarheid' },
+    { key: 'remote_possible', gewicht: 10, impact: 'Filtert op werkomgeving' },
+  ],
+  school: [
+    { key: 'schoolnaam',     gewicht: 25, impact: null },
+    { key: 'contactpersoon', gewicht: 25, impact: null },
+    { key: 'locatie',        gewicht: 15, impact: 'Studenten zien regio' },
+    { key: 'opleidingen',    gewicht: 25, impact: 'Bepaalt welke studenten matchen' },
+    { key: 'avatar_key',     gewicht: 10, impact: 'Logo verhoogt herkenbaarheid' },
+  ],
+};
+
+/**
+ * Bereken profile completeness percentage (0-100) voor een rol.
+ * student_bbl gebruikt student-config.
+ * Returns 0 bij onbekende rol of ontbrekende profileData.
+ */
+function calculateProfileCompleteness(role, profileData) {
+  const configKey = (role === 'student_bbl') ? 'student' : role;
+  const config = COMPLETENESS_CONFIG[configKey];
+  if (!config || !profileData) return 0;
+  const totaal  = config.reduce((s, v) => s + v.gewicht, 0);
+  const behaald = config
+    .filter(v => _heeftWaarde(profileData[v.key]))
+    .reduce((s, v) => s + v.gewicht, 0);
+  return Math.round((behaald / totaal) * 100);
+}
+window.calculateProfileCompleteness = calculateProfileCompleteness;
+
+/**
+ * Geef top 2 niet-ingevulde optionele velden met impact-tekst.
+ * Returns array van { key, impact } objecten, max 2.
+ */
+function getCompletenessSuggestions(role, profileData) {
+  const configKey = (role === 'student_bbl') ? 'student' : role;
+  const config = COMPLETENESS_CONFIG[configKey];
+  if (!config || !profileData) return [];
+  return config
+    .filter(v => v.impact && !_heeftWaarde(profileData[v.key]))
+    .slice(0, 2)
+    .map(v => ({ key: v.key, impact: v.impact }));
+}
+window.getCompletenessSuggestions = getCompletenessSuggestions;
+
+/**
  * Find the public-header element on a public page.
  *
  * Selector strategy (no generic `header` fallback — voorkomt accidental
@@ -873,14 +949,25 @@ function renderRoleLanding(role, profileData = {}) {
   };
   const meta = metaRegelMap[role] || '';
 
-  // Profile completeness als beschikbaar
+  // Profile completeness als beschikbaar — alleen tonen bij <100%
   const completeness = profileData.profile_completeness;
-  const completenessHtml = (typeof completeness === 'number') ? `
+  const suggestions = profileData.completeness_suggestions || [];
+  const profileEditUrl = profileData.profile_edit_url || '#';
+  const completenessHtml = (typeof completeness === 'number' && completeness < 100) ? `
     <div class="rl-completeness">
       <div class="rl-completeness-label">Profiel ${completeness}% compleet</div>
       <div class="rl-completeness-bar">
         <div class="rl-completeness-fill" style="width:${completeness}%"></div>
       </div>
+      ${Array.isArray(suggestions) && suggestions.length > 0 ? `
+        <div class="rl-completeness-suggestions">
+          ${suggestions.map(s => `
+            <a href="${profileEditUrl}" class="rl-completeness-suggestion">
+              <span>+ ${escapeHtml(s.impact)}</span><span aria-hidden="true">→</span>
+            </a>
+          `).join('')}
+        </div>
+      ` : ''}
     </div>
   ` : '';
 

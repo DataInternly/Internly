@@ -722,7 +722,7 @@
 
       const { data: studentProfile } = await db
         .from('student_profiles')
-        .select('opleiding, jaar, school, opdracht_domein, motivatie, skills, bbl_mode')
+        .select('opleiding, jaar, school, opdracht_domein, motivatie, skills, bbl_mode, postcode')
         .eq('profile_id', user.id)
         .maybeSingle();
 
@@ -732,7 +732,15 @@
         naam: profile.naam,
         opleiding: studentProfile.opleiding,
         jaar: studentProfile.jaar,
+        school: studentProfile.school,
+        opdracht_domein: studentProfile.opdracht_domein,
+        postcode: studentProfile.postcode,
+        motivatie: studentProfile.motivatie,
+        skills: studentProfile.skills,
       };
+      data.profile_completeness = window.calculateProfileCompleteness('student_bbl', data);
+      data.completeness_suggestions = window.getCompletenessSuggestions('student_bbl', data);
+      data.profile_edit_url = 'bbl-profile.html';
 
       const anchor = document.getElementById('bbl-welcome-anchor');
       if (!anchor) return;
