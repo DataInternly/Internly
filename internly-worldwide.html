@@ -1802,7 +1802,7 @@
       if (sp?.bbl_mode === true) role = 'student_bbl';
     }
 
-    const publicHeader = document.querySelector('.public-header, header');
+    const publicHeader = document.querySelector('nav.topbar, header.public-header, header, .public-header');
     if (!publicHeader) return;
 
     const ROLES_WITH_TOPBAR  = ['student', 'student_bbl', 'gepensioneerd'];
