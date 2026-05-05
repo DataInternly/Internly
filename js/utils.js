@@ -520,6 +520,27 @@ function escapeHtml(str) {
 }
 
 /**
+ * Find the public-header element on a public page.
+ *
+ * Selector strategy (no generic `header` fallback — voorkomt accidental
+ * matches op <header class="hero"> en vergelijkbaar):
+ *  1. [data-public-header]   — canonical, future-proof
+ *  2. nav.public-nav         — preferred class voor nieuwe pagina's
+ *  3. nav.topbar             — legacy, behouden voor backwards-compat
+ *  4. header.public-header   — legacy, behouden voor backwards-compat
+ *
+ * Returns null if no match — script-block returnt dan veilig early.
+ *
+ * Werkt op nav, header, div, of elk element met data-public-header attribuut.
+ */
+function findPublicHeader() {
+  return document.querySelector(
+    '[data-public-header], nav.public-nav, nav.topbar, header.public-header'
+  );
+}
+window.findPublicHeader = findPublicHeader;
+
+/**
  * Disable a button or trigger element while an async operation runs.
  * Re-enables on success or error. Use to prevent double-submit.
  *

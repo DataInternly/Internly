@@ -628,7 +628,7 @@
 <body>
 
 <!-- TOPBAR -->
-<nav class="topbar">
+<nav class="topbar" data-public-header>
   <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
   <div class="topbar-nav">
     <a href="discover.html">Vacatures</a>
@@ -1136,7 +1136,9 @@ window.addEventListener('load', function() {
       if (sp?.bbl_mode === true) role = 'student_bbl';
     }
 
-    const publicHeader = document.querySelector('nav.topbar, header.public-header, header, .public-header');
+    const publicHeader = (typeof findPublicHeader === 'function')
+      ? findPublicHeader()
+      : document.querySelector('[data-public-header], nav.public-nav, nav.topbar, header.public-header');
     if (!publicHeader) return;
 
     const ROLES_WITH_TOPBAR  = ['student', 'student_bbl', 'gepensioneerd'];

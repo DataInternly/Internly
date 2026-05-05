@@ -562,7 +562,7 @@
 <body>
 
 <!-- ── Nav ── -->
-<nav class="esg-nav" aria-label="Paginanavigatie">
+<nav class="esg-nav" aria-label="Paginanavigatie" data-public-header>
   <a href="/" class="esg-nav-logo">intern<span>ly</span></a>
   <span class="esg-nav-label">ESG &amp; Rapportage</span>
   <a href="/auth.html" class="esg-nav-login">Inloggen</a>
@@ -899,7 +899,9 @@
       if (sp?.bbl_mode === true) role = 'student_bbl';
     }
 
-    const publicHeader = document.querySelector('nav.topbar, header.public-header, header, .public-header');
+    const publicHeader = (typeof findPublicHeader === 'function')
+      ? findPublicHeader()
+      : document.querySelector('[data-public-header], nav.public-nav, nav.topbar, header.public-header');
     if (!publicHeader) return;
 
     const ROLES_WITH_TOPBAR  = ['student', 'student_bbl', 'gepensioneerd'];

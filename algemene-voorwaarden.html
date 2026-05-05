@@ -316,7 +316,7 @@ strong{font-weight:600; color: var(--fg-primary);}
 <body>
 
 <!-- HEADER -->
-<header class="header">
+<header class="header" data-public-header>
   <a class="logo" href="index.html">intern<span class="logo-ly">ly</span></a>
   <a class="back" href="index.html" onclick="if(document.referrer)event.preventDefault(),history.back()">← Terug</a>
 </header>
@@ -503,7 +503,9 @@ strong{font-weight:600; color: var(--fg-primary);}
       if (sp?.bbl_mode === true) role = 'student_bbl';
     }
 
-    const publicHeader = document.querySelector('nav.topbar, header.public-header, header, .public-header');
+    const publicHeader = (typeof findPublicHeader === 'function')
+      ? findPublicHeader()
+      : document.querySelector('[data-public-header], nav.public-nav, nav.topbar, header.public-header');
     if (!publicHeader) return;
 
     const ROLES_WITH_TOPBAR  = ['student', 'student_bbl', 'gepensioneerd'];
