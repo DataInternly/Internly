@@ -809,15 +809,23 @@ async function saveBuddyProfile(formData) {
   const { naam, ...buddyFields } = formData;
 
   if (naam) {
-    const { error: nameErr } = await db
+    console.log('[buddy-dash] saveBuddyProfile naam-update payload:', { naam, user_id: user.id });
+    const { data: updated, error: nameErr } = await db
       .from('profiles')
       .update({ naam })
-      .eq('id', user.id);
+      .eq('id', user.id)
+      .select('id, naam');
     if (nameErr) {
       notify('Naam opslaan mislukt — probeer opnieuw', false);
       console.error('[buddy-dash] saveBuddyProfile naam-update fout:', nameErr.message);
       return;
     }
+    if (!updated || updated.length === 0) {
+      notify('Naam niet opgeslagen — profiel ontbreekt of geblokkeerd', false);
+      console.error('[buddy-dash] profiles UPDATE raakte 0 rijen voor user', user.id);
+      return;
+    }
+    console.log('[buddy-dash] naam-update success:', updated);
   }
 
   const payload = {
