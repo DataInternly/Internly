@@ -697,11 +697,11 @@ const HEADER_NAV_BY_ROLE = {
     { id: 'buddy',        label: 'Buddy',           href: 'matches.html?view=buddy',  icon: '🤝' },
   ],
   gepensioneerd: [
-    { id: 'overzicht',    label: 'Overzicht',       href: '#section-overzicht', icon: '🏠' },
-    { id: 'matches',      label: 'Mijn matches',    href: '#section-matches',   icon: '🤝' },
+    { id: 'overzicht',    label: 'Overzicht',       href: 'buddy-dashboard.html#section-overzicht', icon: '🏠' },
+    { id: 'matches',      label: 'Mijn matches',    href: 'buddy-dashboard.html#section-matches',   icon: '🤝' },
     { id: 'berichten',    label: 'Mijn berichten',  href: 'mijn-berichten.html', icon: '💬' },
     { id: 'notities',     label: 'Mijn notities',   href: 'mijn-notities.html',  icon: '📓' },
-    { id: 'profiel',      label: 'Mijn profiel',    href: '#section-profiel',   icon: '👤' },
+    { id: 'profiel',      label: 'Mijn profiel',    href: 'buddy-dashboard.html#section-profiel',   icon: '👤' },
   ],
   // Toekomstige rollen krijgen hier hun eigen nav-config.
   // company / school behouden hun bestaande sidebar-pattern.
