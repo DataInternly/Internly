@@ -1,5 +1,39 @@
 # HANDOVER
 
+## Run 5 — ILY-LITE Foundation (6 mei 2026)
+
+### Voltooid (8 commits)
+- 5.A   Foundation        17bac95   utils.js + style.css
+- 5.B   Auth backfill     a2fe6b5   auth.html
+- 5.D-1 BOL + BBL         3dfabac   bol/bbl-profile.html
+- 5.D-2 School + begel.   020ee69   school/begeleider-dashboard
+- 5.D-3 Int'l student/sch 6272c21   international-*.html
+- 5.D-4 HBO/WO + default  e8ac77f   student-profile.html (scope-fix)
+- 5.D-5 bbl-profile CSS   654e28d   format-bug fix
+- 5.D-6 BBL nav Profiel   e2526b3   nav scope-fix
+
+### Wat werkt nu
+- ILY-code widget rendert op 7 user-types (BOL/BBL/HBO/WO/
+  default/School/Begeleider/Int'l-student/Int'l-school)
+- BBL nav heeft Profiel-tab (vervangt Kennisbank)
+- Hick's Law contract intact (5 items)
+- Format CSS gefixt op bbl-profile.html
+- Alle test-accounts kunnen ILY-code zien
+
+### Open (vandaag nog)
+- Atomic Burn 1: items 11+14+18 (item 13 al klaar)
+- Coming Soon overlay 3 rollen (rol-specifiek)
+- FTP upload + live verify
+- git push final
+
+### Pre-existing issues (BACKLOG)
+- mijn-berichten.html geen kennisbank-link (NAV-01 sprint)
+- bbl-dashboard.html activeTab='matches' (geen tab) anomaly
+- match-dashboard.html activeTab='hub' (geen tab) anomaly
+- bbl-hub.html div imbalance 228/227 (pre-existing)
+- Profile edit-to-view + avatar (eerder gemeld)
+- student-profile.html toont edit-form bij gevuld profiel
+
 ## RUN 1 STATUS — 5 mei 2026
 
 - **Status:** KLAAR voor smoke-test/deploy
