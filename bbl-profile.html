@@ -291,6 +291,9 @@
       <button class="btn-edit" onclick="showForm()">✏️ Bewerken</button>
     </div>
 
+    <!-- ILY-code widget container (Run 5) -->
+    <div id="ily-code-widget-container"></div>
+
     <div class="overview-card">
       <div class="ov-head">
         <div>
@@ -760,6 +763,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   } else {
     // Nieuw profiel — toon formulier direct
     document.getElementById('view-form').style.display = 'block';
+  }
+
+  // ILY-code ophalen (Run 5)
+  const { data: ilyProfile, error: ilyErr } = await db
+    .from('profiles')
+    .select('ily_code')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (ilyErr) {
+    console.warn('[ily] code-fetch fout:', ilyErr.message);
+  }
+
+  const ilyContainer = document.getElementById('ily-code-widget-container');
+  if (ilyContainer && ilyProfile?.ily_code) {
+    ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
   }
 
   InternlyCalendar.render('ical-container', db, user.id);

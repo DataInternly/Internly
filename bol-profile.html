@@ -444,6 +444,9 @@
       <button onclick="toonFormulier()" class="btn-ghost">✏️ Profiel bewerken</button>
     </div>
 
+    <!-- ILY-code widget container (Run 5) -->
+    <div id="ily-code-widget-container"></div>
+
     <div class="sec-label">Basisgegevens</div>
     <div class="card" style="margin-bottom:16px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -1459,6 +1462,22 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (pcField && !pcField.value) pcField.value = savedPc;
     }
     updateUIForCreateMode();
+  }
+
+  // ILY-code ophalen (Run 5)
+  const { data: ilyProfile, error: ilyErr } = await db
+    .from('profiles')
+    .select('ily_code')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (ilyErr) {
+    console.warn('[ily] code-fetch fout:', ilyErr.message);
+  }
+
+  const ilyContainer = document.getElementById('ily-code-widget-container');
+  if (ilyContainer && ilyProfile?.ily_code) {
+    ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
   }
 
   InternlyCalendar.render('ical-container', db, user.id);
