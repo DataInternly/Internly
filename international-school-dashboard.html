@@ -532,6 +532,9 @@
       <div class="page-title">Institution</div>
       <p class="page-sub">Your institution's profile on Internly Worldwide.</p>
 
+      <!-- ILY-code widget container (Run 5) -->
+      <div id="ily-code-widget-container" lang="nl"></div>
+
       <div class="form-card">
         <div class="form-section-title">Institution</div>
         <div class="field">
@@ -633,6 +636,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderStudents();
     renderSigningList();
     updateSigningBadge();
+
+    // ILY-code ophalen (Run 5)
+    const { data: ilyProfile, error: ilyErr } = await db
+      .from('profiles')
+      .select('ily_code')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (ilyErr) {
+      console.warn('[ily] code-fetch fout:', ilyErr.message);
+    }
+
+    const ilyContainer = document.getElementById('ily-code-widget-container');
+    if (ilyContainer && ilyProfile?.ily_code) {
+      ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
+    }
 
     show('students');
   } catch (err) {

@@ -873,6 +873,9 @@
       <div class="page-title">Your profile</div>
       <p class="page-sub">Companies and universities use this to assess your fit. Keep it accurate.</p>
 
+      <!-- ILY-code widget container (Run 5) -->
+      <div id="ily-code-widget-container" lang="nl"></div>
+
       <div class="form-card">
         <div class="form-section-title">Personal</div>
 
@@ -1159,6 +1162,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initLangsInput();
     await loadProfile();
+
+    // ILY-code ophalen (Run 5)
+    const { data: ilyProfile, error: ilyErr } = await db
+      .from('profiles')
+      .select('ily_code')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (ilyErr) {
+      console.warn('[ily] code-fetch fout:', ilyErr.message);
+    }
+
+    const ilyContainer = document.getElementById('ily-code-widget-container');
+    if (ilyContainer && ilyProfile?.ily_code) {
+      ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
+    }
+
     show('timeline'); // default tab
   } catch (err) {
     console.error('[intl-dash] mount fout:', err?.message || err);
