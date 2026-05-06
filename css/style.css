@@ -2811,3 +2811,111 @@ footer.kb-shared-footer {
   padding: 1px 8px; border-radius: 12px;
   display: inline-block; margin-left: 6px;
 }
+
+/* === COMING SOON PAGES (Sub-Run 5.H — public waitlist) === */
+.cs-page {
+  min-height: 100vh;
+  background: var(--bg, #f4f3ef);
+  display: flex;
+  flex-direction: column;
+  --cs-accent: #e05c1a;
+  --cs-accent-bg: #fdf0e8;
+  --cs-accent-hover: #b84910;
+}
+.cs-page.cs-intl-student {
+  --cs-accent: #1756a8;
+  --cs-accent-bg: #e8f0fc;
+  --cs-accent-hover: #0e3d7a;
+}
+.cs-page.cs-intl-school {
+  --cs-accent: #a06010;
+  --cs-accent-bg: #fdf3e0;
+  --cs-accent-hover: #7a4810;
+}
+.cs-topbar { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border, rgba(0,0,0,0.08)); }
+.cs-logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600; font-size: 1.1rem;
+  color: var(--ink, #0d1520); text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.cs-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+.cs-container { width: 100%; max-width: 540px; text-align: center; }
+.cs-eyebrow {
+  display: inline-block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.75rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cs-accent); background: var(--cs-accent-bg);
+  padding: 6px 14px; border-radius: 20px;
+  margin-bottom: 1.5rem;
+}
+.cs-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600; line-height: 1.1;
+  color: var(--ink, #0d1520);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+.cs-subtitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem; color: var(--ink2, #3a4455);
+  line-height: 1.65; margin-bottom: 2.5rem;
+  max-width: 460px; margin-left: auto; margin-right: auto;
+}
+.cs-form {
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  border-radius: 14px; padding: 1.75rem; text-align: left;
+}
+.cs-field { margin-bottom: 1rem; }
+.cs-field-last { margin-bottom: 1.5rem; }
+.cs-label {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem; font-weight: 500;
+  color: var(--ink2, #3a4455); margin-bottom: 0.4rem;
+}
+.cs-input {
+  width: 100%; padding: 11px 14px;
+  border: 1px solid var(--border, rgba(0,0,0,0.12));
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem; color: var(--ink, #0d1520);
+  background: var(--white, #ffffff);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cs-input:focus {
+  outline: none; border-color: var(--cs-accent);
+  box-shadow: 0 0 0 3px var(--cs-accent-bg);
+}
+.cs-button {
+  width: 100%; padding: 12px 20px;
+  background: var(--cs-accent); color: #ffffff;
+  border: none; border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.cs-button:hover { background: var(--cs-accent-hover); }
+.cs-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.cs-success {
+  display: none;
+  background: var(--green-bg, #e8f5ee);
+  border: 1px solid rgba(26, 122, 72, 0.2);
+  border-radius: 8px; padding: 14px 16px; margin-top: 1rem;
+  font-size: 0.9rem; color: var(--green, #1a7a48); line-height: 1.5;
+}
+.cs-success.show { display: block; }
+.cs-error {
+  display: none;
+  background: var(--red-bg, #fdeaea);
+  border: 1px solid rgba(184, 32, 32, 0.15);
+  border-radius: 8px; padding: 12px 14px; margin-top: 1rem;
+  font-size: 0.85rem; color: var(--red, #b82020);
+}
+.cs-error.show { display: block; }
+.cs-footer { text-align: center; padding: 2rem 1rem; font-family: 'Outfit', sans-serif; font-size: 0.85rem; }
+.cs-footer a { color: var(--ink3, #7a8799); text-decoration: none; }
+.cs-footer a:hover { color: var(--ink, #0d1520); }

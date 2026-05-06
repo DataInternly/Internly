@@ -46,7 +46,10 @@ const _supabaseIsPublicPage = (() => {
     'preview.html',
     'esg-rapportage.html',
     'esg-export.html',
-    'internly_simulator.html'
+    'internly_simulator.html',
+    'coming-soon-stagebegeleider.html',
+    'coming-soon-international-student.html',
+    'coming-soon-international-school.html'
   ].includes(page);
 })();
 

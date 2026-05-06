@@ -788,6 +788,21 @@ function switchTab(tab) {
 
 // ── Role select ──
 function selectRole(role) {
+  // 5.H: 3 rollen zijn nog niet livetest-klaar — direct redirect naar
+  // Coming Soon i.p.v. supabase signup. Zie HANDOVER.md Run 5.H.
+  if (role === 'begeleider') {
+    window.location.href = 'coming-soon-stagebegeleider.html';
+    return;
+  }
+  if (role === 'student-international') {
+    window.location.href = 'coming-soon-international-student.html';
+    return;
+  }
+  if (role === 'school-international') {
+    window.location.href = 'coming-soon-international-school.html';
+    return;
+  }
+
   // BBL is een student met bbl_mode=true — niet een aparte DB-rol
   // 'student-international' / 'school-international' mappen op DB-rol student/school
   // met flag isInternational=true (parallel patroon aan isBBL)

@@ -44,7 +44,10 @@ const PUBLIC_PAGES = [
   'spelregels.html', 'faq.html', 'hoe-het-werkt.html', 'pricing.html',
   'stagebegeleiding.html', '404.html', 'auth.html', 'internly-worldwide.html',
   'la-sign.html', 'preview.html', 'esg-rapportage.html', 'esg-export.html',
-  'internly_simulator.html'
+  'internly_simulator.html',
+  'coming-soon-stagebegeleider.html',
+  'coming-soon-international-student.html',
+  'coming-soon-international-school.html'
 ];
 function _isPublicPage() {
   const path = window.location.pathname;

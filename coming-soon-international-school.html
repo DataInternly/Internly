@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#a06010">
+  <title>Internly Worldwide for Universities</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="cs-page cs-intl-school">
+  <header class="cs-topbar">
+    <a href="index.html" class="cs-logo">intern<span style="color:#FF7E42">ly</span></a>
+  </header>
+
+  <main class="cs-main">
+    <div class="cs-container">
+      <div class="cs-eyebrow">Partnership Program</div>
+      <h1 class="cs-title">Opening soon</h1>
+      <p class="cs-subtitle">Connect your students to verified Dutch internships with full compliance documentation, learning agreement signing, and monitoring.</p>
+
+      <form class="cs-form" id="cs-form" onsubmit="return submitCS(event)">
+        <div class="cs-field">
+          <label class="cs-label" for="cs-institution">Institution name</label>
+          <input class="cs-input" type="text" id="cs-institution" required>
+        </div>
+        <div class="cs-field">
+          <label class="cs-label" for="cs-contact">Contact name</label>
+          <input class="cs-input" type="text" id="cs-contact" required>
+        </div>
+        <div class="cs-field">
+          <label class="cs-label" for="cs-email">Email</label>
+          <input class="cs-input" type="email" id="cs-email" required>
+        </div>
+        <div class="cs-field-last">
+          <label class="cs-label" for="cs-country">Country (optional)</label>
+          <input class="cs-input" type="text" id="cs-country">
+        </div>
+        <button class="cs-button" type="submit" id="cs-btn">Request information</button>
+        <div class="cs-success" id="cs-success">Thanks — our team will reach out within a few business days.</div>
+        <div class="cs-error" id="cs-error">Please enter a valid email address.</div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="cs-footer">
+    <a href="index.html">← Back to homepage</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+  (function() {
+    window.submitCS = async function(ev) {
+      ev.preventDefault();
+      const institutionEl = document.getElementById('cs-institution');
+      const contactEl = document.getElementById('cs-contact');
+      const emailEl = document.getElementById('cs-email');
+      const countryEl = document.getElementById('cs-country');
+      const btn = document.getElementById('cs-btn');
+      const succ = document.getElementById('cs-success');
+      const err = document.getElementById('cs-error');
+
+      err.classList.remove('show');
+
+      const institution = institutionEl.value.trim();
+      const contactName = contactEl.value.trim();
+      const country = countryEl.value.trim();
+      const email = emailEl.value.trim().toLowerCase();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        err.textContent = 'Please enter a valid email address.';
+        err.classList.add('show');
+        return false;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      const client = window.db;
+      if (!client) {
+        err.textContent = 'Something went wrong. Please try again later.';
+        err.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Request information';
+        return false;
+      }
+
+      const payload = {
+        email,
+        naam: contactName + ' (' + institution + (country ? ', ' + country : '') + ')',
+        source: '/coming-soon-international-school'
+      };
+
+      const { error } = await client.from('waitlist').insert(payload);
+
+      btn.disabled = false;
+      btn.textContent = 'Request information';
+
+      if (error && error.code !== '23505') {
+        err.textContent = 'Something went wrong. Please try again later.';
+        err.classList.add('show');
+        return false;
+      }
+
+      document.getElementById('cs-form').style.display = 'none';
+      succ.classList.add('show');
+      return false;
+    };
+  })();
+  </script>
+</body>
+</html>

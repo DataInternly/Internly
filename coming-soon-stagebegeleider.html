@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/favicon_180x180.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#e05c1a">
+  <title>Stagebegeleider Module | Internly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="cs-page">
+  <header class="cs-topbar">
+    <a href="index.html" class="cs-logo">intern<span style="color:#FF7E42">ly</span></a>
+  </header>
+
+  <main class="cs-main">
+    <div class="cs-container">
+      <div class="cs-eyebrow">Stagebegeleider Module</div>
+      <h1 class="cs-title">Binnenkort beschikbaar</h1>
+      <p class="cs-subtitle">Plan, monitor en factureer stages voor je organisatie. Met Mollie-integratie en ESG-rapportage.</p>
+
+      <form class="cs-form" id="cs-form" onsubmit="return submitCS(event)">
+        <div class="cs-field">
+          <label class="cs-label" for="cs-naam">Naam</label>
+          <input class="cs-input" type="text" id="cs-naam" required>
+        </div>
+        <div class="cs-field">
+          <label class="cs-label" for="cs-email">E-mailadres</label>
+          <input class="cs-input" type="email" id="cs-email" required>
+        </div>
+        <div class="cs-field-last">
+          <label class="cs-label" for="cs-sector">Sector (optioneel)</label>
+          <input class="cs-input" type="text" id="cs-sector">
+        </div>
+        <button class="cs-button" type="submit" id="cs-btn">Houd me op de hoogte</button>
+        <div class="cs-success" id="cs-success">Bedankt — we sturen je bericht zodra de module live gaat.</div>
+        <div class="cs-error" id="cs-error">Vul een geldig e-mailadres in.</div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="cs-footer">
+    <a href="index.html">← Naar homepage</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="js/supabase.js"></script>
+  <script>
+  (function() {
+    window.submitCS = async function(ev) {
+      ev.preventDefault();
+      const naamEl = document.getElementById('cs-naam');
+      const emailEl = document.getElementById('cs-email');
+      const sectorEl = document.getElementById('cs-sector');
+      const btn = document.getElementById('cs-btn');
+      const succ = document.getElementById('cs-success');
+      const err = document.getElementById('cs-error');
+
+      err.classList.remove('show');
+
+      const naam = naamEl.value.trim();
+      const email = emailEl.value.trim().toLowerCase();
+      const sector = sectorEl.value.trim();
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        err.textContent = 'Vul een geldig e-mailadres in.';
+        err.classList.add('show');
+        return false;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Bezig…';
+
+      const client = window.db;
+      if (!client) {
+        err.textContent = 'Er ging iets mis. Probeer het later opnieuw.';
+        err.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Houd me op de hoogte';
+        return false;
+      }
+
+      const payload = {
+        email,
+        naam,
+        sector: sector || null,
+        source: '/coming-soon-stagebegeleider'
+      };
+
+      const { error } = await client.from('waitlist').insert(payload);
+
+      btn.disabled = false;
+      btn.textContent = 'Houd me op de hoogte';
+
+      if (error && error.code !== '23505') {
+        err.textContent = 'Er ging iets mis. Probeer het later opnieuw.';
+        err.classList.add('show');
+        return false;
+      }
+
+      document.getElementById('cs-form').style.display = 'none';
+      succ.classList.add('show');
+      return false;
+    };
+  })();
+  </script>
+</body>
+</html>
