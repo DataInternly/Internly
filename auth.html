@@ -1106,6 +1106,22 @@ async function doRegister() {
       console.warn('[auth] Profile insert fout:', profileError.message);
     }
 
+    // 2b. Genereer ILY-code (Run 5 — 7 mei 2026)
+    let codeAttempts = 0;
+    const maxCodeAttempts = 10;
+    while (codeAttempts < maxCodeAttempts) {
+      codeAttempts++;
+      const newCode = _generateILYCodeRaw();
+      const { error: codeErr } = await db.from('profiles')
+        .update({ ily_code: newCode })
+        .eq('id', data.user.id);
+      if (!codeErr) break;
+      if (codeErr.code !== '23505') {
+        console.warn('[auth] ILY-code update fout:', codeErr.message);
+        break;
+      }
+    }
+
     // 3. Gratis abonnement aanmaken voor bedrijf / school
     await seedFreeSubscription(data.user.id, selectedRole);
 
