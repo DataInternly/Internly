@@ -254,6 +254,61 @@
       .topbar-user { display: none; }
       .topbar { padding: 0 14px; }
     }
+
+    /* ─────────────────────────────────────────────────
+       ILY-code widget (Run 5 — 7 mei 2026)
+       ───────────────────────────────────────────────── */
+    .ily-code-widget {
+      background: var(--bg-card, #fff);
+      border: 1px solid var(--line-default, #e2e8f0);
+      border-radius: var(--r-md, 12px);
+      padding: var(--s4, 1rem) var(--s5, 1.25rem);
+      margin-bottom: var(--s4, 1rem);
+    }
+    .ily-code-label {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-tertiary, #7a8799);
+      margin-bottom: 0.5rem;
+    }
+    .ily-code-value {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--c-cream, #f4f3ef);
+      border-radius: var(--r-sm, 8px);
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    .ily-code-display {
+      font-family: var(--font-mono, monospace);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--fg-primary, #0d1520);
+      flex: 1;
+      user-select: all;
+    }
+    .ily-code-copy {
+      background: transparent;
+      border: 1px solid var(--line-default, #e2e8f0);
+      border-radius: var(--r-sm, 8px);
+      padding: 4px 10px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background var(--t-fast, 0.15s);
+    }
+    .ily-code-copy:hover {
+      background: var(--c-cream, #f4f3ef);
+    }
+    .ily-code-hint {
+      font-size: 0.78rem;
+      color: var(--fg-tertiary, #7a8799);
+      line-height: 1.45;
+    }
   </style>
 </head>
 <body>
