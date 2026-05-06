@@ -896,7 +896,7 @@ const HEADER_NAV_BY_ROLE = {
     { id: 'discover',     label: 'Overzicht',       href: 'bbl-hub.html',             icon: '🔧' },
     { id: 'matchpool',    label: 'Matchpool',       href: 'matchpool.html',           icon: '🌊' },
     { id: 'berichten',    label: 'Berichten',       href: 'mijn-berichten.html',      icon: '💬' },
-    { id: 'kennisbank',   label: 'Kennisbank',      href: 'kennisbank.html',          icon: '📚' },
+    { id: 'profiel',      label: 'Profiel',         href: 'bbl-profile.html',         icon: '👤' },
     { id: 'buddy',        label: 'Buddy',           href: 'matches.html?view=buddy',  icon: '🤝' },
   ],
   gepensioneerd: [
@@ -1137,7 +1137,7 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
     <a href="/bbl-hub.html"        class="${activeTab === 'discover'    ? 'active' : ''}">Overzicht</a>
     <a href="/matchpool.html"      class="${activeTab === 'matchpool'   ? 'active' : ''}">Matchpool</a>
     <a href="/mijn-berichten.html" class="${activeTab === 'berichten'   ? 'active' : ''}">Berichten</a>
-    <a href="/kennisbank.html"     class="${activeTab === 'kennisbank'  ? 'active' : ''}">Kennisbank</a>`;
+    <a href="/bbl-profile.html"    class="${activeTab === 'profiel'     ? 'active' : ''}">Profiel</a>`;
 
   return `
     <header class="student-header">
