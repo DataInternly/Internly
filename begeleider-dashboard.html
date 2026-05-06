@@ -647,6 +647,9 @@
       <div class="page-title">Profiel</div>
       <div class="page-sub">Jouw accountgegevens</div>
 
+      <!-- ILY-code widget container (Run 5) -->
+      <div id="ily-code-widget-container"></div>
+
       <div class="form-card">
         <div class="form-section-title">Persoonlijke gegevens</div>
 
@@ -1387,6 +1390,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   const statAfgerond = document.getElementById('statAfgerond');
   if (statAfgerond) statAfgerond.textContent = (completed ?? 0).toString();
   initReferralBanner();
+
+  // ILY-code ophalen (Run 5)
+  const { data: ilyProfile, error: ilyErr } = await db
+    .from('profiles')
+    .select('ily_code')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (ilyErr) {
+    console.warn('[ily] code-fetch fout:', ilyErr.message);
+  }
+
+  const ilyContainer = document.getElementById('ily-code-widget-container');
+  if (ilyContainer && ilyProfile?.ily_code) {
+    ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
+  }
 
   InternlyCalendar.render('ical-container', db, user.id);
 });

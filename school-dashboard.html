@@ -1013,6 +1013,9 @@
       <div class="page-title">Schoolprofiel</div>
       <p class="page-sub">Deze informatie is zichtbaar voor bedrijven en studenten</p>
 
+      <!-- ILY-code widget container (Run 5) -->
+      <div id="ily-code-widget-container"></div>
+
       <!-- Overview -->
       <div id="school-view-profiel" style="display:none">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap">
@@ -2698,6 +2701,22 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await loadNotifications();
   startNotifSubscription();
+
+  // ILY-code ophalen (Run 5)
+  const { data: ilyProfile, error: ilyErr } = await db
+    .from('profiles')
+    .select('ily_code')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (ilyErr) {
+    console.warn('[ily] code-fetch fout:', ilyErr.message);
+  }
+
+  const ilyContainer = document.getElementById('ily-code-widget-container');
+  if (ilyContainer && ilyProfile?.ily_code) {
+    ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
+  }
 
   InternlyCalendar.render('ical-container', db, user.id);
   initSessionTimeout();
