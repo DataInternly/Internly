@@ -44,6 +44,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { background: var(--bl-bg); color: var(--bl-ink); font-family: 'Outfit', sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .bl-article:target { box-shadow: 0 0 0 3px var(--bl-accent-bg); }
 
     /* TOPBAR — match about.html pattern */
     .bl-topbar {
@@ -463,6 +464,11 @@
 </footer>
 
 <script src="js/consent.js" defer></script>
+<script>
+  document.querySelectorAll('.bl-cat').forEach(c =>
+    c.addEventListener('click', e => e.preventDefault())
+  );
+</script>
 
 </body>
 </html>
