@@ -41,7 +41,7 @@ const ROLE_LANDING = {
 const PUBLIC_PAGES = [
   'index.html', 'about.html', 'kennisbank.html', 'kennisbank-artikel.html',
   'privacybeleid.html', 'algemene-voorwaarden.html', 'cookiebeleid.html',
-  'spelregels.html', 'faq.html', 'hoe-het-werkt.html', 'pricing.html',
+  'security.html', 'spelregels.html', 'faq.html', 'hoe-het-werkt.html', 'pricing.html',
   'stagebegeleiding.html', '404.html', 'auth.html', 'internly-worldwide.html',
   'la-sign.html', 'preview.html', 'esg-rapportage.html', 'esg-export.html',
   'internly_simulator.html',

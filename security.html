@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon_180x180.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a7a48">
+<meta name="description" content="Responsible disclosure beleid van Internly — hoe je een beveiligingsprobleem meldt en wat je van ons mag verwachten.">
+<meta property="og:title" content="Security — Internly">
+<meta property="og:description" content="Responsible disclosure beleid van Internly — hoe je een beveiligingsprobleem meldt en wat je van ons mag verwachten.">
+<meta property="og:image" content="https://internly.pro/og-image.png">
+<meta property="og:url" content="https://internly.pro/security.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Internly">
+<meta name="twitter:card" content="summary_large_image">
+<title>Security — Internly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ════════════════════════════════════════════════════════════════════════
+   Security page — responsible disclosure stub.
+   Volgt spelregels.html-archetype (mini-hero + reading-frame + footer).
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ink:       var(--c-ink);
+  --ink2:      var(--fg-secondary);
+  --ink3:      var(--fg-tertiary);
+  --bg:        var(--bg-page);
+  --white:     var(--bg-surface);
+  --border:    var(--line-subtle);
+  --green:     var(--c-green);
+  --green-bg:  #e8f5ee;
+  --orange:    var(--c-orange);
+  --red:       #b82020;
+  --red-bg:    #fdeaea;
+  --amber:     #a06010;
+  --amber-bg:  #fdf3e0;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  background: var(--bg-page);
+  color: var(--fg-primary);
+  font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+p { line-height: 1.7; }
+
+/* ── Topbar ── */
+.topbar {
+  background: rgba(244,243,239,.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-subtle);
+  padding: 0 var(--s6, 32px); height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.t-logo {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--c-green-deep);
+  letter-spacing: -.03em;
+  text-decoration: none;
+}
+.t-logo span { color: var(--c-orange-deep); }
+.t-back {
+  font-size: .85rem;
+  color: var(--fg-tertiary);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: var(--r-pill, 999px);
+  transition: color var(--t-fast, .12s), background var(--t-fast, .12s);
+}
+.t-back:hover {
+  color: var(--fg-primary);
+  background: var(--c-cream);
+}
+
+/* ── Mini-hero ── */
+.hero {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
+    linear-gradient(148deg, #1e8a52 0%, #1a7a48 42%, #145e38 100%);
+  padding: var(--s8, 80px) var(--s6, 32px) var(--s7, 56px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  background-size: 200px 200px;
+  opacity: .035;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-script-eyebrow {
+  font-family: var(--font-script, 'Caveat', cursive);
+  font-size: 1.2rem;
+  color: rgba(255,126,66,.95);
+  display: inline-block;
+  transform: rotate(-1deg);
+  margin-bottom: 4px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size: .72rem; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(255,255,255,.6);
+  margin-bottom: 16px;
+}
+.hero-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--c-orange);
+  flex-shrink: 0;
+}
+.hero h1 {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: clamp(1.8rem, 4.4vw, 2.8rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 span { color: var(--c-orange); }
+.hero-sub {
+  font-size: .95rem;
+  color: rgba(255,255,255,.78);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── Content ── */
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--s8, 48px) var(--s5, 24px) var(--s9, 80px);
+}
+
+.intro-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line-subtle);
+  border-left: 4px solid var(--c-green);
+  border-radius: 0 var(--r-md, 12px) var(--r-md, 12px) 0;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.intro-card p {
+  font-size: .92rem;
+  color: var(--fg-secondary);
+  line-height: 1.7;
+}
+
+.section { margin-bottom: 2.5rem; }
+.section-label {
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size: .7rem; font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  margin-bottom: .75rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.section-label::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: var(--line-subtle);
+}
+.section-title {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--fg-primary);
+  margin-bottom: 1rem;
+  letter-spacing: -.025em;
+}
+
+/* ── Mailto card ── */
+.mailto-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line-subtle);
+  border-left: 4px solid var(--c-orange-deep);
+  border-radius: 0 var(--r-md, 12px) var(--r-md, 12px) 0;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.mailto-card .label {
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size: .7rem; font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+  margin-bottom: .35rem;
+}
+.mailto-card a.mail {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 1.15rem; font-weight: 700;
+  color: var(--c-orange-deep);
+  text-decoration: none;
+  letter-spacing: -.01em;
+  border-bottom: 1px dashed rgba(224,92,26,.4);
+  transition: color var(--t-fast, .12s), border-color var(--t-fast, .12s);
+}
+.mailto-card a.mail:hover {
+  color: #b94613;
+  border-bottom-color: #b94613;
+}
+.mailto-card .hint {
+  font-size: .82rem;
+  color: var(--fg-tertiary);
+  margin-top: .65rem;
+  line-height: 1.6;
+}
+
+/* ── Rule card (3 punten) ── */
+.rule-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md, 12px);
+  padding: 1rem 1.25rem;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.rule-head {
+  display: flex; align-items: flex-start; gap: .75rem;
+  margin-bottom: .35rem;
+}
+.rule-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size: .72rem; font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 1px;
+  background: var(--green-bg);
+  color: var(--c-green);
+}
+.rule-title {
+  font-size: .95rem; font-weight: 600;
+  color: var(--fg-primary);
+  letter-spacing: -.01em;
+}
+.rule-body {
+  font-size: .88rem;
+  color: var(--fg-secondary);
+  line-height: 1.65;
+  padding-left: 36px;
+}
+
+/* ── Scope list ── */
+.scope-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.scope-list li {
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--line-subtle);
+  font-size: .9rem;
+  color: var(--fg-secondary);
+  display: flex;
+  gap: .6rem;
+  align-items: flex-start;
+}
+.scope-list li:last-child { border-bottom: none; }
+.scope-list .marker {
+  flex-shrink: 0;
+  width: 18px;
+  font-family: var(--font-mono, 'DM Mono', monospace);
+  font-size: .85rem;
+  font-weight: 600;
+}
+.scope-list .marker.yes { color: var(--c-green); }
+.scope-list .marker.no  { color: var(--red); }
+
+/* ── Hall of Fame placeholder ── */
+.hof-card {
+  background: var(--bg-surface);
+  border: 1px dashed var(--line-subtle);
+  border-radius: var(--r-md, 12px);
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.hof-card .empty {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: 1rem; font-weight: 600;
+  color: var(--fg-secondary);
+  margin-bottom: .35rem;
+  letter-spacing: -.01em;
+}
+.hof-card .hint {
+  font-size: .82rem;
+  color: var(--fg-tertiary);
+  line-height: 1.6;
+}
+
+/* ── Back-to-home ── */
+.back-block {
+  text-align: center;
+  margin-top: 2rem;
+}
+.back-link {
+  display: inline-block;
+  font-size: .92rem;
+  color: var(--c-orange-deep);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(224,92,26,.4);
+  padding-bottom: 2px;
+  transition: color var(--t-fast, .12s);
+}
+.back-link:hover { color: #b94613; }
+
+/* ── Footer ── */
+.footer {
+  background: var(--c-green-deep);
+  padding: var(--s5, 20px) var(--s6, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.footer-logo {
+  font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  font-size: .9rem; font-weight: 700;
+  color: rgba(255,255,255,.5);
+  letter-spacing: -.02em;
+}
+.footer-logo span { color: var(--c-orange); }
+.footer-links {
+  display: flex; gap: 16px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.footer-links a {
+  font-size: .78rem;
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  transition: color var(--t-fast, .15s);
+}
+.footer-links a:hover { color: var(--c-orange); }
+.footer-copy {
+  font-size: .7rem;
+  color: rgba(255,255,255,.3);
+}
+.footer-tagline {
+  width: 100%;
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,.05);
+  font-size: .76rem;
+  color: rgba(255,255,255,.4);
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-orange-deep);
+  outline-offset: 2px;
+}
+
+@media(max-width:768px) {
+  .hero { padding: 40px 16px; }
+  .content { padding: 32px 16px 60px; }
+}
+@media(max-width:480px) {
+  .topbar { padding: 0 16px; }
+  .footer { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<div class="topbar" data-public-header>
+  <a class="t-logo" href="index.html">intern<span>ly</span></a>
+  <a class="t-back" href="index.html">← Terug naar homepage</a>
+</div>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <span class="hero-script-eyebrow">security</span>
+  <div class="hero-eyebrow"><span class="hero-dot"></span> Sasubo Holding B.V.</div>
+  <h1>Responsible <span>disclosure</span></h1>
+  <p class="hero-sub">Een beveiligingsprobleem ontdekt? We waarderen het als je het verantwoord met ons deelt voordat het publiek wordt.</p>
+</div>
+
+<!-- ── Content ── -->
+<div class="content">
+
+  <div class="intro-card">
+    <p>Internly bewaart gegevens van studenten, scholen en bedrijven. Veiligheid is geen feature — het is een voorwaarde. Help je ons door een kwetsbaarheid te melden, dan krijg je hieronder precies te lezen wat je kunt verwachten.</p>
+  </div>
+
+  <!-- Sectie 1: Hoe te melden -->
+  <div class="section">
+    <div class="section-label">Hoe te melden</div>
+    <div class="section-title">Stuur ons een mail</div>
+
+    <div class="mailto-card">
+      <div class="label">Beveiligingscontact</div>
+      <a class="mail" href="mailto:security@internly.pro">security@internly.pro</a>
+      <p class="hint">Beschrijf het probleem zo concreet mogelijk: wat, waar, en hoe het te reproduceren is. Voeg screenshots of voorbeeldverzoeken toe als dat helpt. Versleuteling op verzoek beschikbaar.</p>
+    </div>
+  </div>
+
+  <!-- Sectie 2: Wat je van ons mag verwachten -->
+  <div class="section">
+    <div class="section-label">Onze belofte</div>
+    <div class="section-title">Wat je van ons mag verwachten</div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num">1</div>
+        <div class="rule-title">Reactie binnen 5 werkdagen</div>
+      </div>
+      <div class="rule-body">We bevestigen ontvangst en geven aan welke vervolgstappen we zetten. Bij urgente kwetsbaarheden reageren we sneller.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num">2</div>
+        <div class="rule-title">Geen juridische actie tegen onderzoek te goeder trouw</div>
+      </div>
+      <div class="rule-body">Zolang je binnen de scope blijft, gegevens van anderen niet inziet of wijzigt, en de melding privé houdt tot we hebben gefixt — ondernemen wij geen juridische actie tegen jou.</div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-head">
+        <div class="rule-num">3</div>
+        <div class="rule-title">Erkenning bij verifieerbare melding</div>
+      </div>
+      <div class="rule-body">Bij een bevestigde kwetsbaarheid plaatsen we je naam (of pseudoniem) op de Hall of Fame hieronder, mits je dat wenst.</div>
+    </div>
+  </div>
+
+  <!-- Sectie 3: Scope -->
+  <div class="section">
+    <div class="section-label">Scope</div>
+    <div class="section-title">Wat valt binnen onze scope</div>
+
+    <ul class="scope-list">
+      <li><span class="marker yes">✓</span><span>Alle subdomeinen van <code>internly.pro</code></span></li>
+      <li><span class="marker yes">✓</span><span>De Internly web-applicatie en eventuele mobiele varianten</span></li>
+      <li><span class="marker yes">✓</span><span>Authenticatie, autorisatie en data-toegang in de Supabase-laag</span></li>
+      <li><span class="marker no">✗</span><span>Third-party leveranciers (Supabase, jsDelivr, Google Translate) — meld die rechtstreeks bij de betreffende leverancier</span></li>
+    </ul>
+  </div>
+
+  <!-- Sectie 4: Out of scope -->
+  <div class="section">
+    <div class="section-label">Out of scope</div>
+    <div class="section-title">Wat we niet als melding behandelen</div>
+
+    <ul class="scope-list">
+      <li><span class="marker no">✗</span><span>Denial-of-service-aanvallen of volume-tests</span></li>
+      <li><span class="marker no">✗</span><span>Social engineering van medewerkers, partners of gebruikers</span></li>
+      <li><span class="marker no">✗</span><span>Fysieke aanvallen op kantoren of medewerkers</span></li>
+      <li><span class="marker no">✗</span><span>Theoretische zwaktes zonder reproduceerbaar bewijs</span></li>
+    </ul>
+  </div>
+
+  <!-- Hall of Fame -->
+  <div class="section" id="hall-of-fame">
+    <div class="section-label">Hall of Fame</div>
+    <div class="section-title">Erkende meldingen</div>
+
+    <div class="hof-card">
+      <div class="empty">Nog geen erkenningen</div>
+      <p class="hint">Wees de eerste die hier vermeld wordt.</p>
+    </div>
+  </div>
+
+  <div class="back-block">
+    <a class="back-link" href="index.html">← Naar homepage</a>
+  </div>
+
+</div><!-- /content -->
+
+<!-- ── Footer ── -->
+<footer class="footer">
+  <div class="footer-logo">intern<span>ly</span></div>
+  <ul class="footer-links">
+    <li><a href="privacybeleid.html">Privacybeleid</a></li>
+    <li><a href="algemene-voorwaarden.html">Algemene voorwaarden</a></li>
+    <li><a href="cookiebeleid.html">Cookiebeleid</a></li>
+    <li><a href="spelregels.html">Spelregels</a></li>
+    <li><a href="about.html">Over ons</a></li>
+    <li><a href="mailto:hallo@internly.pro">Contact</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+  <p class="footer-tagline">Gebouwd door mensen die het zelf hebben meegemaakt.</p>
+</footer>
+
+</body>
+</html>

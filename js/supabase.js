@@ -34,6 +34,7 @@ const _supabaseIsPublicPage = (() => {
     'privacybeleid.html',
     'algemene-voorwaarden.html',
     'cookiebeleid.html',
+    'security.html',
     'spelregels.html',
     'faq.html',
     'hoe-het-werkt.html',
