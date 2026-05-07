@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -10,7 +10,7 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="description" id="article-meta-desc" content="">
   <link rel="canonical" id="canonical-link" href="https://internly.pro/kennisbank-artikel.html">
-  <title id="article-title-tag">Artikel — Internly Kennisbank</title>
+  <title id="article-title-tag">Artikel â€” Internly Kennisbank</title>
   <meta property="og:title" content="Internly Kennisbank">
   <meta property="og:description" content="Lees artikelen over stages, Trust Score, en eerlijk werven via Internly.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
 <script src="js/consent.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/kb.js"></script>
   <link rel="stylesheet" href="css/style.css">
@@ -30,7 +30,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Outfit', sans-serif; background: #f4f3ef; color: #0d1520; font-size: 15px; line-height: 1.6; min-height: 100vh; }
 
-    /* ── TOPBAR (shared with kennisbank.html via kb.js renderKBHeader) ── */
+    /* â”€â”€ TOPBAR (shared with kennisbank.html via kb.js renderKBHeader) â”€â”€ */
     .kb-topbar { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-bottom: 1px solid #f0f0ee; display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 58px; gap: 16px; }
     .kb-logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 700; color: #0d1520; text-decoration: none; flex-shrink: 0; }
     .kb-logo span { color: #e05c1a; }
@@ -43,18 +43,18 @@
     .kb-btn-primary { padding: 7px 18px; background: #1a7a48; color: #fff; border: none; border-radius: 20px; font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .14s; }
     .kb-btn-primary:hover { background: #0f5c36; }
 
-    /* ── LAYOUT ── */
+    /* â”€â”€ LAYOUT â”€â”€ */
     .kb-article-page { max-width: 720px; margin: 0 auto; padding: 36px 20px 80px; }
     .back-link { display: inline-flex; align-items: center; gap: 6px; color: #1a7a48; text-decoration: none; font-size: .88rem; font-weight: 500; margin-bottom: 28px; transition: color .14s; }
     .back-link:hover { color: #0f5c36; }
 
-    /* ── ARTICLE ── */
+    /* â”€â”€ ARTICLE â”€â”€ */
     .kb-article-header { margin-bottom: 32px; }
     .kb-article-header .audience-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
     #article-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2rem; font-weight: 700; color: #0d1520; line-height: 1.25; letter-spacing: -.02em; margin-bottom: 12px; }
     #article-excerpt { font-size: 1.05rem; color: #6b7280; line-height: 1.7; }
 
-    /* ── BODY CONTENT (rendered markdown) ── */
+    /* â”€â”€ BODY CONTENT (rendered markdown) â”€â”€ */
     .article-body { margin: 32px 0; }
     .article-body h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.35rem; font-weight: 700; color: #0d1520; margin: 32px 0 12px; border-bottom: 2px solid #f0f0ee; padding-bottom: 8px; }
     .article-body h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; color: #0d1520; margin: 22px 0 8px; }
@@ -66,7 +66,7 @@
     .article-body a { color: #1a7a48; text-decoration: underline; }
     .article-body a:hover { color: #0f5c36; }
 
-    /* ── FOOTER ── */
+    /* â”€â”€ FOOTER â”€â”€ */
     .article-footer { padding-top: 28px; border-top: 1px solid #f0f0ee; margin-top: 32px; }
     .kb-sources-title { font-size: .9rem; font-weight: 700; color: #374151; margin-bottom: 10px; }
     .kb-sources-list { list-style: none; padding: 0; }
@@ -74,12 +74,12 @@
     .kb-sources-list a { color: #1a7a48; font-size: .88rem; text-decoration: underline; }
     .article-meta { margin-top: 20px; font-size: .8rem; color: #9ca3af; }
 
-    /* ── GERELATEERD ── */
+    /* â”€â”€ GERELATEERD â”€â”€ */
     .related-articles { margin-top: 48px; padding-top: 32px; border-top: 1px solid #f0f0ee; }
     .related-articles h3 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 700; color: #0d1520; margin-bottom: 16px; }
     .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
 
-    /* ── CARDS (shared with kennisbank.html) ── */
+    /* â”€â”€ CARDS (shared with kennisbank.html) â”€â”€ */
     .kb-card { display: flex; flex-direction: column; background: #fff; border: 1.5px solid #f0f0ee; border-radius: 16px; padding: 20px 18px; text-decoration: none; color: inherit; transition: transform .14s, box-shadow .14s, border-color .14s; }
     .kb-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.07); border-color: #c8e6d4; }
     .kb-card-audience { font-size: .73rem; font-weight: 700; color: #1a7a48; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
@@ -89,7 +89,7 @@
     .kb-card-tags { display: flex; gap: 4px; flex-wrap: wrap; }
     .kb-card-date { font-size: .72rem; color: #9ca3af; flex-shrink: 0; }
 
-    /* ── NOTIF ── */
+    /* â”€â”€ NOTIF â”€â”€ */
     .notif { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(12px); background: #0d1520; color: #fff; padding: 12px 24px; border-radius: 12px; font-size: .9rem; box-shadow: 0 8px 28px rgba(0,0,0,.25); z-index: 9999; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -107,12 +107,12 @@
 <div id="kb-header"></div>
 
 <main class="kb-article-page">
-  <a href="kennisbank.html" class="back-link">← Terug naar kennisbank</a>
+  <a href="kennisbank.html" class="back-link">â† Terug naar kennisbank</a>
 
   <article>
     <header class="kb-article-header">
       <div class="audience-tags" id="audience-tags"></div>
-      <h1 id="article-title">Laden…</h1>
+      <h1 id="article-title">Ladenâ€¦</h1>
       <p id="article-excerpt"></p>
     </header>
 
@@ -121,7 +121,7 @@
     <footer class="article-footer">
       <div id="external-links"></div>
       <p class="article-meta">
-        Door <span id="article-author"></span> &nbsp;·&nbsp;
+        Door <span id="article-author"></span> &nbsp;Â·&nbsp;
         <time id="article-date"></time>
       </p>
     </footer>
@@ -134,7 +134,7 @@
 </main>
 
 <script>
-// kennisbank-artikel.html — slug-routing met blog-placeholder fallback (3 mei 2026)
+// kennisbank-artikel.html â€” slug-routing met blog-placeholder fallback (3 mei 2026)
 // 1. Voor 5 blog-referenced slugs zonder kb_articles DB-row: toon inline placeholder
 // 2. Voor alle andere slugs: redirect naar kennisbank.html?artikel= (bestaand pattern)
 //
@@ -146,7 +146,7 @@ const _BLOG_PLACEHOLDER_ARTIKELEN = {
     body: 'Dit artikel is binnenkort beschikbaar. Het behandelt onder andere: stageovereenkomst, onkostenvergoeding, werktijden, begeleiding en wat te doen bij conflict.'
   },
   'wat-is-stagepact': {
-    titel: 'Wat is het Stagepact MBO 2023–2027?',
+    titel: 'Wat is het Stagepact MBO 2023â€“2027?',
     subtitel: 'De afspraken tussen overheid, scholen en werkgevers uitgelegd',
     body: 'Dit artikel is binnenkort beschikbaar. Het Stagepact is een convenant tussen OCW, scholen, werkgevers en studentenorganisaties met afspraken over begeleiding, vergoeding en stagediscriminatie.'
   },
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const placeholder = _BLOG_PLACEHOLDER_ARTIKELEN[slug];
   if (placeholder) {
     // Render inline placeholder zonder Supabase-query
-    document.getElementById('article-title-tag').textContent = placeholder.titel + ' — Internly Kennisbank';
+    document.getElementById('article-title-tag').textContent = placeholder.titel + ' â€” Internly Kennisbank';
     document.getElementById('article-meta-desc').setAttribute('content', placeholder.subtitel);
     document.getElementById('canonical-link').setAttribute('href', 'https://internly.pro/kennisbank-artikel.html?slug=' + encodeURIComponent(slug));
     document.getElementById('article-title').textContent = placeholder.titel;
@@ -185,13 +185,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('article-body').innerHTML =
       '<p>' + placeholder.body + '</p>' +
       '<p style="margin-top:1.5rem;font-size:.88rem;color:#7a8799">' +
-      '<a href="blog.html" style="color:#1a7a48;text-decoration:underline">← Terug naar de blog</a>' +
+      '<a href="blog.html" style="color:#1a7a48;text-decoration:underline">â† Terug naar de blog</a>' +
       '</p>';
     document.getElementById('related-section').style.display = 'none';
     return;
   }
 
-  // Onbekende slug → bestaand redirect-pattern naar kennisbank.html
+  // Onbekende slug â†’ bestaand redirect-pattern naar kennisbank.html
   window.location.replace('kennisbank.html?artikel=' + encodeURIComponent(slug));
 });
 </script>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/favicon_180x180.png">
 <link rel="manifest" href="/manifest.json">
-<title>Mijn notities — Internly</title>
+<title>Mijn notities â€” Internly</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -170,7 +170,7 @@
 
 <div class="notities-page-head">
   <h1>Mijn notities</h1>
-  <div class="notities-page-sub">Een privé plek voor je gedachten, ideeën en reflecties.</div>
+  <div class="notities-page-sub">Een privÃ© plek voor je gedachten, ideeÃ«n en reflecties.</div>
 </div>
 
 <div class="notities-app">
@@ -184,7 +184,7 @@
 
   <main class="notities-editor-pane" id="notities-editor">
     <div class="notities-empty" id="notities-empty">
-      <div class="notities-empty-icon">📓</div>
+      <div class="notities-empty-icon">ðŸ““</div>
       <div class="notities-empty-title">Nog geen notitie geopend</div>
       <div>Klik op een notitie links of maak een nieuwe.</div>
     </div>
@@ -192,22 +192,22 @@
 </div>
 
 <div class="notities-privacy">
-  <span style="color:#7c3aed">🔒</span>
+  <span style="color:#7c3aed">ðŸ”’</span>
   <div>
     <strong>Alleen voor jou zichtbaar.</strong>
-    Deze notities zijn privé en worden niet gedeeld met studenten, scholen, bedrijven of andere buddies. Bij het verwijderen van je account worden ze permanent gewist.
+    Deze notities zijn privÃ© en worden niet gedeeld met studenten, scholen, bedrijven of andere buddies. Bij het verwijderen van je account worden ze permanent gewist.
   </div>
 </div>
 
 <script src="js/utils.js"></script>
 <script src="js/consent.js" defer></script>
 <script src="js/roles.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="js/supabase.js"></script>
 <script src="js/toast.js"></script>
 <script>
 (async () => {
-  // ── Auth + role-guard ──
+  // â”€â”€ Auth + role-guard â”€â”€
   const hasRole = await requireRole('gepensioneerd');
   if (!hasRole) return;
 
@@ -220,19 +220,19 @@
   window.__currentUser = profile;
   window.__currentRole = profile?.role || 'gepensioneerd';
 
-  // ── Render header ──
+  // â”€â”€ Render header â”€â”€
   if (typeof renderRoleHeader === 'function') {
     await renderRoleHeader('gepensioneerd', 'notities', {
       profile: { naam: profile?.naam || '' }
     });
   }
 
-  // ── State ──
+  // â”€â”€ State â”€â”€
   let notes = [];
   let activeId = null;
   let saveTimer = null;
 
-  // ── Load notes ──
+  // â”€â”€ Load notes â”€â”€
   async function loadNotes() {
     const { data, error } = await db.from('buddy_notes')
       .select('id, title, content, created_at, updated_at')
@@ -246,7 +246,7 @@
     }
   }
 
-  // ── Render list ──
+  // â”€â”€ Render list â”€â”€
   function renderList() {
     const listEl = document.getElementById('notities-list');
     if (notes.length === 0) {
@@ -266,7 +266,7 @@
     });
   }
 
-  // ── Open note in editor ──
+  // â”€â”€ Open note in editor â”€â”€
   function openNote(id) {
     activeId = id;
     const note = notes.find(n => n.id === id);
@@ -274,7 +274,7 @@
     const editor = document.getElementById('notities-editor');
     editor.innerHTML = `
       <div class="notities-editor-meta">
-        <span>Laatst bewerkt · ${formatRelative(note.updated_at)}</span>
+        <span>Laatst bewerkt Â· ${formatRelative(note.updated_at)}</span>
         <button class="notities-delete-btn" id="notitie-del-btn">Verwijderen</button>
       </div>
       <input type="text" class="notities-editor-title" id="notitie-title" value="${escapeHtml(note.title || '')}" placeholder="Titel">
@@ -287,7 +287,7 @@
     document.getElementById('notitie-del-btn').addEventListener('click', deleteActive);
   }
 
-  // ── Save with debounce ──
+  // â”€â”€ Save with debounce â”€â”€
   function scheduleSave() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveActive, 800);
@@ -314,7 +314,7 @@
     }
   }
 
-  // ── New note ──
+  // â”€â”€ New note â”€â”€
   async function createNote() {
     const { data, error } = await db.from('buddy_notes')
       .insert({ buddy_id: user.id, title: 'Nieuwe notitie', content: '' })
@@ -328,7 +328,7 @@
     setTimeout(() => document.getElementById('notitie-title')?.select(), 100);
   }
 
-  // ── Delete ──
+  // â”€â”€ Delete â”€â”€
   async function deleteActive() {
     if (!activeId) return;
     if (!confirm('Deze notitie verwijderen?')) return;
@@ -341,7 +341,7 @@
     activeId = null;
     document.getElementById('notities-editor').innerHTML = `
       <div class="notities-empty">
-        <div class="notities-empty-icon">📓</div>
+        <div class="notities-empty-icon">ðŸ““</div>
         <div class="notities-empty-title">Notitie verwijderd</div>
         <div>Klik op een andere notitie of maak een nieuwe.</div>
       </div>`;
@@ -351,7 +351,7 @@
     renderList();
   }
 
-  // ── Helpers ──
+  // â”€â”€ Helpers â”€â”€
   function formatRelative(iso) {
     if (!iso) return '';
     const d = new Date(iso);
@@ -359,12 +359,12 @@
     const diff = (now - d) / 1000;
     if (diff < 60) return 'zojuist';
     if (diff < 3600) return `${Math.floor(diff/60)} min geleden`;
-    if (diff < 86400) return `vandaag · ${d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}`;
-    if (diff < 172800) return `gisteren · ${d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}`;
+    if (diff < 86400) return `vandaag Â· ${d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}`;
+    if (diff < 172800) return `gisteren Â· ${d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}`;
     return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
   }
 
-  // ── Wire events ──
+  // â”€â”€ Wire events â”€â”€
   document.getElementById('notitie-new-btn').addEventListener('click', createNote);
 
   // Save before unload
@@ -375,7 +375,7 @@
     }
   });
 
-  // ── Initial load ──
+  // â”€â”€ Initial load â”€â”€
   await loadNotes();
 })();
 </script>
@@ -388,7 +388,7 @@
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -396,8 +396,8 @@
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

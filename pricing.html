@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,26 +8,26 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0d1520">
-  <meta name="description" content="Internly prijzen — transparante tarieven voor bedrijven en scholen.">
-  <meta property="og:title" content="Prijzen — Internly">
+  <meta name="description" content="Internly prijzen â€” transparante tarieven voor bedrijven en scholen.">
+  <meta property="og:title" content="Prijzen â€” Internly">
   <meta property="og:description" content="Transparante tarieven voor bedrijven en scholen. Geen verborgen kosten.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
   <meta property="og:url" content="https://internly.pro/pricing.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Internly">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Prijzen — Internly</title>
+  <title>Prijzen â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   Subpage archetype (pricing) — 3 audience-tabs + plan-cards.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Subpage archetype (pricing) â€” 3 audience-tabs + plan-cards.
    Globale tokens uit css/style.css.
-   ═══════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 :root {
-  /* Pagina-aliassen → globale tokens */
+  /* Pagina-aliassen â†’ globale tokens */
   --ink:       var(--c-ink);
   --ink2:      var(--fg-secondary);
   --ink3:      var(--fg-tertiary);
@@ -54,7 +54,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Topbar — translucent cream (blueprint) ── */
+/* â”€â”€ Topbar â€” translucent cream (blueprint) â”€â”€ */
 .topbar {
   position: sticky; top: 0; z-index: 100;
   height: var(--nav-h);
@@ -99,7 +99,7 @@ body {
   .topbar-nav a:not(.topbar-cta) { display: none; }
 }
 
-/* ── Mini-hero — green-deep met grain (blueprint) ── */
+/* â”€â”€ Mini-hero â€” green-deep met grain (blueprint) â”€â”€ */
 .hero {
   background:
     radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
@@ -155,7 +155,7 @@ body {
   margin: 0 auto;
 }
 
-/* ── Audience toggle ── */
+/* â”€â”€ Audience toggle â”€â”€ */
 .audience-toggle {
   display: flex;
   justify-content: center;
@@ -184,7 +184,7 @@ body {
   color: var(--c-green);
 }
 
-/* ── Section ── */
+/* â”€â”€ Section â”€â”€ */
 .pricing-section {
   display: none;
   padding: 16px var(--s5, 24px) var(--s9, 80px);
@@ -212,14 +212,14 @@ body {
   margin-bottom: var(--s7, 36px);
 }
 
-/* ── Grid ── */
+/* â”€â”€ Grid â”€â”€ */
 .pricing-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--s5, 20px);
 }
 
-/* ── Plan card ── */
+/* â”€â”€ Plan card â”€â”€ */
 .plan-card {
   background: var(--bg-surface);
   border: 1px solid var(--line-subtle);
@@ -349,7 +349,7 @@ body {
   background: var(--c-cream);
 }
 
-/* ── Pricing note ── */
+/* â”€â”€ Pricing note â”€â”€ */
 .pricing-note {
   text-align: center;
   margin-top: var(--s7, 48px);
@@ -363,7 +363,7 @@ body {
 }
 .pricing-note a:hover { text-decoration: underline; text-underline-offset: 2px; }
 
-/* ── Toast ── */
+/* â”€â”€ Toast â”€â”€ */
 .notif {
   position: fixed; bottom: 24px; left: 50%;
   transform: translateX(-50%) translateY(12px);
@@ -404,7 +404,7 @@ body {
 </style>
 <script src="js/utils.js"></script>
 <script src="js/roles.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="js/supabase.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/consent.js" defer></script>
@@ -440,7 +440,7 @@ body {
 
 <div class="notif" id="notif"></div>
 
-<!-- ── Topbar ── -->
+<!-- â”€â”€ Topbar â”€â”€ -->
 <nav class="topbar" data-public-header>
   <a href="index.html" class="topbar-logo">intern<span>ly</span></a>
   <div class="topbar-nav">
@@ -448,36 +448,36 @@ body {
     <a href="about.html">Over ons</a>
     <a href="stagebegeleiding.html">Stagebegeleiding</a>
     <a href="pricing.html" class="active">Prijzen</a>
-    <a href="auth.html" class="topbar-cta">Inloggen →</a>
+    <a href="auth.html" class="topbar-cta">Inloggen â†’</a>
   </div>
 </nav>
 
-<!-- ── Hero ── -->
+<!-- â”€â”€ Hero â”€â”€ -->
 <header class="hero">
   <div class="hero-inner">
     <span class="hero-script-eyebrow">prijzen</span>
     <div class="hero-eyebrow">Transparante tarieven</div>
     <h1 class="hero-title">Eerlijk geprijsd,<br><span>altijd duidelijk</span></h1>
-    <p class="hero-sub">Geen verborgen kosten. Bedrijven en scholen starten gratis. Individuele begeleiders starten vanaf €49/mnd.</p>
+    <p class="hero-sub">Geen verborgen kosten. Bedrijven en scholen starten gratis. Individuele begeleiders starten vanaf â‚¬49/mnd.</p>
   </div>
 </header>
 
-<!-- ── Student anchor ── -->
+<!-- â”€â”€ Student anchor â”€â”€ -->
 <p style="text-align:center;font-size:.82rem;color:var(--ink3);margin-bottom:1rem;">
-  Student? Internly is voor jou altijd gratis —
-  <a href="auth.html" style="color:var(--orange);text-decoration:none;font-weight:500">maak direct een account aan →</a>
+  Student? Internly is voor jou altijd gratis â€”
+  <a href="auth.html" style="color:var(--orange);text-decoration:none;font-weight:500">maak direct een account aan â†’</a>
 </p>
 
-<!-- ── Toggle ── -->
+<!-- â”€â”€ Toggle â”€â”€ -->
 <div class="audience-toggle">
   <button class="toggle-btn active" id="toggle-bedrijf" onclick="showSection('bedrijf')">Voor bedrijven</button>
   <button class="toggle-btn" id="toggle-school" onclick="showSection('school')">Voor scholen</button>
   <button class="toggle-btn" id="toggle-begeleider" onclick="showSection('begeleider')">Voor begeleiders</button>
 </div>
 
-<!-- ══════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      BEDRIJVEN
-═══════════════════════════════════ -->
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <section class="pricing-section visible" id="section-bedrijf">
 
   <p class="section-eyebrow">Bedrijven</p>
@@ -488,17 +488,17 @@ body {
     <!-- Starter -->
     <div class="plan-card">
       <div class="plan-name">Starter</div>
-      <div class="plan-price">€0</div>
+      <div class="plan-price">â‚¬0</div>
       <div class="plan-period">gratis, voor altijd</div>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li><span class="check">✓</span> 1 actieve vacature</li>
-        <li><span class="check">✓</span> Standaard matchingprofiel</li>
-        <li><span class="check">✓</span> Directe chat met studenten</li>
-        <li><span class="check">✓</span> Stage Hub (basis)</li>
-        <li class="muted"><span class="cross">–</span> ESG-rapportage</li>
-        <li class="muted"><span class="cross">–</span> Trust Score analytics</li>
-        <li class="muted"><span class="cross">–</span> ATS-integratie</li>
+        <li><span class="check">âœ“</span> 1 actieve vacature</li>
+        <li><span class="check">âœ“</span> Standaard matchingprofiel</li>
+        <li><span class="check">âœ“</span> Directe chat met studenten</li>
+        <li><span class="check">âœ“</span> Stage Hub (basis)</li>
+        <li class="muted"><span class="cross">â€“</span> ESG-rapportage</li>
+        <li class="muted"><span class="cross">â€“</span> Trust Score analytics</li>
+        <li class="muted"><span class="cross">â€“</span> ATS-integratie</li>
       </ul>
       <button class="btn-plan outline" onclick="startCheckout('company_starter')">Begin gratis</button>
     </div>
@@ -506,39 +506,39 @@ body {
     <!-- Pro (featured) -->
     <div class="plan-card featured">
       <div class="plan-name">Pro</div>
-      <div class="plan-price">€59 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar</div>
+      <div class="plan-price">â‚¬59 <span>/mnd</span></div>
+      <div class="plan-period">excl. btw Â· maandelijks opzegbaar</div>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li><span class="check">✓</span> Onbeperkt vacatures plaatsen</li>
-        <li><span class="check">✓</span> S1-stagedata voor je CSRD-onderbouwing</li>
-        <li><span class="check">✓</span> Trust Score analytics dashboard</li>
-        <li><span class="check">✓</span> Prioriteit in zoekresultaten</li>
-        <li><span class="check">✓</span> Stage Hub (volledig)</li>
-        <li><span class="check">✓</span> Doorstroomstatistieken</li>
-        <li><span class="check">✓</span> Postcode per vacature (1 locatie)</li>
-        <li class="muted"><span class="cross">–</span> ATS-integratie</li>
+        <li><span class="check">âœ“</span> Onbeperkt vacatures plaatsen</li>
+        <li><span class="check">âœ“</span> S1-stagedata voor je CSRD-onderbouwing</li>
+        <li><span class="check">âœ“</span> Trust Score analytics dashboard</li>
+        <li><span class="check">âœ“</span> Prioriteit in zoekresultaten</li>
+        <li><span class="check">âœ“</span> Stage Hub (volledig)</li>
+        <li><span class="check">âœ“</span> Doorstroomstatistieken</li>
+        <li><span class="check">âœ“</span> Postcode per vacature (1 locatie)</li>
+        <li class="muted"><span class="cross">â€“</span> ATS-integratie</li>
       </ul>
-      <button class="btn-plan primary" data-plan="company_pro" onclick="startCheckout('company_pro')">Kies Pro →</button>
+      <button class="btn-plan primary" data-plan="company_pro" onclick="startCheckout('company_pro')">Kies Pro â†’</button>
     </div>
 
     <!-- Business -->
     <div class="plan-card">
       <div class="plan-name">Business</div>
-      <div class="plan-price">€169 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar</div>
+      <div class="plan-price">â‚¬169 <span>/mnd</span></div>
+      <div class="plan-period">excl. btw Â· maandelijks opzegbaar</div>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li><span class="check">✓</span> Alles van Pro</li>
-        <li class="future">🔜 ATS-integratie (beschikbaar in 2027)</li>
-        <li><span class="check">✓</span> Prioriteitssupport via e-mail</li>
-        <li><span class="check">✓</span> Meerdere vestigingen beheren</li>
-        <li><span class="check">✓</span> Vestiging koppelen per vacature</li>
-        <li class="future">🔜 Whitelabel Stage Hub (beschikbaar in 2027)</li>
-        <li><span class="check">✓</span> Kwartaalrapportage per e-mail</li>
-        <li><span class="check">✓</span> Custom matching-criteria</li>
+        <li><span class="check">âœ“</span> Alles van Pro</li>
+        <li class="future">ðŸ”œ ATS-integratie (beschikbaar in 2027)</li>
+        <li><span class="check">âœ“</span> Prioriteitssupport via e-mail</li>
+        <li><span class="check">âœ“</span> Meerdere vestigingen beheren</li>
+        <li><span class="check">âœ“</span> Vestiging koppelen per vacature</li>
+        <li class="future">ðŸ”œ Whitelabel Stage Hub (beschikbaar in 2027)</li>
+        <li><span class="check">âœ“</span> Kwartaalrapportage per e-mail</li>
+        <li><span class="check">âœ“</span> Custom matching-criteria</li>
       </ul>
-      <button class="btn-plan secondary" data-plan="company_business" onclick="startCheckout('company_business')">Kies Business →</button>
+      <button class="btn-plan secondary" data-plan="company_business" onclick="startCheckout('company_business')">Kies Business â†’</button>
     </div>
 
   </div>
@@ -549,9 +549,9 @@ body {
 
 </section>
 
-<!-- ══════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      SCHOLEN
-═══════════════════════════════════ -->
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <section class="pricing-section" id="section-school">
 
   <p class="section-eyebrow">Scholen &amp; ROC's</p>
@@ -562,17 +562,17 @@ body {
     <!-- Freemium -->
     <div class="plan-card">
       <div class="plan-name">Freemium</div>
-      <div class="plan-price">€0</div>
+      <div class="plan-price">â‚¬0</div>
       <div class="plan-period">gratis, voor altijd</div>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li><span class="check">✓</span> 1 stagebegeleider</li>
-        <li><span class="check">✓</span> Basisdashboard (voortgangsoverzicht)</li>
-        <li><span class="check">✓</span> Inzage in Stage Hub van eigen studenten</li>
-        <li class="muted"><span class="cross">–</span> Signalen (Premium)</li>
-        <li class="muted"><span class="cross">–</span> Meerdere begeleiders</li>
-        <li class="muted"><span class="cross">–</span> Exportrapportages (PDF/CSV)</li>
-        <li class="muted"><span class="cross">–</span> Cohortanalyse &amp; trends</li>
+        <li><span class="check">âœ“</span> 1 stagebegeleider</li>
+        <li><span class="check">âœ“</span> Basisdashboard (voortgangsoverzicht)</li>
+        <li><span class="check">âœ“</span> Inzage in Stage Hub van eigen studenten</li>
+        <li class="muted"><span class="cross">â€“</span> Signalen (Premium)</li>
+        <li class="muted"><span class="cross">â€“</span> Meerdere begeleiders</li>
+        <li class="muted"><span class="cross">â€“</span> Exportrapportages (PDF/CSV)</li>
+        <li class="muted"><span class="cross">â€“</span> Cohortanalyse &amp; trends</li>
       </ul>
       <button class="btn-plan outline" onclick="startCheckout('school_freemium')">Begin gratis</button>
     </div>
@@ -580,20 +580,20 @@ body {
     <!-- Premium (featured) -->
     <div class="plan-card featured">
       <div class="plan-name">Premium</div>
-      <div class="plan-price">€29 <span>/mnd</span></div>
-      <div class="plan-period">of €249/jaar — bespaar €99 &nbsp;·&nbsp; per opleiding · excl. btw</div>
+      <div class="plan-price">â‚¬29 <span>/mnd</span></div>
+      <div class="plan-period">of â‚¬249/jaar â€” bespaar â‚¬99 &nbsp;Â·&nbsp; per opleiding Â· excl. btw</div>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li><span class="check">✓</span> Onbeperkt stagebegeleiders</li>
-        <li><span class="check">✓</span> Exportrapportages (PDF &amp; CSV)</li>
-        <li><span class="check">✓</span> Cohortanalyse &amp; trendgrafieken</li>
-        <li><span class="check">✓</span> Driegesprek-workflow (student + bedrijf + ROC)</li>
-        <li><span class="check">✓</span> BBL-traject volledig ondersteund</li>
-        <li><span class="check">✓</span> Prioriteitssupport</li>
-        <li><span class="check">✓</span> AVG-compliant dataverwerking</li>
+        <li><span class="check">âœ“</span> Onbeperkt stagebegeleiders</li>
+        <li><span class="check">âœ“</span> Exportrapportages (PDF &amp; CSV)</li>
+        <li><span class="check">âœ“</span> Cohortanalyse &amp; trendgrafieken</li>
+        <li><span class="check">âœ“</span> Driegesprek-workflow (student + bedrijf + ROC)</li>
+        <li><span class="check">âœ“</span> BBL-traject volledig ondersteund</li>
+        <li><span class="check">âœ“</span> Prioriteitssupport</li>
+        <li><span class="check">âœ“</span> AVG-compliant dataverwerking</li>
       </ul>
-      <button class="btn-plan primary" data-plan="school_premium_monthly" onclick="startCheckout('school_premium_monthly')">Kies maandelijks →</button>
-      <button class="btn-plan secondary" data-plan="school_premium" onclick="startCheckout('school_premium')" style="margin-top:8px">Kies jaarlijks →</button>
+      <button class="btn-plan primary" data-plan="school_premium_monthly" onclick="startCheckout('school_premium_monthly')">Kies maandelijks â†’</button>
+      <button class="btn-plan secondary" data-plan="school_premium" onclick="startCheckout('school_premium')" style="margin-top:8px">Kies jaarlijks â†’</button>
     </div>
 
   </div>
@@ -604,9 +604,9 @@ body {
 
 </section>
 
-<!-- ══════════════════════════════════
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      BEGELEIDERS
-═══════════════════════════════════ -->
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <section class="pricing-section" id="section-begeleider">
 
   <p class="section-eyebrow">Individuele stagebegeleiders</p>
@@ -617,41 +617,41 @@ body {
     <!-- Begeleider Starter -->
     <div class="plan-card">
       <div class="plan-name">Starter</div>
-      <div class="plan-price">€49 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar · tot 30 studenten</div>
+      <div class="plan-price">â‚¬49 <span>/mnd</span></div>
+      <div class="plan-period">excl. btw Â· maandelijks opzegbaar Â· tot 30 studenten</div>
       <p style="font-size:.75rem;color:var(--ink3);margin-top:.5rem">
         Nog geen account?
         <a href="auth.html" style="color:var(--orange);text-decoration:none;font-weight:500">
-          Registreer gratis →
+          Registreer gratis â†’
         </a>
       </p>
       <div class="plan-divider"></div>
-      <p style="font-size:.8rem;font-style:italic;color:var(--ink3);margin-bottom:.75rem">Je houdt het overzicht over al je studenten — ook als je er twintig tegelijk begeleidt.</p>
+      <p style="font-size:.8rem;font-style:italic;color:var(--ink3);margin-bottom:.75rem">Je houdt het overzicht over al je studenten â€” ook als je er twintig tegelijk begeleidt.</p>
       <ul class="plan-features">
-        <li><span class="check">✓</span> Dashboard met voortgangsoverzicht</li>
-        <li><span class="check">✓</span> Stage Hub per student</li>
-        <li><span class="check">✓</span> Signalen &amp; alerts</li>
-        <li><span class="check">✓</span> Begeleidingsgesprekken plannen</li>
-        <li class="muted"><span class="cross">–</span> Exportrapportages</li>
-        <li class="muted"><span class="cross">–</span> Tot 100 studenten</li>
+        <li><span class="check">âœ“</span> Dashboard met voortgangsoverzicht</li>
+        <li><span class="check">âœ“</span> Stage Hub per student</li>
+        <li><span class="check">âœ“</span> Signalen &amp; alerts</li>
+        <li><span class="check">âœ“</span> Begeleidingsgesprekken plannen</li>
+        <li class="muted"><span class="cross">â€“</span> Exportrapportages</li>
+        <li class="muted"><span class="cross">â€“</span> Tot 100 studenten</li>
       </ul>
-      <button class="btn-plan secondary" data-plan="begeleider_starter" onclick="startCheckout('begeleider_starter')">Kies Starter →</button>
+      <button class="btn-plan secondary" data-plan="begeleider_starter" onclick="startCheckout('begeleider_starter')">Kies Starter â†’</button>
     </div>
 
     <!-- Begeleider Pro (featured) -->
     <div class="plan-card featured">
       <div class="plan-name">Pro</div>
-      <div class="plan-price">€79 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar · tot 100 studenten</div>
+      <div class="plan-price">â‚¬79 <span>/mnd</span></div>
+      <div class="plan-period">excl. btw Â· maandelijks opzegbaar Â· tot 100 studenten</div>
       <div class="plan-divider"></div>
       <p style="font-size:.8rem;font-style:italic;color:var(--ink3);margin-bottom:.75rem">Voor begeleiders die niets aan het toeval willen overlaten en elke student willen kunnen verantwoorden.</p>
       <ul class="plan-features">
-        <li><span class="check">✓</span> Alles van Starter</li>
-        <li><span class="check">✓</span> Exportrapportages (PDF &amp; CSV)</li>
-        <li><span class="check">✓</span> Tot 100 studenten</li>
-        <li><span class="check">✓</span> Prioriteitssupport</li>
+        <li><span class="check">âœ“</span> Alles van Starter</li>
+        <li><span class="check">âœ“</span> Exportrapportages (PDF &amp; CSV)</li>
+        <li><span class="check">âœ“</span> Tot 100 studenten</li>
+        <li><span class="check">âœ“</span> Prioriteitssupport</li>
       </ul>
-      <button class="btn-plan primary" data-plan="begeleider_pro" onclick="startCheckout('begeleider_pro')">Kies Pro →</button>
+      <button class="btn-plan primary" data-plan="begeleider_pro" onclick="startCheckout('begeleider_pro')">Kies Pro â†’</button>
     </div>
 
   </div>
@@ -674,7 +674,7 @@ body {
   ));
 */
 
-// ── Toggle ────────────────────────────────────────────────────────────────────
+// â”€â”€ Toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function showSection(audience) {
   ['bedrijf','school','begeleider'].forEach(a => {
@@ -689,7 +689,7 @@ function showSection(audience) {
   if (p === 'school' || p === 'begeleider') showSection(p);
 })();
 
-// ── Mollie checkout flow — create-checkout Edge Function actief ─────────────
+// â”€â”€ Mollie checkout flow â€” create-checkout Edge Function actief â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function startCheckout(plan) {
   const { data: { session } } = await db.auth.getSession();
@@ -713,7 +713,7 @@ async function startCheckout(plan) {
   }
 
   const btn = document.querySelector('[data-plan="' + plan + '"]');
-  if (btn) { btn.disabled = true; btn.textContent = 'Laden…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Ladenâ€¦'; }
 
   try {
     const res = await fetch(
@@ -741,7 +741,7 @@ async function startCheckout(plan) {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function goToAuth() {
   window.location.href = 'auth.html';
@@ -759,7 +759,7 @@ function goToAuth() {
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="blog.html">Blog</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -770,12 +770,12 @@ function goToAuth() {
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 
-<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -835,14 +835,14 @@ function goToAuth() {
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend → publieke header blijft staan, geen warn
+    // role onbekend â†’ publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }

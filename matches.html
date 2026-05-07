@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,13 +8,13 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Mijn matches — Internly</title>
+  <title>Mijn matches â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/consent.js" defer></script>
@@ -46,12 +46,12 @@
   })();
   </script>
   <style>
-    /* ═══════════════════════════════════════════════════════════════
-       Lijst archetype (matches) — swipe-card variant.
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       Lijst archetype (matches) â€” swipe-card variant.
        Globale tokens uit css/style.css. Alle .swipe-card / .btn-pass /
        .btn-like / .empty-state / .filter-toggle CSS staat globaal.
        Hier alleen pagina-specifieke layout + heading-tokens.
-       ═══════════════════════════════════════════════════════════════ */
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -108,23 +108,23 @@
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs" aria-label="Navigatie">
   <button class="mt-tab" onclick="window.location.href='discover.html'">
-    <span class="mt-icon">🔍</span>
+    <span class="mt-icon">ðŸ”</span>
     <span class="mt-label">Ontdek</span>
   </button>
   <button class="mt-tab active" onclick="window.location.href='matches.html'">
-    <span class="mt-icon">💫</span>
+    <span class="mt-icon">ðŸ’«</span>
     <span class="mt-label">Matches</span>
   </button>
   <button class="mt-tab" onclick="window.location.href='mijn-sollicitaties.html'">
-    <span class="mt-icon">📋</span>
+    <span class="mt-icon">ðŸ“‹</span>
     <span class="mt-label">Stages</span>
   </button>
   <button class="mt-tab" onclick="window.location.href='match-dashboard.html'">
-    <span class="mt-icon">📊</span>
+    <span class="mt-icon">ðŸ“Š</span>
     <span class="mt-label">Hub</span>
   </button>
   <button class="mt-tab" onclick="window.location.href='student-profile.html'">
-    <span class="mt-icon">👤</span>
+    <span class="mt-icon">ðŸ‘¤</span>
     <span class="mt-label">Profiel</span>
   </button>
 </nav>
@@ -140,7 +140,7 @@
     <label class="toggle-row" for="poolToggle">
       <input type="checkbox" class="toggle-input" id="poolToggle" onchange="onToggleChange()">
       <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label">Toon vacatures in matchpool<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Meer informatie over matchpool">ⓘ<span class="info-pop">Vacatures in je <strong>matchpool</strong> zijn opdrachten van bedrijven die al interesse in jou hebben getoond. Zet dit aan om die mee te zien — je kunt er direct contact mee opnemen zonder eerst te liken.</span></span></span>
+      <span class="toggle-label">Toon vacatures in matchpool<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Meer informatie over matchpool">â“˜<span class="info-pop">Vacatures in je <strong>matchpool</strong> zijn opdrachten van bedrijven die al interesse in jou hebben getoond. Zet dit aan om die mee te zien â€” je kunt er direct contact mee opnemen zonder eerst te liken.</span></span></span>
     </label>
     <div class="toggle-sub">Zet dit uit dat bedrijven jou zien</div>
   </div>
@@ -149,7 +149,7 @@
 
   <div class="swipe-actions">
     <button class="btn-pass" onclick="skipCard()">Passen</button>
-    <button class="btn-like" onclick="likeCard()">Like ❤️</button>
+    <button class="btn-like" onclick="likeCard()">Like â¤ï¸</button>
   </div>
 </div>
 
@@ -160,14 +160,14 @@
   <p style="color:#6b8070;font-size:1rem;margin-bottom:24px;line-height:1.55;">Gepensioneerde professionals die je vrijwillig begeleiden.</p>
 
   <!-- Buddy-paren -->
-  <div id="buddyPairsContainer"><p style="color:#6b7280;font-size:.88rem;">Laden…</p></div>
+  <div id="buddyPairsContainer"><p style="color:#6b7280;font-size:.88rem;">Ladenâ€¦</p></div>
 
-  <!-- Geen-buddy CTA — getoond door loadBuddyPairs als pairs leeg zijn -->
+  <!-- Geen-buddy CTA â€” getoond door loadBuddyPairs als pairs leeg zijn -->
   <div id="buddyEmptyCta" style="display:none;text-align:center;padding:32px 16px;background:#faf7ff;border:1px solid #ede9fe;border-radius:12px;margin-top:8px;">
-    <div style="font-size:2rem;margin-bottom:10px;">🤝</div>
+    <div style="font-size:2rem;margin-bottom:10px;">ðŸ¤</div>
     <div style="font-size:.95rem;font-weight:600;color:#0d1520;margin-bottom:6px;">Nog geen buddy gekoppeld</div>
     <div style="font-size:.85rem;color:#6b7280;margin-bottom:16px;">Ga naar Matchpool en zet "Beschikbare buddies tonen" aan om een buddy te vinden.</div>
-    <a href="matchpool.html" style="display:inline-block;background:#7c3aed;color:#fff;padding:10px 20px;border-radius:20px;font-size:.88rem;font-weight:600;text-decoration:none;">Naar Matchpool →</a>
+    <a href="matchpool.html" style="display:inline-block;background:#7c3aed;color:#fff;padding:10px 20px;border-radius:20px;font-size:.88rem;font-weight:600;text-decoration:none;">Naar Matchpool â†’</a>
   </div>
 
   <!-- Buddy-instellingen -->
@@ -178,7 +178,7 @@
       <input type="checkbox" id="buddy-visibility-toggle" onchange="updateBuddyVisibility(this.checked)" style="width:18px;height:18px;cursor:pointer;">
     </label>
     <div style="margin-top:14px;padding:12px;background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;font-size:.82rem;color:#78350f;line-height:1.45;">
-      ⚠️ <strong>Veiligheid:</strong> wees altijd voorzichtig bij het afspreken met mensen die je online hebt ontmoet. Kies voor de eerste ontmoeting een openbare locatie.
+      âš ï¸ <strong>Veiligheid:</strong> wees altijd voorzichtig bij het afspreken met mensen die je online hebt ontmoet. Kies voor de eerste ontmoeting een openbare locatie.
     </div>
   </div>
 </section>
@@ -190,7 +190,7 @@
   let currentUser       = null;
   let notifSubscription = null;
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function formatRelativeTime(iso) {
     const diff = Date.now() - new Date(iso).getTime();
@@ -288,7 +288,7 @@
       .subscribe((status, err) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn('[matches] realtime verbinding verbroken:', err?.message);
-          notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+          notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
         }
       });
   }
@@ -301,15 +301,15 @@
       t.style.cssText = 'position:fixed;top:70px;right:16px;background:#0d1520;color:#fff;padding:10px 16px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;line-height:1.4;font-family:Outfit,sans-serif';
       document.body.appendChild(t);
     }
-    t.textContent = '🔔 ' + message;
+    t.textContent = 'ðŸ”” ' + message;
     t.style.opacity = '1';
     clearTimeout(t._timeout);
     t._timeout = setTimeout(() => { t.style.opacity = '0'; }, 4000);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Toggle helpers
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function getToggleState() {
     const stored = localStorage.getItem('internly_show_vacatures');
@@ -332,10 +332,10 @@
     loadMatches();
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // ─────────────────────────────────────────────────────────────────────────
-  // localStorage — save liked vacature
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // localStorage â€” save liked vacature
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function saveVacatureToLocal(card) {
     let saved;
@@ -355,9 +355,9 @@
     localStorage.setItem('internly_saved_vacatures', JSON.stringify(saved));
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Card rendering
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function createCard(card, stackIndex) {
     const el = document.createElement('div');
@@ -365,7 +365,7 @@
     el.style.zIndex = 10 - stackIndex;
 
     const poolBadge = card.type === 'vacature'
-      ? '<span class="pool-badge">📋 Uit matchpool</span>'
+      ? '<span class="pool-badge">ðŸ“‹ Uit matchpool</span>'
       : '';
 
     const stageHubLink = card.type === 'match' && card.matchId
@@ -374,12 +374,12 @@
             style="display:inline-block;margin-top:10px;font-size:.8rem;font-weight:700;
                    color:#e05c1a;background:#fdf0e8;padding:5px 12px;border-radius:20px;
                    text-decoration:none;">
-            📊 Stage Hub →</a>`
+            ðŸ“Š Stage Hub â†’</a>`
       : '';
 
     el.innerHTML = `
       <div class="card-visual">
-        ${card.emoji || '🏢'}
+        ${card.emoji || 'ðŸ¢'}
         ${poolBadge}
       </div>
       <div class="card-body">
@@ -444,7 +444,7 @@
       if (!showPool) {
         container.innerHTML = `
           <div class="empty-state">
-            <span class="empty-icon">💫</span>
+            <span class="empty-icon">ðŸ’«</span>
             Nog geen matches.<br>
             <small>Zet de matchpool aan om alvast vacatures te bekijken.</small>
             <button class="btn-enable-pool" onclick="enablePool()">Zet aan dat bedrijven jou kunnen vinden</button>
@@ -452,7 +452,7 @@
       } else {
         container.innerHTML = `
           <div class="empty-state">
-            <span class="empty-icon">📭</span>
+            <span class="empty-icon">ðŸ“­</span>
             Geen vacatures beschikbaar.<br>
             <small>Kom later terug.</small>
           </div>`;
@@ -465,9 +465,9 @@
     });
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Swipe actions
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function likeCard() {
     if (window._isLiking) return;
@@ -489,7 +489,7 @@
         if (matchRowErr) { console.warn('[matches] matchRow fetch fout:', matchRowErr.message); }
 
         const { error: updErr } = await db.from('matches').update({ status: 'accepted' }).eq('id', card.matchId).or('party_a.eq.' + currentUser.id + ',party_b.eq.' + currentUser.id);
-        if (updErr) { notify('Match bevestigen mislukt — probeer opnieuw'); window._isLiking = false; return; }
+        if (updErr) { notify('Match bevestigen mislukt â€” probeer opnieuw'); window._isLiking = false; return; }
 
         // Maak conversation aan (of hergebruik bestaande)
         let { data: conv } = await db.from('conversations')
@@ -502,7 +502,7 @@
             .select('id')
             .maybeSingle();
           conv = newConv;
-          if (!conv) { notify('Gesprek kon niet worden aangemaakt — probeer opnieuw'); return; }
+          if (!conv) { notify('Gesprek kon niet worden aangemaakt â€” probeer opnieuw'); return; }
         }
 
         // Notify the other party
@@ -522,7 +522,7 @@
         window.location.href = 'chat.html?match=' + encodeURIComponent(card.matchId);
         return;
       }
-      notify('🎉 Match bevestigd');
+      notify('ðŸŽ‰ Match bevestigd');
     } else {
       // Pool vacature
       if (currentUser && card.source === 'internship_postings') {
@@ -559,12 +559,12 @@
               posting_id:     card.id,
               roc_profile_id: rocProfileId,
             }).select('id').maybeSingle();
-            if (!match) { notify('Er ging iets mis bij het aanmaken van de match — probeer opnieuw'); return; }
+            if (!match) { notify('Er ging iets mis bij het aanmaken van de match â€” probeer opnieuw'); return; }
             const { error: convErr } = await db.from('conversations')
               .insert({ match_id: match.id }).select('id').maybeSingle();
             if (convErr) {
               console.error('[matches] conversation aanmaken mislukt:', convErr.message);
-              notify('Aanvraag verstuurd maar gesprek kon niet worden gestart — ververs de pagina', false);
+              notify('Aanvraag verstuurd maar gesprek kon niet worden gestart â€” ververs de pagina', false);
               advanceCard();
               return;
             }
@@ -578,14 +578,14 @@
               myName + ' heeft interesse in jouw vacature: ' + (card.title || 'Stageplek')
             );
             saveVacatureToLocal(card);
-            notify('✓ Aanvraag verstuurd — wacht op reactie van het bedrijf');
+            notify('âœ“ Aanvraag verstuurd â€” wacht op reactie van het bedrijf');
             advanceCard();
             return;
           }
         } catch(e) { console.error('Match aanmaken fout:', e?.message || 'onbekende fout'); }
       }
       saveVacatureToLocal(card);
-      notify('🔖 Opgeslagen bij Mijn Stages');
+      notify('ðŸ”– Opgeslagen bij Mijn Stages');
     }
 
     advanceCard();
@@ -611,18 +611,18 @@
     currentIndex++;
     if (currentIndex >= allCards.length) {
       currentIndex = 0;
-      notify('Dat was de laatste kaart — kom later terug');
+      notify('Dat was de laatste kaart â€” kom later terug');
     }
     loadCards();
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Data loading
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function loadMatches() {
     const container = document.getElementById('swipe-container');
-    container.innerHTML = `<div class="empty-state"><span class="empty-icon">⏳</span>Laden…</div>`;
+    container.innerHTML = `<div class="empty-state"><span class="empty-icon">â³</span>Ladenâ€¦</div>`;
 
     const showPool = getToggleState();
     allCards       = [];
@@ -649,7 +649,7 @@
             trust:       p.trust_score  || 70,
             grade:       p.trust_grade  || 'B',
             description: 'Dit bedrijf heeft interesse in jouw profiel.',
-            emoji:       '🏢',
+            emoji:       'ðŸ¢',
             sector:      '',
           };
         }));
@@ -683,9 +683,9 @@
         trust:       v.trust_score  || 70,
         grade:       v.trust_grade  || 'B',
         description: (v.description || '').length > 150
-                       ? v.description.slice(0, 150) + '…'
+                       ? v.description.slice(0, 150) + 'â€¦'
                        : (v.description || ''),
-        emoji:       '🏢',
+        emoji:       'ðŸ¢',
         sector:      v.sector || '',
       });
 
@@ -698,9 +698,9 @@
     loadCards();
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Helpers
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function showLoading(containerId, tekst) {
     const el = document.getElementById(containerId);
@@ -709,7 +709,7 @@
   }
 
   // Offline/online listeners
-  window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
+  window.addEventListener('offline', () => notify('Geen internetverbinding â€” wijzigingen worden niet opgeslagen'));
   window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
 
   function signOut() { performLogout(); }
@@ -723,7 +723,7 @@
     }
   });
 
-  // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+  // Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
   window.addEventListener('unhandledrejection', function(e) {
     if (e.reason && (
       e.reason.message?.includes('JWT') ||
@@ -735,9 +735,9 @@
     }
   });
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Init
-  // ─────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   // View-mode: 'buddy' bij ?view=buddy of legacy ?filter=buddy, anders default vacature-view
   const _urlParams = new URLSearchParams(window.location.search);
@@ -746,7 +746,7 @@
   window.addEventListener('DOMContentLoaded', async () => {
     setToggleUI(getToggleState());
 
-    // ── Guard: alleen BOL-studenten ──
+    // â”€â”€ Guard: alleen BOL-studenten â”€â”€
     const hasValidRole = await requireRole('student');
     if (!hasValidRole) return;
 
@@ -827,7 +827,7 @@
         const other   = profileMap[otherId] || {};
         const init    = (other.naam || '?').charAt(0).toUpperCase();
         const name    = escapeHtml(other.naam || 'Onbekend');
-        // Buddy kleurcodering — backlog 30 apr 2026
+        // Buddy kleurcodering â€” backlog 30 apr 2026
         return `<div style="display:flex;align-items:center;gap:14px;padding:14px 12px;border-bottom:1px solid rgba(13,21,32,.07);border-left:3px solid #7c3aed;background:#faf7ff;border-radius:0 6px 6px 0;margin-bottom:6px">
           <div style="width:40px;height:40px;border-radius:50%;background:#ede9fe;color:#7c3aed;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;flex-shrink:0;">${escapeHtml(init)}</div>
           <div>
@@ -848,6 +848,6 @@
 
   <script src="js/translate.js"></script>
   <script src="js/info.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -38,17 +38,17 @@
           <input class="cs-input" type="text" id="cs-sector">
         </div>
         <button class="cs-button" type="submit" id="cs-btn">Houd me op de hoogte</button>
-        <div class="cs-success" id="cs-success">Bedankt — we sturen je bericht zodra de module live gaat.</div>
+        <div class="cs-success" id="cs-success">Bedankt â€” we sturen je bericht zodra de module live gaat.</div>
         <div class="cs-error" id="cs-error">Vul een geldig e-mailadres in.</div>
       </form>
     </div>
   </main>
 
   <footer class="cs-footer">
-    <a href="index.html">← Naar homepage</a>
+    <a href="index.html">â† Naar homepage</a>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
   <script src="js/supabase.js"></script>
@@ -76,7 +76,7 @@
       }
 
       btn.disabled = true;
-      btn.textContent = 'Bezig…';
+      btn.textContent = 'Bezigâ€¦';
 
       const client = window.db;
       if (!client) {

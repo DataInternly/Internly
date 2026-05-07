@@ -256,6 +256,17 @@ async function requireRole(...allowedRoles) {
   }
 }
 
+// 5.K-A7: kleine retry voor netwerk-glitches in profiles fetch
+async function _withRetry(fn, attempts = 2, delayMs = 200) {
+  for (let i = 0; i < attempts; i++) {
+    try { return await fn(); }
+    catch (err) {
+      if (i === attempts - 1) throw err;
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+}
+
 /**
  * Centralized auth guard for protected pages — successor to requireRole.
  * Encapsulates: body anti-flicker state, getSession (fast), role-check,
@@ -321,12 +332,13 @@ async function guardPage(allowedRoles, options) {
       return null;
     }
 
-    // Step 2: fetch profile + role
-    const { data: profile } = await client
+    // Step 2: fetch profile + role (1-2 retries voor netwerk-glitches)
+    const { data: profile } = await _withRetry(() => client
       .from('profiles')
       .select('id, role, naam')
       .eq('id', user.id)
-      .maybeSingle();
+      .maybeSingle()
+    );
 
     if (!profile || !profile.role) {
       _markReady();

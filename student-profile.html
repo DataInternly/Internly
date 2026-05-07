@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,13 +8,13 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Mijn profiel — Internly</title>
+  <title>Mijn profiel â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/avatar.js"></script>
   <script src="js/welcome-overlay.js"></script>
@@ -49,13 +49,13 @@
   })();
   </script>
   <style>
-    /* ═══════════════════════════════════════════════════════════════
-       Dashboard archetype — student-profielformulier + overzicht.
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       Dashboard archetype â€” student-profielformulier + overzicht.
        Globale tokens uit css/style.css. Topbar wordt gerendered door
        js/utils.js renderStudentHeader naar #student-header div.
-       NB: legacy .topbar styles weggehaald — geen <div class="topbar">
+       NB: legacy .topbar styles weggehaald â€” geen <div class="topbar">
        in deze pagina.
-       ═══════════════════════════════════════════════════════════════ */
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     body { background: var(--bg-page, #f4f3ef); color: var(--fg-primary, #0d1520); }
 
@@ -82,7 +82,7 @@
       line-height: 1.55;
     }
 
-    /* ── Progress bar ── */
+    /* â”€â”€ Progress bar â”€â”€ */
     .progress-bar { display: flex; gap: 6px; margin-bottom: var(--s7, 36px); }
     .pb-step {
       flex: 1; height: 4px;
@@ -93,7 +93,7 @@
     .pb-step.done   { background: var(--c-green, #1a7a48); }
     .pb-step.active { background: var(--c-orange-deep, #e05c1a); }
 
-    /* ── Sections ── */
+    /* â”€â”€ Sections â”€â”€ */
     .form-section { display: none; }
     .form-section.active { display: block; }
 
@@ -118,7 +118,7 @@
       line-height: 1.6;
     }
 
-    /* ── Form ── */
+    /* â”€â”€ Form â”€â”€ */
     .field { margin-bottom: var(--s5, 18px); }
     .field label {
       display: block;
@@ -181,7 +181,7 @@
     }
     .char-count.warn { color: var(--c-orange-deep, #e05c1a); }
 
-    /* ── Skills box ── */
+    /* â”€â”€ Skills box â”€â”€ */
     .skills-box {
       border: 1.5px solid var(--line-default, #e2e8f0);
       border-radius: var(--r-md, 10px);
@@ -223,7 +223,7 @@
       margin-top: 4px;
     }
 
-    /* ── Radio groups ── */
+    /* â”€â”€ Radio groups â”€â”€ */
     .radio-group { display: flex; flex-direction: column; gap: 8px; }
     .radio-opt {
       display: flex; align-items: center; gap: 10px;
@@ -256,7 +256,7 @@
       color: var(--fg-tertiary, #9ca3af);
     }
 
-    /* ── Sub-question (nested) ── */
+    /* â”€â”€ Sub-question (nested) â”€â”€ */
     .sub-q {
       background: var(--c-cream, #f4f3ef);
       border-left: 3px solid var(--line-default, #e2e8f0);
@@ -282,7 +282,7 @@
     }
     .sub-q input:focus { border-color: var(--c-green, #1a7a48); }
 
-    /* ── Form nav ── */
+    /* â”€â”€ Form nav â”€â”€ */
     .form-nav {
       display: flex;
       justify-content: space-between;
@@ -349,7 +349,7 @@
       box-shadow: none;
     }
 
-    /* ── Success screen ── */
+    /* â”€â”€ Success screen â”€â”€ */
     .success-screen {
       display: none;
       text-align: center;
@@ -381,7 +381,7 @@
     }
     .btn-cta:hover { background: #b94613; transform: translateY(-1px); }
 
-    /* ── Notif toast ── */
+    /* â”€â”€ Notif toast â”€â”€ */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -405,7 +405,7 @@
       outline-offset: 2px;
     }
 
-    /* ── Leerweg selector (BBL / BOL) ── */
+    /* â”€â”€ Leerweg selector (BBL / BOL) â”€â”€ */
     .profile-track-select {
       border: none;
       padding: 0;
@@ -447,7 +447,7 @@
       margin-top: 2px;
     }
 
-    /* ── Buddy opt-in toggle ── */
+    /* â”€â”€ Buddy opt-in toggle â”€â”€ */
     .buddy-toggle-row {
       display: flex;
       align-items: center;
@@ -527,7 +527,7 @@
     .bdy-req-btn:hover { background: var(--c-green-deep, #0f5c36); }
     .bdy-req-btn:disabled { opacity: .45; cursor: not-allowed; }
 
-    /* ── Profile overview view ── */
+    /* â”€â”€ Profile overview view â”€â”€ */
     .card {
       background: var(--bg-surface, #fff);
       border: 1px solid var(--line-subtle, rgba(13,26,16,.09));
@@ -569,7 +569,7 @@
       background: var(--c-cream, #f4f3ef);
     }
 
-    /* ── Saved vacatures ── */
+    /* â”€â”€ Saved vacatures â”€â”€ */
     .saved-card {
       background: var(--bg-surface, #fff);
       border: 1px solid var(--line-subtle, rgba(13,26,16,.09));
@@ -640,8 +640,8 @@
       line-height: 1.8;
     }
 
-    /* ── Topbar-user (legacy classes, behouden voor compat met
-       js/utils.js renderStudentHeader output) ── */
+    /* â”€â”€ Topbar-user (legacy classes, behouden voor compat met
+       js/utils.js renderStudentHeader output) â”€â”€ */
     .topbar-user {
       display: flex; align-items: center; gap: 10px;
       color: var(--fg-secondary, #374151);
@@ -690,37 +690,37 @@
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
   <a href="discover.html" class="mt-tab">
-    <span class="mt-icon">🔍</span>
+    <span class="mt-icon">ðŸ”</span>
     <span class="mt-label">Ontdek</span>
   </a>
   <a href="matches.html" class="mt-tab">
-    <span class="mt-icon">💫</span>
+    <span class="mt-icon">ðŸ’«</span>
     <span class="mt-label">Matches</span>
   </a>
   <a href="mijn-sollicitaties.html" class="mt-tab">
-    <span class="mt-icon">📋</span>
+    <span class="mt-icon">ðŸ“‹</span>
     <span class="mt-label">Stages</span>
   </a>
   <a href="match-dashboard.html" class="mt-tab">
-    <span class="mt-icon">📊</span>
+    <span class="mt-icon">ðŸ“Š</span>
     <span class="mt-label">Hub</span>
   </a>
   <a href="student-profile.html" class="mt-tab active">
-    <span class="mt-icon">👤</span>
+    <span class="mt-icon">ðŸ‘¤</span>
     <span class="mt-label">Profiel</span>
   </a>
 </nav>
 
 <div class="container">
 
-  <!-- ── Profieloverzicht ────────────────────────────────────────────────── -->
+  <!-- â”€â”€ Profieloverzicht â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="view-profiel" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:8px">
       <div>
-        <div class="page-title" id="pv-naam">—</div>
-        <div class="page-sub" style="margin-bottom:0" id="pv-opleiding">—</div>
+        <div class="page-title" id="pv-naam">â€”</div>
+        <div class="page-sub" style="margin-bottom:0" id="pv-opleiding">â€”</div>
       </div>
-      <button onclick="toonFormulier()" class="btn-ghost">✏️ Profiel bewerken</button>
+      <button onclick="toonFormulier()" class="btn-ghost">âœï¸ Profiel bewerken</button>
     </div>
 
     <!-- ILY-code widget container (Run 5) -->
@@ -729,17 +729,17 @@
     <div class="sec-label">Basisgegevens</div>
     <div class="card" style="margin-bottom:16px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">School</div><div id="pv-school" style="font-size:.92rem;color:#374151">—</div></div>
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Jaar</div><div id="pv-jaar" style="font-size:.92rem;color:#374151">—</div></div>
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Beschikbaar vanaf</div><div id="pv-beschikbaar" style="font-size:.92rem;color:#374151">—</div></div>
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Duur</div><div id="pv-duur" style="font-size:.92rem;color:#374151">—</div></div>
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Postcode</div><div id="pv-postcode" style="font-size:.92rem;color:#374151">—</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">School</div><div id="pv-school" style="font-size:.92rem;color:#374151">â€”</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Jaar</div><div id="pv-jaar" style="font-size:.92rem;color:#374151">â€”</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Beschikbaar vanaf</div><div id="pv-beschikbaar" style="font-size:.92rem;color:#374151">â€”</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Duur</div><div id="pv-duur" style="font-size:.92rem;color:#374151">â€”</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Postcode</div><div id="pv-postcode" style="font-size:.92rem;color:#374151">â€”</div></div>
       </div>
     </div>
 
     <div class="sec-label">Motivatie</div>
     <div class="card" style="margin-bottom:16px">
-      <p id="pv-motivatie" style="font-size:.92rem;color:#374151;line-height:1.7;font-style:italic;margin:0">—</p>
+      <p id="pv-motivatie" style="font-size:.92rem;color:#374151;line-height:1.7;font-style:italic;margin:0">â€”</p>
     </div>
 
     <div class="sec-label">Skills</div>
@@ -750,15 +750,15 @@
     <div class="sec-label">Opdracht</div>
     <div class="card" style="margin-bottom:16px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Domein</div><div id="pv-domein" style="font-size:.92rem;color:#374151">—</div></div>
-        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Aard</div><div id="pv-aard" style="font-size:.92rem;color:#374151">—</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Domein</div><div id="pv-domein" style="font-size:.92rem;color:#374151">â€”</div></div>
+        <div><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Aard</div><div id="pv-aard" style="font-size:.92rem;color:#374151">â€”</div></div>
       </div>
-      <div style="margin-top:12px"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Aanleiding</div><div id="pv-aanleiding" style="font-size:.92rem;color:#374151;line-height:1.6">—</div></div>
+      <div style="margin-top:12px"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:4px">Aanleiding</div><div id="pv-aanleiding" style="font-size:.92rem;color:#374151;line-height:1.6">â€”</div></div>
     </div>
 
     <div class="sec-label">Onderzoeksvraag</div>
     <div class="card" style="margin-bottom:16px;background:#f8fdf9;border-color:#c9e8d5">
-      <p id="pv-onderzoeksvraag" style="font-size:.95rem;color:#0d1520;line-height:1.6;font-style:italic;font-weight:500;margin:0 0 10px">—</p>
+      <p id="pv-onderzoeksvraag" style="font-size:.95rem;color:#0d1520;line-height:1.6;font-style:italic;font-weight:500;margin:0 0 10px">â€”</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <span id="pv-ovtype" class="tag green"></span>
         <span id="pv-resultaat" class="tag neutral"></span>
@@ -769,7 +769,7 @@
     <div class="sec-label" id="buddySectionLabel" style="display:none;">Buddy-netwerk</div>
     <div class="card" id="buddyProfileCard" style="margin-bottom:16px;display:none;">
       <div id="buddyProfileContent">
-        <div style="font-size:.82rem;color:#9ca3af;">Laden…</div>
+        <div style="font-size:.82rem;color:#9ca3af;">Ladenâ€¦</div>
       </div>
     </div>
 
@@ -777,10 +777,10 @@
     <div id="pv-saved-vacatures"></div>
   </div>
 
-  <!-- ── Profielformulier ──────────────────────────────────────────────────── -->
+  <!-- â”€â”€ Profielformulier â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <div id="view-form">
   <div class="page-title">Maak je profiel aan</div>
-  <p class="page-sub">Vul je gegevens en stageopdracht in — bedrijven zoeken op wat jij hier invult.</p>
+  <p class="page-sub">Vul je gegevens en stageopdracht in â€” bedrijven zoeken op wat jij hier invult.</p>
 
   <div class="progress-bar">
     <div class="pb-step active" id="pb-0"></div>
@@ -807,7 +807,7 @@
     <div class="field">
       <label>Geslacht <span class="hint">optioneel</span></label>
       <div style="font-size:.78rem;color:var(--ink3);margin-bottom:6px;line-height:1.4">
-        Alleen gebruikt voor anonieme diversiteitsrapportage — nooit zichtbaar voor bedrijven
+        Alleen gebruikt voor anonieme diversiteitsrapportage â€” nooit zichtbaar voor bedrijven
       </div>
       <select id="sp-geslacht">
         <option value="">Selecteer (optioneel)</option>
@@ -831,11 +831,11 @@
     <div class="field">
       <label>Onderwijsniveau <span class="hint">voor ESG-rapportage bedrijven</span></label>
       <select id="onderwijsniveau">
-        <option value="onbekend">— niet ingevuld —</option>
+        <option value="onbekend">â€” niet ingevuld â€”</option>
         <option value="HBO">HBO</option>
         <option value="WO">WO</option>
-        <option value="MBO_BOL">MBO — BOL (beroeps­opleidend, fulltime school + stage)</option>
-        <option value="MBO_BBL">MBO — BBL (beroeps­begeleidend, werk-leer)</option>
+        <option value="MBO_BOL">MBO â€” BOL (beroepsÂ­opleidend, fulltime school + stage)</option>
+        <option value="MBO_BBL">MBO â€” BBL (beroepsÂ­begeleidend, werk-leer)</option>
       </select>
       <div class="track-sub" style="margin-top:4px;">Helpt bedrijven bij hun ESG-rapportage en geeft relevantere matches.</div>
     </div>
@@ -845,14 +845,14 @@
         <label class="track-option">
           <input type="radio" name="learning_track" value="bol" checked>
           <div>
-            <div class="track-title">BOL — voltijd opleiding</div>
+            <div class="track-title">BOL â€” voltijd opleiding</div>
             <div class="track-sub">Ik zoek een stage via een vacature. <span style="color:#9ca3af;font-size:.75rem">Twijfel je? Vraag het op school.</span></div>
           </div>
         </label>
         <label class="track-option">
           <input type="radio" name="learning_track" value="bbl">
           <div>
-            <div class="track-title">BBL — werken en leren</div>
+            <div class="track-title">BBL â€” werken en leren</div>
             <div class="track-sub">Ik heb al een leerbedrijf en beheer mijn traject.</div>
           </div>
         </label>
@@ -894,9 +894,9 @@
     <div class="field">
       <label>Skills <span class="req">*</span> <span class="hint">typ en druk Enter</span></label>
       <div class="skills-box" id="skillsBox" onclick="document.getElementById('skillsInput').focus()">
-        <input type="text" id="skillsInput" class="skills-input" placeholder="Bijv. React, Copywriting…" maxlength="30">
+        <input type="text" id="skillsInput" class="skills-input" placeholder="Bijv. React, Copywritingâ€¦" maxlength="30">
       </div>
-      <div class="skills-hint">Max 8 skills — druk Enter of komma om toe te voegen.</div>
+      <div class="skills-hint">Max 8 skills â€” druk Enter of komma om toe te voegen.</div>
     </div>
     <div class="field">
       <label>Motivatie <span class="req">*</span> <span class="hint">max 300 tekens</span></label>
@@ -905,7 +905,7 @@
     </div>
     <div class="form-nav">
       <span class="step-ind">1 van 6</span>
-      <button class="btn-next" onclick="next(0)">Volgende →</button>
+      <button class="btn-next" onclick="next(0)">Volgende â†’</button>
     </div>
   </div>
 
@@ -953,9 +953,9 @@
       </div>
     </div>
     <div class="form-nav">
-      <button class="btn-back" onclick="prev(1)">← Terug</button>
+      <button class="btn-back" onclick="prev(1)">â† Terug</button>
       <span class="step-ind">2 van 6</span>
-      <button class="btn-next" onclick="next(1)">Volgende →</button>
+      <button class="btn-next" onclick="next(1)">Volgende â†’</button>
     </div>
   </div>
 
@@ -967,7 +967,7 @@
 
     <div class="field">
       <label>Beschrijf de aanleiding <span class="req">*</span></label>
-      <textarea id="opdracht_aanleiding" maxlength="400" placeholder="Bijv. 'Het bedrijf heeft geen inzicht in hoe hun doelgroep social media gebruikt…'" oninput="charCount('opdracht_aanleiding','ac',400)"></textarea>
+      <textarea id="opdracht_aanleiding" maxlength="400" placeholder="Bijv. 'Het bedrijf heeft geen inzicht in hoe hun doelgroep social media gebruiktâ€¦'" oninput="charCount('opdracht_aanleiding','ac',400)"></textarea>
       <div class="char-count" id="ac">0 / 400</div>
     </div>
     <div class="sub-q">
@@ -975,18 +975,18 @@
       <div class="radio-group">
         <label class="radio-opt" onclick="pick('opdracht_eerder_onderzoek','true',this)">
           <input type="radio" name="eerder">
-          <div class="rl">Ja — er is bestaand onderzoek dat ik kan gebruiken</div>
+          <div class="rl">Ja â€” er is bestaand onderzoek dat ik kan gebruiken</div>
         </label>
         <label class="radio-opt" onclick="pick('opdracht_eerder_onderzoek','false',this)">
           <input type="radio" name="eerder">
-          <div class="rl">Nee — het is een nieuw of onontgonnen vraagstuk</div>
+          <div class="rl">Nee â€” het is een nieuw of onontgonnen vraagstuk</div>
         </label>
       </div>
     </div>
     <div class="form-nav">
-      <button class="btn-back" onclick="prev(2)">← Terug</button>
+      <button class="btn-back" onclick="prev(2)">â† Terug</button>
       <span class="step-ind">3 van 6</span>
-      <button class="btn-next" onclick="next(2)">Volgende →</button>
+      <button class="btn-next" onclick="next(2)">Volgende â†’</button>
     </div>
   </div>
 
@@ -994,7 +994,7 @@
   <div class="form-section" id="section-3">
     <div class="section-label">Stap 4 van 6</div>
     <div class="section-title">Wat is je onderzoeksvraag?</div>
-    <p class="section-sub">Formuleer in één zin wat je wilt uitzoeken of bewijzen. Een voorlopige versie is prima.</p>
+    <p class="section-sub">Formuleer in Ã©Ã©n zin wat je wilt uitzoeken of bewijzen. Een voorlopige versie is prima.</p>
 
     <div class="field">
       <label>Onderzoeksvraag <span class="req">*</span> <span class="hint">max 200 tekens</span></label>
@@ -1006,15 +1006,15 @@
       <div class="radio-group">
         <label class="radio-opt" onclick="pick('onderzoeksvraag_type','Beschrijvend',this)">
           <input type="radio" name="vtype">
-          <div><div class="rl">Beschrijvend — Hoe zit het?</div><div class="rs">Je brengt een situatie in kaart</div></div>
+          <div><div class="rl">Beschrijvend â€” Hoe zit het?</div><div class="rs">Je brengt een situatie in kaart</div></div>
         </label>
         <label class="radio-opt" onclick="pick('onderzoeksvraag_type','Verklarend',this)">
           <input type="radio" name="vtype">
-          <div><div class="rl">Verklarend — Waarom?</div><div class="rs">Je zoekt oorzaken of verbanden</div></div>
+          <div><div class="rl">Verklarend â€” Waarom?</div><div class="rs">Je zoekt oorzaken of verbanden</div></div>
         </label>
         <label class="radio-opt" onclick="pick('onderzoeksvraag_type','Ontwerpend',this)">
           <input type="radio" name="vtype">
-          <div><div class="rl">Ontwerpend — Hoe maak je iets beters?</div><div class="rs">Je ontwerpt een oplossing op basis van inzichten</div></div>
+          <div><div class="rl">Ontwerpend â€” Hoe maak je iets beters?</div><div class="rs">Je ontwerpt een oplossing op basis van inzichten</div></div>
         </label>
       </div>
     </div>
@@ -1023,9 +1023,9 @@
       <input type="text" id="onderzoeksvraag_context" maxlength="200" placeholder="Bijv. 'Millennials in Nederland die duurzame producten kopen'">
     </div>
     <div class="form-nav">
-      <button class="btn-back" onclick="prev(3)">← Terug</button>
+      <button class="btn-back" onclick="prev(3)">â† Terug</button>
       <span class="step-ind">4 van 6</span>
-      <button class="btn-next" onclick="next(3)">Volgende →</button>
+      <button class="btn-next" onclick="next(3)">Volgende â†’</button>
     </div>
   </div>
 
@@ -1051,9 +1051,9 @@
       <input type="text" id="resultaat_doelgroep" maxlength="200" placeholder="Bijv. 'Het marketingteam van het bedrijf'">
     </div>
     <div class="form-nav">
-      <button class="btn-back" onclick="prev(4)">← Terug</button>
+      <button class="btn-back" onclick="prev(4)">â† Terug</button>
       <span class="step-ind">5 van 6</span>
-      <button class="btn-next" onclick="next(4)">Volgende →</button>
+      <button class="btn-next" onclick="next(4)">Volgende â†’</button>
     </div>
   </div>
 
@@ -1072,7 +1072,7 @@
         </label>
         <label class="radio-opt" onclick="pick('methode_type','Kwantitatief',this)">
           <input type="radio" name="meth">
-          <div><div class="rl">Kwantitatief</div><div class="rs">Enquêtes, statistieken, data-analyse</div></div>
+          <div><div class="rl">Kwantitatief</div><div class="rs">EnquÃªtes, statistieken, data-analyse</div></div>
         </label>
         <label class="radio-opt" onclick="pick('methode_type','Mixed methods',this)">
           <input type="radio" name="meth">
@@ -1110,21 +1110,21 @@
       </label>
     </div>
     <div class="form-nav">
-      <button class="btn-back" onclick="prev(5)">← Terug</button>
+      <button class="btn-back" onclick="prev(5)">â† Terug</button>
       <span class="step-ind">6 van 6</span>
-      <button class="btn-submit" id="submitBtn" onclick="submitProfile()">Profiel opslaan →</button>
+      <button class="btn-submit" id="submitBtn" onclick="submitProfile()">Profiel opslaan â†’</button>
     </div>
   </div>
 
   <!-- Success -->
   <div class="success-screen" id="successScreen">
-    <div class="success-icon">🎉</div>
+    <div class="success-icon">ðŸŽ‰</div>
     <div class="success-title">Profiel aangemaakt!</div>
     <p class="success-sub">Je profiel is zichtbaar voor bedrijven. Bekijk je matches en begin met solliciteren.</p>
-    <a href="matches.html" class="btn-cta">Bekijk mijn matches →</a>
+    <a href="matches.html" class="btn-cta">Bekijk mijn matches â†’</a>
   </div>
 
-  <!-- Opgeslagen vacatures — altijd zichtbaar onderaan de pagina -->
+  <!-- Opgeslagen vacatures â€” altijd zichtbaar onderaan de pagina -->
   <div id="saved-section" style="margin-top:48px;display:none">
     <div style="border-top:1px solid #f0f0ee;padding-top:36px">
       <div class="section-title" style="font-size:1.15rem;margin-bottom:4px">Opgeslagen vacatures</div>
@@ -1135,7 +1135,7 @@
   </div><!-- /#view-form -->
 </div><!-- /.container -->
 
-<!-- ── BESCHIKBAARHEID — altijd zichtbaar, buiten view-form/view-profiel ── -->
+<!-- â”€â”€ BESCHIKBAARHEID â€” altijd zichtbaar, buiten view-form/view-profiel â”€â”€ -->
 <div class="container" style="padding-top:0;padding-bottom:2.5rem">
   <div class="section-label">Jouw planning</div>
   <div class="section-title">Beschikbaarheid</div>
@@ -1222,7 +1222,7 @@ function addSkill(s) {
   chip.appendChild(document.createTextNode(s));
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = '×';
+  closeBtn.textContent = 'Ã—';
   closeBtn.addEventListener('click', () => removeSkill(s, closeBtn));
   chip.appendChild(closeBtn);
   document.getElementById('skillsBox').insertBefore(chip, document.getElementById('skillsInput'));
@@ -1241,7 +1241,7 @@ function charCount(inputId, countId, max) {
   el.className   = 'char-count' + (len > max * .9 ? ' warn' : '');
 }
 
-// ── Sector mapping: student opdracht_domein → company sector values ───────────
+// â”€â”€ Sector mapping: student opdracht_domein â†’ company sector values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const STUDENT_TO_COMPANY_SECTOR = {
   'Marketing & Communicatie': ['Marketing'],
   'Software & Development':   ['IT'],
@@ -1255,7 +1255,7 @@ const STUDENT_TO_COMPANY_SECTOR = {
   'Anders':                   ['Anders', 'Niche'],
 };
 
-// ── Matching trigger ─────────────────────────────────────────────────────────
+// â”€â”€ Matching trigger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function triggerStudentMatching(userId, sector) {
   if (!userId || !sector) return 0;
   try {
@@ -1305,7 +1305,7 @@ async function triggerStudentMatching(userId, sector) {
         type:     'new_match',
         ref_id:   posting.id,
         ref_type: 'posting',
-        message:  'Een student heeft interesse in één van je vacatures',
+        message:  'Een student heeft interesse in Ã©Ã©n van je vacatures',
         read:     false,
       }).catch(e => { console.warn('[student-profile] match notificatie mislukt:', e); });
     }
@@ -1316,26 +1316,26 @@ async function triggerStudentMatching(userId, sector) {
   }
 }
 
-// ── Profile overview helpers ─────────────────────────────────────────────────
+// â”€â”€ Profile overview helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
 }
 
 function toonOverzicht(data) {
-  setText('pv-naam',     data.naam     || '—');
-  setText('pv-opleiding', data.opleiding || '—');
-  setText('pv-school',   data.school   || '—');
-  setText('pv-jaar',     data.jaar     ? 'Jaar ' + data.jaar : '—');
+  setText('pv-naam',     data.naam     || 'â€”');
+  setText('pv-opleiding', data.opleiding || 'â€”');
+  setText('pv-school',   data.school   || 'â€”');
+  setText('pv-jaar',     data.jaar     ? 'Jaar ' + data.jaar : 'â€”');
   setText('pv-beschikbaar', data.beschikbaar_vanaf
     ? new Date(data.beschikbaar_vanaf).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' })
-    : '—');
-  setText('pv-duur',         data.duur             || '—');
-  setText('pv-postcode',     data.postcode         || '—');
-  setText('pv-motivatie',    data.motivatie        ? '\u201c' + data.motivatie + '\u201d' : '—');
-  setText('pv-domein',       data.opdracht_domein  || '—');
-  setText('pv-aard',         data.opdracht_aard    || '—');
-  setText('pv-aanleiding',   data.opdracht_aanleiding || '—');
+    : 'â€”');
+  setText('pv-duur',         data.duur             || 'â€”');
+  setText('pv-postcode',     data.postcode         || 'â€”');
+  setText('pv-motivatie',    data.motivatie        ? '\u201c' + data.motivatie + '\u201d' : 'â€”');
+  setText('pv-domein',       data.opdracht_domein  || 'â€”');
+  setText('pv-aard',         data.opdracht_aard    || 'â€”');
+  setText('pv-aanleiding',   data.opdracht_aanleiding || 'â€”');
   setText('pv-onderzoeksvraag', data.onderzoeksvraag
     ? '\u201c' + data.onderzoeksvraag + '\u201d'
     : 'Nog geen onderzoeksvraag ingevuld.');
@@ -1391,7 +1391,7 @@ function laadOpgeslagenVacatures() {
   try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
   catch(e) { saved = []; }
   if (!saved.length) {
-    container.innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af;font-size:.88rem">Nog geen opgeslagen vacatures. <a href="discover.html" style="color:#1a7a48;font-weight:600">Ga naar Ontdek →</a></div>';
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:#9ca3af;font-size:.88rem">Nog geen opgeslagen vacatures. <a href="discover.html" style="color:#1a7a48;font-weight:600">Ga naar Ontdek â†’</a></div>';
     return;
   }
   container.innerHTML = saved.map(v => `
@@ -1399,13 +1399,13 @@ function laadOpgeslagenVacatures() {
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
         <div>
           <div style="font-weight:600;font-size:.92rem;color:#0d1520">${escapeHtml(v.title || v.company_name || 'Vacature')}</div>
-          <div style="font-size:.8rem;color:#6b7280">${escapeHtml(v.company_name || '')}${v.sector ? ' · ' + escapeHtml(v.sector) : ''}</div>
+          <div style="font-size:.8rem;color:#6b7280">${escapeHtml(v.company_name || '')}${v.sector ? ' Â· ' + escapeHtml(v.sector) : ''}</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
           <a href="vacature-detail.html?id=${encodeURIComponent(v.id)}&source=${encodeURIComponent(v.source || 'internships')}"
             style="background:#1a7a48;color:#fff;text-decoration:none;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600">Bekijk</a>
           <button class="del-saved-btn" data-id="${escapeHtml(String(v.id))}"
-            style="background:#fdeaea;color:#b82020;border:none;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer">✕</button>
+            style="background:#fdeaea;color:#b82020;border:none;padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer">âœ•</button>
         </div>
       </div>
     </div>`).join('');
@@ -1423,14 +1423,14 @@ function verwijderOpgeslagen(id) {
   laadOpgeslagenVacatures();
 }
 
-// ── Edit-mode UI helpers ─────────────────────────────────────────────────────
+// â”€â”€ Edit-mode UI helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function updateUIForEditMode() {
   const t = document.querySelector('.page-title');
   const s = document.querySelector('.page-sub');
   const b = document.getElementById('submitBtn');
   if (t) t.textContent = 'Profiel bewerken';
   if (s) s.textContent = 'Pas je gegevens aan en sla op. Alleen nieuwe profielen activeren matching.';
-  if (b) b.textContent = 'Wijzigingen opslaan →';
+  if (b) b.textContent = 'Wijzigingen opslaan â†’';
 }
 
 function updateUIForCreateMode() {
@@ -1439,7 +1439,7 @@ function updateUIForCreateMode() {
   const b = document.getElementById('submitBtn');
   if (t) t.textContent = 'Maak je profiel';
   if (s) s.textContent = 'Vertel bedrijven wie je bent en wat voor opdracht je zoekt.';
-  if (b) b.textContent = 'Profiel opslaan →';
+  if (b) b.textContent = 'Profiel opslaan â†’';
 }
 
 function restoreRadio(fieldName, value) {
@@ -1465,7 +1465,7 @@ function populateForm(data) {
     if (el && data[id] != null) el.value = data[id];
   });
 
-  // zoekt_buddy toggle — backlog 30 apr 2026
+  // zoekt_buddy toggle â€” backlog 30 apr 2026
   const _zb = document.getElementById('zoekt-buddy');
   if (_zb) _zb.checked = !!(data?.zoekt_buddy);
 
@@ -1522,23 +1522,23 @@ function populateForm(data) {
 async function submitProfile() {
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Opslaan…';
+  btn.textContent = 'Opslaanâ€¦';
 
   // Capture edit state before we update it
   const wasEditing = isEditMode;
 
-  // Leerweg — expliciet, nooit impliciet default (build rule 2)
+  // Leerweg â€” expliciet, nooit impliciet default (build rule 2)
   const learningTrack = document.querySelector('input[name="learning_track"]:checked')?.value || 'bol';
   const newBblMode    = learningTrack === 'bbl';
 
-  // Waarschuw bij BOL→BBL switch: actieve sollicitaties blijven, dashboard verandert
+  // Waarschuw bij BOLâ†’BBL switch: actieve sollicitaties blijven, dashboard verandert
   if (wasEditing && _currentBblMode === false && newBblMode === true) {
     const confirmed = confirm(
       'Je wisselt van BOL naar BBL. Je actieve sollicitaties blijven bewaard, maar je dashboard verandert naar de BBL-hub. Doorgaan?'
     );
     if (!confirmed) {
       btn.disabled = false;
-      btn.textContent = 'Wijzigingen opslaan →';
+      btn.textContent = 'Wijzigingen opslaan â†’';
       return;
     }
   }
@@ -1578,7 +1578,7 @@ async function submitProfile() {
     console.error('[student-profile] upsert fout:', error?.message || 'onbekende fout');
     notify(`Fout: ${error?.message || 'onbekende fout'}`);
     btn.disabled = false;
-    btn.textContent = wasEditing ? 'Wijzigingen opslaan →' : 'Profiel opslaan →';
+    btn.textContent = wasEditing ? 'Wijzigingen opslaan â†’' : 'Profiel opslaan â†’';
     return;
   }
 
@@ -1588,9 +1588,9 @@ async function submitProfile() {
   const savedPostcode = payload.postcode;
   if (savedPostcode) localStorage.setItem('internly_student_postcode_' + currentUser.id, savedPostcode);
 
-  // PRODUCT KEUZE 19 apr 2026 — afwijking van originele brief.
+  // PRODUCT KEUZE 19 apr 2026 â€” afwijking van originele brief.
   // Originele brief: redirect altijd na save.
-  // Geïmplementeerd: redirect alleen bij eerste aanmaak en bij BBL<>BOL switch.
+  // GeÃ¯mplementeerd: redirect alleen bij eerste aanmaak en bij BBL<>BOL switch.
   // Reden: bij gewone profielbewerking (telefoonnummer, motivatie, skills)
   // is doorsturen naar dashboard verwarrend. Track switch is wel een
   // hub-wisselende actie, daar is redirect logisch.
@@ -1599,7 +1599,7 @@ async function submitProfile() {
   if (wasEditing && !trackChanged) {
     // Normale edit, leerweg ongewijzigd: blijf op profielpagina
     btn.disabled = false;
-    btn.textContent = 'Wijzigingen opslaan →';
+    btn.textContent = 'Wijzigingen opslaan â†’';
     _currentBblMode = newBblMode;
     toonOverzicht(payload);
     notify('Profiel bijgewerkt');
@@ -1619,7 +1619,7 @@ function showLoading(containerId, tekst) {
   el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
 }
 
-// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -1635,14 +1635,14 @@ window.addEventListener('unhandledrejection', function(e) {
 function signOut() { performLogout(); }
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // Toon opgeslagen vacatures direct vanuit localStorage — geen netwerk nodig
+  // Toon opgeslagen vacatures direct vanuit localStorage â€” geen netwerk nodig
   renderSaved();
 
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
   currentUser = user;
 
-  // Rolcheck — alleen studenten mogen hun stageprofiel bewerken
+  // Rolcheck â€” alleen studenten mogen hun stageprofiel bewerken
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'student') {
@@ -1675,8 +1675,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Welkom overlay — eenmalig na eerste login
-  // welcome-overlay.js — 1 mei 2026
+  // Welkom overlay â€” eenmalig na eerste login
+  // welcome-overlay.js â€” 1 mei 2026
   if (typeof maybeShowWelcomeOverlay === 'function') {
     maybeShowWelcomeOverlay(
       user.id,
@@ -1686,7 +1686,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     );
   }
 
-  // Avatar picker — vanmiddag fix 30 apr 2026
+  // Avatar picker â€” vanmiddag fix 30 apr 2026
   if (typeof renderAvatarPicker === 'function') {
     const _curAvKey = existing?.avatar_key || null;
     window._internlyAvatarKey = _curAvKey;
@@ -1698,7 +1698,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     isEditMode = true;
     populateForm(existing);   // pre-fill hidden form for when user clicks Bewerken
     toonOverzicht(existing);  // show the overview
-    _initBuddyProfileSection(user, existing); // non-blocking — buddy section
+    _initBuddyProfileSection(user, existing); // non-blocking â€” buddy section
   } else {
     // Pre-fill postcode from localStorage on fresh form only
     const savedPc = localStorage.getItem('internly_student_postcode_' + user.id);
@@ -1728,7 +1728,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   InternlyCalendar.render('ical-container', db, user.id);
 });
 
-// ── Buddy profile section ────────────────────────────────────────────────────
+// â”€â”€ Buddy profile section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let _buddyProfileSp = null;
 
 async function _initBuddyProfileSection(user, sp) {
@@ -1755,7 +1755,7 @@ function _renderBuddyProfile() {
   if (!content) return;
   const sp = _buddyProfileSp;
 
-  // Opt-in toggle — gelezen uit student_profiles.buddy_opt_in (DB)
+  // Opt-in toggle â€” gelezen uit student_profiles.buddy_opt_in (DB)
   // Lokale fallback voor snelheid totdat DB-row geladen is
   const key   = 'internly_buddy_optin_' + (currentUser?.id || '');
   const optIn = sp?.buddy_opt_in ?? (localStorage.getItem(key) === 'true');
@@ -1798,7 +1798,7 @@ function _renderBuddyProfile() {
       const safeCtx  = escapeHtml(context);
       html += `
         <div class="bdy-widget" data-type="gepensioneerd" data-context="${safeCtx}">
-          <p>Koppel je aan een gepensioneerde professional die zijn kennis wil doorgeven. Volledig vrijwillig — jij hebt altijd het laatste woord.</p>
+          <p>Koppel je aan een gepensioneerde professional die zijn kennis wil doorgeven. Volledig vrijwillig â€” jij hebt altijd het laatste woord.</p>
           <button class="bdy-req-btn" onclick="buddyHandleRequestFromWidget(this)">
             Vraag een buddy aan
           </button>
@@ -1835,7 +1835,7 @@ async function _toggleBuddyOptIn() {
   }
 }
 
-// ── Opgeslagen vacatures ──
+// â”€â”€ Opgeslagen vacatures â”€â”€
 function renderSaved() {
   let saved;
   try { saved = JSON.parse(localStorage.getItem('internly_saved_vacatures') || '[]'); }
@@ -1845,7 +1845,7 @@ function renderSaved() {
   section.style.display = 'block';
 
   if (saved.length === 0) {
-    list.innerHTML = `<div class="saved-empty">Nog geen opgeslagen vacatures.<br>Ga naar <a href="discover.html" style="color:#1a7a48;font-weight:600">Ontdek</a> en klik op <strong>Lees meer →</strong>.</div>`;
+    list.innerHTML = `<div class="saved-empty">Nog geen opgeslagen vacatures.<br>Ga naar <a href="discover.html" style="color:#1a7a48;font-weight:600">Ontdek</a> en klik op <strong>Lees meer â†’</strong>.</div>`;
     return;
   }
 
@@ -1853,12 +1853,12 @@ function renderSaved() {
     const date = v.saved_at
       ? new Date(v.saved_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
       : '';
-    const titleShort = (v.title || '').length > 52 ? (v.title || '').slice(0, 52) + '…' : (v.title || '');
+    const titleShort = (v.title || '').length > 52 ? (v.title || '').slice(0, 52) + 'â€¦' : (v.title || '');
     return `
       <div class="saved-card">
         <div class="saved-card-info">
           <div class="saved-card-title" title="${escapeHtml(v.title || '')}">${escapeHtml(titleShort)}</div>
-          <div class="saved-card-meta">${escapeHtml(v.company_name || '')} · ${escapeHtml(v.sector || '')}${date ? ' — Opgeslagen ' + date : ''}</div>
+          <div class="saved-card-meta">${escapeHtml(v.company_name || '')} Â· ${escapeHtml(v.sector || '')}${date ? ' â€” Opgeslagen ' + date : ''}</div>
         </div>
         ${renderTrustBadge(v.trust_grade, v.trust_score, false, 'trust-badge-sm')}
         <div class="saved-card-actions">
@@ -1879,7 +1879,7 @@ function removeSaved(index) {
 }
 </script>
 
-<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
+<!-- â”€â”€ WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 <div id="waitlist-overlay" style="
   display:none; position:fixed; inset:0; z-index:9998;
   background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
@@ -1901,7 +1901,7 @@ function removeSaved(index) {
       background:rgba(255,255,255,.15);border:none;
       color:#fff;width:28px;height:28px;border-radius:50%;
       font-size:1rem;cursor:pointer;line-height:1;
-      display:flex;align-items:center;justify-content:center;">×</button>
+      display:flex;align-items:center;justify-content:center;">Ã—</button>
     <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
       intern<span style="color:#FF7E42;">ly</span>
     </div>
@@ -1916,7 +1916,7 @@ function removeSaved(index) {
       Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
     </p>
     <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
-      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
+      Geen spam. Maximaal Ã©Ã©n mail per maand. Altijd makkelijk uitschrijven.
     </p>
 
     <div id="wl-form">
@@ -1935,12 +1935,12 @@ function removeSaved(index) {
         border-radius:50px;font-family:'Outfit',sans-serif;
         font-size:.95rem;font-weight:700;cursor:pointer;
         transition:background .15s;">
-        Houd me op de hoogte →
+        Houd me op de hoogte â†’
       </button>
     </div>
 
     <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
-      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:1.8rem;margin-bottom:8px;">ðŸŽ‰</div>
       <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
       <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
     </div>
@@ -1993,7 +1993,7 @@ function removeSaved(index) {
     }
 
     btn.disabled    = true;
-    btn.textContent = 'Bezig…';
+    btn.textContent = 'Bezigâ€¦';
 
     const client = (typeof db !== 'undefined') ? db
       : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -2003,7 +2003,7 @@ function removeSaved(index) {
       .insert({ email, source: window.location.pathname });
 
     btn.disabled    = false;
-    btn.textContent = 'Houd me op de hoogte →';
+    btn.textContent = 'Houd me op de hoogte â†’';
 
     if (error) {
       if (error.code === '23505') {
@@ -2023,7 +2023,7 @@ function removeSaved(index) {
   };
 })();
 </script>
-<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
+<!-- â”€â”€ EINDE WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
 <!-- Google Translate Widget -->
 <div id="google_translate_element" style="display:none"></div>
@@ -2061,6 +2061,6 @@ window.addEventListener('load', function() {
 </script>
 <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script src="js/calendar.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -9,13 +9,13 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FF7E42">
   <meta name="description" content="Ontdek stageplaatsen bij transparante bedrijven. Filter op sector, locatie en reistijd.">
-  <title>Vacatures zoeken — Internly</title>
+  <title>Vacatures zoeken â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/welcome-overlay.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC6ozhZf1wVjSq6aBMhOmW1u3nfr1UsGMc&libraries=places" defer></script>
@@ -52,12 +52,12 @@
   })();
   </script>
   <style>
-    /* ═══════════════════════════════════════════════════════════════
-       Lijst archetype — pagina-specifieke layout. Globale tokens
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       Lijst archetype â€” pagina-specifieke layout. Globale tokens
        komen uit css/style.css. Geen rebrand, alleen visuele update.
-       NB: legacy .topbar styles weggehaald — de pagina gebruikt
+       NB: legacy .topbar styles weggehaald â€” de pagina gebruikt
        <div id="student-header"> dat door js/utils.js wordt gevuld.
-       ═══════════════════════════════════════════════════════════════ */
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     body {
       background: var(--bg-page, #f4f3ef);
@@ -70,7 +70,7 @@
       padding: var(--s7, 40px) var(--s5, 24px) var(--s9, 80px);
     }
 
-    /* ── Page-head — eyebrow + title + sub ── */
+    /* â”€â”€ Page-head â€” eyebrow + title + sub â”€â”€ */
     .page-eyebrow {
       font-family: var(--font-mono, 'DM Mono', monospace);
       font-size: .72rem; font-weight: 500;
@@ -95,7 +95,7 @@
       line-height: 1.55;
     }
 
-    /* ── Filter-toolbar ── */
+    /* â”€â”€ Filter-toolbar â”€â”€ */
     .filters {
       display: flex; gap: var(--s2, 10px); flex-wrap: wrap;
       align-items: center;
@@ -147,7 +147,7 @@
       margin-bottom: var(--s4, 16px);
     }
 
-    /* ── Cards-grid ── */
+    /* â”€â”€ Cards-grid â”€â”€ */
     .cards-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -189,7 +189,7 @@
       text-transform: uppercase;
     }
 
-    /* Trust-badge (.trust-a/b/c) — discover-specific class names,
+    /* Trust-badge (.trust-a/b/c) â€” discover-specific class names,
        blijven zoals ze in de JS gerenderd worden door renderTrustBadge */
     .trust-badge {
       display: inline-flex; align-items: center; gap: 4px;
@@ -262,7 +262,7 @@
     .apply-btn:hover { background: #b94613; transform: translateY(-1px); }
     .apply-btn:active { transform: scale(.97); }
 
-    /* ── Empty / loading states ── */
+    /* â”€â”€ Empty / loading states â”€â”€ */
     .state-box {
       grid-column: 1 / -1;
       text-align: center;
@@ -277,7 +277,7 @@
       padding: 5px 12px; border-radius: 6px; font-size: .8rem;
     }
 
-    /* ── Notif toast ── */
+    /* â”€â”€ Notif toast â”€â”€ */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -301,7 +301,7 @@
       outline-offset: 2px;
     }
 
-    /* ── Topbar-user (legacy classes, behouden voor compat) ── */
+    /* â”€â”€ Topbar-user (legacy classes, behouden voor compat) â”€â”€ */
     .topbar-user {
       display: flex; align-items: center; gap: 10px;
       color: var(--fg-secondary, #374151);
@@ -332,7 +332,7 @@
       border-color: var(--fg-tertiary, #6b8070);
     }
 
-    /* ── Reistijd filter ── */
+    /* â”€â”€ Reistijd filter â”€â”€ */
     .reistijd-filter { margin-bottom: var(--s5, 20px); }
     .rf-toggle {
       display: inline-flex; align-items: center; gap: 8px;
@@ -449,7 +449,7 @@
     }
     .trust-info:hover .trust-info-text { display: block; }
 
-    /* ── Buddy section ── */
+    /* â”€â”€ Buddy section â”€â”€ */
     #buddySection {
       display: none; /* shown only for authenticated students */
       background: #f0f7f3;
@@ -488,7 +488,7 @@
     .buddy-tab-panel.active { display: block; }
 
     /* buddy cards (shared with buddy.js render output) */
-    /* Buddy kleurcodering — backlog 30 apr 2026: paarse hue voor buddy in student-interface */
+    /* Buddy kleurcodering â€” backlog 30 apr 2026: paarse hue voor buddy in student-interface */
     .buddy-card {
       display: flex; align-items: center; gap: 14px;
       background: #fff;
@@ -630,60 +630,60 @@
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
   <a href="discover.html" class="mt-tab active">
-    <span class="mt-icon">🔍</span>
+    <span class="mt-icon">ðŸ”</span>
     <span class="mt-label">Ontdek</span>
   </a>
   <a href="matches.html" class="mt-tab">
-    <span class="mt-icon">💫</span>
+    <span class="mt-icon">ðŸ’«</span>
     <span class="mt-label">Matches</span>
   </a>
   <a href="mijn-sollicitaties.html" class="mt-tab">
-    <span class="mt-icon">📋</span>
+    <span class="mt-icon">ðŸ“‹</span>
     <span class="mt-label">Stages</span>
   </a>
   <a href="match-dashboard.html" class="mt-tab">
-    <span class="mt-icon">📊</span>
+    <span class="mt-icon">ðŸ“Š</span>
     <span class="mt-label">Hub</span>
   </a>
   <a href="student-profile.html" class="mt-tab">
-    <span class="mt-icon">👤</span>
+    <span class="mt-icon">ðŸ‘¤</span>
     <span class="mt-label">Profiel</span>
   </a>
 </nav>
 
 <div class="container">
-  <div class="page-eyebrow">Stages — open</div>
+  <div class="page-eyebrow">Stages â€” open</div>
   <h1>Ontdek stageopdrachten</h1>
-  <p class="page-sub">Gematchte vacatures op basis van jouw leerdoelen — beoordeeld op betrouwbaarheid. Studenten kijken mee.</p>
+  <p class="page-sub">Gematchte vacatures op basis van jouw leerdoelen â€” beoordeeld op betrouwbaarheid. Studenten kijken mee.</p>
 
   <div id="worldwide-banner" style="
     background:#e8f5ee;border:1px solid rgba(26,122,72,.15);
     border-radius:8px;padding:.65rem 1rem;margin-bottom:1rem;
     display:flex;align-items:center;justify-content:space-between;
     font-size:.82rem;color:#1a7a48">
-    <span>🌍 Looking for international internships?
+    <span>ðŸŒ Looking for international internships?
       <a href="internly-worldwide.html"
          style="font-weight:500;text-decoration:underline;
                 text-underline-offset:2px">
-        Learn how Internly Worldwide works →
+        Learn how Internly Worldwide works â†’
       </a>
     </span>
     <button onclick="this.parentElement.style.display='none';sessionStorage.setItem('ww_banner_dismissed','1')"
       style="background:none;border:none;cursor:pointer;
              font-size:1rem;color:#1a7a48;padding:0 0 0 .5rem">
-      ✕
+      âœ•
     </button>
   </div>
 
-  <!-- Profile-missing banner — shown only when logged-in student has no profile yet -->
+  <!-- Profile-missing banner â€” shown only when logged-in student has no profile yet -->
   <div id="noprofileBanner" style="display:none;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;padding:14px 18px;margin-bottom:20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
     <span style="font-size:.9rem;color:#92400e">Je hebt nog geen profiel. Zonder profiel kunnen bedrijven je niet vinden.</span>
-    <a href="student-profile.html" style="background:#FF7E42;color:#fff;padding:8px 20px;border-radius:50px;font-size:.85rem;font-weight:600;text-decoration:none;white-space:nowrap">Maak je profiel aan →</a>
+    <a href="student-profile.html" style="background:#FF7E42;color:#fff;padding:8px 20px;border-radius:50px;font-size:.85rem;font-weight:600;text-decoration:none;white-space:nowrap">Maak je profiel aan â†’</a>
   </div>
 
   <div class="filters">
     <input type="text" id="searchInput" class="search-bar"
-      placeholder="Zoek op titel, bedrijf, sector of skill…"
+      placeholder="Zoek op titel, bedrijf, sector of skillâ€¦"
       oninput="filterCards()">
 
     <select id="sectorFilter" onchange="filterCards()">
@@ -712,9 +712,9 @@
 
     <select id="trustFilter" onchange="filterCards()">
       <option value="">Alle Trust Scores</option>
-      <option value="a">A — Betrouwbaar</option>
-      <option value="b">B — Gemiddeld</option>
-      <option value="c">C — Let op</option>
+      <option value="a">A â€” Betrouwbaar</option>
+      <option value="b">B â€” Gemiddeld</option>
+      <option value="c">C â€” Let op</option>
     </select>
 
     <select id="niveauFilter" onchange="filterCards()">
@@ -732,7 +732,7 @@
   <div class="reistijd-filter">
     <button class="rf-toggle" id="rfToggle" onclick="toggleReistijd()" type="button">
       <span class="rf-dot"></span>
-      🚌 Filter op reistijd (OV)
+      ðŸšŒ Filter op reistijd (OV)
     </button>
     <div class="rf-panel" id="rfPanel">
       <div class="rf-row">
@@ -759,22 +759,22 @@
         background:none;border:1px solid #f5c87a;border-radius:20px;
         padding:4px 12px;font-size:.78rem;font-weight:600;
         color:#a06010;cursor:pointer;white-space:nowrap;">
-        🔍 Toon voorbeeldvacature
+        ðŸ” Toon voorbeeldvacature
       </button>
     <div class="trust-info">
-      <span style="font-size:.8rem;color:#9ca3af">ℹ Trust Score</span>
+      <span style="font-size:.8rem;color:#9ca3af">â„¹ Trust Score</span>
       <div class="trust-info-text">De Trust Score beoordeelt de betrouwbaarheid van het stagebedrijf op basis van openbare data. A = hoog vertrouwen, B = gemiddeld, C = wees voorzichtig.</div>
     </div>
     </div>
   </div>
-  <!-- ── DEMO VACATURE TOGGLE ── -->
+  <!-- â”€â”€ DEMO VACATURE TOGGLE â”€â”€ -->
   <div id="demoDiscoverBar" style="
     display:none;
     background:#fdf3e0;border:1px solid #f5c87a;border-radius:12px;
     padding:10px 16px;margin-bottom:12px;
     font-size:.85rem;color:#a06010;
     align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <span>🔍 Voorbeeldvacature zichtbaar — zo zien echte vacatures eruit.</span>
+    <span>ðŸ” Voorbeeldvacature zichtbaar â€” zo zien echte vacatures eruit.</span>
     <button onclick="toggleDemoDiscover(false)" style="
       background:none;border:1px solid #f5c87a;border-radius:8px;
       padding:4px 12px;font-size:.8rem;color:#a06010;cursor:pointer;">
@@ -785,7 +785,7 @@
 
   <div id="internshipsContainer" class="cards-container"></div>
 
-  <!-- ── BUDDY SECTION (shown only for authenticated students) ───────────────── -->
+  <!-- â”€â”€ BUDDY SECTION (shown only for authenticated students) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
   <section id="buddySection" aria-label="Mijn buddy's">
     <h2>Buddy-systeem</h2>
     <p class="buddy-section-sub">Koppel je aan een medestudent of ervaren professional voor extra steun tijdens je stage.</p>
@@ -797,11 +797,11 @@
     </div>
 
     <div id="buddyTabPairs" class="buddy-tab-panel active">
-      <div id="buddyPairsList"><p class="buddy-empty">Laden…</p></div>
+      <div id="buddyPairsList"><p class="buddy-empty">Ladenâ€¦</p></div>
     </div>
 
     <div id="buddyTabRequests" class="buddy-tab-panel">
-      <div id="buddyRequestsList"><p class="buddy-empty">Laden…</p></div>
+      <div id="buddyRequestsList"><p class="buddy-empty">Ladenâ€¦</p></div>
     </div>
 
     <div id="buddyTabFind" class="buddy-tab-panel">
@@ -812,14 +812,14 @@
 
 <script>
 
-// ── State ──────────────────────────────────────────────────────────────────
+// â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let currentUser            = null;
 let notifSubscription      = null;
-let currentUserStudentType = 'nl'; // 'nl' | 'international' — bepaalt of we open_to_international filter actief zetten
+let currentUserStudentType = 'nl'; // 'nl' | 'international' â€” bepaalt of we open_to_international filter actief zetten
 // reviewsByCompany: { companyUserId: { avg: float, count: int } }
 let reviewsByCompany   = {};
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function renderCard(row) {
   const tags     = Array.isArray(row.tags) ? row.tags : [];
@@ -843,7 +843,7 @@ function renderCard(row) {
     const { avg, count } = reviewsByCompany[row._companyUserId];
     const starsFilled = Math.round(avg);
     const avgStr      = avg.toFixed(1);
-    const starsStr    = [1,2,3,4,5].map(i => i <= starsFilled ? '★' : '☆').join('');
+    const starsStr    = [1,2,3,4,5].map(i => i <= starsFilled ? 'â˜…' : 'â˜†').join('');
     reviewStarsHtml = `<span class="mini-stars">${starsStr} ${avgStr} <span class="ms-count">(${count})</span></span>`;
   }
 
@@ -864,12 +864,12 @@ function renderCard(row) {
         <div>
           <h3>${eCompany || 'Bedrijf'}</h3>
           <div class="company-sector">${eSector}</div>
-          ${eVestNaam ? `<div style="font-size:.76rem;color:var(--ink3);margin-top:2px">📍 ${eVestNaam}</div>` : ''}
+          ${eVestNaam ? `<div style="font-size:.76rem;color:var(--ink3);margin-top:2px">ðŸ“ ${eVestNaam}</div>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
-          ${row._isPosting ? '<span style="font-size:.7rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 8px;border-radius:20px;white-space:nowrap">🏢 Bedrijfsposting</span>' : ''}
-          ${row.visa_sponsorship ? '<span style="font-size:.7rem;font-weight:600;background:#e8f0fc;color:#1756a8;padding:3px 8px;border-radius:20px;white-space:nowrap">🛂 Visa sponsorship</span>' : ''}
-          ${row.housing_available ? '<span style="font-size:.7rem;font-weight:600;background:#e8f5ee;color:#1a7a48;padding:3px 8px;border-radius:20px;white-space:nowrap">🏠 Housing available</span>' : ''}
+          ${row._isPosting ? '<span style="font-size:.7rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 8px;border-radius:20px;white-space:nowrap">ðŸ¢ Bedrijfsposting</span>' : ''}
+          ${row.visa_sponsorship ? '<span style="font-size:.7rem;font-weight:600;background:#e8f0fc;color:#1756a8;padding:3px 8px;border-radius:20px;white-space:nowrap">ðŸ›‚ Visa sponsorship</span>' : ''}
+          ${row.housing_available ? '<span style="font-size:.7rem;font-weight:600;background:#e8f5ee;color:#1a7a48;padding:3px 8px;border-radius:20px;white-space:nowrap">ðŸ  Housing available</span>' : ''}
           <div style="display:flex;flex-direction:column;align-items:flex-end">
             ${renderTrustBadge(row.trust_grade, row.trust_score, true)}
           </div>
@@ -880,9 +880,9 @@ function renderCard(row) {
       <p class="description">${eDesc}</p>
 
       <div class="meta">
-        <span>⏱ ${eDur || '—'}</span>
-        <span>📅 ${start}</span>
-        ${displayLoc ? `<span>📍 ${displayLoc}</span>` : ''}
+        <span>â± ${eDur || 'â€”'}</span>
+        <span>ðŸ“… ${start}</span>
+        ${displayLoc ? `<span>ðŸ“ ${displayLoc}</span>` : ''}
         <span class="reistijd-badge rb-onb" style="display:none" data-badge></span>
       </div>
 
@@ -890,18 +890,18 @@ function renderCard(row) {
         ${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
       </div>
 
-      ${(row.trust_grade === 'C') ? `<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-top:6px;border-left:3px solid var(--red,#b82020);">⚠ Dit bedrijf reageert vaak laat of niet. Houd rekening met geen antwoord.</div>` : ''}
+      ${(row.trust_grade === 'C') ? `<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-top:6px;border-left:3px solid var(--red,#b82020);">âš  Dit bedrijf reageert vaak laat of niet. Houd rekening met geen antwoord.</div>` : ''}
 
       <div class="card-footer">
         <div style="display:flex;flex-direction:column;gap:4px">
           <span class="guarantee ${row.guarantee ? 'yes' : 'no'}">
-            ${row.guarantee ? '⚡ Responsgarantie' : 'Geen garantie'}
+            ${row.guarantee ? 'âš¡ Responsgarantie' : 'Geen garantie'}
           </span>
           ${reviewStarsHtml}
         </div>
         <a class="apply-btn"
           href="vacature-detail.html?id=${row.id}&source=${row._isPosting ? 'internship_postings' : 'internships'}">
-          Lees meer →
+          Lees meer â†’
         </a>
       </div>
     </div>`;
@@ -909,7 +909,7 @@ function renderCard(row) {
 
 async function loadInternships() {
   const container = document.getElementById('internshipsContainer');
-  container.innerHTML = `<div class="state-box"><span class="state-icon">⏳</span>Vacatures laden…</div>`;
+  container.innerHTML = `<div class="state-box"><span class="state-icon">â³</span>Vacatures ladenâ€¦</div>`;
 
   // Postings-query opbouwen met optionele international filter
   let postingsQuery = db.from('internship_postings')
@@ -933,7 +933,7 @@ async function loadInternships() {
 
   if (err1 || err2) {
     console.error('[discover] laden fout:', (err1 || err2)?.message || 'onbekende fout');
-    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Vacatures konden niet worden geladen. Probeer de pagina te verversen.</div>`;
+    container.innerHTML = `<div class="state-box error"><span class="state-icon">âš ï¸</span>Vacatures konden niet worden geladen. Probeer de pagina te verversen.</div>`;
     return;
   }
 
@@ -954,7 +954,7 @@ async function loadInternships() {
       reviewsByCompany[r.reviewee_id].sum   += r.rating;
       reviewsByCompany[r.reviewee_id].count += 1;
     });
-    // Convert sum→avg
+    // Convert sumâ†’avg
     Object.keys(reviewsByCompany).forEach(id => {
       const d = reviewsByCompany[id];
       reviewsByCompany[id] = { avg: d.sum / d.count, count: d.count };
@@ -969,10 +969,10 @@ async function loadInternships() {
   if (combined.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
-        <span class="es-icon">📭</span>
+        <span class="es-icon">ðŸ“­</span>
         <p class="es-primary">Nog geen vacatures beschikbaar</p>
         <p class="es-secondary">Er worden regelmatig nieuwe stages toegevoegd. Probeer het opnieuw, of ontdek wat anders past via de matchpool.</p>
-        <button type="button" class="es-cta" onclick="window.location.reload()">Probeer opnieuw →</button>
+        <button type="button" class="es-cta" onclick="window.location.reload()">Probeer opnieuw â†’</button>
         <a href="matchpool.html" class="es-sub" style="text-decoration:none;display:inline-block;margin-top:.65rem;">of bekijk de matchpool</a>
       </div>`;
     return;
@@ -982,11 +982,11 @@ async function loadInternships() {
   filterCards(); // apply any active filters (including ?niveau= from URL)
 }
 
-// ── Reistijd filter state ──────────────────────────────────────────────────
+// â”€â”€ Reistijd filter state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let reistijdActief   = false;
-let studentPostcode  = ''; // ingesteld na auth — zie DOMContentLoaded
+let studentPostcode  = ''; // ingesteld na auth â€” zie DOMContentLoaded
 let maxReistijd      = 60;
-const reistijdCache  = new Map();   // key: "VAN|NAAR" → { minuten, status }
+const reistijdCache  = new Map();   // key: "VAN|NAAR" â†’ { minuten, status }
 
 function toggleReistijd() {
   reistijdActief = !reistijdActief;
@@ -1046,7 +1046,7 @@ function onSliderChange() {
 
 async function updateReistijdBadges() {
   if (!studentPostcode || !REISTIJD.valideer(studentPostcode)) return;
-  document.getElementById('rfHint').textContent = 'Reistijden berekenen…';
+  document.getElementById('rfHint').textContent = 'Reistijden berekenenâ€¦';
 
   const cards = Array.from(document.querySelectorAll('.stage-card'));
   const promises = cards.map(async card => {
@@ -1083,16 +1083,16 @@ function setBadge(badge, minuten, status) {
   badge.className = 'reistijd-badge';
   if (status === 'laden') {
     badge.classList.add('rb-lad');
-    badge.textContent = '🚌 …';
+    badge.textContent = 'ðŸšŒ â€¦';
   } else if (status === 'onbekend' || status === 'fout' || minuten === null) {
     badge.classList.add('rb-onb');
-    badge.textContent = '🚌 —';
+    badge.textContent = 'ðŸšŒ â€”';
   } else if (minuten <= maxReistijd) {
     badge.classList.add('rb-ok');
-    badge.textContent = '🚌 ' + minuten + ' min';
+    badge.textContent = 'ðŸšŒ ' + minuten + ' min';
   } else {
     badge.classList.add('rb-ver');
-    badge.textContent = '🚌 ' + minuten + ' min';
+    badge.textContent = 'ðŸšŒ ' + minuten + ' min';
   }
 }
 
@@ -1110,7 +1110,7 @@ function filterOpReistijd() {
   });
   filterCards();
 }
-// ── End reistijd ───────────────────────────────────────────────────────────
+// â”€â”€ End reistijd â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function filterCards() {
   const q        = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -1148,7 +1148,7 @@ function filterCards() {
     if (!nr) {
       nr = document.createElement('div');
       nr.id = 'no-results'; nr.className = 'state-box';
-      nr.innerHTML = '<span class="state-icon">🔎</span>Geen vacatures gevonden voor deze filters.<br><button onclick="clearFilters()" class="btn-ghost" type="button" style="margin-top:.75rem">Alle filters wissen</button>';
+      nr.innerHTML = '<span class="state-icon">ðŸ”Ž</span>Geen vacatures gevonden voor deze filters.<br><button onclick="clearFilters()" class="btn-ghost" type="button" style="margin-top:.75rem">Alle filters wissen</button>';
       document.getElementById('internshipsContainer').appendChild(nr);
     }
   } else if (nr) nr.remove();
@@ -1174,8 +1174,8 @@ function showLoading(containerId, tekst) {
 }
 
 // Offline/online listeners
-window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
-window.addEventListener('online',  () => { notify('Verbinding hersteld — pagina wordt vernieuwd…'); location.reload(); });
+window.addEventListener('offline', () => notify('Geen internetverbinding â€” wijzigingen worden niet opgeslagen'));
+window.addEventListener('online',  () => { notify('Verbinding hersteld â€” pagina wordt vernieuwdâ€¦'); location.reload(); });
 
 function signOut() { performLogout(); }
 
@@ -1274,17 +1274,17 @@ function startNotifSubscription() {
     .subscribe((status, err) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
         console.warn('[discover] realtime verbinding verbroken:', err?.message);
-        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
+        notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
       }
     });
 }
 
 function showToast() {
-  notify('Nieuwe melding ontvangen — check je overzicht');
+  notify('Nieuwe melding ontvangen â€” check je overzicht');
 }
-// ── End notification system ────────────────────────────────────────────────
+// â”€â”€ End notification system â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// ── Buddy integration ─────────────────────────────────────────────────────
+// â”€â”€ Buddy integration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Render buddy section after init.
@@ -1315,7 +1315,7 @@ function _buddyRenderDiscover(sp) {
       ? '(' + BuddyModule.pendingRequests.length + ')' : '';
   }
 
-  // Find tab — peer widget with student context
+  // Find tab â€” peer widget with student context
   const context = {
     sector:          sp.sector          || '',
     opleiding:       sp.opleiding       || '',
@@ -1336,9 +1336,9 @@ function buddySwitchTab(tab, btn) {
 
 // Cached student profile context for re-renders triggered by realtime updates
 let _buddySpContext = {};
-// ── End buddy integration ─────────────────────────────────────────────────
+// â”€â”€ End buddy integration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -1351,13 +1351,13 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 
-// ── Demo vacature toggle (discover) ──────────────────────────────────────
+// â”€â”€ Demo vacature toggle (discover) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DEMO_DISCOVER_KEY = 'internly_demo_discover';
 
 const DEMO_VACATURE = {
   company_name: 'Vandaag Agency',
   sector:       'Communicatie & Media',
-  title:        'Marketingstagiair — Contentcreatie & Social Media',
+  title:        'Marketingstagiair â€” Contentcreatie & Social Media',
   description:  'Werk mee aan campagnes voor A-merken, schrijf contentstrategie en beheer social kanalen. Volledige begeleiding door een senior strateeg.',
   duration:     '5 maanden',
   tags:         ['Social media', 'Copywriting', 'Adobe CC'],
@@ -1393,7 +1393,7 @@ function renderDiscoverDemoState(enabled) {
         <div style="position:absolute;top:10px;right:10px;
           background:#fdf3e0;color:#a06010;font-size:.72rem;font-weight:700;
           padding:3px 9px;border-radius:20px;letter-spacing:.04em;">
-          Voorbeeld · Bedrijf
+          Voorbeeld Â· Bedrijf
         </div>
         <div class="company-header">
           <div>
@@ -1405,20 +1405,20 @@ function renderDiscoverDemoState(enabled) {
         <h4>${escapeHtml(v.title)}</h4>
         <p class="description">${escapeHtml(v.description)}</p>
         <div class="meta">
-          <span>⏱ ${escapeHtml(v.duration)}</span>
-          <span>📅 Flexibel</span>
+          <span>â± ${escapeHtml(v.duration)}</span>
+          <span>ðŸ“… Flexibel</span>
         </div>
         <div class="tags">${tags}</div>
         <div class="card-footer">
-          <span class="guarantee yes">⚡ Responsgarantie</span>
+          <span class="guarantee yes">âš¡ Responsgarantie</span>
           <a href="auth.html" class="apply-btn" style="background:var(--orange)">
-            Maak je profiel aan →
+            Maak je profiel aan â†’
           </a>
         </div>
       </div>`;
   }
 }
-// ── End demo vacature toggle ──────────────────────────────────────────────
+// â”€â”€ End demo vacature toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 window.addEventListener('DOMContentLoaded', async () => {
   initDemoDiscover();
@@ -1428,7 +1428,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   const { data: { user } } = await db.auth.getUser();
   if (user) {
-    // ── Rol check nu via DB (vervangt sessionStorage check — sprint 5) ──
+    // â”€â”€ Rol check nu via DB (vervangt sessionStorage check â€” sprint 5) â”€â”€
     const hasValidRole = await requireRole('student');
     if (!hasValidRole) return;
   }
@@ -1438,10 +1438,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     // requireRole('student') op regel 1432 redirect non-students al weg, dus
     // we hoeven de rol hier niet te overschrijven. auth.html zet de echte rol
     // bij login (regel 963). Cross-pollination naar bedrijf-context bij chat
-    // → mijn-berichten flow is hiermee voorkomen.
+    // â†’ mijn-berichten flow is hiermee voorkomen.
 
     currentUser = user;
-    // Laad postcode scoped op gebruiker (privacy — gedeeld apparaat)
+    // Laad postcode scoped op gebruiker (privacy â€” gedeeld apparaat)
     studentPostcode = localStorage.getItem('internly_student_postcode_' + user.id) || '';
 
     // Toon notificatiebel (gerenderd door renderStudentHeader)
@@ -1466,15 +1466,15 @@ window.addEventListener('DOMContentLoaded', async () => {
 
       // BBL-guard: BBL-studenten horen op bbl-hub (canon via getRoleLanding)
       if (sp?.bbl_mode === true) { window.location.replace(getRoleLanding('student', true)); return; }
-      // Onboarding-guard: geen profiel of geen naam → terug naar profiel-form
-      // OPEN VRAAG (30 apr 2026): mogelijk conflict met canon B2 — zie stap 4 deliverable.
+      // Onboarding-guard: geen profiel of geen naam â†’ terug naar profiel-form
+      // OPEN VRAAG (30 apr 2026): mogelijk conflict met canon B2 â€” zie stap 4 deliverable.
       if (!sp || !sp.naam) { window.location.replace('student-profile.html'); return; }
 
       // International filter-flag: bepaalt query-builder gedrag in loadInternships
       currentUserStudentType = sp?.student_type === 'international' ? 'international' : 'nl';
 
-      // Welkom overlay — eenmalig na eerste login
-      // welcome-overlay.js — 1 mei 2026
+      // Welkom overlay â€” eenmalig na eerste login
+      // welcome-overlay.js â€” 1 mei 2026
       if (typeof maybeShowWelcomeOverlay === 'function') {
         maybeShowWelcomeOverlay(
           user.id,
@@ -1484,7 +1484,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         );
       }
 
-      // ── Buddy system init ────────────────────────────────────
+      // â”€â”€ Buddy system init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       const buddySec = document.getElementById('buddySection');
       if (buddySec) {
         buddySec.style.display = 'block';
@@ -1515,7 +1515,7 @@ window.addEventListener('beforeunload', async () => {
 });
 </script>
 
-<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
+<!-- â”€â”€ WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 <div id="waitlist-overlay" style="
   display:none; position:fixed; inset:0; z-index:9998;
   background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
@@ -1537,7 +1537,7 @@ window.addEventListener('beforeunload', async () => {
       background:rgba(255,255,255,.15);border:none;
       color:#fff;width:28px;height:28px;border-radius:50%;
       font-size:1rem;cursor:pointer;line-height:1;
-      display:flex;align-items:center;justify-content:center;">×</button>
+      display:flex;align-items:center;justify-content:center;">Ã—</button>
     <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
       intern<span style="color:#FF7E42;">ly</span>
     </div>
@@ -1552,7 +1552,7 @@ window.addEventListener('beforeunload', async () => {
       Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
     </p>
     <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
-      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
+      Geen spam. Maximaal Ã©Ã©n mail per maand. Altijd makkelijk uitschrijven.
     </p>
 
     <div id="wl-form">
@@ -1571,12 +1571,12 @@ window.addEventListener('beforeunload', async () => {
         border-radius:50px;font-family:'Outfit',sans-serif;
         font-size:.95rem;font-weight:700;cursor:pointer;
         transition:background .15s;">
-        Houd me op de hoogte →
+        Houd me op de hoogte â†’
       </button>
     </div>
 
     <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
-      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
+      <div style="font-size:1.8rem;margin-bottom:8px;">ðŸŽ‰</div>
       <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
       <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
     </div>
@@ -1629,7 +1629,7 @@ window.addEventListener('beforeunload', async () => {
     }
 
     btn.disabled    = true;
-    btn.textContent = 'Bezig…';
+    btn.textContent = 'Bezigâ€¦';
 
     const client = (typeof db !== 'undefined') ? db
       : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1639,7 +1639,7 @@ window.addEventListener('beforeunload', async () => {
       .insert({ email, source: window.location.pathname });
 
     btn.disabled    = false;
-    btn.textContent = 'Houd me op de hoogte →';
+    btn.textContent = 'Houd me op de hoogte â†’';
 
     if (error) {
       if (error.code === '23505') {
@@ -1659,13 +1659,13 @@ window.addEventListener('beforeunload', async () => {
   };
 })();
 </script>
-<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
+<!-- â”€â”€ EINDE WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
 
 <script src="js/translate.js"></script>
 <script>
 window.addEventListener('load', function() {
   // Pre-select niveau filter from URL param (passed by landing page CTA)
-  // Do NOT call filterCards() here — cards load async; loadInternships() calls it after render
+  // Do NOT call filterCards() here â€” cards load async; loadInternships() calls it after render
   const urlNiveau = new URLSearchParams(window.location.search).get('niveau');
   if (urlNiveau) {
     const nf = document.getElementById('niveauFilter');
@@ -1696,7 +1696,7 @@ window.addEventListener('load', function() {
     <li><a href="about.html" style="font-size:.76rem;color:rgba(255,255,255,.45);text-decoration:none;">Over ons</a></li>
     <li><a href="mailto:hallo@internly.pro" style="font-size:.76rem;color:rgba(255,255,255,.45);text-decoration:none;">Contact</a></li>
   </ul>
-  <div style="font-size:.68rem;color:rgba(255,255,255,.3);">© 2026 Sasubo Holding B.V.</div>
+  <div style="font-size:.68rem;color:rgba(255,255,255,.3);">Â© 2026 Sasubo Holding B.V.</div>
 </footer>
 </body>
 </html>

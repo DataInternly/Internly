@@ -1,0 +1,6 @@
+Contact: mailto:security@internly.pro
+Contact: mailto:data@internly.pro
+Expires: 2027-05-07T00:00:00.000Z
+Preferred-Languages: nl, en
+Policy: https://internly.pro/security
+Acknowledgments: https://internly.pro/security#hall-of-fame

@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
-  INTERNATIONAL SCHOOL DASHBOARD — Internly Worldwide
-  ─────────────────────────────────────────────────────────────────────────────
+  INTERNATIONAL SCHOOL DASHBOARD â€” Internly Worldwide
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Logged-in dashboard for foreign universities monitoring their students'
   inbound internships in the Netherlands.
 
   Auth guard: profiles.role = 'school' AND international_school_profiles row exists.
 
   Three sections:
-    6a  My Students   — list Learning Agreements where school_id = auth.uid()
-    6b  Sign Documents — direct sign for LAs awaiting university signature
-    6c  Account       — manage international_school_profiles (institution name,
+    6a  My Students   â€” list Learning Agreements where school_id = auth.uid()
+    6b  Sign Documents â€” direct sign for LAs awaiting university signature
+    6c  Account       â€” manage international_school_profiles (institution name,
                         country, website, contact, verified status)
 
   All text English. No NL terminology.
-  Load order: utils.js → supabase.js → inline.
+  Load order: utils.js â†’ supabase.js â†’ inline.
   Each catch: notify() + console.error().
-  ─────────────────────────────────────────────────────────────────────────────
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -->
 <html lang="en">
 <head>
@@ -27,18 +27,18 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0f5c36">
-  <title>Internly Worldwide — University Dashboard</title>
+  <title>Internly Worldwide â€” University Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/account.js"></script>
   <script src="js/toast.js"></script>
   <script>
-    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    // Pre-load shim â€” telemetry.js overschrijft dit bij succesvolle load.
     window._fCtx = {
       _init: function(p) {
         console.warn('[telemetry] js/telemetry.js niet geladen, ' +
@@ -119,10 +119,10 @@
       outline-offset: 2px;
     }
 
-    /* ── Layout ───────────────────────────────────────────────── */
+    /* â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .layout { display: flex; min-height: 100vh; }
 
-    /* ── Sidebar (dark + green head) ──────────────────────────── */
+    /* â”€â”€ Sidebar (dark + green head) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .sidebar {
       width: var(--sidebar-w);
       background: var(--ink);
@@ -222,7 +222,7 @@
     }
     .sidebar-bottom a:hover, .sidebar-bottom button:hover { color: #fff; }
 
-    /* ── Main ─────────────────────────────────────────────────── */
+    /* â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .main {
       flex: 1;
       padding: 28px 36px;
@@ -242,7 +242,7 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* ── Banners ─────────────────────────────────────────────── */
+    /* â”€â”€ Banners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .banner {
       padding: 12px 16px;
       border-radius: var(--r-sm);
@@ -260,7 +260,7 @@
       font-family: inherit; text-decoration: underline;
     }
 
-    /* ── Cards ────────────────────────────────────────────────── */
+    /* â”€â”€ Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .card {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -276,7 +276,7 @@
     .card-title { font-weight: 600; color: var(--ink); }
     .card-sub { font-size: .82rem; color: var(--ink3); margin-top: 2px; }
 
-    /* ── Status pills ─────────────────────────────────────────── */
+    /* â”€â”€ Status pills â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .status-pill {
       font-size: .72rem; padding: 3px 8px; border-radius: 20px;
       font-weight: 600;
@@ -289,7 +289,7 @@
     .status-pill.complete        { background: var(--green-bg); color: var(--green); }
     .status-pill.action          { background: var(--orange);   color: #fff; }
 
-    /* ── Forms ────────────────────────────────────────────────── */
+    /* â”€â”€ Forms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .form-card {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -329,7 +329,7 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
     }
 
-    /* ── Buttons ──────────────────────────────────────────────── */
+    /* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .btn-primary {
       background: var(--green);
       color: #fff;
@@ -371,7 +371,7 @@
     }
     .btn-ghost:hover { border-color: var(--ink2); }
 
-    /* ── State boxes ──────────────────────────────────────────── */
+    /* â”€â”€ State boxes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .state-box {
       background: var(--white);
       border: 1px dashed var(--border2);
@@ -382,7 +382,7 @@
     }
     .state-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
 
-    /* ── Notification toast ───────────────────────────────────── */
+    /* â”€â”€ Notification toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -399,7 +399,7 @@
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── LA detail expand ─────────────────────────────────────── */
+    /* â”€â”€ LA detail expand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .la-detail {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -434,7 +434,7 @@
       margin: 3px 0;
     }
 
-    /* ── Mobile ───────────────────────────────────────────────── */
+    /* â”€â”€ Mobile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     @media (max-width: 768px) {
       .layout { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: relative; }
@@ -455,9 +455,9 @@
 
 <div class="layout">
 
-  <!-- ════════════════════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SIDEBAR
-       ════════════════════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <aside class="sidebar">
     <div class="sidebar-head">
       <div class="brand">Internly <span>Worldwide</span></div>
@@ -466,8 +466,8 @@
     <div class="sidebar-user">
       <div class="avatar" id="userAvatar">?</div>
       <div>
-        <div class="uname" id="userName">Loading…</div>
-        <div class="umail" id="userEmail">—</div>
+        <div class="uname" id="userName">Loadingâ€¦</div>
+        <div class="umail" id="userEmail">â€”</div>
         <span class="verify-pill pending" id="verifyPill" style="display:none">Pending verification</span>
       </div>
     </div>
@@ -475,20 +475,20 @@
       <div class="sidebar-section">
         <span class="sidebar-label">Oversight</span>
         <button class="nav-btn active" id="nav-students" onclick="show('students')">
-          <span class="nav-icon">🎓</span> My Students
+          <span class="nav-icon">ðŸŽ“</span> My Students
         </button>
         <button class="nav-btn" id="nav-signing" onclick="show('signing')">
-          <span class="nav-icon">📜</span> Sign Documents
+          <span class="nav-icon">ðŸ“œ</span> Sign Documents
           <span class="nav-badge" id="badgePending" style="display:none">0</span>
         </button>
       </div>
       <div class="sidebar-section">
         <span class="sidebar-label">Institution</span>
         <button class="nav-btn" id="nav-institution" onclick="show('institution')">
-          <span class="nav-icon">🏛</span> Institution
+          <span class="nav-icon">ðŸ›</span> Institution
         </button>
         <button class="nav-btn" id="nav-account" onclick="show('account')">
-          <span class="nav-icon">⚙️</span> Account
+          <span class="nav-icon">âš™ï¸</span> Account
         </button>
       </div>
     </div>
@@ -499,35 +499,35 @@
     </div>
   </aside>
 
-  <!-- ════════════════════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        MAIN
-       ════════════════════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <main class="main">
 
-    <!-- Verification banner — shown when school not yet verified -->
+    <!-- Verification banner â€” shown when school not yet verified -->
     <div class="banner warn" id="verifyBanner" style="display:none">
-      <span>⏳ Your institution is pending verification by Internly. Until verified, your account is read-only.</span>
+      <span>â³ Your institution is pending verification by Internly. Until verified, your account is read-only.</span>
     </div>
 
-    <!-- ── Sectie 6a — MY STUDENTS ──────────────────────────────── -->
+    <!-- â”€â”€ Sectie 6a â€” MY STUDENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen active" id="screen-students">
       <div class="page-title">My students</div>
       <p class="page-sub">All Learning Agreements where your institution is named.</p>
       <div id="studentsList">
-        <div class="state-box"><span class="state-icon">⏳</span>Loading agreements…</div>
+        <div class="state-box"><span class="state-icon">â³</span>Loading agreementsâ€¦</div>
       </div>
     </div>
 
-    <!-- ── Sectie 6b — SIGN DOCUMENTS ───────────────────────────── -->
+    <!-- â”€â”€ Sectie 6b â€” SIGN DOCUMENTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-signing">
       <div class="page-title">Sign documents</div>
       <p class="page-sub">Learning Agreements that need your signature as the home university.</p>
       <div id="signingList">
-        <div class="state-box"><span class="state-icon">⏳</span>Loading documents…</div>
+        <div class="state-box"><span class="state-icon">â³</span>Loading documentsâ€¦</div>
       </div>
     </div>
 
-    <!-- ── Sectie 6c — INSTITUTION PROFILE ──────────────────────── -->
+    <!-- â”€â”€ Sectie 6c â€” INSTITUTION PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-institution">
       <div class="page-title">Institution</div>
       <p class="page-sub">Your institution's profile on Internly Worldwide.</p>
@@ -570,7 +570,7 @@
       <button class="btn-primary" id="saveAccountBtn" onclick="saveAccount()">Save institution</button>
     </div>
 
-    <!-- ── Sectie 6d — ACCOUNT (personal settings via AccountModule) ─── -->
+    <!-- â”€â”€ Sectie 6d â€” ACCOUNT (personal settings via AccountModule) â”€â”€â”€ -->
     <div class="screen" id="screen-account">
       <div class="page-title">Account settings</div>
       <p class="page-sub">Manage your contact information and preferences</p>
@@ -581,16 +581,16 @@
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // State
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let currentUser   = null;
 let schoolProfile = null;          // international_school_profiles row
 let agreements    = [];            // learning_agreements where school_id = uid()
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Initial mount + auth guard
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const { data: { user } } = await db.auth.getUser();
@@ -618,7 +618,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (role !== 'school') {
-      // Not a school account — redirect (could be student, company, etc.)
+      // Not a school account â€” redirect (could be student, company, etc.)
       window.location.replace(
         typeof getRoleLanding === 'function'
           ? getRoleLanding(role)
@@ -627,7 +627,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Telemetry init — zie CLAUDE.md voor codenames
+    // Telemetry init â€” zie CLAUDE.md voor codenames
     if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('intl-school');
 
     await loadSchoolProfile();
@@ -660,9 +660,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Tab switching
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -675,8 +675,8 @@ async function show(id) {
   if (id === 'signing')  renderSigningList();
   if (id === 'account') {
     window._currentUserId = currentUser?.id;
-    // renderAccountScreen returnt een Promise die resolvet ná de
-    // requestAnimationFrame — we kunnen daarna betrouwbaar de DOM lezen
+    // renderAccountScreen returnt een Promise die resolvet nÃ¡ de
+    // requestAnimationFrame â€” we kunnen daarna betrouwbaar de DOM lezen
     // zonder setTimeout-race.
     await AccountModule.renderAccountScreen('account-container', 'en');
     const form = document.querySelector('#account-container .account-form');
@@ -684,9 +684,9 @@ async function show(id) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // School profile load + save (Sectie 6c)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function loadSchoolProfile() {
   try {
     const { data, error } = await db.from('international_school_profiles')
@@ -700,7 +700,7 @@ async function loadSchoolProfile() {
     const pill   = document.getElementById('verifyPill');
     const banner = document.getElementById('verifyBanner');
     if (schoolProfile?.verified) {
-      if (pill)   { pill.style.display = 'inline-block'; pill.textContent = 'Verified ✓'; pill.classList.remove('pending'); }
+      if (pill)   { pill.style.display = 'inline-block'; pill.textContent = 'Verified âœ“'; pill.classList.remove('pending'); }
       if (banner) banner.style.display = 'none';
     } else {
       if (pill)   { pill.style.display = 'inline-block'; pill.textContent = 'Pending verification'; pill.classList.add('pending'); }
@@ -729,7 +729,7 @@ function setVal(id, v) {
 async function saveAccount() {
   if (!currentUser) { notify('Not signed in', false); return; }
   const btn = document.getElementById('saveAccountBtn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Savingâ€¦';
 
   const payload = {
     profile_id:       currentUser.id,
@@ -759,10 +759,10 @@ async function saveAccount() {
 
     if (error) {
       console.error('[intl-school] saveAccount fout:', error.message);
-      notify('Could not save account — please try again', false);
+      notify('Could not save account â€” please try again', false);
       return;
     }
-    notify('✓ Account saved');
+    notify('âœ“ Account saved');
     schoolProfile = Object.assign({}, schoolProfile || {}, payload);
   } catch (err) {
     btn.disabled = false; btn.textContent = 'Save account';
@@ -771,9 +771,9 @@ async function saveAccount() {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Agreements load + render (Sectie 6a)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function loadAgreements() {
   try {
     // RLS la_school_select restricts to school_id = auth.uid()
@@ -796,14 +796,14 @@ async function loadAgreements() {
         const nameMap = {};
         (profs || []).forEach(p => { nameMap[p.id] = p.naam; });
         agreements.forEach(a => {
-          a._studentName = nameMap[a.student_id] || '—';
-          a._companyName = nameMap[a.company_id] || '—';
+          a._studentName = nameMap[a.student_id] || 'â€”';
+          a._companyName = nameMap[a.company_id] || 'â€”';
         });
       } catch (lookupErr) {
         console.error('[intl-school] profile lookup fout:', lookupErr?.message || lookupErr);
         agreements.forEach(a => {
-          a._studentName = a._studentName || '—';
-          a._companyName = a._companyName || '—';
+          a._studentName = a._studentName || 'â€”';
+          a._companyName = a._companyName || 'â€”';
         });
       }
     }
@@ -820,7 +820,7 @@ function renderStudents() {
   if (!agreements || agreements.length === 0) {
     list.innerHTML = `
       <div class="state-box">
-        <span class="state-icon">🎓</span>
+        <span class="state-icon">ðŸŽ“</span>
         No Learning Agreements linked to your institution yet.<br>
         <small style="display:block;margin-top:6px">Students who name your university in their Learning Agreement will appear here.</small>
       </div>
@@ -834,14 +834,14 @@ function renderStudents() {
         <div>
           <div class="card-title">${escapeHtml(a._studentName || 'Student')}</div>
           <div class="card-sub">
-            ${escapeHtml(a._companyName || 'Company')} ·
-            ${a.start_date || '—'} → ${a.end_date || '—'} ·
-            ${a.hours_per_week || '—'} h/wk
+            ${escapeHtml(a._companyName || 'Company')} Â·
+            ${a.start_date || 'â€”'} â†’ ${a.end_date || 'â€”'} Â·
+            ${a.hours_per_week || 'â€”'} h/wk
           </div>
         </div>
         <span class="status-pill ${escapeHtml(a.status || 'draft')}">${escapeHtml(laStatusLabel(a.status))}</span>
       </div>
-      <button class="btn-ghost" onclick="toggleDetails('${escapeHtml(a.id)}')" id="td-${escapeHtml(a.id)}-btn">View details ▾</button>
+      <button class="btn-ghost" onclick="toggleDetails('${escapeHtml(a.id)}')" id="td-${escapeHtml(a.id)}-btn">View details â–¾</button>
       <div class="la-detail" id="td-${escapeHtml(a.id)}" style="display:none">
         ${renderDetail(a)}
       </div>
@@ -854,22 +854,22 @@ function renderDetail(a) {
   const objsHtml = objs.length
     ? `<ul class="objectives-list">${objs.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>`
     : '<span style="color:var(--ink3);font-style:italic">None specified</span>';
-  const compLabel = ({ paid: 'Paid', stipend: 'Stipend', unpaid: 'Unpaid' })[a.compensation] || a.compensation || '—';
-  const compAmount = a.compensation_amount ? '€' + Number(a.compensation_amount).toFixed(0) + '/mo' : '';
+  const compLabel = ({ paid: 'Paid', stipend: 'Stipend', unpaid: 'Unpaid' })[a.compensation] || a.compensation || 'â€”';
+  const compAmount = a.compensation_amount ? 'â‚¬' + Number(a.compensation_amount).toFixed(0) + '/mo' : '';
 
   return `
-    <div class="la-detail-row"><div class="lbl">Period</div><div class="val">${a.start_date || '—'} → ${a.end_date || '—'}</div></div>
-    <div class="la-detail-row"><div class="lbl">Hours / week</div><div class="val">${a.hours_per_week || '—'}</div></div>
-    <div class="la-detail-row"><div class="lbl">Credits</div><div class="val">${a.academic_credits ? a.academic_credits + ' ECTS' : '—'}</div></div>
-    <div class="la-detail-row"><div class="lbl">Compensation</div><div class="val">${escapeHtml(compLabel)}${compAmount ? ' — ' + escapeHtml(compAmount) : ''}</div></div>
-    <div class="la-detail-row"><div class="lbl">Supervisor</div><div class="val">${escapeHtml(a.supervisor_name || '—')}${a.supervisor_email ? ' (' + escapeHtml(a.supervisor_email) + ')' : ''}</div></div>
+    <div class="la-detail-row"><div class="lbl">Period</div><div class="val">${a.start_date || 'â€”'} â†’ ${a.end_date || 'â€”'}</div></div>
+    <div class="la-detail-row"><div class="lbl">Hours / week</div><div class="val">${a.hours_per_week || 'â€”'}</div></div>
+    <div class="la-detail-row"><div class="lbl">Credits</div><div class="val">${a.academic_credits ? a.academic_credits + ' ECTS' : 'â€”'}</div></div>
+    <div class="la-detail-row"><div class="lbl">Compensation</div><div class="val">${escapeHtml(compLabel)}${compAmount ? ' â€” ' + escapeHtml(compAmount) : ''}</div></div>
+    <div class="la-detail-row"><div class="lbl">Supervisor</div><div class="val">${escapeHtml(a.supervisor_name || 'â€”')}${a.supervisor_email ? ' (' + escapeHtml(a.supervisor_email) + ')' : ''}</div></div>
     <div class="la-detail-row" style="align-items:flex-start"><div class="lbl">Objectives</div><div class="val">${objsHtml}</div></div>
     <div class="la-detail-row" style="margin-top:6px;border-top:1px solid var(--border);padding-top:8px">
       <div class="lbl">Signatures</div>
       <div class="val" style="font-size:.82rem">
-        Student: ${a.student_signed_at ? '✓ ' + escapeHtml(formatDateShort(a.student_signed_at)) : '— pending'} ·
-        Company: ${a.company_signed_at ? '✓ ' + escapeHtml(formatDateShort(a.company_signed_at)) : '— pending'} ·
-        University: ${a.school_signed_at ? '✓ ' + escapeHtml(formatDateShort(a.school_signed_at)) : '— pending'}
+        Student: ${a.student_signed_at ? 'âœ“ ' + escapeHtml(formatDateShort(a.student_signed_at)) : 'â€” pending'} Â·
+        Company: ${a.company_signed_at ? 'âœ“ ' + escapeHtml(formatDateShort(a.company_signed_at)) : 'â€” pending'} Â·
+        University: ${a.school_signed_at ? 'âœ“ ' + escapeHtml(formatDateShort(a.school_signed_at)) : 'â€” pending'}
       </div>
     </div>
   `;
@@ -881,7 +881,7 @@ function toggleDetails(id) {
   if (!det) return;
   const isHidden = det.style.display === 'none';
   det.style.display = isHidden ? 'block' : 'none';
-  if (btn) btn.textContent = isHidden ? 'Hide details ▴' : 'View details ▾';
+  if (btn) btn.textContent = isHidden ? 'Hide details â–´' : 'View details â–¾';
 }
 
 function laStatusLabel(s) {
@@ -891,7 +891,7 @@ function laStatusLabel(s) {
     company_signed:  'Awaiting your signature',
     school_signed:   'Awaiting company',
     complete:        'Complete'
-  })[s] || (s || '—');
+  })[s] || (s || 'â€”');
 }
 
 function formatDateShort(iso) {
@@ -901,9 +901,9 @@ function formatDateShort(iso) {
   } catch (_e) { return iso; }
 }
 
-// ════════════════════════════════════════════════════════════════
-// Sign list (Sectie 6b) — LAs needing university signature
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Sign list (Sectie 6b) â€” LAs needing university signature
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function pendingForUni() {
   // University signs after company; or first if company hasn't yet.
   // We surface anything with status 'student_signed' or 'company_signed' that
@@ -930,7 +930,7 @@ function renderSigningList() {
   if (pending.length === 0) {
     list.innerHTML = `
       <div class="state-box">
-        <span class="state-icon">📜</span>
+        <span class="state-icon">ðŸ“œ</span>
         Nothing waiting for your signature right now.
       </div>
     `;
@@ -941,11 +941,11 @@ function renderSigningList() {
     <div class="card">
       <div class="card-head">
         <div>
-          <div class="card-title">${escapeHtml(a._studentName || 'Student')} — ${escapeHtml(a._companyName || 'Company')}</div>
+          <div class="card-title">${escapeHtml(a._studentName || 'Student')} â€” ${escapeHtml(a._companyName || 'Company')}</div>
           <div class="card-sub">
-            ${a.start_date || '—'} → ${a.end_date || '—'} ·
-            ${a.hours_per_week || '—'} h/wk ·
-            supervisor ${escapeHtml(a.supervisor_name || '—')}
+            ${a.start_date || 'â€”'} â†’ ${a.end_date || 'â€”'} Â·
+            ${a.hours_per_week || 'â€”'} h/wk Â·
+            supervisor ${escapeHtml(a.supervisor_name || 'â€”')}
           </div>
         </div>
         <span class="status-pill action">Action needed</span>
@@ -977,7 +977,7 @@ async function signAsSchool(laId) {
       .eq('school_id', currentUser.id); // RLS safety net (la_school_update)
     if (error) throw error;
 
-    notify('✓ Signed successfully');
+    notify('âœ“ Signed successfully');
 
     // Refresh + re-render
     await loadAgreements();
@@ -990,9 +990,9 @@ async function signAsSchool(laId) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Sign out
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function signOut() {
   try {
     await db.auth.signOut();
@@ -1004,7 +1004,7 @@ async function signOut() {
   window.location.href = 'auth.html';
 }
 
-// notify() and escapeHtml() come from js/utils.js — do not redefine here.
+// notify() and escapeHtml() come from js/utils.js â€” do not redefine here.
 </script>
 
 <!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
@@ -1015,7 +1015,7 @@ async function signOut() {
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -1023,8 +1023,8 @@ async function signOut() {
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

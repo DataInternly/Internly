@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
-  INTERNATIONAL STUDENT DASHBOARD — Internly
-  ─────────────────────────────────────────────────────────────────────────────
-  Inbound students (foreign → NL internships).
+  INTERNATIONAL STUDENT DASHBOARD â€” Internly
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  Inbound students (foreign â†’ NL internships).
   Loaded after auth when student_profiles.student_type === 'international'.
-  Routing: js/roles.js NIET geladen op deze pagina — dit dashboard heeft
+  Routing: js/roles.js NIET geladen op deze pagina â€” dit dashboard heeft
   geen routing-aanroepen (smartHomeRedirect / getRoleLanding /
   resolveStudentDashboard worden hier nergens aangeroepen).
-  Indien toekomstige refactor één van die functies hier toevoegt, MOET
-  js/roles.js eerst worden geladen (zie §Laadvolgorde in CLAUDE.md).
+  Indien toekomstige refactor Ã©Ã©n van die functies hier toevoegt, MOET
+  js/roles.js eerst worden geladen (zie Â§Laadvolgorde in CLAUDE.md).
 
   Sections:
     4a Document Hub (always-visible top strip)
@@ -21,7 +21,7 @@
 
   Storage bucket: 'intern-documents', path = {user_id}/{kind}_{ts}.{ext}
   Per-user RLS isolation expected on storage.objects.
-  ─────────────────────────────────────────────────────────────────────────────
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -->
 <html lang="en">
 <head>
@@ -32,20 +32,20 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0f5c36">
-  <title>Internly Worldwide — International Internships</title>
+  <title>Internly Worldwide â€” International Internships</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/avatar.js"></script>
   <script src="js/welcome-overlay.js"></script>
   <script src="js/account.js"></script>
   <script src="js/toast.js"></script>
   <script>
-    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    // Pre-load shim â€” telemetry.js overschrijft dit bij succesvolle load.
     window._fCtx = {
       _init: function(p) {
         console.warn('[telemetry] js/telemetry.js niet geladen, ' +
@@ -126,10 +126,10 @@
       outline-offset: 2px;
     }
 
-    /* ── Layout ───────────────────────────────────────────────── */
+    /* â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .layout { display: flex; min-height: 100vh; }
 
-    /* ── Sidebar (dark + green head per design rule) ──────────── */
+    /* â”€â”€ Sidebar (dark + green head per design rule) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .sidebar {
       width: var(--sidebar-w);
       background: var(--ink);
@@ -212,14 +212,14 @@
     }
     .sidebar-bottom a:hover, .sidebar-bottom button:hover { color: #fff; }
 
-    /* ── Main ─────────────────────────────────────────────────── */
+    /* â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .main {
       flex: 1;
       padding: 28px 36px;
       overflow-y: auto;
     }
 
-    /* ── Document Hub strip (Sectie 4a) ───────────────────────── */
+    /* â”€â”€ Document Hub strip (Sectie 4a) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .doc-hub {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -268,7 +268,7 @@
       font-family: inherit; margin-top: auto;
     }
 
-    /* ── Profile completion bar ───────────────────────────────── */
+    /* â”€â”€ Profile completion bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .completion-bar {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -301,7 +301,7 @@
       color: var(--ink3);
     }
 
-    /* ── Screens ──────────────────────────────────────────────── */
+    /* â”€â”€ Screens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .screen { display: none; }
     .screen.active { display: block; }
 
@@ -316,7 +316,7 @@
       margin-bottom: 22px;
     }
 
-    /* ── Forms ────────────────────────────────────────────────── */
+    /* â”€â”€ Forms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .form-card {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -357,7 +357,7 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
     }
 
-    /* ── Buttons ──────────────────────────────────────────────── */
+    /* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .btn-primary {
       background: var(--green);
       color: #fff;
@@ -402,7 +402,7 @@
     .btn-ghost:hover:not(:disabled) { border-color: var(--ink2); }
     .btn-ghost:disabled { opacity: .5; cursor: not-allowed; }
 
-    /* ── Language tags ────────────────────────────────────────── */
+    /* â”€â”€ Language tags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .tags-box {
       display: flex; flex-wrap: wrap; gap: 6px;
       padding: 8px 10px;
@@ -434,7 +434,7 @@
       background: transparent;
     }
 
-    /* ── Timeline (Sectie 4d) ─────────────────────────────────── */
+    /* â”€â”€ Timeline (Sectie 4d) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .timeline-eta {
       background: var(--orange-bg);
       color: var(--orange-deep);
@@ -470,7 +470,7 @@
     .step-text { font-size: .92rem; color: var(--ink); flex: 1; }
     .step-meta { font-size: .78rem; color: var(--ink3); }
 
-    /* ── Vacancies (Sectie 4e) ────────────────────────────────── */
+    /* â”€â”€ Vacancies (Sectie 4e) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .filter-row {
       display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
     }
@@ -540,7 +540,7 @@
       text-align: center;
     }
 
-    /* ── Profile gate overlay (Sectie 4c) ─────────────────────── */
+    /* â”€â”€ Profile gate overlay (Sectie 4c) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .gate-overlay {
       background: var(--orange-bg);
       border: 1px solid rgba(224,92,26,.3);
@@ -574,7 +574,7 @@
       margin-top: 4px;
     }
 
-    /* ── Applications + LA list (Sectie 4f / 4g) ──────────────── */
+    /* â”€â”€ Applications + LA list (Sectie 4f / 4g) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .app-card {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -599,7 +599,7 @@
     .app-status.rejected { background: var(--red-bg);   color: var(--red); }
     .app-status.draft    { background: #f3f4f6;          color: var(--ink3); }
 
-    /* ── State boxes ──────────────────────────────────────────── */
+    /* â”€â”€ State boxes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .state-box {
       background: var(--white);
       border: 1px dashed var(--border2);
@@ -611,7 +611,7 @@
     .state-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
     .state-box.error { border-color: rgba(184,32,32,.3); color: var(--red); }
 
-    /* ── Notification toast ───────────────────────────────────── */
+    /* â”€â”€ Notification toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -628,7 +628,7 @@
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── Buddy section ────────────────────────────────────────── */
+    /* â”€â”€ Buddy section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .buddy-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -680,7 +680,7 @@
     .buddy-status-chip.requested { background: var(--amber-bg); color: var(--amber); }
     .buddy-status-chip.active    { background: var(--green-bg); color: var(--green); }
 
-    /* ── Sign link box (LA flow) ──────────────────────────────── */
+    /* â”€â”€ Sign link box (LA flow) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .sign-link-box {
       background: var(--bg);
       border: 1px solid var(--border2);
@@ -712,7 +712,7 @@
     }
     .copy-btn:hover { border-color: var(--ink2); }
 
-    /* ── Mobile (768px breakpoint) ────────────────────────────── */
+    /* â”€â”€ Mobile (768px breakpoint) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     @media (max-width: 768px) {
       .layout { flex-direction: column; }
       .sidebar {
@@ -738,9 +738,9 @@
 
 <div class="layout">
 
-  <!-- ════════════════════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SIDEBAR
-       ════════════════════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <aside class="sidebar">
     <div class="sidebar-head">
       <div class="brand">Internly <span>Worldwide</span></div>
@@ -749,8 +749,8 @@
     <div class="sidebar-user">
       <div class="avatar" id="userAvatar">?</div>
       <div>
-        <div class="uname" id="userName">Loading…</div>
-        <div class="umail" id="userEmail">—</div>
+        <div class="uname" id="userName">Loadingâ€¦</div>
+        <div class="umail" id="userEmail">â€”</div>
       </div>
     </div>
 
@@ -758,31 +758,31 @@
       <div class="sidebar-section">
         <span class="sidebar-label">Your journey</span>
         <button class="nav-btn active" id="nav-timeline" onclick="show('timeline')">
-          <span class="nav-icon">🗺</span> Timeline
+          <span class="nav-icon">ðŸ—º</span> Timeline
         </button>
         <button class="nav-btn" id="nav-profile" onclick="show('profile')">
-          <span class="nav-icon">👤</span> Profile
+          <span class="nav-icon">ðŸ‘¤</span> Profile
         </button>
       </div>
       <div class="sidebar-section">
         <span class="sidebar-label">Internships</span>
         <button class="nav-btn" id="nav-discover" onclick="show('discover')">
-          <span class="nav-icon">🔍</span> Discover
+          <span class="nav-icon">ðŸ”</span> Discover
         </button>
         <button class="nav-btn" id="nav-applications" onclick="show('applications')">
-          <span class="nav-icon">📨</span> Applications
+          <span class="nav-icon">ðŸ“¨</span> Applications
         </button>
         <button class="nav-btn" id="nav-learning" onclick="show('learning')">
-          <span class="nav-icon">📜</span> Learning Agreement
+          <span class="nav-icon">ðŸ“œ</span> Learning Agreement
         </button>
         <button class="nav-btn" id="nav-buddy" onclick="show('buddy')">
-          <span class="nav-icon">🤝</span> Buddy
+          <span class="nav-icon">ðŸ¤</span> Buddy
         </button>
       </div>
       <div class="sidebar-section">
         <span class="sidebar-label">Account</span>
         <button class="nav-btn" id="nav-account" onclick="show('account')">
-          <span class="nav-icon">⚙️</span> Account
+          <span class="nav-icon">âš™ï¸</span> Account
         </button>
       </div>
     </div>
@@ -794,19 +794,19 @@
     </div>
   </aside>
 
-  <!-- ════════════════════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        MAIN
-       ════════════════════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <main class="main">
 
-    <!-- ── Sectie 4a — DOCUMENT HUB STRIP (always visible) ─────────────── -->
+    <!-- â”€â”€ Sectie 4a â€” DOCUMENT HUB STRIP (always visible) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="doc-hub" id="docHub">
 
-      <!-- Card 1 — Visa -->
+      <!-- Card 1 â€” Visa -->
       <div class="doc-card">
         <div class="doc-label">Visa</div>
         <div class="doc-title">Status</div>
-        <span class="doc-status idle" id="hub-visa-status">Loading…</span>
+        <span class="doc-status idle" id="hub-visa-status">Loadingâ€¦</span>
         <select id="visa-status-select" onchange="updateVisaStatus()" style="margin-top:10px">
           <option value="not_required">Not required (EU)</option>
           <option value="not_started">Not started</option>
@@ -815,40 +815,40 @@
         </select>
       </div>
 
-      <!-- Card 2 — Work Authorization -->
+      <!-- Card 2 â€” Work Authorization -->
       <div class="doc-card">
         <div class="doc-label">Work auth</div>
-        <div class="doc-title" id="hub-work-type">—</div>
+        <div class="doc-title" id="hub-work-type">â€”</div>
         <div id="hub-work-status" style="font-size:.74rem;color:var(--ink3);margin-bottom:6px">No document yet</div>
         <input type="file" id="work-auth-file" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="uploadWorkAuth(event)">
-        <button class="doc-action" onclick="document.getElementById('work-auth-file').click()">📎 Upload</button>
+        <button class="doc-action" onclick="document.getElementById('work-auth-file').click()">ðŸ“Ž Upload</button>
       </div>
 
-      <!-- Card 3 — Health Insurance -->
+      <!-- Card 3 â€” Health Insurance -->
       <div class="doc-card">
         <div class="doc-label">Health</div>
         <div class="doc-title">Insurance</div>
         <span class="doc-status idle" id="hub-health-status">Not arranged</span>
         <input type="file" id="health-file" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="uploadHealth(event)">
-        <button class="doc-action" onclick="document.getElementById('health-file').click()" style="margin-top:8px">📎 Upload</button>
+        <button class="doc-action" onclick="document.getElementById('health-file').click()" style="margin-top:8px">ðŸ“Ž Upload</button>
       </div>
 
-      <!-- Card 4 — Housing -->
+      <!-- Card 4 â€” Housing -->
       <div class="doc-card">
         <div class="doc-label">Housing</div>
         <div class="doc-title">Status</div>
         <select id="housing-status-select" onchange="updateHousing()" style="margin-top:10px">
-          <option value="no_option">🔴 No option yet</option>
-          <option value="searching">🟡 Actively searching</option>
-          <option value="found">🟢 Found</option>
+          <option value="no_option">ðŸ”´ No option yet</option>
+          <option value="searching">ðŸŸ¡ Actively searching</option>
+          <option value="found">ðŸŸ¢ Found</option>
         </select>
       </div>
 
-      <!-- Card 5 — Learning Agreement -->
+      <!-- Card 5 â€” Learning Agreement -->
       <div class="doc-card">
         <div class="doc-label">LA</div>
-        <div class="doc-title" id="hub-la-count">— agreements</div>
-        <button class="doc-action" onclick="show('learning')" style="margin-top:8px">View →</button>
+        <div class="doc-title" id="hub-la-count">â€” agreements</div>
+        <button class="doc-action" onclick="show('learning')" style="margin-top:8px">View â†’</button>
       </div>
 
     </div>
@@ -860,15 +860,15 @@
       <div class="completion-label">Profile complete</div>
     </div>
 
-    <!-- ── Sectie 4d — TIMELINE ─────────────────────────────────── -->
+    <!-- â”€â”€ Sectie 4d â€” TIMELINE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen active" id="screen-timeline">
       <div class="page-title">Your journey</div>
       <p class="page-sub">A step-by-step view of where you are in the international internship process.</p>
-      <div class="timeline-eta" id="timelineEta">Estimating timeline…</div>
+      <div class="timeline-eta" id="timelineEta">Estimating timelineâ€¦</div>
       <div class="timeline-list" id="timelineList"></div>
     </div>
 
-    <!-- ── Sectie 4b — PROFILE ──────────────────────────────────── -->
+    <!-- â”€â”€ Sectie 4b â€” PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-profile">
       <div class="page-title">Your profile</div>
       <p class="page-sub">Companies and universities use this to assess your fit. Keep it accurate.</p>
@@ -905,7 +905,7 @@
           <div class="field">
             <label>Study level</label>
             <select id="p-study-level">
-              <option value="">Select…</option>
+              <option value="">Selectâ€¦</option>
               <option value="bachelor">Bachelor</option>
               <option value="master">Master</option>
               <option value="phd">PhD</option>
@@ -924,7 +924,7 @@
         <div class="field">
           <label>Add languages you speak fluently</label>
           <div class="tags-box" id="langsBox" onclick="document.getElementById('langsInput').focus()">
-            <input type="text" id="langsInput" class="tags-input" placeholder="EN, NL, IT, DE…" maxlength="20">
+            <input type="text" id="langsInput" class="tags-input" placeholder="EN, NL, IT, DEâ€¦" maxlength="20">
           </div>
           <div style="font-size:.78rem;color:var(--ink3);margin-top:4px">Press Enter after each language. Common: EN, NL, DE, FR, ES, IT.</div>
         </div>
@@ -935,7 +935,7 @@
         <div class="field">
           <label>Work authorization type</label>
           <select id="p-work-auth">
-            <option value="">Select…</option>
+            <option value="">Selectâ€¦</option>
             <option value="eu_free">EU Free Movement</option>
             <option value="cpt">CPT (Curricular Practical Training)</option>
             <option value="opt">OPT (Optional Practical Training)</option>
@@ -949,10 +949,10 @@
       <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Save profile</button>
     </div>
 
-    <!-- ── Sectie 4e — DISCOVER (with Sectie 4c gate overlay) ──── -->
+    <!-- â”€â”€ Sectie 4e â€” DISCOVER (with Sectie 4c gate overlay) â”€â”€â”€â”€ -->
     <div class="screen" id="screen-discover">
       <div class="page-title">Available internships</div>
-      <p class="page-sub">Curated for international students — visa sponsorship, housing support, language fit.</p>
+      <p class="page-sub">Curated for international students â€” visa sponsorship, housing support, language fit.</p>
 
       <div class="gate-overlay" id="discoverGate" style="display:none">
         <div class="gate-text">
@@ -963,37 +963,37 @@
             <div class="gate-progress-label" id="gateProgressLabel">0% complete</div>
           </div>
         </div>
-        <button class="btn-orange" onclick="show('profile')">Complete profile →</button>
+        <button class="btn-orange" onclick="show('profile')">Complete profile â†’</button>
       </div>
 
       <div class="filter-row">
-        <input type="text" id="searchBox" placeholder="Search by title, company, sector…" oninput="filterVacs()">
+        <input type="text" id="searchBox" placeholder="Search by title, company, sectorâ€¦" oninput="filterVacs()">
         <select id="sectorFilter" onchange="filterVacs()">
           <option value="">All sectors</option>
         </select>
       </div>
 
       <div id="vacContainer">
-        <div class="state-box"><span class="state-icon">⏳</span>Loading vacancies…</div>
+        <div class="state-box"><span class="state-icon">â³</span>Loading vacanciesâ€¦</div>
       </div>
     </div>
 
-    <!-- ── Sectie 4f — APPLICATIONS ─────────────────────────────── -->
+    <!-- â”€â”€ Sectie 4f â€” APPLICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-applications">
       <div class="page-title">Your applications</div>
       <p class="page-sub">Track the status of internships you've applied to.</p>
       <div id="applicationsList">
-        <div class="state-box"><span class="state-icon">⏳</span>Loading applications…</div>
+        <div class="state-box"><span class="state-icon">â³</span>Loading applicationsâ€¦</div>
       </div>
     </div>
 
-    <!-- ── Sectie 4g — LEARNING AGREEMENT ───────────────────────── -->
+    <!-- â”€â”€ Sectie 4g â€” LEARNING AGREEMENT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-learning">
       <div class="page-title">Learning Agreement</div>
       <p class="page-sub">Once you have an accepted application, build your Learning Agreement here.</p>
 
       <div id="laListContainer">
-        <div class="state-box"><span class="state-icon">⏳</span>Loading…</div>
+        <div class="state-box"><span class="state-icon">â³</span>Loadingâ€¦</div>
       </div>
 
       <div id="laBuilder" style="display:none;margin-top:18px">
@@ -1021,7 +1021,7 @@
           </div>
           <div class="field">
             <label>Learning objectives (max 5, one per line)</label>
-            <textarea id="la-objectives" rows="5" maxlength="2000" placeholder="• Develop full-stack web skills..."></textarea>
+            <textarea id="la-objectives" rows="5" maxlength="2000" placeholder="â€¢ Develop full-stack web skills..."></textarea>
           </div>
           <div class="field-row">
             <div class="field">
@@ -1033,7 +1033,7 @@
               </select>
             </div>
             <div class="field">
-              <label>Compensation amount (€/month)</label>
+              <label>Compensation amount (â‚¬/month)</label>
               <input type="number" id="la-amount" min="0" placeholder="e.g. 500">
             </div>
           </div>
@@ -1053,17 +1053,17 @@
       </div>
     </div>
 
-    <!-- ── Sectie Buddy ─────────────────────────────────────────── -->
+    <!-- â”€â”€ Sectie Buddy â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-buddy">
       <div class="page-title">Find a buddy</div>
-      <p class="page-sub">Retired professionals from across the Netherlands offer informal guidance to international interns. They are volunteers — not your supervisor.</p>
+      <p class="page-sub">Retired professionals from across the Netherlands offer informal guidance to international interns. They are volunteers â€” not your supervisor.</p>
 
       <div id="buddyContent">
-        <div class="state-box"><span class="state-icon">⏳</span>Loading buddies…</div>
+        <div class="state-box"><span class="state-icon">â³</span>Loading buddiesâ€¦</div>
       </div>
     </div>
 
-    <!-- ── Sectie Account ───────────────────────────────────────── -->
+    <!-- â”€â”€ Sectie Account â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
     <div class="screen" id="screen-account">
       <div class="page-title">Account settings</div>
       <p class="page-sub">Manage your contact information and preferences</p>
@@ -1074,9 +1074,9 @@
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // State
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let currentUser    = null;
 let studentProfile = null;
 let postings       = [];
@@ -1085,9 +1085,9 @@ let myAgreements   = [];
 let activeMatchForLA = null;
 let languagesSpoken = [];
 
-// ════════════════════════════════════════════════════════════════
-// isProfileComplete — exact spec (Barry, sprint internationale)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// isProfileComplete â€” exact spec (Barry, sprint internationale)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function isProfileComplete(sp) {
   if (!sp) return false;
   const hasBasics = !!(
@@ -1099,15 +1099,15 @@ function isProfileComplete(sp) {
   return hasBasics && hasLanguages;
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Initial mount
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     const { data: { user } } = await db.auth.getUser();
     if (!user) { window.location.replace('auth.html'); return; }
 
-    // Role guard — CC Instruction B 2026-04-30
+    // Role guard â€” CC Instruction B 2026-04-30
     const { data: _iProf } = await db
       .from('profiles')
       .select('role')
@@ -1124,8 +1124,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Student type guard
-    // _sp === null means new user doing onboarding — allow access.
-    // _sp present but not 'international' — redirect to correct page.
+    // _sp === null means new user doing onboarding â€” allow access.
+    // _sp present but not 'international' â€” redirect to correct page.
     const { data: _iSp } = await db
       .from('student_profiles')
       .select('student_type, naam')
@@ -1146,8 +1146,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = user;
     document.getElementById('userEmail').textContent = user.email || '';
 
-    // Welkom overlay — eenmalig na eerste login
-    // welcome-overlay.js — 1 mei 2026
+    // Welkom overlay â€” eenmalig na eerste login
+    // welcome-overlay.js â€” 1 mei 2026
     if (typeof maybeShowWelcomeOverlay === 'function') {
       maybeShowWelcomeOverlay(
         user.id,
@@ -1157,7 +1157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       );
     }
 
-    // Telemetry init — zie CLAUDE.md voor codenames
+    // Telemetry init â€” zie CLAUDE.md voor codenames
     if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('intl-student');
 
     initLangsInput();
@@ -1186,9 +1186,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Tab switching
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1208,9 +1208,9 @@ function show(id) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Profile load + save
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function loadProfile() {
   try {
     const { data, error } = await db
@@ -1261,7 +1261,7 @@ async function loadProfile() {
     renderTimeline();
     await loadVacancies();
 
-    // Avatar picker — vanmiddag fix 30 apr 2026
+    // Avatar picker â€” vanmiddag fix 30 apr 2026
     if (typeof renderAvatarPicker === 'function') {
       const _curAvKey = studentProfile?.avatar_key || null;
       window._internlyAvatarKey = _curAvKey;
@@ -1285,13 +1285,13 @@ function setVal(id, v) {
 
 function showInternationalOverzicht(data) {
   const fields = [
-    { label: 'Name', value: data.naam || '—' },
+    { label: 'Name', value: data.naam || 'â€”' },
     { label: 'Student type', value: data.student_type || 'international' },
-    { label: 'Nationality', value: data.nationality || '—' },
-    { label: 'Home university', value: data.home_university || '—' },
-    { label: 'Study level', value: data.study_level || '—' },
-    { label: 'Study field', value: data.study_field || '—' }
-  ].filter(f => f.value && f.value !== '—');
+    { label: 'Nationality', value: data.nationality || 'â€”' },
+    { label: 'Home university', value: data.home_university || 'â€”' },
+    { label: 'Study level', value: data.study_level || 'â€”' },
+    { label: 'Study field', value: data.study_field || 'â€”' }
+  ].filter(f => f.value && f.value !== 'â€”');
 
   const card = document.createElement('div');
   card.id = 'intl-profile-view';
@@ -1306,7 +1306,7 @@ function showInternationalOverzicht(data) {
       </div>
       <button onclick="showInternationalForm()"
         style="display:inline-flex;align-items:center;gap:.4rem;padding:7px 16px;background:#eceae4;color:#3a4455;border:1px solid rgba(13,21,32,.12);border-radius:8px;cursor:pointer;font-size:.85rem;font-family:'Outfit',sans-serif">
-        ✏️ Edit
+        âœï¸ Edit
       </button>
     </div>
     ${fields.map(f => `
@@ -1344,7 +1344,7 @@ function showInternationalForm() {
 async function saveProfile() {
   if (!currentUser) { notify('Not signed in', false); return; }
   const btn = document.getElementById('saveProfileBtn');
-  btn.disabled = true; btn.textContent = 'Saving…';
+  btn.disabled = true; btn.textContent = 'Savingâ€¦';
 
   // Sweep any unconfirmed language input
   const lastLang = document.getElementById('langsInput');
@@ -1375,10 +1375,10 @@ async function saveProfile() {
 
     if (error) {
       console.error('[intl-dash] saveProfile fout:', error.message);
-      notify('Could not save profile — please try again', false);
+      notify('Could not save profile â€” please try again', false);
       return;
     }
-    notify('✓ Profile saved');
+    notify('âœ“ Profile saved');
 
     Object.assign(studentProfile, payload);
     if (studentProfile.naam) {
@@ -1405,9 +1405,9 @@ async function saveProfile() {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Document Hub (Sectie 4a)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function populateDocHub() {
   const sp = studentProfile || {};
 
@@ -1418,7 +1418,7 @@ function populateDocHub() {
   const workTitle = document.getElementById('hub-work-type');
   const workStat  = document.getElementById('hub-work-status');
   workTitle.textContent = workAuthLabel(sp.work_auth_type) || 'Not set';
-  workStat.textContent  = sp.work_auth_doc_url ? '✓ Document on file' : 'No document yet';
+  workStat.textContent  = sp.work_auth_doc_url ? 'âœ“ Document on file' : 'No document yet';
 
   setHealthBadge(sp.health_insurance_status || 'not_arranged');
 
@@ -1439,7 +1439,7 @@ function setVisaBadge(status) {
     not_required: { cls: 'ok',   txt: 'Not required (EU)' },
     not_started:  { cls: 'bad',  txt: 'Not started' },
     in_progress:  { cls: 'warn', txt: 'In progress' },
-    approved:     { cls: 'ok',   txt: 'Approved ✓' }
+    approved:     { cls: 'ok',   txt: 'Approved âœ“' }
   };
   const m = map[status] || map.not_required;
   el.classList.add(m.cls);
@@ -1452,7 +1452,7 @@ function setHealthBadge(status) {
   const map = {
     not_arranged: { cls: 'bad',  txt: 'Not arranged' },
     in_progress:  { cls: 'warn', txt: 'In progress' },
-    arranged:     { cls: 'ok',   txt: 'Arranged ✓' }
+    arranged:     { cls: 'ok',   txt: 'Arranged âœ“' }
   };
   const m = map[status] || map.not_arranged;
   el.classList.add(m.cls);
@@ -1479,7 +1479,7 @@ async function updateVisaStatus() {
     if (error) throw error;
     studentProfile.visa_status = v;
     setVisaBadge(v);
-    notify('✓ Visa status updated');
+    notify('âœ“ Visa status updated');
     renderTimeline();
   } catch (err) {
     console.error('[intl-dash] updateVisaStatus fout:', err?.message || err);
@@ -1495,7 +1495,7 @@ async function updateHousing() {
       .upsert({ profile_id: currentUser.id, housing_status: v }, { onConflict: 'profile_id' });
     if (error) throw error;
     studentProfile.housing_status = v;
-    notify('✓ Housing status updated');
+    notify('âœ“ Housing status updated');
     updateCompletionBar();
     renderTimeline();
   } catch (err) {
@@ -1504,11 +1504,11 @@ async function updateHousing() {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // File uploads (Storage bucket: intern-documents)
 // Path: {user_id}/{kind}_{timestamp}.{ext}
 // We store the path (not the public URL) in student_profiles.
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function uploadWorkAuth(ev) {
   await uploadDoc(ev, 'work_auth', 'work_auth_doc_url');
 }
@@ -1547,7 +1547,7 @@ async function uploadDoc(ev, kind, urlColumn, onAfter) {
     if (dbErr) throw dbErr;
 
     studentProfile[urlColumn] = path;
-    notify('✓ Document uploaded');
+    notify('âœ“ Document uploaded');
     populateDocHub();
     if (typeof onAfter === 'function') await onAfter();
     updateCompletionBar();
@@ -1575,9 +1575,9 @@ async function updateField(col, val) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Languages tags
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function initLangsInput() {
   const inp = document.getElementById('langsInput');
   if (!inp) return;
@@ -1616,16 +1616,16 @@ function renderLanguagesChips() {
     chip.appendChild(document.createTextNode(l));
     const closeBtn = document.createElement('button');
     closeBtn.type = 'button';
-    closeBtn.textContent = '×';
+    closeBtn.textContent = 'Ã—';
     closeBtn.addEventListener('click', () => removeLanguage(l));
     chip.appendChild(closeBtn);
     box.insertBefore(chip, inp);
   });
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Profile completion bar
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function updateCompletionBar() {
   if (!studentProfile) return;
   const score = computeProfileScore();
@@ -1651,9 +1651,9 @@ function computeProfileScore() {
   return Math.round(((filled + (langs ? 1 : 0)) / (required.length + 1)) * 100);
 }
 
-// ════════════════════════════════════════════════════════════════
-// Discover gate (Sectie 4c) — read-only flow for incomplete profile
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Discover gate (Sectie 4c) â€” read-only flow for incomplete profile
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function applyDiscoverGate() {
   const gate = document.getElementById('discoverGate');
   const fill = document.getElementById('gateProgressFill');
@@ -1667,9 +1667,9 @@ function applyDiscoverGate() {
   renderVacancies();
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Vacancies (Sectie 4e)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function loadVacancies() {
   try {
     const { data, error } = await db.from('internship_postings')
@@ -1697,7 +1697,7 @@ async function loadVacancies() {
     console.error('[intl-dash] loadVacancies fout:', err?.message || err);
     notify('Could not load vacancies', false);
     document.getElementById('vacContainer').innerHTML =
-      '<div class="state-box error"><span class="state-icon">⚠️</span>Could not load vacancies. Please refresh.</div>';
+      '<div class="state-box error"><span class="state-icon">âš ï¸</span>Could not load vacancies. Please refresh.</div>';
   }
 }
 
@@ -1718,7 +1718,7 @@ function renderVacancies() {
   });
 
   if (filtered.length === 0) {
-    container.innerHTML = '<div class="state-box"><span class="state-icon">📭</span>No vacancies match your filters yet.</div>';
+    container.innerHTML = '<div class="state-box"><span class="state-icon">ðŸ“­</span>No vacancies match your filters yet.</div>';
     return;
   }
 
@@ -1740,17 +1740,17 @@ function renderVacCard(p, profileComplete) {
   return `
     <div class="vac-card">
       <h3>${eTitle || 'Internship'}</h3>
-      <div class="vac-meta">${eCompany} · ${eSector || '—'} · ${eDur || 'Flexible'}</div>
+      <div class="vac-meta">${eCompany} Â· ${eSector || 'â€”'} Â· ${eDur || 'Flexible'}</div>
       <div class="vac-badges">
         ${grade ? `<span class="vac-badge ${gradeCls}">Trust ${grade}</span>` : ''}
-        ${p.visa_sponsorship    ? '<span class="vac-badge visa">🛂 Visa sponsorship</span>' : ''}
-        ${p.housing_available   ? '<span class="vac-badge housing">🏠 Housing</span>' : ''}
+        ${p.visa_sponsorship    ? '<span class="vac-badge visa">ðŸ›‚ Visa sponsorship</span>' : ''}
+        ${p.housing_available   ? '<span class="vac-badge housing">ðŸ  Housing</span>' : ''}
       </div>
       <div class="vac-desc">${eDesc}</div>
       <div class="vac-actions">
         ${profileComplete
           ? (isApplied
-              ? '<button class="btn-ghost" disabled>Applied ✓</button>'
+              ? '<button class="btn-ghost" disabled>Applied âœ“</button>'
               : `<button class="btn-primary" onclick="applyForPosting('${escapeHtml(p.id)}')">Apply</button>`)
           : ''}
       </div>
@@ -1779,11 +1779,11 @@ async function applyForPosting(postingId) {
     });
     if (error) throw error;
 
-    notify('✓ Application sent');
+    notify('âœ“ Application sent');
     await loadMatches();
     renderVacancies();
 
-    // Soft prompt — student can start LA from Applications when accepted
+    // Soft prompt â€” student can start LA from Applications when accepted
     setTimeout(() => {
       if (confirm('Application sent! Want to view your applications now?')) {
         show('applications');
@@ -1795,9 +1795,9 @@ async function applyForPosting(postingId) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Applications (Sectie 4f)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function loadMatches() {
   try {
     const { data, error } = await db.from('matches')
@@ -1816,7 +1816,7 @@ async function renderApplications() {
   const list = document.getElementById('applicationsList');
   if (!list) return;
   if (!myMatches || myMatches.length === 0) {
-    list.innerHTML = '<div class="state-box"><span class="state-icon">📭</span>You haven\'t applied to any internships yet.<br><small style="display:block;margin-top:6px">Browse vacancies in <a href="#" onclick="show(\'discover\');return false;" style="color:var(--green);font-weight:600">Discover</a>.</small></div>';
+    list.innerHTML = '<div class="state-box"><span class="state-icon">ðŸ“­</span>You haven\'t applied to any internships yet.<br><small style="display:block;margin-top:6px">Browse vacancies in <a href="#" onclick="show(\'discover\');return false;" style="color:var(--green);font-weight:600">Discover</a>.</small></div>';
     return;
   }
 
@@ -1837,7 +1837,7 @@ async function renderApplications() {
   list.innerHTML = myMatches.map(m => {
     const p = postingMap[m.posting_id] || {};
     const eTitle   = escapeHtml(p.title || 'Internship');
-    const eCompany = escapeHtml(p.company_name || '—');
+    const eCompany = escapeHtml(p.company_name || 'â€”');
     const grade    = (p.trust_grade || '').toUpperCase();
     const status   = (m.status || 'pending').toLowerCase();
     const hasLA    = (myAgreements || []).some(la => la.match_id === m.id);
@@ -1845,10 +1845,10 @@ async function renderApplications() {
 
     let actionHTML = '';
     if (hasLA) {
-      actionHTML = '<div class="app-sub" style="margin-top:8px;color:var(--green)">📜 Learning Agreement in progress · <a href="#" onclick="show(\'learning\');return false;" style="color:var(--green);font-weight:600">View</a></div>';
+      actionHTML = '<div class="app-sub" style="margin-top:8px;color:var(--green)">ðŸ“œ Learning Agreement in progress Â· <a href="#" onclick="show(\'learning\');return false;" style="color:var(--green);font-weight:600">View</a></div>';
     } else if (status === 'accepted') {
       if (completeOk) {
-        actionHTML = `<button class="btn-orange" onclick="startLA('${escapeHtml(m.id)}')" style="margin-top:8px">📜 Start Learning Agreement</button>`;
+        actionHTML = `<button class="btn-orange" onclick="startLA('${escapeHtml(m.id)}')" style="margin-top:8px">ðŸ“œ Start Learning Agreement</button>`;
       } else {
         actionHTML = '<div class="vac-disabled-note" style="margin-top:8px">Complete your profile to start the Learning Agreement.</div>';
       }
@@ -1859,7 +1859,7 @@ async function renderApplications() {
         <div class="app-head">
           <div>
             <div class="app-title">${eTitle}</div>
-            <div class="app-sub">${eCompany}${grade ? ' · Trust ' + grade : ''}</div>
+            <div class="app-sub">${eCompany}${grade ? ' Â· Trust ' + grade : ''}</div>
           </div>
           <span class="app-status ${status}">${labelStatus(status)}</span>
         </div>
@@ -1878,9 +1878,9 @@ function labelStatus(s) {
   })[s] || s;
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Learning Agreement (Sectie 4g)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function loadAgreements() {
   try {
     const { data, error } = await db.from('learning_agreements')
@@ -1923,7 +1923,7 @@ async function renderAgreementsList() {
   const c = document.getElementById('laListContainer');
   if (!c) return;
   if (!myAgreements || myAgreements.length === 0) {
-    c.innerHTML = '<div class="state-box"><span class="state-icon">📜</span>No Learning Agreements yet.<br><small style="display:block;margin-top:6px">Create one from an accepted application in <a href="#" onclick="show(\'applications\');return false;" style="color:var(--green);font-weight:600">Applications</a>.</small></div>';
+    c.innerHTML = '<div class="state-box"><span class="state-icon">ðŸ“œ</span>No Learning Agreements yet.<br><small style="display:block;margin-top:6px">Create one from an accepted application in <a href="#" onclick="show(\'applications\');return false;" style="color:var(--green);font-weight:600">Applications</a>.</small></div>';
     return;
   }
 
@@ -1932,14 +1932,14 @@ async function renderAgreementsList() {
       <div class="app-head">
         <div>
           <div class="app-title">${escapeHtml(la.school_name || 'Learning Agreement')}</div>
-          <div class="app-sub">${la.start_date || '—'} → ${la.end_date || '—'} · ${la.hours_per_week || '—'} h/wk · supervisor ${escapeHtml(la.supervisor_name || '—')}</div>
+          <div class="app-sub">${la.start_date || 'â€”'} â†’ ${la.end_date || 'â€”'} Â· ${la.hours_per_week || 'â€”'} h/wk Â· supervisor ${escapeHtml(la.supervisor_name || 'â€”')}</div>
         </div>
         <span class="app-status ${laStatusCls(la.status)}">${laStatusLabel(la.status)}</span>
       </div>
       <div class="app-sub" style="margin-top:8px;font-size:.78rem">
-        Student: ${la.student_signed_at ? '✓ signed' : '— pending'} ·
-        Company: ${la.company_signed_at ? '✓ signed' : '— pending'} ·
-        University: ${la.school_signed_at ? '✓ signed' : '— pending'}
+        Student: ${la.student_signed_at ? 'âœ“ signed' : 'â€” pending'} Â·
+        Company: ${la.company_signed_at ? 'âœ“ signed' : 'â€” pending'} Â·
+        University: ${la.school_signed_at ? 'âœ“ signed' : 'â€” pending'}
       </div>
     </div>
   `).join('');
@@ -1952,7 +1952,7 @@ function laStatusLabel(s) {
     company_signed:  'Awaiting university',
     school_signed:   'Awaiting company',
     complete:        'Complete'
-  })[s] || (s || '—');
+  })[s] || (s || 'â€”');
 }
 function laStatusCls(s) {
   if (s === 'complete') return 'accepted';
@@ -1969,7 +1969,7 @@ async function submitLA() {
     return;
   }
   const btn = document.getElementById('laSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Submitting…';
+  btn.disabled = true; btn.textContent = 'Submittingâ€¦';
 
   const match = (myMatches || []).find(m => m.id === activeMatchForLA);
   if (!match) {
@@ -1978,14 +1978,14 @@ async function submitLA() {
     return;
   }
 
-  // Parse objectives — split lines, strip bullets, max 5
+  // Parse objectives â€” split lines, strip bullets, max 5
   const objText = (document.getElementById('la-objectives').value || '')
     .split('\n')
-    .map(s => s.trim().replace(/^[•\-\*]\s*/, ''))
+    .map(s => s.trim().replace(/^[â€¢\-\*]\s*/, ''))
     .filter(Boolean)
     .slice(0, 5);
 
-  // Validatie LA velden — audit fix 2026-04-30
+  // Validatie LA velden â€” audit fix 2026-04-30
   const _laStart  = document.getElementById('la-start')?.value;
   const _laEnd    = document.getElementById('la-end')?.value;
   const _laHours  = parseInt(document.getElementById('la-hours')?.value || '0', 10);
@@ -2049,7 +2049,7 @@ async function submitLA() {
       .insert({ la_id: laRow.id, party: 'school' }).select().single();
     if (e4) throw e4;
 
-    // 4. Notify company (best-effort — wrapped so LA flow does not fail if notification CHECK fails)
+    // 4. Notify company (best-effort â€” wrapped so LA flow does not fail if notification CHECK fails)
     try {
       await db.from('notifications').insert({
         user_id:  match.party_b,
@@ -2068,14 +2068,14 @@ async function submitLA() {
     const cUrl = baseUrl + cToken.token;
     const sUrl = baseUrl + sToken.token;
 
-    notify('✓ Learning Agreement created & signed');
+    notify('âœ“ Learning Agreement created & signed');
     btn.disabled = false; btn.textContent = 'Create & sign as student';
 
     const builder = document.getElementById('laBuilder');
     if (builder) {
       builder.innerHTML = `
         <div class="form-card">
-          <div class="form-section-title">Learning Agreement created ✓</div>
+          <div class="form-section-title">Learning Agreement created âœ“</div>
           <p style="font-size:.9rem;color:var(--ink2);margin-bottom:14px">
             Forward these links to your company supervisor and your home university coordinator.
             Each link is valid for 7 days and works once.
@@ -2114,15 +2114,15 @@ function copyText(elId) {
   const text = el.textContent;
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(
-      () => notify('✓ Link copied'),
-      () => notify('Could not copy — please select manually', false)
+      () => notify('âœ“ Link copied'),
+      () => notify('Could not copy â€” please select manually', false)
     );
   } else {
     try {
       const r = document.createRange(); r.selectNodeContents(el);
       const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
       document.execCommand('copy');
-      notify('✓ Link copied');
+      notify('âœ“ Link copied');
     } catch (e) {
       console.error('[intl-dash] copy fallback fout:', e?.message || e);
       notify('Could not copy', false);
@@ -2130,9 +2130,9 @@ function copyText(elId) {
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Timeline (Sectie 4d)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderTimeline() {
   const list = document.getElementById('timelineList');
   const eta  = document.getElementById('timelineEta');
@@ -2168,7 +2168,7 @@ function renderTimeline() {
     else cls = 'pending';
     return `
       <div class="timeline-step">
-        <div class="step-dot ${cls}">${cls === 'done' ? '✓' : (i + 1)}</div>
+        <div class="step-dot ${cls}">${cls === 'done' ? 'âœ“' : (i + 1)}</div>
         <div class="step-text">${s.label}</div>
         <div class="step-meta">${cls === 'done' ? 'Done' : (cls === 'active' ? 'Now' : '')}</div>
       </div>
@@ -2178,16 +2178,16 @@ function renderTimeline() {
   const remaining = steps.filter(s => !s.done).length;
   if (eta) {
     if (remaining === 0) {
-      eta.textContent = '🎉 You\'re all set! Enjoy your internship.';
+      eta.textContent = 'ðŸŽ‰ You\'re all set! Enjoy your internship.';
     } else {
       eta.textContent = `Estimated ${remaining} week${remaining === 1 ? '' : 's'} of preparation remaining.`;
     }
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Buddy section (worldwide buddy zoeker)
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 let buddyCandidates = [];
 let myBuddyRequests = [];
 let myBuddyPairs    = [];
@@ -2195,7 +2195,7 @@ let myBuddyPairs    = [];
 async function loadBuddySection() {
   const c = document.getElementById('buddyContent');
   if (!c) return;
-  c.innerHTML = '<div class="state-box"><span class="state-icon">⏳</span>Loading buddies…</div>';
+  c.innerHTML = '<div class="state-box"><span class="state-icon">â³</span>Loading buddiesâ€¦</div>';
 
   try {
     // 1. Available buddies (registered with role='gepensioneerd' AND open_to_international)
@@ -2231,7 +2231,7 @@ async function loadBuddySection() {
   } catch (err) {
     console.error('[intl-dash] loadBuddySection fout:', err?.message || err);
     notify('Could not load buddies', false);
-    c.innerHTML = '<div class="state-box error"><span class="state-icon">⚠️</span>Could not load buddies. Please refresh.</div>';
+    c.innerHTML = '<div class="state-box error"><span class="state-icon">âš ï¸</span>Could not load buddies. Please refresh.</div>';
   }
 }
 
@@ -2242,11 +2242,11 @@ function renderBuddySection() {
   if (buddyCandidates.length === 0) {
     c.innerHTML = `
       <div class="state-box">
-        <span class="state-icon">🤝</span>
+        <span class="state-icon">ðŸ¤</span>
         <strong>No buddies available yet</strong>
         <div style="margin-top:6px">
           We are building our network of Internly Worldwide buddies.
-          Check back soon — or ask your host company if they can connect you
+          Check back soon â€” or ask your host company if they can connect you
           with an experienced professional.
         </div>
       </div>
@@ -2280,13 +2280,13 @@ function renderBuddyCardItem(b) {
 
   let actionHtml;
   if (isPaired || reqRow?.status === 'accepted') {
-    actionHtml = '<span class="buddy-status-chip active">✓ Active buddy</span>';
+    actionHtml = '<span class="buddy-status-chip active">âœ“ Active buddy</span>';
   } else if (reqRow?.status === 'pending') {
-    actionHtml = '<span class="buddy-status-chip requested">⏳ Request sent</span>';
+    actionHtml = '<span class="buddy-status-chip requested">â³ Request sent</span>';
   } else {
     const safeId = escapeHtml(b.id);
     actionHtml = `
-      <textarea class="buddy-msg-input" id="msg-${safeId}" placeholder="Optional message — introduce yourself in 1–2 lines"></textarea>
+      <textarea class="buddy-msg-input" id="msg-${safeId}" placeholder="Optional message â€” introduce yourself in 1â€“2 lines"></textarea>
       <button class="btn-primary" onclick="requestBuddy('${safeId}')">Request buddy</button>
     `;
   }
@@ -2304,7 +2304,7 @@ function renderBuddyCardItem(b) {
 async function requestBuddy(buddyId) {
   if (!currentUser) { notify('Not signed in', false); return; }
 
-  // Honeypot guard — blokkeer bots die het verborgen veld invullen.
+  // Honeypot guard â€” blokkeer bots die het verborgen veld invullen.
   // _guard returnt true bij OK, false als de honeypot getriggerd is.
   if (typeof _fCtx !== 'undefined' && _fCtx._guard && !_fCtx._guard('buddy-request')) return;
 
@@ -2335,17 +2335,17 @@ async function requestBuddy(buddyId) {
       console.error('[intl-dash] buddy notification fout (non-blocking):', notifyErr?.message || notifyErr);
     }
 
-    notify('✓ Buddy request sent');
+    notify('âœ“ Buddy request sent');
     await loadBuddySection();
   } catch (err) {
     console.error('[intl-dash] requestBuddy fout:', err?.message || err);
-    notify('Could not send request — please try again', false);
+    notify('Could not send request â€” please try again', false);
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Sign out
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function signOut() {
   try {
     await db.auth.signOut();
@@ -2357,7 +2357,7 @@ async function signOut() {
   window.location.href = 'auth.html';
 }
 
-// notify() and escapeHtml() come from js/utils.js — do not redefine here.
+// notify() and escapeHtml() come from js/utils.js â€” do not redefine here.
 </script>
 
 <!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
@@ -2368,7 +2368,7 @@ async function signOut() {
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -2376,8 +2376,8 @@ async function signOut() {
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

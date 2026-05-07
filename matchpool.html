@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
@@ -8,17 +8,17 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Matchpool — Internly</title>
+  <title>Matchpool â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <style>
-    /* ── Page layout ──────────────────────────────────────────────────────── */
+    /* â”€â”€ Page layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     body { background: var(--bg, #f4f3ef); }
 
     .mp-main {
@@ -41,7 +41,7 @@
       margin: 0 0 20px;
     }
 
-    /* ── Toggle pills ─────────────────────────────────────────────────────── */
+    /* â”€â”€ Toggle pills â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-toggles {
       display: flex;
       gap: 8px;
@@ -79,7 +79,7 @@
       color: #fff;
     }
 
-    /* ── Card deck ────────────────────────────────────────────────────────── */
+    /* â”€â”€ Card deck â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-deck { position: relative; }
 
     .mp-card {
@@ -113,7 +113,7 @@
       transform: translateX(-110px) rotate(-8deg);
     }
 
-    /* ── Card header (color by type) ──────────────────────────────────────── */
+    /* â”€â”€ Card header (color by type) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-card-header {
       padding: 24px 20px 20px;
       color: #fff;
@@ -163,7 +163,7 @@
       opacity: .85;
     }
 
-    /* ── Card body ────────────────────────────────────────────────────────── */
+    /* â”€â”€ Card body â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-card-body { padding: 16px 20px 20px; }
 
     .mp-card-label {
@@ -232,7 +232,7 @@
       color: #92400e;
     }
 
-    /* ── Action buttons ───────────────────────────────────────────────────── */
+    /* â”€â”€ Action buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-actions {
       display: flex;
       justify-content: center;
@@ -280,7 +280,7 @@
       transform: scale(1.08);
     }
 
-    /* ── Progress ─────────────────────────────────────────────────────────── */
+    /* â”€â”€ Progress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-progress {
       text-align: center;
       font-size: .8rem;
@@ -288,7 +288,7 @@
       margin-top: 12px;
     }
 
-    /* ── Empty state ──────────────────────────────────────────────────────── */
+    /* â”€â”€ Empty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-empty {
       text-align: center;
       padding: 40px 20px;
@@ -324,7 +324,7 @@
       margin-top: .65rem;
     }
 
-    /* ── Loading ──────────────────────────────────────────────────────────── */
+    /* â”€â”€ Loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .mp-loading {
       text-align: center;
       padding: 60px 20px;
@@ -340,7 +340,7 @@
 
   <main class="mp-main">
     <h1 class="mp-page-title">Matchpool</h1>
-    <p class="mp-page-sub">Snel ontdekken wat bij jou past — swipe door vacatures, buddies en bedrijven.</p>
+    <p class="mp-page-sub">Snel ontdekken wat bij jou past â€” swipe door vacatures, buddies en bedrijven.</p>
 
     <div class="mp-toggles" id="mp-toggles">
       <button type="button" class="mp-pill mp-pill--on" id="mpt-vacature"
@@ -352,27 +352,27 @@
     </div>
 
     <div class="mp-deck" id="mp-deck">
-      <!-- Kaart-container — js/matchpool.js showCard() vult innerHTML en zet className = 'mp-card mp-card--in'. -->
+      <!-- Kaart-container â€” js/matchpool.js showCard() vult innerHTML en zet className = 'mp-card mp-card--in'. -->
       <div id="mp-card" class="mp-card mp-card--in">
-        <div class="mp-loading">Laden…</div>
+        <div class="mp-loading">Ladenâ€¦</div>
       </div>
     </div>
 
-    <!-- Swipe-acties — js/matchpool.js toont/verbergt via display:flex / none. -->
+    <!-- Swipe-acties â€” js/matchpool.js toont/verbergt via display:flex / none. -->
     <div id="mp-actions" class="swipe-actions" style="display:none;margin-top:20px;">
       <button type="button" class="btn-pass" onclick="mpPass()">Passen</button>
-      <button type="button" class="btn-like" onclick="mpLike()">Like ❤️</button>
+      <button type="button" class="btn-like" onclick="mpLike()">Like â¤ï¸</button>
     </div>
 
-    <!-- Voortgang — js/matchpool.js _updateProgress() schrijft tekst zoals "3 gezien · 27 te gaan". -->
+    <!-- Voortgang â€” js/matchpool.js _updateProgress() schrijft tekst zoals "3 gezien Â· 27 te gaan". -->
     <div id="mp-progress" class="mp-progress"></div>
 
-    <!-- Lege state — getoond door js/matchpool.js showEmpty() (NAV-00C) -->
+    <!-- Lege state â€” getoond door js/matchpool.js showEmpty() (NAV-00C) -->
     <div class="mp-empty" id="mp-empty" style="display:none;">
-      <div class="mp-empty-icon">✏️</div>
+      <div class="mp-empty-icon">âœï¸</div>
       <div class="mp-empty-body"></div>
-      <a href="bol-profile.html" class="mp-empty-link">Profiel aanvullen →</a>
-      <p class="mp-empty-sub">Duurt ongeveer 3 minuten — een volledig profiel geeft de beste matches</p>
+      <a href="bol-profile.html" class="mp-empty-link">Profiel aanvullen â†’</a>
+      <p class="mp-empty-sub">Duurt ongeveer 3 minuten â€” een volledig profiel geeft de beste matches</p>
     </div>
   </main>
 </div>
@@ -380,7 +380,7 @@
 <div id="notif-root"></div>
 
 <script>
-  // ── Notification support ───────────────────────────────────────────────────
+  // â”€â”€ Notification support â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   var currentUser       = null;
   var notifSubscription = null;
 
@@ -484,7 +484,7 @@
 
   window.addEventListener('beforeunload', () => {
     try {
-      // Cleanup realtime subscription — audit fix 2026-04-30
+      // Cleanup realtime subscription â€” audit fix 2026-04-30
       if (typeof db !== 'undefined' && db.removeAllChannels) {
         db.removeAllChannels();
       }
@@ -530,7 +530,7 @@
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
+      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -538,8 +538,8 @@
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

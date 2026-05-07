@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -9,23 +9,23 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FF7E42">
   <meta name="description" content="Veelgestelde vragen over Internly, voor studenten, bedrijven, scholen en begeleiders. Korte antwoorden, geen omslachtigheid.">
-  <meta property="og:title" content="FAQ — Internly">
+  <meta property="og:title" content="FAQ â€” Internly">
   <meta property="og:description" content="Veelgestelde vragen over Internly, voor studenten, bedrijven, scholen en begeleiders.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
   <meta property="og:url" content="https://internly.pro/faq.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Internly">
   <meta name="twitter:card" content="summary_large_image">
-  <title>FAQ — Internly</title>
+  <title>FAQ â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* ═══════════════════════════════════════════════════════════════
-       Subpage archetype (faq) — accordion-lijst variant.
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       Subpage archetype (faq) â€” accordion-lijst variant.
        Globale tokens uit css/style.css. JS bindt op .faq-tab,
-       .faq-panel, .faq-q, .faq-item.open — class-namen behouden.
-       ═══════════════════════════════════════════════════════════════ */
+       .faq-panel, .faq-q, .faq-item.open â€” class-namen behouden.
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     :root {
       --green:       var(--c-green);
@@ -57,7 +57,7 @@
     }
     p { line-height: 1.7; }
 
-    /* ── TOPBAR — translucent cream ── */
+    /* â”€â”€ TOPBAR â€” translucent cream â”€â”€ */
     .topbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(244,243,239,.92);
@@ -122,7 +122,7 @@
       border-color: rgba(255,126,66,.25);
     }
 
-    /* ── FOOTER (blueprint dark green) ── */
+    /* â”€â”€ FOOTER (blueprint dark green) â”€â”€ */
     footer {
       background: var(--c-green-deep);
       padding: var(--s5, 24px) var(--s6, 32px);
@@ -151,25 +151,25 @@
     .footer-links a:hover { color: var(--c-orange); }
     .footer-copy { font-size: .72rem; color: rgba(255,255,255,.3); }
 
-    /* ── Google Translate branding suppression ── */
+    /* â”€â”€ Google Translate branding suppression â”€â”€ */
     .goog-te-banner-frame { display: none !important; }
     .skiptranslate        { display: none !important; }
     .goog-te-gadget       { display: none !important; }
     body                  { top: 0 !important; position: static !important; }
 
-    /* ── Animaties ── */
+    /* â”€â”€ Animaties â”€â”€ */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
 
-    /* ── MAIN WRAP ── */
+    /* â”€â”€ MAIN WRAP â”€â”€ */
     .main-wrap {
       max-width: 980px;
       margin: 0 auto;
       padding: var(--s8, 80px) var(--s6, 32px) var(--s10, 120px);
     }
 
-    /* ── FAQ HERO ── */
+    /* â”€â”€ FAQ HERO â”€â”€ */
     .faq-hero { padding-bottom: var(--s7, 56px); }
     .faq-hero .script-eyebrow {
       font-family: var(--font-script, 'Caveat', cursive);
@@ -211,7 +211,7 @@
       max-width: 580px;
     }
 
-    /* ── TABS ── */
+    /* â”€â”€ TABS â”€â”€ */
     .faq-tabs {
       display: flex;
       gap: 4px;
@@ -247,11 +247,11 @@
       border-radius: 2px;
     }
 
-    /* ── PANELS ── */
+    /* â”€â”€ PANELS â”€â”€ */
     .faq-panel { display: none; }
     .faq-panel.active { display: block; }
 
-    /* ── CATEGORY HEADER ── */
+    /* â”€â”€ CATEGORY HEADER â”€â”€ */
     .faq-cat-head {
       display: flex;
       align-items: baseline;
@@ -283,7 +283,7 @@
       color: var(--fg-tertiary);
     }
 
-    /* ── FAQ ITEMS ── */
+    /* â”€â”€ FAQ ITEMS â”€â”€ */
     .faq-item {
       border-bottom: 1px solid var(--line-subtle);
     }
@@ -348,7 +348,7 @@
     }
     .faq-a ul li { margin-bottom: 4px; }
 
-    /* ── CONTACT BLOCK ── */
+    /* â”€â”€ CONTACT BLOCK â”€â”€ */
     .faq-contact {
       margin-top: var(--s8, 80px);
       padding: var(--s6, 32px);
@@ -395,7 +395,7 @@
       outline-offset: 2px;
     }
 
-    /* ── RESPONSIVE ── */
+    /* â”€â”€ RESPONSIVE â”€â”€ */
     @media (max-width: 768px) {
       .main-wrap { padding: 48px 16px 80px; }
       .topbar-nav a:not(.topbar-cta) { display: none; }
@@ -428,7 +428,7 @@
       <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
       <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
     </div>
-    <a href="auth.html" class="topbar-cta">Inloggen →</a>
+    <a href="auth.html" class="topbar-cta">Inloggen â†’</a>
   </div>
 </nav>
 
@@ -545,7 +545,7 @@
           <span class="faq-plus" aria-hidden="true">+</span>
         </button>
         <div class="faq-a">
-          <p>Drie tarieven, Starter (gratis), Pro (~€49 per maand) en Business (~€149 per maand). Volledige prijslijst en wat in welke staat op <a href="/pricing.html">Prijzen</a>.</p>
+          <p>Drie tarieven, Starter (gratis), Pro (~â‚¬49 per maand) en Business (~â‚¬149 per maand). Volledige prijslijst en wat in welke staat op <a href="/pricing.html">Prijzen</a>.</p>
         </div>
       </div>
 
@@ -606,7 +606,7 @@
           <span class="faq-plus" aria-hidden="true">+</span>
         </button>
         <div class="faq-a">
-          <p>Freemium, basisgebruik gratis. Premium (€299 per jaar per opleiding) geeft uitgebreide rapportages, meerdere begeleiders, ATS koppeling. Eerste 100 stagebegeleiders krijgen lifetime gratis premium.</p>
+          <p>Freemium, basisgebruik gratis. Premium (â‚¬299 per jaar per opleiding) geeft uitgebreide rapportages, meerdere begeleiders, ATS koppeling. Eerste 100 stagebegeleiders krijgen lifetime gratis premium.</p>
         </div>
       </div>
 
@@ -748,7 +748,7 @@
           <span class="faq-plus" aria-hidden="true">+</span>
         </button>
         <div class="faq-a">
-          <p>Beide kanten kunnen op elk moment de koppeling beëindigen, zonder reden, zonder gevolg voor de Trust Score. We kijken altijd of er een betere match mogelijk is.</p>
+          <p>Beide kanten kunnen op elk moment de koppeling beÃ«indigen, zonder reden, zonder gevolg voor de Trust Score. We kijken altijd of er een betere match mogelijk is.</p>
         </div>
       </div>
 
@@ -989,11 +989,11 @@
     <a href="mailto:hallo@internly.pro">Contact</a>
     <a href="auth.html">Inloggen</a>
   </div>
-  <div class="footer-copy">© 2026 Sasubo Holding B.V. — Alle rechten voorbehouden</div>
-  <p style="width:100%;text-align:center;margin-top:8px;font-size:.78rem;color:rgba(255,255,255,.3);">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
+  <div class="footer-copy">Â© 2026 Sasubo Holding B.V. â€” Alle rechten voorbehouden</div>
+  <p style="width:100%;text-align:center;margin-top:8px;font-size:.78rem;color:rgba(255,255,255,.3);">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
 </footer>
 
-<!-- Run 1 cluster 3.1 (Bedward P2): supabase + utils + roles gestript.
+<!-- Sprint 5 cleanup: supabase + utils + roles gestript.
      faq.html gebruikt geen db-calls of utils-helpers buiten Google Translate. -->
 <script src="js/consent.js" defer></script>
 
@@ -1058,13 +1058,13 @@ document.querySelectorAll('.faq-q').forEach(q => {
 });
 </script>
 
-<!-- Run 1.8 — scripts terug voor hybrid header (Run 1 strip teruggedraaid;
+<!-- Run 1.8 â€” scripts terug voor hybrid header (Run 1 strip teruggedraaid;
      supabase config heeft autoRefreshToken=false op publieke pagina's, dus veilig). -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
 
-<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -1124,14 +1124,14 @@ document.querySelectorAll('.faq-q').forEach(q => {
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend → publieke header blijft staan, geen warn
+    // role onbekend â†’ publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }

@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
-  LEARNING AGREEMENT SIGN PAGE — Internly Worldwide
-  ─────────────────────────────────────────────────────────────────────────────
+  LEARNING AGREEMENT SIGN PAGE â€” Internly Worldwide
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   Public, no-auth page for signing a Learning Agreement via a one-time token.
   URL: /la-sign.html?token={64-char hex token}
 
   Per sprint instruction:
-    - load order: supabase-cdn → js/supabase.js (NO utils.js, NO auth guard)
+    - load order: supabase-cdn â†’ js/supabase.js (NO utils.js, NO auth guard)
     - all text English
     - clean centered layout, no sidebar
 
@@ -21,7 +21,7 @@
        - UPDATE learning_agreements (status + signed_at)
        - UPDATE la_tokens (used = true)
        - Show confirmation
-  ─────────────────────────────────────────────────────────────────────────────
+  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -->
 <html lang="en">
 <head>
@@ -32,14 +32,14 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0f5c36">
-  <title>Sign Learning Agreement — Internly Worldwide</title>
+  <title>Sign Learning Agreement â€” Internly Worldwide</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script>
-    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
+    // Pre-load shim â€” telemetry.js overschrijft dit bij succesvolle load.
     window._fCtx = {
       _init: function(p) {
         console.warn('[telemetry] js/telemetry.js niet geladen, ' +
@@ -119,7 +119,7 @@
       outline-offset: 2px;
     }
 
-    /* ── Header (no sidebar — just brand bar) ─────────────────── */
+    /* â”€â”€ Header (no sidebar â€” just brand bar) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     header.brand-bar {
       background: var(--green-deep);
       color: #fff;
@@ -139,7 +139,7 @@
       text-transform: uppercase;
     }
 
-    /* ── Main centered card ───────────────────────────────────── */
+    /* â”€â”€ Main centered card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     main {
       flex: 1;
       padding: 40px 16px 60px;
@@ -166,7 +166,7 @@
       margin-bottom: 22px;
     }
 
-    /* ── Summary block ────────────────────────────────────────── */
+    /* â”€â”€ Summary block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .summary {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -206,7 +206,7 @@
       margin: 4px 0;
     }
 
-    /* ── Status badges ────────────────────────────────────────── */
+    /* â”€â”€ Status badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .status-pill {
       display: inline-block;
       font-size: .76rem;
@@ -220,7 +220,7 @@
     .status-pill.school_signed   { background: var(--amber-bg); color: var(--amber); }
     .status-pill.complete        { background: var(--green-bg); color: var(--green); }
 
-    /* ── Consent box ──────────────────────────────────────────── */
+    /* â”€â”€ Consent box â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .consent {
       display: flex; align-items: flex-start; gap: 10px;
       padding: 12px 14px;
@@ -237,7 +237,7 @@
     }
     .consent-text { font-size: .9rem; color: var(--ink2); line-height: 1.5; }
 
-    /* ── Buttons ──────────────────────────────────────────────── */
+    /* â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .btn-primary {
       background: var(--green);
       color: #fff;
@@ -265,7 +265,7 @@
       padding: 0;
     }
 
-    /* ── State boxes ──────────────────────────────────────────── */
+    /* â”€â”€ State boxes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     .state {
       text-align: center;
       padding: 30px 14px;
@@ -291,7 +291,7 @@
     .state.warn  h2  { color: var(--amber); }
     .state.success h2 { color: var(--green); }
 
-    /* ── Footer ───────────────────────────────────────────────── */
+    /* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
     footer.foot {
       padding: 14px 16px;
       text-align: center;
@@ -327,25 +327,25 @@
 <main>
   <div class="sheet" id="root" role="region" aria-live="polite">
     <div class="state">
-      <span class="icon">⏳</span>
-      <h2>Loading agreement…</h2>
+      <span class="icon">â³</span>
+      <h2>Loading agreementâ€¦</h2>
       <p>Please wait while we verify your link.</p>
     </div>
   </div>
 </main>
 
 <footer class="foot">
-  <a href="privacybeleid.html">Privacy</a> ·
-  <a href="spelregels.html">House rules</a> ·
+  <a href="privacybeleid.html">Privacy</a> Â·
+  <a href="spelregels.html">House rules</a> Â·
   <a href="https://internly.pro/">Internly.pro</a>
 </footer>
 
 <script>
-// ════════════════════════════════════════════════════════════════
-// Local helpers (no utils.js — explicitly per sprint instruction).
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Local helpers (no utils.js â€” explicitly per sprint instruction).
 // Names deliberately not 'notify' / 'escapeHtml' to keep the
 // loop-shield grep clean (CLAUDE.md rule).
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function _esc(s) {
   if (s == null) return '';
   return String(s)
@@ -362,7 +362,7 @@ function _setRoot(html) {
 }
 
 function _formatDate(iso) {
-  if (!iso) return '—';
+  if (!iso) return 'â€”';
   try {
     return new Date(iso).toLocaleDateString('en-GB',
       { day: 'numeric', month: 'long', year: 'numeric' });
@@ -376,18 +376,18 @@ function _statusLabel(s) {
     company_signed:  'Awaiting university',
     school_signed:   'Awaiting company',
     complete:        'Complete'
-  })[s] || s || '—';
+  })[s] || s || 'â€”';
 }
 
 function _partyLabel(p) {
   return p === 'company' ? 'company supervisor' : 'home university representative';
 }
 
-// ════════════════════════════════════════════════════════════════
-// Init — read token, validate, render
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Init â€” read token, validate, render
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 document.addEventListener('DOMContentLoaded', async () => {
-  // Telemetry init — zie CLAUDE.md voor codenames
+  // Telemetry init â€” zie CLAUDE.md voor codenames
   if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('la-sign');
 
   const params = new URLSearchParams(window.location.search);
@@ -396,9 +396,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!token) {
     _setRoot(`
       <div class="state error">
-        <span class="icon">⚠️</span>
+        <span class="icon">âš ï¸</span>
         <h2>No token provided</h2>
-        <p>This page requires a signing link. If you received an email or message with a link, open it again — or ask the student to resend.</p>
+        <p>This page requires a signing link. If you received an email or message with a link, open it again â€” or ask the student to resend.</p>
       </div>
     `);
     return;
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[la-sign] token lookup fout:', err?.message || err);
     _setRoot(`
       <div class="state error">
-        <span class="icon">⚠️</span>
+        <span class="icon">âš ï¸</span>
         <h2>Could not verify link</h2>
         <p>Something went wrong on our side. Please refresh the page and try again.</p>
       </div>
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!tokenRow) {
     _setRoot(`
       <div class="state error">
-        <span class="icon">🔒</span>
+        <span class="icon">ðŸ”’</span>
         <h2>Invalid link</h2>
         <p>This signing link is not recognised. Ask the student to resend a fresh link.</p>
       </div>
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (tokenRow.used) {
     _setRoot(`
       <div class="state warn">
-        <span class="icon">✓</span>
+        <span class="icon">âœ“</span>
         <h2>Already signed</h2>
         <p>This Learning Agreement has already been signed using this link. Each link can be used only once.</p>
       </div>
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (new Date(tokenRow.expires_at) < new Date()) {
     _setRoot(`
       <div class="state warn">
-        <span class="icon">⏰</span>
+        <span class="icon">â°</span>
         <h2>Link expired</h2>
         <p>This signing link is older than 7 days. Ask the student to issue a fresh one from their dashboard.</p>
       </div>
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Token valid — load LA
+  // Token valid â€” load LA
   let la;
   try {
     const { data, error } = await db.from('learning_agreements')
@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('[la-sign] LA load fout:', err?.message || err);
     _setRoot(`
       <div class="state error">
-        <span class="icon">⚠️</span>
+        <span class="icon">âš ï¸</span>
         <h2>Could not load agreement</h2>
         <p>${_esc(err?.message || 'Unknown error.')}</p>
       </div>
@@ -480,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!la) {
     _setRoot(`
       <div class="state error">
-        <span class="icon">⚠️</span>
+        <span class="icon">âš ï¸</span>
         <h2>Agreement not found</h2>
         <p>The Learning Agreement linked to this token no longer exists.</p>
       </div>
@@ -491,9 +491,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderSignForm(la, tokenRow);
 });
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Render summary + sign form
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function renderSignForm(la, tokenRow) {
   const objs = Array.isArray(la.learning_objectives) ? la.learning_objectives : [];
   const objsHtml = objs.length
@@ -504,10 +504,10 @@ function renderSignForm(la, tokenRow) {
     paid:    'Paid',
     stipend: 'Stipend',
     unpaid:  'Unpaid'
-  })[la.compensation] || la.compensation || '—';
+  })[la.compensation] || la.compensation || 'â€”';
 
   const compAmount = la.compensation_amount
-    ? `€${Number(la.compensation_amount).toFixed(0)}/month`
+    ? `â‚¬${Number(la.compensation_amount).toFixed(0)}/month`
     : '';
 
   const partyAction = tokenRow.party === 'company'
@@ -518,34 +518,34 @@ function renderSignForm(la, tokenRow) {
     <h1>Sign Learning Agreement</h1>
     <p class="lead">
       You are signing as the <strong>${_esc(_partyLabel(tokenRow.party))}</strong>.
-      Review the details below carefully — once signed, this is binding.
+      Review the details below carefully â€” once signed, this is binding.
       Status: <span class="status-pill ${_esc(la.status)}">${_esc(_statusLabel(la.status))}</span>
     </p>
 
     <div class="summary">
       <div class="summary-row">
         <span class="summary-label">Period</span>
-        <span class="summary-value">${_esc(_formatDate(la.start_date))} → ${_esc(_formatDate(la.end_date))}</span>
+        <span class="summary-value">${_esc(_formatDate(la.start_date))} â†’ ${_esc(_formatDate(la.end_date))}</span>
       </div>
       <div class="summary-row">
         <span class="summary-label">Hours / week</span>
-        <span class="summary-value">${la.hours_per_week ? _esc(String(la.hours_per_week)) : '—'}</span>
+        <span class="summary-value">${la.hours_per_week ? _esc(String(la.hours_per_week)) : 'â€”'}</span>
       </div>
       <div class="summary-row">
         <span class="summary-label">Academic credits</span>
-        <span class="summary-value">${la.academic_credits ? _esc(String(la.academic_credits)) + ' ECTS' : '—'}</span>
+        <span class="summary-value">${la.academic_credits ? _esc(String(la.academic_credits)) + ' ECTS' : 'â€”'}</span>
       </div>
       <div class="summary-row">
         <span class="summary-label">Compensation</span>
-        <span class="summary-value">${_esc(compLabel)}${compAmount ? ' — ' + _esc(compAmount) : ''}</span>
+        <span class="summary-value">${_esc(compLabel)}${compAmount ? ' â€” ' + _esc(compAmount) : ''}</span>
       </div>
       <div class="summary-row">
         <span class="summary-label">Home university</span>
-        <span class="summary-value">${_esc(la.school_name || '—')}</span>
+        <span class="summary-value">${_esc(la.school_name || 'â€”')}</span>
       </div>
       <div class="summary-row">
         <span class="summary-label">Supervisor</span>
-        <span class="summary-value">${_esc(la.supervisor_name || '—')}${la.supervisor_email ? ' (' + _esc(la.supervisor_email) + ')' : ''}</span>
+        <span class="summary-value">${_esc(la.supervisor_name || 'â€”')}${la.supervisor_email ? ' (' + _esc(la.supervisor_email) + ')' : ''}</span>
       </div>
       <div class="summary-row" style="flex-direction:column;align-items:stretch">
         <span class="summary-label" style="margin-bottom:6px">Learning objectives</span>
@@ -583,25 +583,25 @@ function updateSignBtn() {
   if (cb && btn) btn.disabled = !cb.checked;
 }
 
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // Sign handler
-// ════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function signAgreement() {
   const la = window.__la_active;
   const tokenRow = window.__la_token;
   if (!la || !tokenRow) return;
 
-  // Honeypot guard — blokkeer bots die het verborgen veld invullen.
+  // Honeypot guard â€” blokkeer bots die het verborgen veld invullen.
   // _guard returnt true bij OK, false als de honeypot getriggerd is.
   if (typeof _fCtx !== 'undefined' && _fCtx._guard && !_fCtx._guard('la-sign')) return;
 
   const btn = document.getElementById('signBtn');
   const errBox = document.getElementById('signError');
   if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
-  if (btn) { btn.disabled = true; btn.textContent = 'Signing…'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Signingâ€¦'; }
 
   try {
-    // Determine new status — escalate to 'complete' if the OTHER side has already signed
+    // Determine new status â€” escalate to 'complete' if the OTHER side has already signed
     let newStatus, signedField;
     if (tokenRow.party === 'company') {
       signedField = 'company_signed_at';
@@ -623,7 +623,7 @@ async function signAgreement() {
     const { error: e2 } = await db.from('la_tokens')
       .update({ used: true }).eq('id', tokenRow.id);
     if (e2) {
-      // LA is already signed; token mark failed. Log but show success — re-using
+      // LA is already signed; token mark failed. Log but show success â€” re-using
       // this token would still trigger the 'used' check on next attempt only after
       // server clock catches up. We log so Barry can see the discrepancy.
       console.error('[la-sign] token mark used fout (LA already updated):', e2?.message || e2);
@@ -646,12 +646,12 @@ function renderConfirmation(newStatus, party) {
 
   _setRoot(`
     <div class="state success">
-      <span class="icon">${isComplete ? '🎉' : '✓'}</span>
+      <span class="icon">${isComplete ? 'ðŸŽ‰' : 'âœ“'}</span>
       <h2>${isComplete ? 'Learning Agreement complete' : 'Signed successfully'}</h2>
       <p>
         Thank you. Your signature on behalf of the ${_esc(sideLabel)} has been recorded.
         ${isComplete
-          ? 'All three parties have now signed — the agreement is final.'
+          ? 'All three parties have now signed â€” the agreement is final.'
           : 'The remaining party will be notified to countersign.'}
       </p>
       <p style="font-size:.82rem;color:var(--ink3)">

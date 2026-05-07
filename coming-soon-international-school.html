@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -42,17 +42,17 @@
           <input class="cs-input" type="text" id="cs-country">
         </div>
         <button class="cs-button" type="submit" id="cs-btn">Request information</button>
-        <div class="cs-success" id="cs-success">Thanks — our team will reach out within a few business days.</div>
+        <div class="cs-success" id="cs-success">Thanks â€” our team will reach out within a few business days.</div>
         <div class="cs-error" id="cs-error">Please enter a valid email address.</div>
       </form>
     </div>
   </main>
 
   <footer class="cs-footer">
-    <a href="index.html">← Back to homepage</a>
+    <a href="index.html">â† Back to homepage</a>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
   <script src="js/supabase.js"></script>
@@ -82,7 +82,7 @@
       }
 
       btn.disabled = true;
-      btn.textContent = 'Sending…';
+      btn.textContent = 'Sendingâ€¦';
 
       const client = window.db;
       if (!client) {

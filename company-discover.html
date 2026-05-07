@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,13 +8,13 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Studenten ontdekken — Internly</title>
+  <title>Studenten ontdekken â€” Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
   <script src="js/supabase.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/consent.js" defer></script>
@@ -46,18 +46,18 @@
   })();
   </script>
   <style>
-    /* ═══════════════════════════════════════════════════════════════
-       Lijst archetype (company-discover) — bedrijf zoekt studenten.
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       Lijst archetype (company-discover) â€” bedrijf zoekt studenten.
        Globale tokens uit css/style.css. Bedrijfs-pagina met eigen
        topbar (geen student-header).
-       ═══════════════════════════════════════════════════════════════ */
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     body {
       background: var(--bg-page, #f4f3ef);
       color: var(--fg-primary, #0d1520);
     }
 
-    /* ── Topbar — translucent cream blueprint ── */
+    /* â”€â”€ Topbar â€” translucent cream blueprint â”€â”€ */
     .topbar {
       background: rgba(244,243,239,.92);
       backdrop-filter: blur(8px);
@@ -117,7 +117,7 @@
       border-color: rgba(255,126,66,.25);
     }
 
-    /* ── Container + headings ── */
+    /* â”€â”€ Container + headings â”€â”€ */
     .container {
       max-width: 1100px;
       margin: 0 auto;
@@ -149,7 +149,7 @@
       line-height: 1.55;
     }
 
-    /* ── Filters ── */
+    /* â”€â”€ Filters â”€â”€ */
     .filters {
       display: flex; gap: var(--s2, 10px); flex-wrap: wrap;
       align-items: center;
@@ -195,7 +195,7 @@
     }
     .filters button:hover { background: #b94613; transform: translateY(-1px); }
 
-    /* ── Cards ── */
+    /* â”€â”€ Cards â”€â”€ */
     .cards-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -347,7 +347,7 @@
     .btn-contact:hover { background: #b94613; transform: translateY(-1px); }
     .btn-contact:active { transform: scale(.97); }
 
-    /* ── State boxes ── */
+    /* â”€â”€ State boxes â”€â”€ */
     .state-box {
       grid-column: 1 / -1;
       text-align: center;
@@ -366,7 +366,7 @@
       font-size: .8rem;
     }
 
-    /* ── Notif ── */
+    /* â”€â”€ Notif â”€â”€ */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -388,7 +388,7 @@
       outline-offset: 2px;
     }
 
-    /* ── Topbar-user (legacy classes — gemaakt door inline JS na auth) ── */
+    /* â”€â”€ Topbar-user (legacy classes â€” gemaakt door inline JS na auth) â”€â”€ */
     .topbar-user {
       display: flex; align-items: center; gap: 10px;
       color: var(--fg-secondary);
@@ -452,7 +452,7 @@
     <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
   </div>
   <div id="topbarAuth" style="display:flex;align-items:center;gap:10px">
-    <span class="role-badge">🏢 Bedrijf</span>
+    <span class="role-badge">ðŸ¢ Bedrijf</span>
     <a href="auth.html" style="color:var(--fg-secondary);text-decoration:none;font-size:.88rem;font-weight:500;">Inloggen</a>
   </div>
 </div>
@@ -460,24 +460,24 @@
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
   <a href="company-dashboard.html" class="mt-tab">
-    <span class="mt-icon">📊</span>
+    <span class="mt-icon">ðŸ“Š</span>
     <span class="mt-label">Dashboard</span>
   </a>
   <a href="company-discover.html" class="mt-tab active">
-    <span class="mt-icon">🔍</span>
+    <span class="mt-icon">ðŸ”</span>
     <span class="mt-label">Stagiairs</span>
   </a>
 </nav>
 
 <div class="container">
-  <a href="company-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--fg-tertiary);font-size:.88rem;text-decoration:none;">← Terug naar dashboard</a>
-  <div class="page-eyebrow">Stagiairs — open</div>
+  <a href="company-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--fg-tertiary);font-size:.88rem;text-decoration:none;">â† Terug naar dashboard</a>
+  <div class="page-eyebrow">Stagiairs â€” open</div>
   <h1>Zoek een stagiair</h1>
-  <p class="page-sub">Studenten die zichzelf hebben aangemeld — inclusief hun domein en skills</p>
+  <p class="page-sub">Studenten die zichzelf hebben aangemeld â€” inclusief hun domein en skills</p>
 
   <div class="filters">
     <input type="text" id="searchInput" class="search-bar"
-      placeholder="Zoek op naam, skill of opleiding…"
+      placeholder="Zoek op naam, skill of opleidingâ€¦"
       oninput="filterCards()">
 
     <select id="domeinFilter" onchange="filterCards()">
@@ -502,18 +502,18 @@
       background:none;border:1px solid #f5c87a;border-radius:20px;
       padding:4px 12px;font-size:.78rem;font-weight:600;
       color:#a06010;cursor:pointer;white-space:nowrap;">
-      🔍 Toon voorbeeldstudent
+      ðŸ” Toon voorbeeldstudent
     </button>
   </div>
 
-  <!-- ── DEMO STUDENT TOGGLE ── -->
+  <!-- â”€â”€ DEMO STUDENT TOGGLE â”€â”€ -->
   <div id="demoCDBar" style="
     display:none;
     background:#fdf3e0;border:1px solid #f5c87a;border-radius:12px;
     padding:10px 16px;margin-bottom:12px;
     font-size:.85rem;color:#a06010;
     align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <span>🔍 Voorbeeldprofiel zichtbaar — zo zien echte studentprofielen eruit.</span>
+    <span>ðŸ” Voorbeeldprofiel zichtbaar â€” zo zien echte studentprofielen eruit.</span>
     <button onclick="toggleDemoCompanyDiscover(false)" style="
       background:none;border:1px solid #f5c87a;border-radius:8px;
       padding:4px 12px;font-size:.8rem;color:#a06010;cursor:pointer;">
@@ -555,10 +555,10 @@ function renderCard(s) {
           <div class="avatar">${escapeHtml(s.initialen||'?')}</div>
           <div>
             <div class="card-name">${eNaam}</div>
-            <div class="card-meta">${eOpl} · ${eSchool} · Jaar ${eJaar}</div>
+            <div class="card-meta">${eOpl} Â· ${eSchool} Â· Jaar ${eJaar}</div>
           </div>
         </div>
-        <span class="avail-badge">📅 ${formatDate(s.beschikbaar_vanaf)}</span>
+        <span class="avail-badge">ðŸ“… ${formatDate(s.beschikbaar_vanaf)}</span>
       </div>
 
       ${s.opdracht_domein ? `
@@ -580,7 +580,7 @@ function renderCard(s) {
 
 async function loadStudents() {
   const container = document.getElementById('studentsContainer');
-  container.innerHTML = `<div class="state-box"><span class="state-icon">⏳</span>Studenten laden…</div>`;
+  container.innerHTML = `<div class="state-box"><span class="state-icon">â³</span>Studenten ladenâ€¦</div>`;
 
   const { data, error } = await db
     .from('student_profiles_pool')
@@ -589,14 +589,14 @@ async function loadStudents() {
 
   if (error) {
     console.error('[company-discover] laden fout:', error?.message || 'onbekende fout');
-    container.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Studentprofielen konden niet worden geladen. Probeer de pagina te verversen.</div>`;
+    container.innerHTML = `<div class="state-box error"><span class="state-icon">âš ï¸</span>Studentprofielen konden niet worden geladen. Probeer de pagina te verversen.</div>`;
     return;
   }
 
   if (!data || data.length === 0) {
     container.innerHTML = `
       <div class="state-box">
-        <span class="state-icon">📭</span>
+        <span class="state-icon">ðŸ“­</span>
         Studenten die hun profiel hebben ingevuld verschijnen hier automatisch. Deel de link naar Internly om studenten uit te nodigen.
       </div>`;
     return;
@@ -628,7 +628,7 @@ function filterCards() {
       noResult = document.createElement('div');
       noResult.id = 'no-results';
       noResult.className = 'state-box';
-      noResult.innerHTML = '<span class="state-icon">🔎</span>Geen studenten gevonden voor deze filters.';
+      noResult.innerHTML = '<span class="state-icon">ðŸ”Ž</span>Geen studenten gevonden voor deze filters.';
       document.getElementById('studentsContainer').appendChild(noResult);
     }
   } else if (noResult) {
@@ -637,7 +637,7 @@ function filterCards() {
 }
 
 function contact(naam) {
-  notify(`Verzoek verstuurd aan ${naam} — de student ontvangt een melding`);
+  notify(`Verzoek verstuurd aan ${naam} â€” de student ontvangt een melding`);
 }
 
 function showLoading(containerId, tekst) {
@@ -646,7 +646,7 @@ function showLoading(containerId, tekst) {
   el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
 }
 
-// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -661,7 +661,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
 function signOut() { performLogout(); }
 
-// ── Demo student toggle (company-discover) ────────────────────────────────
+// â”€â”€ Demo student toggle (company-discover) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DEMO_CD_KEY = 'internly_demo_company_discover';
 
 function initDemoCompanyDiscover() {
@@ -689,17 +689,17 @@ function renderCDDemoState(enabled) {
         <div style="position:absolute;top:10px;right:10px;
           background:#fdf3e0;color:#a06010;font-size:.72rem;font-weight:700;
           padding:3px 9px;border-radius:20px;letter-spacing:.04em;">
-          Voorbeeld · Student
+          Voorbeeld Â· Student
         </div>
         <div class="card-header">
           <div style="display:flex;align-items:center;gap:10px">
             <div class="avatar">LH</div>
             <div>
               <div class="card-name">Lena Hartman</div>
-              <div class="card-meta">Communication &amp; Multimedia Design · HvA · Jaar 3</div>
+              <div class="card-meta">Communication &amp; Multimedia Design Â· HvA Â· Jaar 3</div>
             </div>
           </div>
-          <span class="avail-badge">📅 September 2026</span>
+          <span class="avail-badge">ðŸ“… September 2026</span>
         </div>
         <div style="margin-bottom:10px">
           <span class="tag domain">Marketing &amp; Communicatie</span>
@@ -719,22 +719,22 @@ function renderCDDemoState(enabled) {
           </div>
         </div>
         <div class="card-footer">
-          <span class="duur-text">⏱ 5 maanden</span>
+          <span class="duur-text">â± 5 maanden</span>
           <a href="auth.html" class="btn-contact" style="text-decoration:none;display:inline-block">
-            Maak je profiel aan →
+            Maak je profiel aan â†’
           </a>
         </div>
       </div>`;
   }
 }
-// ── End demo student toggle ───────────────────────────────────────────────
+// â”€â”€ End demo student toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 window.addEventListener('DOMContentLoaded', async () => {
   initDemoCompanyDiscover();
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
 
-  // Rolcheck — alleen bedrijf-gebruikers mogen studentprofielen doorzoeken
+  // Rolcheck â€” alleen bedrijf-gebruikers mogen studentprofielen doorzoeken
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'bedrijf') {
@@ -751,7 +751,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const name = getDisplayName(user);
   const initials2 = name.slice(0, 2).toUpperCase();
   authEl.innerHTML = `
-    <span class="role-badge">🏢 Bedrijf</span>
+    <span class="role-badge">ðŸ¢ Bedrijf</span>
     <div class="topbar-user">
       <div class="topbar-avatar">${escapeHtml(initials2)}</div>
       <span>${escapeHtml(name)}</span>
@@ -763,6 +763,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 </script>
 
   <script src="js/translate.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>
