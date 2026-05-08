@@ -992,7 +992,7 @@ async function renderRoleHeader(role, activeTab, opts = {}) {
     ? `<button class="role-header-back" onclick="goBack()" title="Terug">←</button>`
     : '';
   const logoutHtml = showLogout
-    ? `<button class="role-header-logout" onclick="performLogout()" title="Uitloggen">Uit</button>`
+    ? `<button class="role-header-logout" onclick="performLogout()" title="Uitloggen">🚪 Uitloggen</button>`
     : '';
 
   container.innerHTML = `
@@ -1181,7 +1181,7 @@ function _renderStudentHeaderLoggedIn({ profile, bblMode, buddyCount, activeTab 
           <span class="avatar">${escapeHtml(avatarInit)}</span>
         </a>
         <button class="sh-back-btn" onclick="goBack('discover.html')" title="Vorige pagina" aria-label="Vorige pagina">← Terug</button>
-        <button class="sh-logout-btn" onclick="performLogout()" title="Uitloggen" aria-label="Uitloggen">↪ Uit</button>
+        <button class="sh-logout-btn" onclick="performLogout()" title="Uitloggen" aria-label="Uitloggen">🚪 Uitloggen</button>
       </div>
     </header>`;
 }

@@ -237,6 +237,25 @@ body {
   font-size: .9rem;
 }
 
+.topbar-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--r-pill, 999px);
+  background: var(--red-bg, #fdeaea);
+  color: var(--red, #b82020);
+  border: 1px solid rgba(184,32,32,.2);
+  font-size: .82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--t-fast, 120ms);
+  text-decoration: none;
+}
+.topbar-logout:hover {
+  background: #f8d5d5;
+}
+
 /* ── Language Switcher ────────────────────────────────────────────────────── */
 
 .lang-switcher { display: flex; gap: 4px; align-items: center; }
