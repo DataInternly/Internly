@@ -564,7 +564,7 @@ const COMPLETENESS_CONFIG = {
     { key: 'bedrijfsnaam',    gewicht: 10, impact: null },
     { key: 'sector',          gewicht: 15, impact: null },
     { key: 'size',            gewicht: 10, impact: 'Studenten zien jouw schaal' },
-    { key: 'website',         gewicht: 15, impact: 'Vergroot vertrouwen' },
+    { key: 'website',         gewicht: 15, impact: 'Voeg website toe' },
     { key: 'beschrijving',    gewicht: 30, impact: 'Studenten lezen dit als eerste' },
     { key: 'avatar_key',      gewicht: 10, impact: 'Logo verhoogt herkenbaarheid' },
     { key: 'remote_possible', gewicht: 10, impact: 'Filtert op werkomgeving' },
