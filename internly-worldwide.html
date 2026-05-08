@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,8 +7,8 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <meta name="description" content="Internly Worldwide â€” find and manage international internships with Trust Score protection, Learning Agreement support, and three-party progress tracking for students, companies and institutions.">
-  <title>Internly Worldwide â€” International Internships</title>
+  <meta name="description" content="Internly Worldwide — find and manage international internships with Trust Score protection, Learning Agreement support, and three-party progress tracking for students, companies and institutions.">
+  <title>Internly Worldwide — International Internships</title>
   <meta property="og:title" content="Internly Worldwide">
   <meta property="og:description" content="Internationale stagematching voor studenten, scholen en bedrijven over de grens.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
@@ -23,7 +23,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/consent.js" defer></script>
   <style>
-    /* â”€â”€ Reset + tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Reset + tokens ───────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -44,7 +44,7 @@
     button { font-family: inherit; cursor: pointer; border: none; background: none; }
     section { scroll-margin-top: 72px; }
 
-    /* â”€â”€ Nav â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Nav ──────────────────────────────────────────── */
     .nav {
       position: sticky; top: 0; z-index: 100;
       height: 56px;
@@ -120,7 +120,7 @@
       .nav-center { display: flex; }
     }
 
-    /* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Hero ─────────────────────────────────────────── */
     .hero {
       background: #0d1520;
       padding: 5rem 1.5rem 4rem;
@@ -247,7 +247,7 @@
       color: rgba(255, 255, 255, 0.7);
     }
 
-    /* â”€â”€ World map (hero right) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── World map (hero right) ───────────────────────── */
     .hero-right {
       animation: fadeIn 1s 0.3s ease both;
     }
@@ -303,7 +303,7 @@
       to   { opacity: 1; }
     }
 
-    /* â”€â”€ Section base â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Section base ─────────────────────────────────── */
     .section { padding: 4.5rem 1.5rem; }
     .section-cream { background: #faf7f3; }
     .section-beige { background: #f4f3ef; }
@@ -327,7 +327,7 @@
     }
     .section-dark p.lead { color: rgba(255, 255, 255, 0.65); }
 
-    /* â”€â”€ Trust Score (Section 1) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Trust Score (Section 1) ──────────────────────── */
     .ts-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -443,7 +443,7 @@
     .grade-pill.amber { background: #fff8e8; color: #855700; }
     .grade-pill.red   { background: #fde8e3; color: #92271a; }
 
-    /* â”€â”€ Step flow (Section 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Step flow (Section 2) ────────────────────────── */
     .steps {
       display: grid;
       grid-template-columns: 1fr;
@@ -530,7 +530,7 @@
       line-height: 1.5;
     }
     .role-list li::before {
-      content: 'âœ“';
+      content: '✓';
       color: #1a7a48;
       font-weight: 600;
       flex-shrink: 0;
@@ -549,7 +549,7 @@
     }
     .role-cta:hover { background: #0d4d2d; }
 
-    /* â”€â”€ Learning Agreement (Section 3) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Learning Agreement (Section 3) ───────────────── */
     .la-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -653,7 +653,7 @@
       line-height: 1.5;
     }
     .la-bullets li::before {
-      content: 'â€¢';
+      content: '•';
       color: #1a7a48;
       font-weight: 700;
       flex-shrink: 0;
@@ -677,7 +677,7 @@
       line-height: 1.6;
     }
 
-    /* â”€â”€ Companies dark (Section 4) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Companies dark (Section 4) ───────────────────── */
     .benefit-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -718,7 +718,7 @@
       margin-top: 0.85rem;
     }
 
-    /* â”€â”€ Milestones grid (Section 5) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Milestones grid (Section 5) ──────────────────── */
     .ms-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -787,7 +787,7 @@
       font-weight: 500;
     }
 
-    /* â”€â”€ Stay informed (waitlist) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Stay informed (waitlist) ─────────────────────── */
     .ww-section {
       background: linear-gradient(135deg, #0f5c36 0%, #1a7a48 100%);
       color: #ffffff;
@@ -901,7 +901,7 @@
       line-height: 1.5;
     }
 
-    /* â”€â”€ FAQ (Section 6) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── FAQ (Section 6) ──────────────────────────────── */
     .faq-list { margin-top: 1.5rem; max-width: 720px; }
     .faq-item { border-bottom: 1px solid rgba(13, 21, 32, 0.08); }
     .faq-q {
@@ -946,7 +946,7 @@
       line-height: 1.7;
     }
 
-    /* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Footer ───────────────────────────────────────── */
     .footer {
       background: #0d1520;
       color: rgba(255, 255, 255, 0.55);
@@ -1015,7 +1015,7 @@
 </head>
 <body>
 
-  <!-- â•â•â• NAV â•â•â• -->
+  <!-- ═══ NAV ═══ -->
   <nav class="nav" data-public-header>
     <a href="index.html" class="nav-logo">
       <span class="green">intern</span><span class="orange">ly</span>
@@ -1029,26 +1029,26 @@
       <a href="#faq">FAQ</a>
     </div>
     <div class="nav-right">
-      <a href="hoe-het-werkt.html" class="nav-lang">ðŸ‡³ðŸ‡± Nederlands</a>
-      <a href="auth.html" class="nav-cta">Sign in â†’</a>
+      <a href="hoe-het-werkt.html" class="nav-lang">🇳🇱 Nederlands</a>
+      <a href="auth.html" class="nav-cta">Sign in →</a>
     </div>
   </nav>
 
-  <!-- â•â•â• HERO â•â•â• -->
+  <!-- ═══ HERO ═══ -->
   <header class="hero">
     <div class="hero-inner">
       <div class="hero-left">
         <div class="eyebrow">Global internship platform</div>
         <h1>Find your internship,<br><em>anywhere in the world.</em></h1>
-        <p class="hero-sub">Internly Worldwide connects international students with verified employers â€” with the same Trust Score protection and structured progress tracking used by thousands of Dutch internships.</p>
+        <p class="hero-sub">Internly Worldwide connects international students with verified employers — with the same Trust Score protection and structured progress tracking used by thousands of Dutch internships.</p>
         <div class="hero-ctas">
-          <a href="discover.html" class="btn-primary">Find an internship â†’</a>
+          <a href="discover.html" class="btn-primary">Find an internship →</a>
           <a href="auth.html?role=school" class="btn-secondary">Register your institution</a>
         </div>
         <div class="stat-pills">
-          <span class="stat-pill">ðŸŒ 40+ countries</span>
-          <span class="stat-pill">â­ Trust Score verified</span>
-          <span class="stat-pill">ðŸ“‹ Learning Agreement support</span>
+          <span class="stat-pill">🌍 40+ countries</span>
+          <span class="stat-pill">⭐ Trust Score verified</span>
+          <span class="stat-pill">📋 Learning Agreement support</span>
         </div>
       </div>
 
@@ -1076,10 +1076,10 @@
   <circle cx="85" cy="88" r="3.5" fill="#FF7E42"/>
   <text class="city-label" x="85" y="78" text-anchor="middle">New York</text>
 
-  <!-- SÃ£o Paulo -->
+  <!-- São Paulo -->
   <circle class="pulse-ring delay-2" cx="108" cy="175" r="4"/>
   <circle cx="108" cy="175" r="3" fill="#FF7E42" opacity="0.85"/>
-  <text class="city-label" x="108" y="188" text-anchor="middle">SÃ£o Paulo</text>
+  <text class="city-label" x="108" y="188" text-anchor="middle">São Paulo</text>
 
   <!-- London -->
   <circle class="pulse-ring delay-1" cx="178" cy="86" r="4"/>
@@ -1112,12 +1112,12 @@
     </div>
   </header>
 
-  <!-- â•â•â• SECTION 1 â€” TRUST SCORE â•â•â• -->
+  <!-- ═══ SECTION 1 — TRUST SCORE ═══ -->
   <section id="trust" class="section section-cream">
     <div class="section-inner">
       <div class="eyebrow dark">Reputation system</div>
       <h2>The Trust Score</h2>
-      <p class="lead">Before you apply, you already know how reliable an employer is. The Trust Score combines platform behaviour data with verified student reviews â€” making it resistant to manipulation.</p>
+      <p class="lead">Before you apply, you already know how reliable an employer is. The Trust Score combines platform behaviour data with verified student reviews — making it resistant to manipulation.</p>
 
       <div class="ts-grid">
         <div class="ts-card" id="tsCard">
@@ -1125,9 +1125,9 @@
             <div class="ts-avatar">VA</div>
             <div class="ts-meta">
               <div class="name">Vandaag Agency</div>
-              <div class="sub">Digital Marketing Â· Amsterdam</div>
+              <div class="sub">Digital Marketing · Amsterdam</div>
             </div>
-            <div class="ts-grade">A â€” Trusted</div>
+            <div class="ts-grade">A — Trusted</div>
           </div>
 
           <div class="ts-bar-row">
@@ -1173,25 +1173,25 @@
               <div class="ts-total-label">Total score</div>
               <div class="ts-total-num" data-num="87">0</div>
             </div>
-            <div class="ts-total-badge">A â€” Trusted</div>
+            <div class="ts-total-badge">A — Trusted</div>
           </div>
         </div>
 
         <div class="explain-stack">
           <div class="explain-card green">
-            <div class="explain-title">âœ“ Always visible before you apply</div>
-            <p class="explain-text">See the employer's Trust Score before submitting your application â€” not after.</p>
+            <div class="explain-title">✓ Always visible before you apply</div>
+            <p class="explain-text">See the employer's Trust Score before submitting your application — not after.</p>
           </div>
           <div class="explain-card orange">
-            <div class="explain-title">âš¡ Behaviour-based, not just reviews</div>
+            <div class="explain-title">⚡ Behaviour-based, not just reviews</div>
             <p class="explain-text">Response times, cancellation patterns, and learning goal fulfilment feed directly into the score.</p>
           </div>
           <div class="explain-card gray">
-            <div class="explain-title">ðŸ“Š Grade scale</div>
+            <div class="explain-title">📊 Grade scale</div>
             <div class="grade-pills-inline">
-              <span class="grade-pill green">A Â· 85â€“100 Â· Trusted</span>
-              <span class="grade-pill amber">B Â· 65â€“84 Â· Average</span>
-              <span class="grade-pill red">C Â· &lt;65 Â· Caution</span>
+              <span class="grade-pill green">A · 85–100 · Trusted</span>
+              <span class="grade-pill amber">B · 65–84 · Average</span>
+              <span class="grade-pill red">C · &lt;65 · Caution</span>
             </div>
           </div>
         </div>
@@ -1199,7 +1199,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• SECTION 2 â€” HOW IT WORKS â•â•â• -->
+  <!-- ═══ SECTION 2 — HOW IT WORKS ═══ -->
   <section id="how" class="section section-beige">
     <div class="section-inner">
       <div class="eyebrow dark">The process</div>
@@ -1209,37 +1209,37 @@
       <div class="steps">
         <div class="step">
           <div class="step-num">1</div>
-          <div class="step-icon">ðŸ”</div>
+          <div class="step-icon">🔍</div>
           <div class="step-title">Discover</div>
           <p class="step-text">Browse verified internships filtered by sector, duration and Trust Score.</p>
         </div>
         <div class="step">
           <div class="step-num">2</div>
-          <div class="step-icon">ðŸ“‹</div>
+          <div class="step-icon">📋</div>
           <div class="step-title">Apply</div>
           <p class="step-text">Submit your application with a motivation and your learning goals.</p>
         </div>
         <div class="step">
           <div class="step-num">3</div>
-          <div class="step-icon">ðŸ’¬</div>
+          <div class="step-icon">💬</div>
           <div class="step-title">Match</div>
           <p class="step-text">The employer responds within their guaranteed window or their Trust Score drops.</p>
         </div>
         <div class="step">
           <div class="step-num">4</div>
-          <div class="step-icon">ðŸ“</div>
+          <div class="step-icon">📝</div>
           <div class="step-title">Learning Agreement</div>
           <p class="step-text">Student, institution, and employer sign the LA. Your internship is officially protected.</p>
         </div>
         <div class="step">
           <div class="step-num">5</div>
-          <div class="step-icon">ðŸ“Š</div>
+          <div class="step-icon">📊</div>
           <div class="step-title">Track progress</div>
           <p class="step-text">Eight milestones guide the internship. Each one confirmed by the right party.</p>
         </div>
         <div class="step">
           <div class="step-num">6</div>
-          <div class="step-icon">ðŸŽ“</div>
+          <div class="step-icon">🎓</div>
           <div class="step-title">Certificate</div>
           <p class="step-text">After completion, download your verified internship certificate.</p>
         </div>
@@ -1254,7 +1254,7 @@
             <li>Track your 8 milestones</li>
             <li>Download your certificate</li>
           </ul>
-          <a href="auth.html?role=student" class="role-cta">Register as student â†’</a>
+          <a href="auth.html?role=student" class="role-cta">Register as student →</a>
         </div>
         <div class="role-col">
           <div class="role-label">As an employer</div>
@@ -1264,7 +1264,7 @@
             <li>ESG-ready progress reporting</li>
             <li>Connect to motivated candidates globally</li>
           </ul>
-          <a href="auth.html?role=bedrijf" class="role-cta">Register your company â†’</a>
+          <a href="auth.html?role=bedrijf" class="role-cta">Register your company →</a>
         </div>
         <div class="role-col">
           <div class="role-label">As an institution</div>
@@ -1274,40 +1274,40 @@
             <li>Three-party progress confirmation</li>
             <li>Flag issues early</li>
           </ul>
-          <a href="auth.html?role=school" class="role-cta">Register your institution â†’</a>
+          <a href="auth.html?role=school" class="role-cta">Register your institution →</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- â•â•â• SECTION 3 â€” LEARNING AGREEMENT â•â•â• -->
+  <!-- ═══ SECTION 3 — LEARNING AGREEMENT ═══ -->
   <section id="agreement" class="section section-cream">
     <div class="section-inner">
       <div class="eyebrow dark">Your legal protection</div>
       <h2>Learning Agreement support</h2>
-      <p class="lead">The Learning Agreement (LA) is the international equivalent of the Dutch POK â€” a binding document between you, your institution, and your host employer. Internly manages the entire signing flow digitally.</p>
+      <p class="lead">The Learning Agreement (LA) is the international equivalent of the Dutch POK — a binding document between you, your institution, and your host employer. Internly manages the entire signing flow digitally.</p>
 
       <div class="la-grid">
         <div class="la-doc">
           <div class="la-doc-head">
             <div class="la-doc-title">
-              <span class="icon">ðŸ“„</span>
+              <span class="icon">📄</span>
               Learning Agreement
             </div>
             <span class="la-doc-badge">Internly Worldwide</span>
           </div>
 
           <div class="la-sig">
-            <span class="la-sig-name"><span class="icon">ðŸ‘¤</span>Student â€” Lena de Vries</span>
-            <span class="la-sig-status signed">âœ“ Signed</span>
+            <span class="la-sig-name"><span class="icon">👤</span>Student — Lena de Vries</span>
+            <span class="la-sig-status signed">✓ Signed</span>
           </div>
           <div class="la-sig">
-            <span class="la-sig-name"><span class="icon">ðŸ¢</span>Employer â€” Vandaag Agency</span>
-            <span class="la-sig-status signed">âœ“ Signed</span>
+            <span class="la-sig-name"><span class="icon">🏢</span>Employer — Vandaag Agency</span>
+            <span class="la-sig-status signed">✓ Signed</span>
           </div>
           <div class="la-sig">
-            <span class="la-sig-name"><span class="icon">ðŸŽ“</span>Institution â€” HvA Amsterdam</span>
-            <span class="la-sig-status pending">â³ Pending</span>
+            <span class="la-sig-name"><span class="icon">🎓</span>Institution — HvA Amsterdam</span>
+            <span class="la-sig-status pending">⏳ Pending</span>
           </div>
 
           <div class="la-progress">
@@ -1331,7 +1331,7 @@
           </ul>
 
           <div class="callout">
-            <div class="callout-title">Erasmus+ compatible â€” but not required</div>
+            <div class="callout-title">Erasmus+ compatible — but not required</div>
             <p class="callout-text">Whether you're on an Erasmus+ grant, a bilateral agreement, or organising your internship independently, Internly's LA flow works for all three.</p>
           </div>
 
@@ -1356,7 +1356,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• SECTION 4 â€” FOR COMPANIES â•â•â• -->
+  <!-- ═══ SECTION 4 — FOR COMPANIES ═══ -->
   <section id="companies" class="section section-dark">
     <div class="section-inner">
       <div class="eyebrow alt">Hire international talent</div>
@@ -1364,35 +1364,35 @@
 
       <div class="benefit-grid">
         <div class="benefit-card">
-          <div class="benefit-icon">ðŸŒ</div>
+          <div class="benefit-icon">🌍</div>
           <div class="benefit-title">Global talent pipeline</div>
-          <p class="benefit-text">Connect with motivated students from universities worldwide â€” filtered by sector, skills, and availability.</p>
+          <p class="benefit-text">Connect with motivated students from universities worldwide — filtered by sector, skills, and availability.</p>
         </div>
         <div class="benefit-card">
-          <div class="benefit-icon">â­</div>
+          <div class="benefit-icon">⭐</div>
           <div class="benefit-title">Build your reputation</div>
           <p class="benefit-text">Your Trust Score is visible to every student on the platform. Responsive, reliable employers attract better candidates.</p>
         </div>
         <div class="benefit-card">
-          <div class="benefit-icon">ðŸ“Š</div>
+          <div class="benefit-icon">📊</div>
           <div class="benefit-title">ESG-ready reporting</div>
-          <p class="benefit-text">Every completed internship generates structured data for your Social Impact and ESG reporting â€” ready for CSRD and sustainability reports.</p>
+          <p class="benefit-text">Every completed internship generates structured data for your Social Impact and ESG reporting — ready for CSRD and sustainability reports.</p>
         </div>
         <div class="benefit-card">
-          <div class="benefit-icon">ðŸ“‹</div>
+          <div class="benefit-icon">📋</div>
           <div class="benefit-title">Paperwork handled</div>
-          <p class="benefit-text">Learning Agreement signing, progress tracking, and final certificates â€” all managed through the platform.</p>
+          <p class="benefit-text">Learning Agreement signing, progress tracking, and final certificates — all managed through the platform.</p>
         </div>
       </div>
 
       <div class="companies-cta-wrap">
-        <a href="auth.html?role=bedrijf" class="btn-primary">Register your company for free â†’</a>
+        <a href="auth.html?role=bedrijf" class="btn-primary">Register your company for free →</a>
         <p class="companies-cta-note">Starter plan is free. No credit card.</p>
       </div>
     </div>
   </section>
 
-  <!-- â•â•â• SECTION 5 â€” MILESTONES â•â•â• -->
+  <!-- ═══ SECTION 5 — MILESTONES ═══ -->
   <section class="section section-beige">
     <div class="section-inner">
       <div class="eyebrow dark">Progress tracking</div>
@@ -1405,7 +1405,7 @@
           <div class="ms-card-title">Profile complete</div>
           <div class="ms-card-meta">
             <span class="ms-pct green">+10%</span>
-            <span class="ms-actor">âš™ï¸ auto</span>
+            <span class="ms-actor">⚙️ auto</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1413,7 +1413,7 @@
           <div class="ms-card-title">Learning Agreement signed</div>
           <div class="ms-card-meta">
             <span class="ms-pct green">+15%</span>
-            <span class="ms-actor">ðŸŽ“ institution</span>
+            <span class="ms-actor">🎓 institution</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1421,7 +1421,7 @@
           <div class="ms-card-title">First three-way meeting</div>
           <div class="ms-card-meta">
             <span class="ms-pct green">+10%</span>
-            <span class="ms-actor">ðŸŽ“ institution</span>
+            <span class="ms-actor">🎓 institution</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1429,7 +1429,7 @@
           <div class="ms-card-title">Mid-term goals met</div>
           <div class="ms-card-meta">
             <span class="ms-pct orange">+15%</span>
-            <span class="ms-actor">ðŸŽ“ institution</span>
+            <span class="ms-actor">🎓 institution</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1437,7 +1437,7 @@
           <div class="ms-card-title">Progress report submitted</div>
           <div class="ms-card-meta">
             <span class="ms-pct orange">+15%</span>
-            <span class="ms-actor">ðŸ‘¤ â†’ ðŸŽ“</span>
+            <span class="ms-actor">👤 → 🎓</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1445,7 +1445,7 @@
           <div class="ms-card-title">Second three-way meeting</div>
           <div class="ms-card-meta">
             <span class="ms-pct green">+10%</span>
-            <span class="ms-actor">ðŸŽ“ institution</span>
+            <span class="ms-actor">🎓 institution</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1453,7 +1453,7 @@
           <div class="ms-card-title">Final report submitted</div>
           <div class="ms-card-meta">
             <span class="ms-pct orange">+15%</span>
-            <span class="ms-actor">ðŸ‘¤ â†’ ðŸŽ“</span>
+            <span class="ms-actor">👤 → 🎓</span>
           </div>
         </div>
         <div class="ms-card">
@@ -1461,21 +1461,21 @@
           <div class="ms-card-title">Final assessment</div>
           <div class="ms-card-meta">
             <span class="ms-pct green">+10%</span>
-            <span class="ms-actor">ðŸ¢ â†’ ðŸŽ“</span>
+            <span class="ms-actor">🏢 → 🎓</span>
           </div>
         </div>
       </div>
 
-      <a href="hoe-het-werkt.html#mijlpalen" class="ms-link">â†’ Read the full milestone guide</a>
+      <a href="hoe-het-werkt.html#mijlpalen" class="ms-link">→ Read the full milestone guide</a>
     </div>
   </section>
 
-  <!-- â•â•â• STAY INFORMED â€” waitlist â•â•â• -->
+  <!-- ═══ STAY INFORMED — waitlist ═══ -->
   <section class="ww-section">
     <div class="ww-inner">
       <div class="eyebrow">Stay informed</div>
       <h2>Internly Worldwide<br>is growing.</h2>
-      <p class="ww-body">We're expanding our network of verified employers and partner institutions globally. Sign up to be notified when new internships are added in your region â€” and to get early access to platform updates.</p>
+      <p class="ww-body">We're expanding our network of verified employers and partner institutions globally. Sign up to be notified when new internships are added in your region — and to get early access to platform updates.</p>
 
       <div class="ww-form" id="ww-form">
         <input type="email"
@@ -1487,13 +1487,13 @@
         <button id="ww-submit-btn"
                 class="ww-submit"
                 type="button"
-                onclick="wwSignup()">Notify me â†’</button>
+                onclick="wwSignup()">Notify me →</button>
       </div>
 
       <div class="ww-error" id="ww-error" role="alert"></div>
 
       <div class="ww-success" id="ww-success">
-        <div class="ww-success-icon">âœ“</div>
+        <div class="ww-success-icon">✓</div>
         <div class="ww-success-text">You're on the list. We'll be in touch.</div>
       </div>
 
@@ -1501,7 +1501,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• SECTION 6 â€” FAQ â•â•â• -->
+  <!-- ═══ SECTION 6 — FAQ ═══ -->
   <section id="faq" class="section section-cream">
     <div class="section-inner">
       <div class="eyebrow dark">Frequently asked questions</div>
@@ -1513,7 +1513,7 @@
             <span>Is Internly free for students?</span>
             <span class="faq-icon">+</span>
           </button>
-          <div class="faq-a"><div class="faq-a-inner">Always. Students never pay â€” not now, not later. Costs are covered by employers using the platform to find and manage interns.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">Always. Students never pay — not now, not later. Costs are covered by employers using the platform to find and manage interns.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" type="button">
@@ -1527,21 +1527,21 @@
             <span>Does the host company need to be registered in a specific country?</span>
             <span class="faq-icon">+</span>
           </button>
-          <div class="faq-a"><div class="faq-a-inner">No. Any company anywhere in the world can register as a host employer. The Trust Score system applies globally â€” response times, commitment, and mentoring quality are tracked regardless of location.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">No. Any company anywhere in the world can register as a host employer. The Trust Score system applies globally — response times, commitment, and mentoring quality are tracked regardless of location.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" type="button">
             <span>What is the difference between a POK and a Learning Agreement?</span>
             <span class="faq-icon">+</span>
           </button>
-          <div class="faq-a"><div class="faq-a-inner">The POK (Praktijkovereenkomst) is the Dutch-specific three-party internship contract required by law for MBO students. The Learning Agreement is its international equivalent â€” used across Europe and worldwide for higher education internship recognition. Internly supports both.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">The POK (Praktijkovereenkomst) is the Dutch-specific three-party internship contract required by law for MBO students. The Learning Agreement is its international equivalent — used across Europe and worldwide for higher education internship recognition. Internly supports both.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" type="button">
             <span>Can my institution manage multiple students through one account?</span>
             <span class="faq-icon">+</span>
           </button>
-          <div class="faq-a"><div class="faq-a-inner">Yes. Your institution dashboard shows all active students, their progress milestones, and pending Learning Agreement confirmations â€” all in one view.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">Yes. Your institution dashboard shows all active students, their progress milestones, and pending Learning Agreement confirmations — all in one view.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" type="button">
@@ -1568,7 +1568,7 @@
     </div>
   </section>
 
-  <!-- â•â•â• FOOTER â•â•â• -->
+  <!-- ═══ FOOTER ═══ -->
   <footer class="footer">
     <div class="footer-inner">
       <div>
@@ -1578,7 +1578,7 @@
           </span>
           <span class="footer-pill">Worldwide</span>
         </div>
-        <div class="footer-tag">Â© 2026 Internly â€” Sasubo Holding B.V.</div>
+        <div class="footer-tag">© 2026 Internly — Sasubo Holding B.V.</div>
       </div>
       <div>
         <div class="footer-col-label">Platform</div>
@@ -1604,7 +1604,7 @@
   <script>
     'use strict';
 
-    // â”€â”€ 1. Smooth scroll on anchor links â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 1. Smooth scroll on anchor links ──────────────
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', e => {
         const href = link.getAttribute('href');
@@ -1616,7 +1616,7 @@
       });
     });
 
-    // â”€â”€ 2. Active nav highlight on scroll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 2. Active nav highlight on scroll ─────────────
     const navLinks = document.querySelectorAll('#navCenter a');
     const sections = document.querySelectorAll('section[id]');
     const linkBySection = {};
@@ -1637,7 +1637,7 @@
       sections.forEach(s => navObserver.observe(s));
     }
 
-    // â”€â”€ 3. Trust Score animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 3. Trust Score animation ──────────────────────
     const tsCard = document.getElementById('tsCard');
     if (tsCard && 'IntersectionObserver' in window) {
       const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
@@ -1675,7 +1675,7 @@
       tsObserver.observe(tsCard);
     }
 
-    // â”€â”€ 4. FAQ accordion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 4. FAQ accordion ──────────────────────────────
     document.querySelectorAll('.faq-item').forEach(item => {
       const q = item.querySelector('.faq-q');
       if (!q) return;
@@ -1694,12 +1694,12 @@
   </script>
 
   <script>
-    // â”€â”€ Worldwide waitlist â€” gedelegeerd aan js/supabase.js â”€â”€
-    // Sprint 5 cleanup â€” 30 apr 2026.
+    // ── Worldwide waitlist — gedelegeerd aan js/supabase.js ──
+    // Sprint 5 cleanup — 30 apr 2026.
     // Geen inline credentials meer; gebruikt window.db (centraal
     // gemaakt in js/supabase.js). Fallback: window.__SUPABASE_ANON_KEY
     // is publiek per design en alleen actief als window.db ontbreekt.
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ────────────────────────────────────────────────────────
     (function() {
       const SUPA_URL_FALLBACK = 'https://qoxgbkbnjsycodcqqmft.supabase.co';
 
@@ -1738,7 +1738,7 @@
           return;
         }
 
-        // Schema-aware payload â€” waitlist columns confirmed in
+        // Schema-aware payload — waitlist columns confirmed in
         // internly_migration.sql:293-307. 'language' column does
         // not exist; 'source' and 'type' do.
         const payload = {
@@ -1753,7 +1753,7 @@
             .insert(payload);
 
           if (error && error.code === '23505') {
-            // Duplicate â€” treat as success (already signed up)
+            // Duplicate — treat as success (already signed up)
             if (form)   form.style.display   = 'none';
             if (succEl) succEl.style.display = 'flex';
             return;
@@ -1766,7 +1766,7 @@
 
         } catch (e) {
           btn.disabled = false;
-          btn.textContent = 'Notify me â†’';
+          btn.textContent = 'Notify me →';
           if (errEl) {
             errEl.textContent =
               'Something went wrong. Please try again.';
@@ -1778,10 +1778,10 @@
     })();
   </script>
 
-<!-- Run 1.8 â€” utils.js toegevoegd voor hybrid header (cdn + supabase staan al boven) -->
+<!-- Run 1.8 — utils.js toegevoegd voor hybrid header (cdn + supabase staan al boven) -->
 <script src="js/utils.js"></script>
 
-<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -1841,14 +1841,14 @@
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend â†’ publieke header blijft staan, geen warn
+    // role onbekend → publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }

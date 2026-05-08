@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -10,8 +10,8 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="description" content="Antwoorden op stagevragen. Voor studenten, bedrijven, scholen en buddies.">
   <link rel="canonical" href="https://internly.pro/kennisbank.html">
-  <title>Kennisbank â€” Internly</title>
-  <meta property="og:title" content="Kennisbank â€” Internly">
+  <title>Kennisbank — Internly</title>
+  <meta property="og:title" content="Kennisbank — Internly">
   <meta property="og:description" content="Artikelen, gidsen en achtergrond bij stages, Trust Score en eerlijk werven.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
   <meta property="og:url" content="https://internly.pro/kennisbank.html">
@@ -27,7 +27,7 @@
   <script src="js/kb.js"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* â”€â”€ KB tokens (RUN â€” visual revamp 1 mei 2026) â”€â”€ */
+    /* ── KB tokens (RUN — visual revamp 1 mei 2026) ── */
     :root {
       --kb-ink:        var(--fg-primary,    #0d1520);
       --kb-ink2:       var(--fg-secondary,  #3a4455);
@@ -65,7 +65,7 @@
       min-height: 100vh;
     }
 
-    /* â”€â”€ KB shared nav (rendered by renderKBHeader â†’ #kb-header) â”€â”€ */
+    /* ── KB shared nav (rendered by renderKBHeader → #kb-header) ── */
     .kb-topbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(244,243,239,.92);
@@ -130,7 +130,7 @@
     }
     .kb-btn-primary:hover { background: #b94613; }
 
-    /* â”€â”€ KB language toggle (kb-prefixed) â”€â”€ */
+    /* ── KB language toggle (kb-prefixed) ── */
     .kb-lang-btn {
       padding: 6px 12px;
       border: 1.5px solid var(--line-default, #e2e8f0);
@@ -150,7 +150,7 @@
       color: #fff;
     }
 
-    /* â”€â”€ HERO â”€â”€ */
+    /* ── HERO ── */
     .hero {
       position: relative; min-height: 92vh;
       display: flex; align-items: center;
@@ -245,7 +245,7 @@
       50%      { transform: translateX(-50%) translateY(6px); }
     }
 
-    /* â”€â”€ AUDIENCE â”€â”€ */
+    /* ── AUDIENCE ── */
     .audience { background: var(--kb-bg); padding: 4rem 1.5rem 3rem; }
     .aud-inner { max-width: 960px; margin: 0 auto; }
     .aud-label {
@@ -302,7 +302,7 @@
     .tile-intl .aud-icon { background: var(--kb-teal-bg); color: var(--kb-teal); }
     .tile-intl.on .aud-name { color: var(--kb-teal); }
 
-    /* â”€â”€ FEATURED â”€â”€ */
+    /* ── FEATURED ── */
     .featured { padding: 0 1.5rem 2.5rem; background: var(--kb-bg); }
     .feat-inner { max-width: 960px; margin: 0 auto; }
     .section-head { display: flex; align-items: baseline; gap: .75rem; margin-bottom: 1.25rem; }
@@ -349,7 +349,7 @@
     .feat-card-2 { background: linear-gradient(135deg, #1a3a6a 0%, var(--kb-blue) 100%); }
     .feat-card-3 { background: linear-gradient(135deg, var(--kb-green-dk) 0%, var(--kb-green) 100%); }
 
-    /* â”€â”€ ARTICLES â”€â”€ */
+    /* ── ARTICLES ── */
     .articles { padding: 0 1.5rem 4rem; background: var(--kb-bg); }
     .art-inner { max-width: 960px; margin: 0 auto; }
     .cat-section { margin-bottom: 2.5rem; }
@@ -427,7 +427,7 @@
     .reveal { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s ease; }
     .reveal.revealed { opacity: 1; transform: none; }
 
-    /* â”€â”€ OVERLAY â”€â”€ */
+    /* ── OVERLAY ── */
     .overlay {
       position: fixed; inset: 0; z-index: 500;
       display: flex; flex-direction: column;
@@ -583,7 +583,7 @@
       background: var(--kb-white); color: var(--kb-ink2);
     }
     .pill.ok { background: var(--kb-green-bg); color: var(--kb-green-dk); border-color: rgba(26,122,72,.2); }
-    .pill.ok::before { content: 'âœ“ '; }
+    .pill.ok::before { content: '✓ '; }
 
     .art-sources {
       margin-top: 2.5rem; padding-top: 1.25rem;
@@ -603,7 +603,7 @@
     }
     .ra-item:hover { background: var(--kb-ink); color: #fff; border-color: var(--kb-ink); }
 
-    /* â”€â”€ TIPS TICKER â”€â”€ */
+    /* ── TIPS TICKER ── */
     .ticker-wrap {
       background: var(--kb-orange);
       overflow: hidden; height: 40px;
@@ -616,13 +616,13 @@
       padding: 0 3rem; letter-spacing: .02em;
       display: flex; align-items: center; gap: .5rem;
     }
-    .ticker-item::before { content: 'â˜…'; opacity: .65; }
+    .ticker-item::before { content: '★'; opacity: .65; }
     @keyframes kb-tickerScroll {
       from { transform: translateX(0); }
       to   { transform: translateX(-50%); }
     }
 
-    /* â”€â”€ CTA â”€â”€ */
+    /* ── CTA ── */
     .cta-section { padding: 0 1.5rem 2.5rem; background: var(--kb-bg); }
     .cta-inner { max-width: 960px; margin: 0 auto; }
     .cta-card {
@@ -685,7 +685,7 @@
     .cta-btn-g:hover { border-color: rgba(255,255,255,.7); color: #fff; }
     .cta-trust { font-size: .68rem; color: rgba(255,255,255,.4); margin-top: .6rem; width: 100%; position: relative; z-index: 1; }
 
-    /* â”€â”€ STICKY BAR â”€â”€ */
+    /* ── STICKY BAR ── */
     .sticky-bar {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 350;
       background: var(--kb-green-dk);
@@ -724,7 +724,7 @@
     .sb-close:hover { color: #fff; }
     @media (max-width: 480px) { .sb-sub { display: none; } .sb-title { font-size: .82rem; } }
 
-    /* â”€â”€ FOOTER â”€â”€ */
+    /* ── FOOTER ── */
     .footer { background: var(--kb-ink); padding: 2.5rem 1.5rem; text-align: center; }
     .footer-logo {
       font-family: 'Bricolage Grotesque', sans-serif;
@@ -734,7 +734,7 @@
     .footer-logo span { color: var(--kb-orange); }
     .footer-txt { font-size: .78rem; color: rgba(255,255,255,.35); }
 
-    /* â”€â”€ NOTIF â”€â”€ */
+    /* ── NOTIF ── */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -769,7 +769,7 @@
   <div class="hero-inner">
     <div class="hero-kicker" id="hk">Kennisbank 2025</div>
     <h1 class="hero-h1" id="hh">Alles over stages.<br><em>Eerlijk &amp; duidelijk.</em></h1>
-    <p class="hero-sub" id="hs">Van rechten tot kansen â€” voor studenten, bedrijven en scholen. Kies wie je bent en we tonen wat voor jou relevant is.</p>
+    <p class="hero-sub" id="hs">Van rechten tot kansen — voor studenten, bedrijven en scholen. Kies wie je bent en we tonen wat voor jou relevant is.</p>
     <div class="hero-counters">
       <div class="hc-item">
         <div class="hc-num"><span class="counter" data-target="77">0</span><span class="hc-pct">%</span></div>
@@ -780,7 +780,7 @@
         <div class="hc-label" id="cl2">MBO-studenten ervaart stagediscriminatie</div>
       </div>
       <div class="hc-item green-accent">
-        <div class="hc-num"><span style="font-size:1.4rem;font-weight:300;color:rgba(63,190,122,.5)">â‚¬</span><span class="counter" data-target="30">0</span><span class="hc-pct">M</span></div>
+        <div class="hc-num"><span style="font-size:1.4rem;font-weight:300;color:rgba(63,190,122,.5)">€</span><span class="counter" data-target="30">0</span><span class="hc-pct">M</span></div>
         <div class="hc-label" id="cl3">overheidsinvestering in het Stagepact</div>
       </div>
     </div>
@@ -800,7 +800,7 @@
 <section class="audience" id="audienceSection">
   <div class="aud-inner">
     <h2 class="aud-label" id="audLabel">Voor wie zoek je informatie?</h2>
-    <p class="aud-sub" id="audSub">Kies je perspectief â€” de kennisbank past zich aan.</p>
+    <p class="aud-sub" id="audSub">Kies je perspectief — de kennisbank past zich aan.</p>
     <div class="aud-grid" id="audGrid"></div>
   </div>
 </section>
@@ -820,11 +820,11 @@
       <div class="cta-logomark">intern<span class="no">ly</span></div>
       <div class="cta-copy">
         <div class="cta-headline" id="ctaHeadline">Vind jouw stageplek op Internly</div>
-        <div class="cta-sub" id="ctaSub">Transparante werkgevers Â· Trust Score zichtbaar vÃ³Ã³r je solliciteert Â· Altijd gratis voor studenten</div>
-        <div class="cta-trust" id="ctaTrust">Voor studenten altijd gratis Â· Geen spam Â· Op elk moment afmelden</div>
+        <div class="cta-sub" id="ctaSub">Transparante werkgevers · Trust Score zichtbaar vóór je solliciteert · Altijd gratis voor studenten</div>
+        <div class="cta-trust" id="ctaTrust">Voor studenten altijd gratis · Geen spam · Op elk moment afmelden</div>
       </div>
       <div class="cta-actions">
-        <a class="cta-btn-p" href="auth.html" id="ctaBtnP">Meld je nu aan â†’</a>
+        <a class="cta-btn-p" href="auth.html" id="ctaBtnP">Meld je nu aan →</a>
         <a class="cta-btn-g" href="discover.html" id="ctaBtnG">Bekijk vacatures</a>
       </div>
     </div>
@@ -852,19 +852,19 @@
 <!-- STICKY BAR -->
 <div class="sticky-bar" id="stickyBar">
   <div class="sb-copy">
-    <div class="sb-title" id="sbTitle">Vind jouw stage op Internly â€” altijd gratis voor studenten</div>
-    <div class="sb-sub" id="sbSub">Transparante werkgevers Â· Trust Score Â· Geen ghosting meer</div>
+    <div class="sb-title" id="sbTitle">Vind jouw stage op Internly — altijd gratis voor studenten</div>
+    <div class="sb-sub" id="sbSub">Transparante werkgevers · Trust Score · Geen ghosting meer</div>
   </div>
   <div class="sb-actions">
-    <a class="sb-btn" href="auth.html" id="sbBtn">Meld je aan â†’</a>
-    <button class="sb-close" onclick="kbDismissBar()" aria-label="Sluiten">Ã—</button>
+    <a class="sb-btn" href="auth.html" id="sbBtn">Meld je aan →</a>
+    <button class="sb-close" onclick="kbDismissBar()" aria-label="Sluiten">×</button>
   </div>
 </div>
 
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-logo"><span style="color:#3fbe7a">intern</span><span>ly</span></div>
-  <div class="footer-txt">Â© 2026 Sasubo Holding B.V. Â· Kennisbank voor de stagemarkt</div>
+  <div class="footer-txt">© 2026 Sasubo Holding B.V. · Kennisbank voor de stagemarkt</div>
   <div style="margin-top:.75rem;display:flex;justify-content:center;gap:1.5rem">
     <a href="privacybeleid.html" style="font-size:.75rem;color:rgba(255,255,255,.3);text-decoration:none">Privacy</a>
     <a href="spelregels.html" style="font-size:.75rem;color:rgba(255,255,255,.3);text-decoration:none">Spelregels</a>
@@ -875,7 +875,7 @@
 <script>
 'use strict';
 
-/* â”€â”€ DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── DATA ───────────────────────────────────────────────────────────── */
 
 const kbAUD = [
   { key:'BOL', cls:'tile-bol', name:'BOL Student', desc:'Schoolgericht leren + stage',
@@ -897,7 +897,7 @@ const kbArticles = [
     time:'3', source:'Indeed NL', featured:true, featClass:'feat-card-1',
     detail: () => `
 <h1 class="art-h1">Ghosting bij stages: wat zijn je rechten?</h1>
-<p class="art-intro">Je stuurt je motivatiebrief, je wacht, je wacht â€” en dan: niets. Ghosting is de grootste frustratie in de stagemarkt. Maar je staat sterker dan je denkt.</p>
+<p class="art-intro">Je stuurt je motivatiebrief, je wacht, je wacht — en dan: niets. Ghosting is de grootste frustratie in de stagemarkt. Maar je staat sterker dan je denkt.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-orange)">77%</div><div class="sbl">ervaart ghosting van een stagebedrijf (Indeed NL)</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-red)">4,0%</div><div class="sbl">CBS: discriminatie begint bij geen reactie</div></div>
@@ -909,8 +909,8 @@ const kbArticles = [
   <div class="step"><div class="snum">3</div><div class="sbody"><h4>Betrek je stagebegeleider</h4><p>Je school kan namens jou contact opnemen. Stagebegeleiders hebben soms directe lijnen.</p></div></div>
   <div class="step"><div class="snum">4</div><div class="sbody"><h4>Meld het bij SBB</h4><p>SBB houdt toezicht op erkende leerbedrijven. Structureel niet-reageren kan leiden tot maatregelen.</p></div></div>
 </div>
-<div class="infobox ib-green"><div class="ibt">ðŸ›¡ï¸ Hoe Internly je beschermt</div><p>Op Internly hebben bedrijven een responsverplichting. Reageren ze niet binnen de gestelde termijn, dan daalt automatisch hun <strong>Trust Score</strong>. Studenten zien vÃ³Ã³r ze solliciteren hoe responsief een bedrijf is.</p></div>
-<div class="art-sources"><strong>Bronnen</strong>: Indeed NL, Ghosting in de stagemarkt 2023 Â· CBS, Schoolverlatersonderzoek 2024 Â· Stagepact MBO 2023â€“2027</div>
+<div class="infobox ib-green"><div class="ibt">🛡️ Hoe Internly je beschermt</div><p>Op Internly hebben bedrijven een responsverplichting. Reageren ze niet binnen de gestelde termijn, dan daalt automatisch hun <strong>Trust Score</strong>. Studenten zien vóór ze solliciteren hoe responsief een bedrijf is.</p></div>
+<div class="art-sources"><strong>Bronnen</strong>: Indeed NL, Ghosting in de stagemarkt 2023 · CBS, Schoolverlatersonderzoek 2024 · Stagepact MBO 2023–2027</div>
 ` },
 
   { id:'discriminatie', cats:['BOL'], stat:{n:'1 op 10', l:'ervaart discriminatie bij stage (CBS 2025)'}, badge:'actueel',
@@ -919,11 +919,11 @@ const kbArticles = [
     time:'4', source:'CBS 2025', featured:true, featClass:'feat-card-2',
     detail: () => `
 <h1 class="art-h1">Stagediscriminatie: herkennen, melden, doorzetten</h1>
-<p class="art-intro">Discriminatie bij stages is een structureel probleem in Nederland. CBS publiceerde in december 2025 de meest recente cijfers. Zo herken je het â€” en dit zijn je stappen.</p>
+<p class="art-intro">Discriminatie bij stages is een structureel probleem in Nederland. CBS publiceerde in december 2025 de meest recente cijfers. Zo herken je het — en dit zijn je stappen.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-red);font-size:1.5rem">1 op 10</div><div class="sbl">MBO-BOL (CBS 2025)</div></div>
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-amber)">42%</div><div class="sbl">onderneemt gÃ©Ã©n actie</div></div>
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-ink3)">6%</div><div class="sbl">doet officiÃ«le melding</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-amber)">42%</div><div class="sbl">onderneemt géén actie</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-ink3)">6%</div><div class="sbl">doet officiële melding</div></div>
 </div>
 <div class="art-sec">Meest voorkomende gronden</div>
 <div class="bars">
@@ -933,90 +933,90 @@ const kbArticles = [
 </div>
 <div class="steps">
   <div class="step"><div class="snum">1</div><div class="sbody"><h4>Bespreek het met je mentor</h4><p>30% praat eerst met school. Je begeleider kent de procedures.</p></div></div>
-  <div class="step"><div class="snum">2</div><div class="sbody"><h4>OfficiÃ«le melding bij school of SBB</h4><p>School is verplicht je een vervangende stage aan te bieden. SBB kan het leerbedrijf maatregelen opleggen.</p></div></div>
-  <div class="step"><div class="snum">3</div><div class="sbody"><h4>Discriminatie.nl</h4><p>Voor officiÃ«le klachten en juridisch advies. Anoniem melden kan.</p></div></div>
+  <div class="step"><div class="snum">2</div><div class="sbody"><h4>Officiële melding bij school of SBB</h4><p>School is verplicht je een vervangende stage aan te bieden. SBB kan het leerbedrijf maatregelen opleggen.</p></div></div>
+  <div class="step"><div class="snum">3</div><div class="sbody"><h4>Discriminatie.nl</h4><p>Voor officiële klachten en juridisch advies. Anoniem melden kan.</p></div></div>
 </div>
-<div class="art-sources"><strong>Bron</strong>: CBS Schoolverlatersonderzoek 2024, gepubliceerd december 2025 Â· Stagepact MBO 2023-2027 Â· Kennisinstituut voor Emancipatievraagstukken (KIS)</div>
+<div class="art-sources"><strong>Bron</strong>: CBS Schoolverlatersonderzoek 2024, gepubliceerd december 2025 · Stagepact MBO 2023-2027 · Kennisinstituut voor Emancipatievraagstukken (KIS)</div>
 ` },
 
   { id:'bol-bbl', cats:['BOL','BBL'], stat:{n:'80/20', l:'BOL vs BBL verdeling'}, badge:'evergreen',
     title:'BOL of BBL: wat past bij jou?',
-    excerpt:'Twee manieren om je MBO-diploma te halen. Salaris, schooldagen, contract â€” volledig vergeleken.',
+    excerpt:'Twee manieren om je MBO-diploma te halen. Salaris, schooldagen, contract — volledig vergeleken.',
     time:'5', source:'SBB / OCO', featured:true, featClass:'feat-card-3',
     detail: () => `
 <h1 class="art-h1">BOL of BBL: wat past bij jou?</h1>
-<p class="art-intro">In het MBO kun je je diploma op twee manieren halen. Beide leerwegen leveren hetzelfde officiÃ«le diploma â€” maar de route verschilt fundamenteel.</p>
+<p class="art-intro">In het MBO kun je je diploma op twee manieren halen. Beide leerwegen leveren hetzelfde officiële diploma — maar de route verschilt fundamenteel.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-blue)">80%</div><div class="sbl">van MBO-studenten volgt BOL</div></div>
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">20%</div><div class="sbl">kiest BBL â€” werkend leren</div></div>
-  <div class="stat-box"><div class="sbn">1.600</div><div class="sbl">studieuren/jaar â€” beide leerwegen</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">20%</div><div class="sbl">kiest BBL — werkend leren</div></div>
+  <div class="stat-box"><div class="sbn">1.600</div><div class="sbl">studieuren/jaar — beide leerwegen</div></div>
 </div>
 <div class="art-sec">5 sleutelverschillen</div>
 <div class="compare">
   <div class="chead" style="grid-template-columns:1fr 1fr 1fr"><div>Aspect</div><div style="opacity:.7">BOL</div><div style="opacity:.7">BBL</div></div>
-  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Schooldagen</div><div class="cbol">4â€“5 dagen/week</div><div class="cbbl">1â€“2 dagen/week</div></div>
-  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Inkomen</div><div class="cbol">Geen loon â€” evt. stagevergoeding</div><div class="cbbl">Salaris + arbeidscontract</div></div>
-  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Studiefinanciering</div><div class="cbol">Ja (18â€“30 jr)</div><div class="cbbl">Nee (je verdient al)</div></div>
+  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Schooldagen</div><div class="cbol">4–5 dagen/week</div><div class="cbbl">1–2 dagen/week</div></div>
+  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Inkomen</div><div class="cbol">Geen loon — evt. stagevergoeding</div><div class="cbbl">Salaris + arbeidscontract</div></div>
+  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Studiefinanciering</div><div class="cbol">Ja (18–30 jr)</div><div class="cbbl">Nee (je verdient al)</div></div>
   <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Vakantie</div><div class="cbol">Schoolvakanties</div><div class="cbbl">~25 opgebouwde dagen</div></div>
 </div>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">ðŸ“š</div><div class="mini-t" style="color:var(--kb-blue)">Kies BOL als jeâ€¦</div><div class="mini-d">Nog geen werkgever hebt, graag samenwerkt met klasgenoten, of studiefinanciering wilt aanvragen.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">ðŸ”§</div><div class="mini-t" style="color:var(--kb-green-dk)">Kies BBL als jeâ€¦</div><div class="mini-d">Al weet wat je wil worden, direct wil verdienen en het liefst leert door te doen.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">📚</div><div class="mini-t" style="color:var(--kb-blue)">Kies BOL als je…</div><div class="mini-d">Nog geen werkgever hebt, graag samenwerkt met klasgenoten, of studiefinanciering wilt aanvragen.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">🔧</div><div class="mini-t" style="color:var(--kb-green-dk)">Kies BBL als je…</div><div class="mini-d">Al weet wat je wil worden, direct wil verdienen en het liefst leert door te doen.</div></div>
 </div>
-<div class="art-sources"><strong>Bronnen</strong>: SBB, s-bb.nl Â· OCO, onderwijsconsument.nl Â· Indeed NL, CarriÃ¨regids BOL BBL 2025</div>
+<div class="art-sources"><strong>Bronnen</strong>: SBB, s-bb.nl · OCO, onderwijsconsument.nl · Indeed NL, Carrièregids BOL BBL 2025</div>
 ` },
 
   { id:'stagevergoeding', cats:['BOL'], stat:{n:'41%', l:'van MBO-stagiairs krijgt een vergoeding'}, badge:'actueel',
     title:'Stagevergoeding 2025: wat heb je recht op?',
-    excerpt:'Niet wettelijk verplicht â€” maar er verandert veel. Onkostenvergoeding, wetsvoorstel 2026, gemiddelden per niveau.',
+    excerpt:'Niet wettelijk verplicht — maar er verandert veel. Onkostenvergoeding, wetsvoorstel 2026, gemiddelden per niveau.',
     time:'4', source:'CNV Jongeren / OCO',
     detail: () => `
 <h1 class="art-h1">Stagevergoeding 2025: wat heb je recht op?</h1>
-<p class="art-intro">Niet elke stagiair wordt betaald â€” en dat is (nog) legaal. Maar er zijn wÃ©l dingen die je werkgever verplicht is te dekken, en dat gaat binnenkort veranderen.</p>
+<p class="art-intro">Niet elke stagiair wordt betaald — en dat is (nog) legaal. Maar er zijn wél dingen die je werkgever verplicht is te dekken, en dat gaat binnenkort veranderen.</p>
 <div class="stats-row">
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">â‚¬182</div><div class="sbl">gem. MBO 4 dagen/week (stage.nl)</div></div>
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-amber)">41%</div><div class="sbl">van MBO-stagiairs krijgt Ã¼berhaupt een vergoeding</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">€182</div><div class="sbl">gem. MBO 4 dagen/week (stage.nl)</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-amber)">41%</div><div class="sbl">van MBO-stagiairs krijgt überhaupt een vergoeding</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-blue)">2026</div><div class="sbl">verwachte wetsbehandeling</div></div>
 </div>
-<div class="infobox ib-green"><div class="ibt">âœ“ Onkostenvergoeding â€” altijd verplicht (Stagepact 2023)</div><p>Je leerbedrijf moet <strong>alle kosten vergoeden die je maakt om stage te lopen</strong>: reiskosten, verplichte bedrijfskleding, VOG. Stage mag jou niets kosten.</p></div>
-<div class="infobox ib-amber"><div class="ibt">âš–ï¸ Stagevergoeding â€” niet verplicht, maar in opmars</div><p>Staat in steeds meer cao's: van 60 cao's in 2023 (10%) naar 103 in 2024 (17%). Check jouw cao op cao.nl.</p></div>
+<div class="infobox ib-green"><div class="ibt">✓ Onkostenvergoeding — altijd verplicht (Stagepact 2023)</div><p>Je leerbedrijf moet <strong>alle kosten vergoeden die je maakt om stage te lopen</strong>: reiskosten, verplichte bedrijfskleding, VOG. Stage mag jou niets kosten.</p></div>
+<div class="infobox ib-amber"><div class="ibt">⚖️ Stagevergoeding — niet verplicht, maar in opmars</div><p>Staat in steeds meer cao's: van 60 cao's in 2023 (10%) naar 103 in 2024 (17%). Check jouw cao op cao.nl.</p></div>
 <div class="art-sec">Gemiddelden 2025 per niveau</div>
 <div class="bars">
-  <div class="bar-row"><div class="bm"><span class="bl">MBO</span><span class="bv">â‚¬150â€“350/mnd</span></div><div class="bt"><div class="bf" style="width:35%;background:var(--kb-blue)"></div></div></div>
-  <div class="bar-row"><div class="bm"><span class="bl">HBO</span><span class="bv">â‚¬350â€“600/mnd</span></div><div class="bt"><div class="bf" style="width:60%;background:var(--kb-green)"></div></div></div>
-  <div class="bar-row"><div class="bm"><span class="bl">Rijksoverheid (alle niveaus)</span><span class="bv">â‚¬775/mnd (2025)</span></div><div class="bt"><div class="bf" style="width:80%;background:var(--kb-orange)"></div></div></div>
+  <div class="bar-row"><div class="bm"><span class="bl">MBO</span><span class="bv">€150–350/mnd</span></div><div class="bt"><div class="bf" style="width:35%;background:var(--kb-blue)"></div></div></div>
+  <div class="bar-row"><div class="bm"><span class="bl">HBO</span><span class="bv">€350–600/mnd</span></div><div class="bt"><div class="bf" style="width:60%;background:var(--kb-green)"></div></div></div>
+  <div class="bar-row"><div class="bm"><span class="bl">Rijksoverheid (alle niveaus)</span><span class="bv">€775/mnd (2025)</span></div><div class="bt"><div class="bf" style="width:80%;background:var(--kb-orange)"></div></div></div>
 </div>
-<div class="art-sources"><strong>Bronnen</strong>: Stage.nl, stagevergoeding 2025 Â· CNV Jongeren, cao-monitor 2024 Â· OCO, mbo-stagevergoeding Â· Rijksoverheid.nl, minimumloon stage</div>
+<div class="art-sources"><strong>Bronnen</strong>: Stage.nl, stagevergoeding 2025 · CNV Jongeren, cao-monitor 2024 · OCO, mbo-stagevergoeding · Rijksoverheid.nl, minimumloon stage</div>
 ` },
 
-  { id:'stagepact', cats:['BOL','BBL','School','Bedrijf'], stat:{n:'â‚¬30M', l:'Stagepact investering 2023â€“2027'}, badge:'actueel',
-    title:'Het Stagepact MBO 2023â€“2027 uitgelegd',
-    excerpt:'Vier doelen, â‚¬30 miljoen, 2027 als deadline. Wat hebben scholen, bedrijven en overheid beloofd?',
+  { id:'stagepact', cats:['BOL','BBL','School','Bedrijf'], stat:{n:'€30M', l:'Stagepact investering 2023–2027'}, badge:'actueel',
+    title:'Het Stagepact MBO 2023–2027 uitgelegd',
+    excerpt:'Vier doelen, €30 miljoen, 2027 als deadline. Wat hebben scholen, bedrijven en overheid beloofd?',
     time:'4', source:'Rijksoverheid',
     detail: () => `
-<h1 class="art-h1">Het Stagepact MBO 2023â€“2027</h1>
-<p class="art-intro">In februari 2023 ondertekenden studenten, scholen, werkgevers en de rijksoverheid een pact voor een eerlijkere stagemarkt. Vier doelen, Ã©Ã©n deadline: 2027.</p>
+<h1 class="art-h1">Het Stagepact MBO 2023–2027</h1>
+<p class="art-intro">In februari 2023 ondertekenden studenten, scholen, werkgevers en de rijksoverheid een pact voor een eerlijkere stagemarkt. Vier doelen, één deadline: 2027.</p>
 <div class="stats-row">
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-orange)">â‚¬30M</div><div class="sbl">overheidsinvestering</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-orange)">€30M</div><div class="sbl">overheidsinvestering</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">4</div><div class="sbl">meetbare doelen</div></div>
   <div class="stat-box"><div class="sbn">2027</div><div class="sbl">herijkingsmoment</div></div>
 </div>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">ðŸ¤</div><div class="mini-t">Betere begeleiding</div><div class="mini-d">Min. 3 contactmomenten per stage â€” Ã©Ã©n bij het leerbedrijf zelf.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">âš–</div><div class="mini-t">Geen discriminatie</div><div class="mini-d">Stagematching op leerwensen. Geen klikgesprekken meer.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">ðŸ¢</div><div class="mini-t">Voldoende plekken</div><div class="mini-d">SBB monitort actief vraag en aanbod.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">ðŸ’¶</div><div class="mini-t">Passende vergoeding</div><div class="mini-d">Onkostenvergoeding verplicht. Stagevergoeding via cao's en straks wettelijk.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">🤝</div><div class="mini-t">Betere begeleiding</div><div class="mini-d">Min. 3 contactmomenten per stage — één bij het leerbedrijf zelf.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">⚖</div><div class="mini-t">Geen discriminatie</div><div class="mini-d">Stagematching op leerwensen. Geen klikgesprekken meer.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">🏢</div><div class="mini-t">Voldoende plekken</div><div class="mini-d">SBB monitort actief vraag en aanbod.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">💶</div><div class="mini-t">Passende vergoeding</div><div class="mini-d">Onkostenvergoeding verplicht. Stagevergoeding via cao's en straks wettelijk.</div></div>
 </div>
-<div class="art-sources"><strong>Bron</strong>: Rijksoverheid.nl, Stagepact MBO 2023â€“2027 Â· Kennispunt BPV Â· MBO Raad</div>
+<div class="art-sources"><strong>Bron</strong>: Rijksoverheid.nl, Stagepact MBO 2023–2027 · Kennispunt BPV · MBO Raad</div>
 ` },
 
-  { id:'bbl-rechten', cats:['BBL'], stat:{n:'â‚¬2.700', l:"subsidie per BBL'er per jaar"}, badge:'evergreen',
+  { id:'bbl-rechten', cats:['BBL'], stat:{n:'€2.700', l:"subsidie per BBL'er per jaar"}, badge:'evergreen',
     title:'BBL: jouw rechten als werknemer-in-opleiding',
-    excerpt:"Als BBL'er ben je juridisch een werknemer. Salaris, vakantiedagen, subsidie voor je werkgever â€” alles uitgelegd.",
+    excerpt:"Als BBL'er ben je juridisch een werknemer. Salaris, vakantiedagen, subsidie voor je werkgever — alles uitgelegd.",
     time:'5', source:'SBB / RVO',
     detail: () => `
 <h1 class="art-h1">BBL: jouw rechten als werknemer-in-opleiding</h1>
-<p class="art-intro">Bij een BBL-opleiding ben je juridisch gezien een werknemer. Je hebt een arbeidscontract, recht op salaris en vakantiedagen â€” en je werkgever heeft verplichtingen tegenover jou.</p>
+<p class="art-intro">Bij een BBL-opleiding ben je juridisch gezien een werknemer. Je hebt een arbeidscontract, recht op salaris en vakantiedagen — en je werkgever heeft verplichtingen tegenover jou.</p>
 <div class="pills">
   <span class="pill ok">Salaris (CAO of wettelijk minimum)</span>
   <span class="pill ok">Betaalde schooldag</span>
@@ -1025,11 +1025,11 @@ const kbArticles = [
   <span class="pill ok">Begeleiding op de werkvloer</span>
   <span class="pill ok">Ontslagbescherming</span>
 </div>
-<div class="infobox ib-green"><div class="ibt">ðŸ’° Subsidie voor jouw werkgever</div><p>Bedrijven die een BBL'er begeleiden kunnen bij RVO de <strong>Subsidieregeling Praktijkleren</strong> aanvragen: max. <strong>â‚¬2.700 per student per jaar</strong>. Dit maakt jou extra aantrekkelijk als kandidaat.</p></div>
-<div class="art-sources"><strong>Bronnen</strong>: SBB, s-bb.nl Â· RVO, Subsidieregeling Praktijkleren Â· BOVAG, BBL-gids 2025</div>
+<div class="infobox ib-green"><div class="ibt">💰 Subsidie voor jouw werkgever</div><p>Bedrijven die een BBL'er begeleiden kunnen bij RVO de <strong>Subsidieregeling Praktijkleren</strong> aanvragen: max. <strong>€2.700 per student per jaar</strong>. Dit maakt jou extra aantrekkelijk als kandidaat.</p></div>
+<div class="art-sources"><strong>Bronnen</strong>: SBB, s-bb.nl · RVO, Subsidieregeling Praktijkleren · BOVAG, BBL-gids 2025</div>
 ` },
 
-  { id:'internationaal', cats:['Internationaal'], stat:{n:'EU', l:'vrij te werken â€” geen vergunning nodig'}, badge:'evergreen',
+  { id:'internationaal', cats:['Internationaal'], stat:{n:'EU', l:'vrij te werken — geen vergunning nodig'}, badge:'evergreen',
     title:'Internationaal student: stage in Nederland',
     excerpt:'EU-burgers: vrijheid van beweging, geen vergunning. Non-EU: regels per situatie. Zoekjaar, Erasmus+, BSN.',
     time:'5', source:'IND / StudyInNL',
@@ -1037,43 +1037,43 @@ const kbArticles = [
 <h1 class="art-h1">Internationaal student: stage in Nederland</h1>
 <p class="art-intro">De regels voor een stage in Nederland hangen sterk af van je nationaliteit en situatie. Hier is een overzicht van wat voor jou geldt.</p>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-teal)"><div class="mini-icon">ðŸ‡ªðŸ‡º</div><div class="mini-t" style="color:var(--kb-teal)">EU / EEA / Zwitserland</div><div class="mini-d">Vrijheid van beweging. Geen werkvergunning nodig. Registreer bij de gemeente voor een BSN-nummer. Sluit Nederlandse zorgverzekering af.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">ðŸ“„</div><div class="mini-t" style="color:var(--kb-amber)">Non-EU (studerend in NL)</div><div class="mini-d">Stage als verplicht onderdeel van je opleiding: geen aparte vergunning nodig. Check je verblijfsvergunning (IND.nl).</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">âš ï¸</div><div class="mini-t" style="color:var(--kb-red)">Non-EU (vanuit buitenland)</div><div class="mini-d">GVVA (gecombineerde vergunning) nodig bij stage langer dan 90 dagen. Max 6 maanden voor MBO. Vergoeding â‰¥50% minimumloon.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">ðŸŽ“</div><div class="mini-t" style="color:var(--kb-green-dk)">Zoekjaar (Orientation Year)</div><div class="mini-d">Non-EU afgestudeerden (HBO/WO) kunnen een zoekjaarvergunning aanvragen. 1 jaar in NL werken of stagelopen. Aanvragen via IND.nl.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-teal)"><div class="mini-icon">🇪🇺</div><div class="mini-t" style="color:var(--kb-teal)">EU / EEA / Zwitserland</div><div class="mini-d">Vrijheid van beweging. Geen werkvergunning nodig. Registreer bij de gemeente voor een BSN-nummer. Sluit Nederlandse zorgverzekering af.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">📄</div><div class="mini-t" style="color:var(--kb-amber)">Non-EU (studerend in NL)</div><div class="mini-d">Stage als verplicht onderdeel van je opleiding: geen aparte vergunning nodig. Check je verblijfsvergunning (IND.nl).</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">⚠️</div><div class="mini-t" style="color:var(--kb-red)">Non-EU (vanuit buitenland)</div><div class="mini-d">GVVA (gecombineerde vergunning) nodig bij stage langer dan 90 dagen. Max 6 maanden voor MBO. Vergoeding ≥50% minimumloon.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">🎓</div><div class="mini-t" style="color:var(--kb-green-dk)">Zoekjaar (Orientation Year)</div><div class="mini-d">Non-EU afgestudeerden (HBO/WO) kunnen een zoekjaarvergunning aanvragen. 1 jaar in NL werken of stagelopen. Aanvragen via IND.nl.</div></div>
 </div>
-<div class="infobox ib-teal"><div class="ibt">âœˆï¸ Erasmus+ voor EU-studenten</div><p>Studeer je in een EU-land en wil je stage in Nederland? Dan kom je mogelijk in aanmerking voor een <strong>Erasmus+ beurs van â‚¬400â€“600/maand</strong>. Vraag het na bij je onderwijsinstelling.</p></div>
-<div class="infobox ib-green"><div class="ibt">ðŸ’¡ Praktische tips</div><p>Vraag een BSN-nummer aan direct na aankomst. Platforms als LinkedIn, Internly en Stagemarkt.nl bieden ook Engelstalige vacatures. Amsterdam, Rotterdam en tech-bedrijven werken vaak in het Engels.</p></div>
-<div class="art-sources"><strong>Bronnen</strong>: IND.nl, Intern or apprentice in the Netherlands Â· StudyInNL.org Â· Government.nl, internships for foreign students Â· Erasmus+, erasmus.nl</div>
+<div class="infobox ib-teal"><div class="ibt">✈️ Erasmus+ voor EU-studenten</div><p>Studeer je in een EU-land en wil je stage in Nederland? Dan kom je mogelijk in aanmerking voor een <strong>Erasmus+ beurs van €400–600/maand</strong>. Vraag het na bij je onderwijsinstelling.</p></div>
+<div class="infobox ib-green"><div class="ibt">💡 Praktische tips</div><p>Vraag een BSN-nummer aan direct na aankomst. Platforms als LinkedIn, Internly en Stagemarkt.nl bieden ook Engelstalige vacatures. Amsterdam, Rotterdam en tech-bedrijven werken vaak in het Engels.</p></div>
+<div class="art-sources"><strong>Bronnen</strong>: IND.nl, Intern or apprentice in the Netherlands · StudyInNL.org · Government.nl, internships for foreign students · Erasmus+, erasmus.nl</div>
 ` },
 
   { id:'mbo-niveaus', cats:['BOL','BBL'], stat:{n:'4', l:'niveaus, elk ander diploma & profiel'}, badge:'evergreen',
-    title:'MBO niveaus 1â€“4: wat houdt elk niveau in?',
+    title:'MBO niveaus 1–4: wat houdt elk niveau in?',
     excerpt:'Van entreeopleiding tot middenkader. Toelatingseisen, duur en doorstroomopties per niveau.',
     time:'4', source:'DUO / ROC van Amsterdam',
     detail: () => `
-<h1 class="art-h1">MBO niveaus 1â€“4</h1>
+<h1 class="art-h1">MBO niveaus 1–4</h1>
 <p class="art-intro">Het MBO kent vier niveaus, elk met eigen toelatingseisen, duur en toekomstperspectief. Zo vind je jouw plek.</p>
 <div class="compare">
   <div class="chead" style="grid-template-columns:50px 1fr 1fr 1fr"><div>Niv.</div><div style="opacity:.7">Instroom</div><div style="opacity:.7">Duur</div><div style="opacity:.7">Daarna</div></div>
   <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-ink3)">1</div><div>Geen diploma</div><div>1 jr</div><div>Niveau 2 of werk</div></div>
-  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-blue)">2</div><div>VMBO b/k</div><div>1â€“2 jr</div><div>Niveau 3 of werk</div></div>
-  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-green)">3</div><div>VMBO k/tl of MBO-2</div><div>2â€“3 jr</div><div>Niveau 4 of werk</div></div>
-  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-orange)">4</div><div>VMBO k/tl, HAVO of MBO-3</div><div>1â€“4 jr</div><div>HBO of management</div></div>
+  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-blue)">2</div><div>VMBO b/k</div><div>1–2 jr</div><div>Niveau 3 of werk</div></div>
+  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-green)">3</div><div>VMBO k/tl of MBO-2</div><div>2–3 jr</div><div>Niveau 4 of werk</div></div>
+  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-orange)">4</div><div>VMBO k/tl, HAVO of MBO-3</div><div>1–4 jr</div><div>HBO of management</div></div>
 </div>
-<div class="infobox ib-blue"><div class="ibt">ðŸŽ“ Niveau 4 â†’ HBO</div><p>Met een MBO niveau 4-diploma kun je doorstromen naar het HBO. Dat maakt niveau 4 uniek: het is tegelijk een beroepsopleiding Ã©n een opstap naar verder studeren.</p></div>
-<div class="art-sources"><strong>Bronnen</strong>: ROC van Amsterdam, bol-bbl-niveaus Â· DUO, kwalificatiestructuur MBO Â· KiesMBO.nl</div>
+<div class="infobox ib-blue"><div class="ibt">🎓 Niveau 4 → HBO</div><p>Met een MBO niveau 4-diploma kun je doorstromen naar het HBO. Dat maakt niveau 4 uniek: het is tegelijk een beroepsopleiding én een opstap naar verder studeren.</p></div>
+<div class="art-sources"><strong>Bronnen</strong>: ROC van Amsterdam, bol-bbl-niveaus · DUO, kwalificatiestructuur MBO · KiesMBO.nl</div>
 ` },
 
-  { id:'subsidie', cats:['Bedrijf'], stat:{n:'â‚¬2.700', l:'per BBL-student per jaar (RVO)'}, badge:'actueel',
+  { id:'subsidie', cats:['Bedrijf'], stat:{n:'€2.700', l:'per BBL-student per jaar (RVO)'}, badge:'actueel',
     title:'Subsidie Praktijkleren: zo vraag je het aan',
-    excerpt:'Begeleid je een BBL-student? Max â‚¬2.700/jaar via RVO. Voorwaarden, deadlines, wat je moet bewaren.',
+    excerpt:'Begeleid je een BBL-student? Max €2.700/jaar via RVO. Voorwaarden, deadlines, wat je moet bewaren.',
     time:'3', source:'RVO.nl',
     detail: () => `
 <h1 class="art-h1">Subsidie Praktijkleren: zo vraag je het aan</h1>
-<p class="art-intro">Begeleid je een BBL-student? Dan heb je recht op maximaal â‚¬2.700 per student per jaar via de Subsidieregeling Praktijkleren van RVO.</p>
+<p class="art-intro">Begeleid je een BBL-student? Dan heb je recht op maximaal €2.700 per student per jaar via de Subsidieregeling Praktijkleren van RVO.</p>
 <div class="stats-row">
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">â‚¬2.700</div><div class="sbl">max. per BBL-student per jaar</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">€2.700</div><div class="sbl">max. per BBL-student per jaar</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-blue)">RVO</div><div class="sbl">aanvragen na afloop studiejaar</div></div>
 </div>
 <div class="pills">
@@ -1082,8 +1082,8 @@ const kbArticles = [
   <span class="pill ok">Volledig studiejaar begeleid</span>
   <span class="pill ok">Aanvraag binnen periode</span>
 </div>
-<div class="infobox ib-orange"><div class="ibt">ðŸ“‹ Aanvraag nÃ¡ het studiejaar</div><p>Bewaar: aanwezigheidsregistratie, begeleidingsverslagen en kopie van de BPV-overeenkomst. Check <strong>rvo.nl</strong> voor exacte deadlines.</p></div>
-<div class="art-sources"><strong>Bron</strong>: RVO.nl, Subsidieregeling Praktijkleren Â· Business.gov.nl</div>
+<div class="infobox ib-orange"><div class="ibt">📋 Aanvraag ná het studiejaar</div><p>Bewaar: aanwezigheidsregistratie, begeleidingsverslagen en kopie van de BPV-overeenkomst. Check <strong>rvo.nl</strong> voor exacte deadlines.</p></div>
+<div class="art-sources"><strong>Bron</strong>: RVO.nl, Subsidieregeling Praktijkleren · Business.gov.nl</div>
 ` },
 
   { id:'esg', cats:['Bedrijf'], stat:{n:'CSRD', l:'sociale impact verplicht rapporteren'}, badge:'actueel',
@@ -1092,34 +1092,34 @@ const kbArticles = [
     time:'4', source:'VSME / Internly',
     detail: () => `
 <h1 class="art-h1">ESG & stagiairs: sociale impact voor CSRD</h1>
-<p class="art-intro">De Corporate Sustainability Reporting Directive (CSRD) verplicht bedrijven te rapporteren over sociale impact. Stages zijn directe, meetbare bijdragen â€” als je de data bijhoudt.</p>
+<p class="art-intro">De Corporate Sustainability Reporting Directive (CSRD) verplicht bedrijven te rapporteren over sociale impact. Stages zijn directe, meetbare bijdragen — als je de data bijhoudt.</p>
 <div class="two-col">
-  <div class="mini"><div class="mini-icon">ðŸ‘¥</div><div class="mini-t">S: Talentontwikkeling</div><div class="mini-d">Aantal stagiairs, leerdoelen behaald, doorstroom naar vaste aanstelling.</div></div>
-  <div class="mini"><div class="mini-icon">âš–ï¸</div><div class="mini-t">S: Gelijke kansen</div><div class="mini-d">Diversiteit stagiairs, vergoeding betaald/niet betaald, inclusiviteitsbeleid.</div></div>
-  <div class="mini"><div class="mini-icon">ðŸ«</div><div class="mini-t">S: Community</div><div class="mini-d">Samenwerking met scholen, bijdrage aan beschikbaarheid stageplekken.</div></div>
-  <div class="mini"><div class="mini-icon">ðŸ“Š</div><div class="mini-t">G: Begeleidingskwaliteit</div><div class="mini-d">Trust Score, studenttevredenheid, leerdoelrealisatie â€” meetbaar via Internly.</div></div>
+  <div class="mini"><div class="mini-icon">👥</div><div class="mini-t">S: Talentontwikkeling</div><div class="mini-d">Aantal stagiairs, leerdoelen behaald, doorstroom naar vaste aanstelling.</div></div>
+  <div class="mini"><div class="mini-icon">⚖️</div><div class="mini-t">S: Gelijke kansen</div><div class="mini-d">Diversiteit stagiairs, vergoeding betaald/niet betaald, inclusiviteitsbeleid.</div></div>
+  <div class="mini"><div class="mini-icon">🏫</div><div class="mini-t">S: Community</div><div class="mini-d">Samenwerking met scholen, bijdrage aan beschikbaarheid stageplekken.</div></div>
+  <div class="mini"><div class="mini-icon">📊</div><div class="mini-t">G: Begeleidingskwaliteit</div><div class="mini-d">Trust Score, studenttevredenheid, leerdoelrealisatie — meetbaar via Internly.</div></div>
 </div>
-<div class="infobox ib-green"><div class="ibt">ðŸ“ˆ Kant-en-klare export via Internly</div><p>Internly genereert automatisch een VSME-conforme ESG-export voor je jaarverslag.</p></div>
-<div class="art-sources"><strong>Bronnen</strong>: CSRD, VSME-standaard Â· Internly ESG-module Â· Business.gov.nl</div>
+<div class="infobox ib-green"><div class="ibt">📈 Kant-en-klare export via Internly</div><p>Internly genereert automatisch een VSME-conforme ESG-export voor je jaarverslag.</p></div>
+<div class="art-sources"><strong>Bronnen</strong>: CSRD, VSME-standaard · Internly ESG-module · Business.gov.nl</div>
 ` },
 
   { id:'stagematching', cats:['School'], stat:{n:'+20%', l:'minder zoektijd bij stagematching (ROA)'}, badge:'actueel',
     title:'Stagematching: eerlijker stages voor iedereen',
-    excerpt:'Stagematching koppelt op leerwensen, niet op uiterlijk. Hoe je het invoert als school â€” en wat Internly doet.',
+    excerpt:'Stagematching koppelt op leerwensen, niet op uiterlijk. Hoe je het invoert als school — en wat Internly doet.',
     time:'3', source:'ROA / Stagepact',
     detail: () => `
 <h1 class="art-h1">Stagematching: eerlijker stages voor iedereen</h1>
-<p class="art-intro">Traditioneel zoeken studenten zelf een stageplek â€” met alle ongelijkheid van dien. Stagematching draait dit om.</p>
+<p class="art-intro">Traditioneel zoeken studenten zelf een stageplek — met alle ongelijkheid van dien. Stagematching draait dit om.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">70%</div><div class="sbl">NL-achtergrond: vindt stage na 1e poging (ROA)</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-red)">50%</div><div class="sbl">niet-westerse achtergrond: pas na meerdere pogingen</div></div>
 </div>
 <div class="steps">
-  <div class="step"><div class="snum">1</div><div class="sbody"><h4>Student vult leerdoelen in</h4><p>Geen cv of foto â€” leerdoelen, motivatie en ambities vormen het matching-profiel.</p></div></div>
-  <div class="step"><div class="snum">2</div><div class="sbody"><h4>Algoritme koppelt op inhoud</h4><p>Bedrijven worden gematcht op domein-fit en Trust Score â€” niet op naam of uiterlijk.</p></div></div>
+  <div class="step"><div class="snum">1</div><div class="sbody"><h4>Student vult leerdoelen in</h4><p>Geen cv of foto — leerdoelen, motivatie en ambities vormen het matching-profiel.</p></div></div>
+  <div class="step"><div class="snum">2</div><div class="sbody"><h4>Algoritme koppelt op inhoud</h4><p>Bedrijven worden gematcht op domein-fit en Trust Score — niet op naam of uiterlijk.</p></div></div>
   <div class="step"><div class="snum">3</div><div class="sbody"><h4>School ziet het dashboard</h4><p>Begeleiders zien direct wie vastloopt en welke bedrijven betrouwbaar zijn.</p></div></div>
 </div>
-<div class="art-sources"><strong>Bronnen</strong>: ROA, Schoolverlaters tussen onderwijs en arbeidsmarkt Â· Stagepact MBO 2023â€“2027, toolbox stagematching Â· KIS</div>
+<div class="art-sources"><strong>Bronnen</strong>: ROA, Schoolverlaters tussen onderwijs en arbeidsmarkt · Stagepact MBO 2023–2027, toolbox stagematching · KIS</div>
 ` },
 
   { id:'buddy', cats:['Buddy'], stat:{n:'1:1', l:'persoonlijke koppeling op aanvraag'}, badge:'evergreen',
@@ -1128,26 +1128,26 @@ const kbArticles = [
     time:'3', source:'Internly',
     detail: () => `
 <h1 class="art-h1">De stagebuddy: wie, wat en waarom?</h1>
-<p class="art-intro">Een stagebuddy is een vrijwillige gepensioneerde professional die jou begeleidt als je dat wil. Geen beoordelaar, geen rapporteur â€” gewoon iemand met ervaring die er voor je is.</p>
+<p class="art-intro">Een stagebuddy is een vrijwillige gepensioneerde professional die jou begeleidt als je dat wil. Geen beoordelaar, geen rapporteur — gewoon iemand met ervaring die er voor je is.</p>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸ’¬</div><div class="mini-t">Klankbord</div><div class="mini-d">Alles vragen wat je liever niet aan begeleider of school vraagt. Neutraal en vertrouwelijk.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸ§­</div><div class="mini-t">Richting geven</div><div class="mini-d">Hoe ga je om met moeilijke situaties op de werkvloer? Een buddy heeft dat zelf meegemaakt.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸ““</div><div class="mini-t">Notitieboekje</div><div class="mini-d">PrivÃ© notities die alleen jij kunt zien. Bijhouden wat je hebt besproken.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸŒ±</div><div class="mini-t">Geen beoordeling</div><div class="mini-d">Nooit een rapport. Nooit voor de school. Alleen jouw ontwikkeling als doel.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">💬</div><div class="mini-t">Klankbord</div><div class="mini-d">Alles vragen wat je liever niet aan begeleider of school vraagt. Neutraal en vertrouwelijk.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">🧭</div><div class="mini-t">Richting geven</div><div class="mini-d">Hoe ga je om met moeilijke situaties op de werkvloer? Een buddy heeft dat zelf meegemaakt.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">📓</div><div class="mini-t">Notitieboekje</div><div class="mini-d">Privé notities die alleen jij kunt zien. Bijhouden wat je hebt besproken.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">🌱</div><div class="mini-t">Geen beoordeling</div><div class="mini-d">Nooit een rapport. Nooit voor de school. Alleen jouw ontwikkeling als doel.</div></div>
 </div>
-<div class="infobox" style="background:var(--kb-purple-bg);border-left:3px solid var(--kb-purple)"><div class="ibt" style="color:var(--kb-purple)">âœ“ Altijd opt-in, nooit verplicht</div><p style="color:var(--kb-ink2)">Je vraagt het zelf aan als je het wil. Nooit verplicht. Expliciete toestemming voor koppeling. Altijd opzegbaar.</p></div>
+<div class="infobox" style="background:var(--kb-purple-bg);border-left:3px solid var(--kb-purple)"><div class="ibt" style="color:var(--kb-purple)">✓ Altijd opt-in, nooit verplicht</div><p style="color:var(--kb-ink2)">Je vraagt het zelf aan als je het wil. Nooit verplicht. Expliciete toestemming voor koppeling. Altijd opzegbaar.</p></div>
 ` },
 ];
 
 const kbTipsNL = [
   'Check altijd of een bedrijf erkend is via s-bb.nl',
-  'Stagevergoeding niet ontvangen? Onkostenvergoeding is wÃ©l verplicht',
-  "Als BBL'er ben je juridisch werknemer â€” met alle rechten van dien",
+  'Stagevergoeding niet ontvangen? Onkostenvergoeding is wél verplicht',
+  "Als BBL'er ben je juridisch werknemer — met alle rechten van dien",
   'Ghosting melden kan bij SBB: s-bb.nl/meldpunt',
-  'Stagediscriminatie meemaken? Altijd melden â€” recht op vervangende stage',
-  'Erasmus+ beurs voor EU-studenten: â‚¬400â€“600/maand voor stage in NL',
+  'Stagediscriminatie meemaken? Altijd melden — recht op vervangende stage',
+  'Erasmus+ beurs voor EU-studenten: €400–600/maand voor stage in NL',
   'Stagepact 2023-2027: minimaal 3 contactmomenten per stage verplicht',
-  'BBL-werkgever? Claim je subsidie Praktijkleren bij RVO: max â‚¬2.700/jr',
+  'BBL-werkgever? Claim je subsidie Praktijkleren bij RVO: max €2.700/jr',
   'Wil je overstappen van BOL naar BBL? Bespreek dit met je school',
   'MBO niveau 4-diploma geeft toegang tot het HBO',
 ];
@@ -1158,8 +1158,8 @@ const kbSClass  = { BOL:'s-bol',  BBL:'s-bbl',  Bedrijf:'s-bedrijf',  School:'s-
 
 const kbCatOrder = ['BOL','BBL','Bedrijf','School','Internationaal','Buddy'];
 const kbCatLabels = {
-  BOL:'BOL â€” Beroepsopleidende Leerweg',
-  BBL:'BBL â€” Beroepsbegeleidende Leerweg',
+  BOL:'BOL — Beroepsopleidende Leerweg',
+  BBL:'BBL — Beroepsbegeleidende Leerweg',
   Bedrijf:'Voor bedrijven',
   School:'Voor scholen & begeleiders',
   Internationaal:'Internationale studenten',
@@ -1168,14 +1168,14 @@ const kbCatLabels = {
 
 let kbCurAud = 'alle';
 
-/* â”€â”€ TICKER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── TICKER ─────────────────────────────────────────────────────────── */
 function kbBuildTicker() {
   const doubled = [...kbTipsNL, ...kbTipsNL];
   document.getElementById('ticker').innerHTML =
     doubled.map(t => `<span class="ticker-item">${t}</span>`).join('');
 }
 
-/* â”€â”€ AUDIENCE TILES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── AUDIENCE TILES ─────────────────────────────────────────────────── */
 function kbBuildAud() {
   const g = document.getElementById('audGrid');
   g.innerHTML = kbAUD.map(a => `
@@ -1196,7 +1196,7 @@ function kbSelectAud(key) {
   }
 }
 
-/* â”€â”€ FEATURED â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── FEATURED ───────────────────────────────────────────────────────── */
 function kbBuildFeatured() {
   const featArts = kbArticles.filter(a => a.featured && (kbCurAud==='alle' || a.cats.includes(kbCurAud)));
   const fallback = kbArticles.filter(a => kbCurAud==='alle' || a.cats.includes(kbCurAud)).slice(0,3);
@@ -1204,7 +1204,7 @@ function kbBuildFeatured() {
   const classes = ['feat-card-1','feat-card-2','feat-card-3'];
   document.getElementById('featGrid').innerHTML = toShow.map((a,i) => `
     <div class="feat-card ${classes[i%3]} reveal" onclick="kbOpenArt('${a.id}')" style="animation-delay:${i*.1}s">
-      <div class="feat-bg-num" aria-hidden="true">${a.stat.n.replace(/[â‚¬M%]/g,'').replace(' op ','')}</div>
+      <div class="feat-bg-num" aria-hidden="true">${a.stat.n.replace(/[€M%]/g,'').replace(' op ','')}</div>
       <div class="feat-tag">${a.cats[0]}</div>
       <div class="feat-title">${a.title}</div>
       <div class="feat-excerpt">${a.stat.n} ${a.stat.l}</div>
@@ -1212,7 +1212,7 @@ function kbBuildFeatured() {
   kbRevealEls();
 }
 
-/* â”€â”€ ARTICLE GRID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── ARTICLE GRID ───────────────────────────────────────────────────── */
 function kbBuildGrid() {
   const el = document.getElementById('artInner');
   const cats = (kbCurAud === 'alle') ? kbCatOrder : [kbCurAud];
@@ -1239,7 +1239,7 @@ function kbBuildGrid() {
   kbRevealEls();
 }
 
-/* â”€â”€ OVERLAY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── OVERLAY ────────────────────────────────────────────────────────── */
 function kbOpenArt(id) {
   const a = kbArticles.find(x => x.id === id);
   if (!a) return;
@@ -1272,7 +1272,7 @@ function kbBuildRelated(id, cats) {
   </div>`;
 }
 
-/* â”€â”€ REVEAL OBSERVER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── REVEAL OBSERVER ────────────────────────────────────────────────── */
 function kbRevealEls() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); obs.unobserve(e.target); } });
@@ -1280,7 +1280,7 @@ function kbRevealEls() {
   document.querySelectorAll('.reveal:not(.revealed)').forEach(el => obs.observe(el));
 }
 
-/* â”€â”€ COUNTER ANIMATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── COUNTER ANIMATION ──────────────────────────────────────────────── */
 function kbAnimateCounters() {
   document.querySelectorAll('.counter').forEach(el => {
     const target = parseInt(el.dataset.target);
@@ -1294,23 +1294,23 @@ function kbAnimateCounters() {
   });
 }
 
-/* â”€â”€ CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── CTA ────────────────────────────────────────────────────────────── */
 function kbApplyCTA() {
-  // NL-only â€” geen toggle in deze versie
+  // NL-only — geen toggle in deze versie
   const els = {
     ctaHeadline: 'Vind jouw stageplek op Internly',
-    ctaSub:      'Transparante werkgevers Â· Trust Score zichtbaar vÃ³Ã³r je solliciteert Â· Altijd gratis voor studenten',
-    ctaTrust:    'Voor studenten altijd gratis Â· Geen spam Â· Op elk moment afmelden',
-    ctaBtnP:     'Meld je nu aan â†’',
+    ctaSub:      'Transparante werkgevers · Trust Score zichtbaar vóór je solliciteert · Altijd gratis voor studenten',
+    ctaTrust:    'Voor studenten altijd gratis · Geen spam · Op elk moment afmelden',
+    ctaBtnP:     'Meld je nu aan →',
     ctaBtnG:     'Bekijk vacatures',
-    sbTitle:     'Vind jouw stage op Internly â€” altijd gratis voor studenten',
-    sbSub:       'Transparante werkgevers Â· Trust Score Â· Geen ghosting meer',
-    sbBtn:       'Meld je aan â†’',
+    sbTitle:     'Vind jouw stage op Internly — altijd gratis voor studenten',
+    sbSub:       'Transparante werkgevers · Trust Score · Geen ghosting meer',
+    sbBtn:       'Meld je aan →',
   };
   Object.entries(els).forEach(([k,v]) => { const el = document.getElementById(k); if (el) el.textContent = v; });
 }
 
-/* â”€â”€ STICKY BAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── STICKY BAR ─────────────────────────────────────────────────────── */
 let kbBarDismissed = false;
 function kbDismissBar() {
   kbBarDismissed = true;
@@ -1328,13 +1328,13 @@ setTimeout(() => {
   }
 }, 2500);
 
-/* â”€â”€ DEEP LINK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── DEEP LINK ──────────────────────────────────────────────────────── */
 function kbCheckDeepLink() {
   const id = new URLSearchParams(window.location.search).get('artikel');
   if (id) kbOpenArt(id);
 }
 
-/* â”€â”€ AUTH-AWARE CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── AUTH-AWARE CTA ─────────────────────────────────────────────────── */
 async function kbInitAuthCTA() {
   try {
     if (typeof db === 'undefined' || !db?.auth) return;
@@ -1347,24 +1347,24 @@ async function kbInitAuthCTA() {
   } catch (e) { /* niet ingelogd, doe niets */ }
 }
 
-/* â”€â”€ KEY CLOSE OVERLAY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── KEY CLOSE OVERLAY ──────────────────────────────────────────────── */
 document.addEventListener('keydown', e => { if (e.key === 'Escape') kbCloseOverlay(); });
 
-/* â”€â”€ BILINGUAL â€” kbT static labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── BILINGUAL — kbT static labels ─────────────────────────────────── */
 const kbLang = { current: 'nl' };
 
 const kbT = {
   nl: {
     hk:'Kennisbank 2025',
     hh:'Alles over stages.<br><em>Eerlijk &amp; duidelijk.</em>',
-    hs:'Van rechten tot kansen â€” voor studenten, bedrijven en scholen. Kies wie je bent en we tonen wat voor jou relevant is.',
+    hs:'Van rechten tot kansen — voor studenten, bedrijven en scholen. Kies wie je bent en we tonen wat voor jou relevant is.',
     cl1:'ervaart ghosting van een stagebedrijf',
     cl2:'MBO-studenten ervaart stagediscriminatie',
     cl2pct:' op 10',
     cl3:'overheidsinvestering in het Stagepact',
     scrollTip:'scroll',
     audLabel:'Voor wie zoek je informatie?',
-    audSub:'Kies je perspectief â€” de kennisbank past zich aan.',
+    audSub:'Kies je perspectief — de kennisbank past zich aan.',
     featLabel:'Meest gelezen',
     backLabel:'Kennisbank',
     verderLezen:'Verder lezen',
@@ -1376,14 +1376,14 @@ const kbT = {
   en: {
     hk:'Knowledge Base 2025',
     hh:'Everything about internships.<br><em>Honest &amp; clear.</em>',
-    hs:'From rights to opportunities â€” for students, companies and schools. Choose who you are and we show what is relevant for you.',
+    hs:'From rights to opportunities — for students, companies and schools. Choose who you are and we show what is relevant for you.',
     cl1:'experience ghosting from a company',
     cl2:'MBO students experience stage discrimination',
     cl2pct:' in 10',
     cl3:'government investment in the Stage Pact',
     scrollTip:'scroll',
     audLabel:'Who are you looking for information for?',
-    audSub:'Choose your perspective â€” the knowledge base adapts.',
+    audSub:'Choose your perspective — the knowledge base adapts.',
     featLabel:'Most read',
     backLabel:'Knowledge base',
     verderLezen:'Further reading',
@@ -1397,40 +1397,40 @@ const kbT = {
 const kbCtaStrings = {
   nl: {
     ctaHeadline:'Vind jouw stageplek op Internly',
-    ctaSub:'Transparante werkgevers Â· Trust Score zichtbaar vÃ³Ã³r je solliciteert Â· Altijd gratis voor studenten',
-    ctaTrust:'Voor studenten altijd gratis Â· Geen spam Â· Op elk moment afmelden',
-    ctaBtnP:'Meld je nu aan â†’',
+    ctaSub:'Transparante werkgevers · Trust Score zichtbaar vóór je solliciteert · Altijd gratis voor studenten',
+    ctaTrust:'Voor studenten altijd gratis · Geen spam · Op elk moment afmelden',
+    ctaBtnP:'Meld je nu aan →',
     ctaBtnG:'Bekijk vacatures',
-    sbTitle:'Vind jouw stage op Internly â€” altijd gratis voor studenten',
-    sbSub:'Transparante werkgevers Â· Trust Score Â· Geen ghosting meer',
-    sbBtn:'Meld je aan â†’',
+    sbTitle:'Vind jouw stage op Internly — altijd gratis voor studenten',
+    sbSub:'Transparante werkgevers · Trust Score · Geen ghosting meer',
+    sbBtn:'Meld je aan →',
   },
   en: {
     ctaHeadline:'Find your internship on Internly',
-    ctaSub:'Transparent employers Â· Trust Score visible before you apply Â· Always free for students',
-    ctaTrust:'Always free for students Â· No spam Â· Cancel anytime',
-    ctaBtnP:'Sign up now â†’',
+    ctaSub:'Transparent employers · Trust Score visible before you apply · Always free for students',
+    ctaTrust:'Always free for students · No spam · Cancel anytime',
+    ctaBtnP:'Sign up now →',
     ctaBtnG:'Browse vacancies',
-    sbTitle:'Find your internship on Internly â€” always free for students',
-    sbSub:'Transparent employers Â· Trust Score Â· No more ghosting',
-    sbBtn:'Sign up â†’',
+    sbTitle:'Find your internship on Internly — always free for students',
+    sbSub:'Transparent employers · Trust Score · No more ghosting',
+    sbBtn:'Sign up →',
   },
 };
 
 const kbTipsEN = [
   'Always check if a company is accredited at s-bb.nl',
   'Internship allowance not received? Expense reimbursement IS mandatory',
-  'As a BBL student you are legally an employee â€” with all rights that entails',
+  'As a BBL student you are legally an employee — with all rights that entails',
   'Report ghosting to SBB: s-bb.nl/meldpunt',
-  'Experiencing stage discrimination? Always report â€” right to replacement internship',
-  'Erasmus+ grant for EU students: â‚¬400â€“600/month for internship in NL',
+  'Experiencing stage discrimination? Always report — right to replacement internship',
+  'Erasmus+ grant for EU students: €400–600/month for internship in NL',
   'Stage Pact 2023-2027: minimum 3 contact moments per internship required',
-  'BBL employer? Claim your practical learning subsidy at RVO: max â‚¬2,700/yr',
+  'BBL employer? Claim your practical learning subsidy at RVO: max €2,700/yr',
   'Want to switch from BOL to BBL? Discuss with your school',
   'MBO level 4 diploma gives access to HBO (University of Applied Sciences)',
 ];
 
-/* â”€â”€ BILINGUAL â€” kbAUD overrides (name + desc) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── BILINGUAL — kbAUD overrides (name + desc) ─────────────────────── */
 const kbAUDLang = {
   BOL:            { nl:{name:'BOL Student',         desc:'Schoolgericht leren + stage'},      en:{name:'BOL Student',         desc:'School-based learning + internship'} },
   BBL:            { nl:{name:'BBL Student',         desc:'Werkend leren + arbeidscontract'},  en:{name:'BBL Student',         desc:'Work-based learning + contract'} },
@@ -1439,13 +1439,13 @@ const kbAUDLang = {
   Internationaal: { nl:{name:'Internationaal',      desc:'Stage in NL als buitenlandse student'}, en:{name:'International', desc:'Internship in NL as foreign student'} },
 };
 
-/* â”€â”€ BILINGUAL â€” kbCatLabels overrides â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── BILINGUAL — kbCatLabels overrides ─────────────────────────────── */
 const kbCatLabelsLang = {
-  nl: { BOL:'BOL â€” Beroepsopleidende Leerweg', BBL:'BBL â€” Beroepsbegeleidende Leerweg', Bedrijf:'Voor bedrijven', School:'Voor scholen & begeleiders', Internationaal:'Internationale studenten', Buddy:'De stagebuddy' },
-  en: { BOL:'BOL â€” Vocational Learning Pathway', BBL:'BBL â€” Work-based Learning', Bedrijf:'For companies', School:'For schools & supervisors', Internationaal:'International students', Buddy:'The internship buddy' },
+  nl: { BOL:'BOL — Beroepsopleidende Leerweg', BBL:'BBL — Beroepsbegeleidende Leerweg', Bedrijf:'Voor bedrijven', School:'Voor scholen & begeleiders', Internationaal:'Internationale studenten', Buddy:'De stagebuddy' },
+  en: { BOL:'BOL — Vocational Learning Pathway', BBL:'BBL — Work-based Learning', Bedrijf:'For companies', School:'For schools & supervisors', Internationaal:'International students', Buddy:'The internship buddy' },
 };
 
-/* â”€â”€ BILINGUAL â€” kbArticleLang (title + excerpt + stat.l per id) â”€â”€â”€â”€â”€ */
+/* ── BILINGUAL — kbArticleLang (title + excerpt + stat.l per id) ───── */
 const kbArticleLang = {
   ghosting: {
     nl: { title:'Ghosting bij stages: wat zijn je rechten?', excerpt:'77% van MBO-studenten ervaart ghosting van stagebedrijven. Hier is wat je kunt doen.', statL:'ervaart ghosting' },
@@ -1456,40 +1456,40 @@ const kbArticleLang = {
     en: { title:'Stage discrimination: recognise, report, persist', excerpt:'CBS figures December 2025: 1 in 10 MBO-BOL students experiences discrimination. Here are your steps.', statL:'experiences discrimination (CBS 2025)' },
   },
   'bol-bbl': {
-    nl: { title:'BOL of BBL: wat past bij jou?', excerpt:'Twee manieren om je MBO-diploma te halen. Salaris, schooldagen, contract â€” volledig vergeleken.', statL:'BOL vs BBL verdeling' },
-    en: { title:'BOL or BBL: which suits you?', excerpt:'Two ways to get your MBO diploma. Salary, school days, contract â€” fully compared.', statL:'BOL vs BBL split' },
+    nl: { title:'BOL of BBL: wat past bij jou?', excerpt:'Twee manieren om je MBO-diploma te halen. Salaris, schooldagen, contract — volledig vergeleken.', statL:'BOL vs BBL verdeling' },
+    en: { title:'BOL or BBL: which suits you?', excerpt:'Two ways to get your MBO diploma. Salary, school days, contract — fully compared.', statL:'BOL vs BBL split' },
   },
   stagevergoeding: {
-    nl: { title:'Stagevergoeding 2025: wat heb je recht op?', excerpt:'Niet wettelijk verplicht â€” maar er verandert veel. Onkostenvergoeding, wetsvoorstel 2026, gemiddelden per niveau.', statL:'van MBO-stagiairs krijgt een vergoeding' },
-    en: { title:'Internship allowance 2025: what are you entitled to?', excerpt:'Not legally required â€” but much is changing. Expense reimbursement, 2026 bill, averages by level.', statL:'of MBO interns receive an allowance' },
+    nl: { title:'Stagevergoeding 2025: wat heb je recht op?', excerpt:'Niet wettelijk verplicht — maar er verandert veel. Onkostenvergoeding, wetsvoorstel 2026, gemiddelden per niveau.', statL:'van MBO-stagiairs krijgt een vergoeding' },
+    en: { title:'Internship allowance 2025: what are you entitled to?', excerpt:'Not legally required — but much is changing. Expense reimbursement, 2026 bill, averages by level.', statL:'of MBO interns receive an allowance' },
   },
   stagepact: {
-    nl: { title:'Het Stagepact MBO 2023â€“2027 uitgelegd', excerpt:'Vier doelen, â‚¬30 miljoen, 2027 als deadline. Wat hebben scholen, bedrijven en overheid beloofd?', statL:'Stagepact investering 2023â€“2027' },
-    en: { title:'The MBO Stage Pact 2023â€“2027 explained', excerpt:'Four goals, â‚¬30 million, 2027 as deadline. What have schools, companies and government promised?', statL:'Stage Pact investment 2023â€“2027' },
+    nl: { title:'Het Stagepact MBO 2023–2027 uitgelegd', excerpt:'Vier doelen, €30 miljoen, 2027 als deadline. Wat hebben scholen, bedrijven en overheid beloofd?', statL:'Stagepact investering 2023–2027' },
+    en: { title:'The MBO Stage Pact 2023–2027 explained', excerpt:'Four goals, €30 million, 2027 as deadline. What have schools, companies and government promised?', statL:'Stage Pact investment 2023–2027' },
   },
   'bbl-rechten': {
-    nl: { title:'BBL: jouw rechten als werknemer-in-opleiding', excerpt:"Als BBL'er ben je juridisch een werknemer. Salaris, vakantiedagen, subsidie voor je werkgever â€” alles uitgelegd.", statL:"subsidie per BBL'er per jaar" },
-    en: { title:'BBL: your rights as an employee-in-training', excerpt:'As a BBL student you are legally an employee. Salary, holiday days, subsidy for your employer â€” all explained.', statL:'subsidy per BBL student per year' },
+    nl: { title:'BBL: jouw rechten als werknemer-in-opleiding', excerpt:"Als BBL'er ben je juridisch een werknemer. Salaris, vakantiedagen, subsidie voor je werkgever — alles uitgelegd.", statL:"subsidie per BBL'er per jaar" },
+    en: { title:'BBL: your rights as an employee-in-training', excerpt:'As a BBL student you are legally an employee. Salary, holiday days, subsidy for your employer — all explained.', statL:'subsidy per BBL student per year' },
   },
   'mbo-niveaus': {
-    nl: { title:'MBO niveaus 1â€“4: wat houdt elk niveau in?', excerpt:'Van entreeopleiding tot middenkader. Toelatingseisen, duur en doorstroomopties per niveau.', statL:'niveaus, elk ander diploma & profiel' },
-    en: { title:'MBO levels 1â€“4: what does each level entail?', excerpt:'From entry level to middle management. Entry requirements, duration and progression options per level.', statL:'levels, each with different diploma & profile' },
+    nl: { title:'MBO niveaus 1–4: wat houdt elk niveau in?', excerpt:'Van entreeopleiding tot middenkader. Toelatingseisen, duur en doorstroomopties per niveau.', statL:'niveaus, elk ander diploma & profiel' },
+    en: { title:'MBO levels 1–4: what does each level entail?', excerpt:'From entry level to middle management. Entry requirements, duration and progression options per level.', statL:'levels, each with different diploma & profile' },
   },
   subsidie: {
-    nl: { title:'Subsidie Praktijkleren: zo vraag je het aan', excerpt:'Begeleid je een BBL-student? Max â‚¬2.700/jaar via RVO. Voorwaarden, deadlines, wat je moet bewaren.', statL:'per BBL-student per jaar (RVO)' },
-    en: { title:'Practical Learning Subsidy: how to apply', excerpt:'Supervising a BBL student? Max â‚¬2,700/year via RVO. Requirements, deadlines, what to keep.', statL:'per BBL student per year (RVO)' },
+    nl: { title:'Subsidie Praktijkleren: zo vraag je het aan', excerpt:'Begeleid je een BBL-student? Max €2.700/jaar via RVO. Voorwaarden, deadlines, wat je moet bewaren.', statL:'per BBL-student per jaar (RVO)' },
+    en: { title:'Practical Learning Subsidy: how to apply', excerpt:'Supervising a BBL student? Max €2,700/year via RVO. Requirements, deadlines, what to keep.', statL:'per BBL student per year (RVO)' },
   },
   esg: {
     nl: { title:'ESG & stagiairs: sociale impact voor CSRD', excerpt:'Stages leveren directe ESG-datapunten op. Zo gebruik je stagebeleid strategisch voor je CSRD-jaarverslag.', statL:'sociale impact verplicht rapporteren' },
     en: { title:'ESG & interns: social impact for CSRD', excerpt:'Internships generate direct ESG data points. Here is how to use internship policy strategically for your CSRD report.', statL:'social impact mandatory reporting' },
   },
   stagematching: {
-    nl: { title:'Stagematching: eerlijker stages voor iedereen', excerpt:'Stagematching koppelt op leerwensen, niet op uiterlijk. Hoe je het invoert als school â€” en wat Internly doet.', statL:'minder zoektijd bij stagematching (ROA)' },
+    nl: { title:'Stagematching: eerlijker stages voor iedereen', excerpt:'Stagematching koppelt op leerwensen, niet op uiterlijk. Hoe je het invoert als school — en wat Internly doet.', statL:'minder zoektijd bij stagematching (ROA)' },
     en: { title:'Internship matching: fairer internships for everyone', excerpt:'Internship matching connects based on learning goals, not appearance. How to implement it as a school.', statL:'less search time with internship matching (ROA)' },
   },
   internationaal: {
-    nl: { title:'Internationaal student: stage in Nederland', excerpt:'EU-burgers: vrijheid van beweging, geen vergunning. Non-EU: regels per situatie. Zoekjaar, Erasmus+, BSN.', statL:'vrij te werken â€” geen vergunning nodig' },
-    en: { title:'International student: internship in the Netherlands', excerpt:'EU citizens: freedom of movement, no permit. Non-EU: rules depend on situation. Orientation year, Erasmus+, BSN.', statL:'free to work â€” no permit needed' },
+    nl: { title:'Internationaal student: stage in Nederland', excerpt:'EU-burgers: vrijheid van beweging, geen vergunning. Non-EU: regels per situatie. Zoekjaar, Erasmus+, BSN.', statL:'vrij te werken — geen vergunning nodig' },
+    en: { title:'International student: internship in the Netherlands', excerpt:'EU citizens: freedom of movement, no permit. Non-EU: rules depend on situation. Orientation year, Erasmus+, BSN.', statL:'free to work — no permit needed' },
   },
   buddy: {
     nl: { title:'De stagebuddy: wie, wat en waarom?', excerpt:'Een gepensioneerde professional die er voor jou is tijdens je stage. Geen beoordelaar. Gewoon een klankbord.', statL:'persoonlijke koppeling op aanvraag' },
@@ -1497,11 +1497,11 @@ const kbArticleLang = {
   },
 };
 
-/* â”€â”€ BILINGUAL â€” kbArticleDetailLang (per article EN HTML) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── BILINGUAL — kbArticleDetailLang (per article EN HTML) ─────────── */
 const kbArticleDetailLang = {
   ghosting: { en: () => `
 <h1 class="art-h1">Ghosting during internships: what are your rights?</h1>
-<p class="art-intro">You send your motivation letter, you wait and wait â€” and then: nothing. Ghosting is the biggest frustration in the internship market. But you have more options than you think.</p>
+<p class="art-intro">You send your motivation letter, you wait and wait — and then: nothing. Ghosting is the biggest frustration in the internship market. But you have more options than you think.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-orange)">77%</div><div class="sbl">experience ghosting from a company (Indeed NL)</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-red)">4.0%</div><div class="sbl">CBS: discrimination starts with no reply</div></div>
@@ -1513,8 +1513,8 @@ const kbArticleDetailLang = {
   <div class="step"><div class="snum">3</div><div class="sbody"><h4>Involve your internship supervisor</h4><p>Your school can contact the company on your behalf. Supervisors sometimes have direct lines.</p></div></div>
   <div class="step"><div class="snum">4</div><div class="sbody"><h4>Report it to SBB</h4><p>SBB supervises accredited training companies. Structural non-response can lead to measures.</p></div></div>
 </div>
-<div class="infobox ib-green"><div class="ibt">ðŸ›¡ï¸ How Internly protects you</div><p>On Internly, companies have a response obligation. If they don't respond within the set deadline, their <strong>Trust Score</strong> automatically drops. Students see how responsive a company is before applying.</p></div>
-<div class="art-sources"><strong>Sources</strong>: Indeed NL, Ghosting in the internship market 2023 Â· CBS, School-leavers survey 2024 Â· Stage Pact MBO 2023â€“2027</div>
+<div class="infobox ib-green"><div class="ibt">🛡️ How Internly protects you</div><p>On Internly, companies have a response obligation. If they don't respond within the set deadline, their <strong>Trust Score</strong> automatically drops. Students see how responsive a company is before applying.</p></div>
+<div class="art-sources"><strong>Sources</strong>: Indeed NL, Ghosting in the internship market 2023 · CBS, School-leavers survey 2024 · Stage Pact MBO 2023–2027</div>
 ` },
 
   discriminatie: { en: () => `
@@ -1536,71 +1536,71 @@ const kbArticleDetailLang = {
   <div class="step"><div class="snum">2</div><div class="sbody"><h4>Official report to school or SBB</h4><p>School is obligated to offer you a replacement internship. SBB can impose measures on the training company.</p></div></div>
   <div class="step"><div class="snum">3</div><div class="sbody"><h4>Discriminatie.nl</h4><p>For official complaints and legal advice. Anonymous reporting is possible.</p></div></div>
 </div>
-<div class="art-sources"><strong>Source</strong>: CBS School-leavers survey 2024, published December 2025 Â· Stage Pact MBO 2023-2027 Â· Knowledge Institute for Emancipation Issues (KIS)</div>
+<div class="art-sources"><strong>Source</strong>: CBS School-leavers survey 2024, published December 2025 · Stage Pact MBO 2023-2027 · Knowledge Institute for Emancipation Issues (KIS)</div>
 ` },
 
   'bol-bbl': { en: () => `
 <h1 class="art-h1">BOL or BBL: which suits you?</h1>
-<p class="art-intro">In MBO you can obtain your diploma in two ways. Both pathways deliver the same official diploma â€” but the route differs fundamentally.</p>
+<p class="art-intro">In MBO you can obtain your diploma in two ways. Both pathways deliver the same official diploma — but the route differs fundamentally.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-blue)">80%</div><div class="sbl">of MBO students follow BOL</div></div>
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">20%</div><div class="sbl">choose BBL â€” work-based learning</div></div>
-  <div class="stat-box"><div class="sbn">1,600</div><div class="sbl">study hours/year â€” both pathways</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">20%</div><div class="sbl">choose BBL — work-based learning</div></div>
+  <div class="stat-box"><div class="sbn">1,600</div><div class="sbl">study hours/year — both pathways</div></div>
 </div>
 <div class="art-sec">5 key differences</div>
 <div class="compare">
   <div class="chead" style="grid-template-columns:1fr 1fr 1fr"><div>Aspect</div><div style="opacity:.7">BOL</div><div style="opacity:.7">BBL</div></div>
-  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">School days</div><div class="cbol">4â€“5 days/week</div><div class="cbbl">1â€“2 days/week</div></div>
-  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Income</div><div class="cbol">No wage â€” possibly internship allowance</div><div class="cbbl">Salary + employment contract</div></div>
-  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Study finance</div><div class="cbol">Yes (18â€“30 yr)</div><div class="cbbl">No (you already earn)</div></div>
+  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">School days</div><div class="cbol">4–5 days/week</div><div class="cbbl">1–2 days/week</div></div>
+  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Income</div><div class="cbol">No wage — possibly internship allowance</div><div class="cbbl">Salary + employment contract</div></div>
+  <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Study finance</div><div class="cbol">Yes (18–30 yr)</div><div class="cbbl">No (you already earn)</div></div>
   <div class="crow" style="grid-template-columns:1fr 1fr 1fr"><div class="cdim">Holiday</div><div class="cbol">School holidays</div><div class="cbbl">~25 accrued days</div></div>
 </div>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">ðŸ“š</div><div class="mini-t" style="color:var(--kb-blue)">Choose BOL if youâ€¦</div><div class="mini-d">Don't have an employer yet, enjoy working with classmates, or want to apply for study finance.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">ðŸ”§</div><div class="mini-t" style="color:var(--kb-green-dk)">Choose BBL if youâ€¦</div><div class="mini-d">Already know what you want to become, want to earn immediately and prefer learning by doing.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">📚</div><div class="mini-t" style="color:var(--kb-blue)">Choose BOL if you…</div><div class="mini-d">Don't have an employer yet, enjoy working with classmates, or want to apply for study finance.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">🔧</div><div class="mini-t" style="color:var(--kb-green-dk)">Choose BBL if you…</div><div class="mini-d">Already know what you want to become, want to earn immediately and prefer learning by doing.</div></div>
 </div>
-<div class="art-sources"><strong>Sources</strong>: SBB, s-bb.nl Â· OCO, onderwijsconsument.nl Â· Indeed NL, BOL/BBL career guide 2025</div>
+<div class="art-sources"><strong>Sources</strong>: SBB, s-bb.nl · OCO, onderwijsconsument.nl · Indeed NL, BOL/BBL career guide 2025</div>
 ` },
 
   stagevergoeding: { en: () => `
 <h1 class="art-h1">Internship allowance 2025: what are you entitled to?</h1>
-<p class="art-intro">Not every intern gets paid â€” and that is (still) legal. But there are things your employer is obligated to cover, and that is about to change.</p>
+<p class="art-intro">Not every intern gets paid — and that is (still) legal. But there are things your employer is obligated to cover, and that is about to change.</p>
 <div class="stats-row">
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">â‚¬182</div><div class="sbl">avg MBO 4 days/week (stage.nl)</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">€182</div><div class="sbl">avg MBO 4 days/week (stage.nl)</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-amber)">41%</div><div class="sbl">of MBO interns receive any allowance</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-blue)">2026</div><div class="sbl">expected legislative debate</div></div>
 </div>
-<div class="infobox ib-green"><div class="ibt">âœ“ Expense reimbursement â€” always mandatory (Stage Pact 2023)</div><p>Your training company must <strong>cover all costs you incur to do your internship</strong>: travel costs, required work clothing, VOG. An internship must cost you nothing.</p></div>
-<div class="infobox ib-amber"><div class="ibt">âš–ï¸ Internship allowance â€” not required, but growing</div><p>Included in more and more collective agreements: from 60 in 2023 (10%) to 103 in 2024 (17%). Check your CAO at cao.nl.</p></div>
+<div class="infobox ib-green"><div class="ibt">✓ Expense reimbursement — always mandatory (Stage Pact 2023)</div><p>Your training company must <strong>cover all costs you incur to do your internship</strong>: travel costs, required work clothing, VOG. An internship must cost you nothing.</p></div>
+<div class="infobox ib-amber"><div class="ibt">⚖️ Internship allowance — not required, but growing</div><p>Included in more and more collective agreements: from 60 in 2023 (10%) to 103 in 2024 (17%). Check your CAO at cao.nl.</p></div>
 <div class="art-sec">2025 averages by level</div>
 <div class="bars">
-  <div class="bar-row"><div class="bm"><span class="bl">MBO</span><span class="bv">â‚¬150â€“350/mo</span></div><div class="bt"><div class="bf" style="width:35%;background:var(--kb-blue)"></div></div></div>
-  <div class="bar-row"><div class="bm"><span class="bl">HBO</span><span class="bv">â‚¬350â€“600/mo</span></div><div class="bt"><div class="bf" style="width:60%;background:var(--kb-green)"></div></div></div>
-  <div class="bar-row"><div class="bm"><span class="bl">Government (all levels)</span><span class="bv">â‚¬775/mo (2025)</span></div><div class="bt"><div class="bf" style="width:80%;background:var(--kb-orange)"></div></div></div>
+  <div class="bar-row"><div class="bm"><span class="bl">MBO</span><span class="bv">€150–350/mo</span></div><div class="bt"><div class="bf" style="width:35%;background:var(--kb-blue)"></div></div></div>
+  <div class="bar-row"><div class="bm"><span class="bl">HBO</span><span class="bv">€350–600/mo</span></div><div class="bt"><div class="bf" style="width:60%;background:var(--kb-green)"></div></div></div>
+  <div class="bar-row"><div class="bm"><span class="bl">Government (all levels)</span><span class="bv">€775/mo (2025)</span></div><div class="bt"><div class="bf" style="width:80%;background:var(--kb-orange)"></div></div></div>
 </div>
-<div class="art-sources"><strong>Sources</strong>: Stage.nl, internship allowance 2025 Â· CNV Jongeren, CAO monitor 2024 Â· OCO, mbo internship allowance Â· Rijksoverheid.nl, minimum wage internship</div>
+<div class="art-sources"><strong>Sources</strong>: Stage.nl, internship allowance 2025 · CNV Jongeren, CAO monitor 2024 · OCO, mbo internship allowance · Rijksoverheid.nl, minimum wage internship</div>
 ` },
 
   stagepact: { en: () => `
-<h1 class="art-h1">The MBO Stage Pact 2023â€“2027</h1>
+<h1 class="art-h1">The MBO Stage Pact 2023–2027</h1>
 <p class="art-intro">In February 2023, students, schools, employers and the national government signed a pact for a fairer internship market. Four goals, one deadline: 2027.</p>
 <div class="stats-row">
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-orange)">â‚¬30M</div><div class="sbl">government investment</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-orange)">€30M</div><div class="sbl">government investment</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">4</div><div class="sbl">measurable goals</div></div>
   <div class="stat-box"><div class="sbn">2027</div><div class="sbl">review moment</div></div>
 </div>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">ðŸ¤</div><div class="mini-t">Better supervision</div><div class="mini-d">Min. 3 contact moments per internship â€” one at the training company itself.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">âš–</div><div class="mini-t">No discrimination</div><div class="mini-d">Internship matching based on learning goals. No more "click interviews".</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">ðŸ¢</div><div class="mini-t">Enough places</div><div class="mini-d">SBB actively monitors supply and demand.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">ðŸ’¶</div><div class="mini-t">Appropriate allowance</div><div class="mini-d">Expense reimbursement mandatory. Internship allowance via CAOs and soon by law.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-blue)"><div class="mini-icon">🤝</div><div class="mini-t">Better supervision</div><div class="mini-d">Min. 3 contact moments per internship — one at the training company itself.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">⚖</div><div class="mini-t">No discrimination</div><div class="mini-d">Internship matching based on learning goals. No more "click interviews".</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">🏢</div><div class="mini-t">Enough places</div><div class="mini-d">SBB actively monitors supply and demand.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">💶</div><div class="mini-t">Appropriate allowance</div><div class="mini-d">Expense reimbursement mandatory. Internship allowance via CAOs and soon by law.</div></div>
 </div>
-<div class="art-sources"><strong>Source</strong>: Rijksoverheid.nl, Stage Pact MBO 2023â€“2027 Â· Knowledge Centre BPV Â· MBO Council</div>
+<div class="art-sources"><strong>Source</strong>: Rijksoverheid.nl, Stage Pact MBO 2023–2027 · Knowledge Centre BPV · MBO Council</div>
 ` },
 
   'bbl-rechten': { en: () => `
 <h1 class="art-h1">BBL: your rights as an employee-in-training</h1>
-<p class="art-intro">In a BBL programme you are legally an employee. You have an employment contract, a right to salary and holiday days â€” and your employer has obligations towards you.</p>
+<p class="art-intro">In a BBL programme you are legally an employee. You have an employment contract, a right to salary and holiday days — and your employer has obligations towards you.</p>
 <div class="pills">
   <span class="pill ok">Salary (CAO or statutory minimum)</span>
   <span class="pill ok">Paid school day</span>
@@ -1609,29 +1609,29 @@ const kbArticleDetailLang = {
   <span class="pill ok">Supervision at work</span>
   <span class="pill ok">Protection against dismissal</span>
 </div>
-<div class="infobox ib-green"><div class="ibt">ðŸ’° Subsidy for your employer</div><p>Companies supervising a BBL student can apply at RVO for the <strong>Practical Learning Subsidy</strong>: max. <strong>â‚¬2,700 per student per year</strong>. This makes you extra attractive as a candidate.</p></div>
-<div class="art-sources"><strong>Sources</strong>: SBB, s-bb.nl Â· RVO, Practical Learning Subsidy Â· BOVAG, BBL guide 2025</div>
+<div class="infobox ib-green"><div class="ibt">💰 Subsidy for your employer</div><p>Companies supervising a BBL student can apply at RVO for the <strong>Practical Learning Subsidy</strong>: max. <strong>€2,700 per student per year</strong>. This makes you extra attractive as a candidate.</p></div>
+<div class="art-sources"><strong>Sources</strong>: SBB, s-bb.nl · RVO, Practical Learning Subsidy · BOVAG, BBL guide 2025</div>
 ` },
 
   'mbo-niveaus': { en: () => `
-<h1 class="art-h1">MBO levels 1â€“4</h1>
+<h1 class="art-h1">MBO levels 1–4</h1>
 <p class="art-intro">MBO has four levels, each with their own entry requirements, duration and future prospects. Here is how you find your place.</p>
 <div class="compare">
   <div class="chead" style="grid-template-columns:50px 1fr 1fr 1fr"><div>Lvl.</div><div style="opacity:.7">Entry req.</div><div style="opacity:.7">Duration</div><div style="opacity:.7">Then</div></div>
   <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-ink3)">1</div><div>No diploma</div><div>1 yr</div><div>Level 2 or work</div></div>
-  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-blue)">2</div><div>VMBO b/k</div><div>1â€“2 yr</div><div>Level 3 or work</div></div>
-  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-green)">3</div><div>VMBO k/tl or MBO-2</div><div>2â€“3 yr</div><div>Level 4 or work</div></div>
-  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-orange)">4</div><div>VMBO k/tl, HAVO or MBO-3</div><div>1â€“4 yr</div><div>HBO or management</div></div>
+  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-blue)">2</div><div>VMBO b/k</div><div>1–2 yr</div><div>Level 3 or work</div></div>
+  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-green)">3</div><div>VMBO k/tl or MBO-2</div><div>2–3 yr</div><div>Level 4 or work</div></div>
+  <div class="crow" style="grid-template-columns:50px 1fr 1fr 1fr"><div style="font-weight:700;color:var(--kb-orange)">4</div><div>VMBO k/tl, HAVO or MBO-3</div><div>1–4 yr</div><div>HBO or management</div></div>
 </div>
-<div class="infobox ib-blue"><div class="ibt">ðŸŽ“ Level 4 â†’ HBO</div><p>With an MBO level 4 diploma you can continue to HBO. That makes level 4 unique: it is both a vocational qualification and a stepping stone to further study.</p></div>
-<div class="art-sources"><strong>Sources</strong>: ROC van Amsterdam, BOL-BBL levels Â· DUO, MBO qualification structure Â· KiesMBO.nl</div>
+<div class="infobox ib-blue"><div class="ibt">🎓 Level 4 → HBO</div><p>With an MBO level 4 diploma you can continue to HBO. That makes level 4 unique: it is both a vocational qualification and a stepping stone to further study.</p></div>
+<div class="art-sources"><strong>Sources</strong>: ROC van Amsterdam, BOL-BBL levels · DUO, MBO qualification structure · KiesMBO.nl</div>
 ` },
 
   subsidie: { en: () => `
 <h1 class="art-h1">Practical Learning Subsidy: how to apply</h1>
-<p class="art-intro">Supervising a BBL student? Then you are entitled to up to â‚¬2,700 per student per year via the Practical Learning Subsidy from RVO.</p>
+<p class="art-intro">Supervising a BBL student? Then you are entitled to up to €2,700 per student per year via the Practical Learning Subsidy from RVO.</p>
 <div class="stats-row">
-  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">â‚¬2,700</div><div class="sbl">max. per BBL student per year</div></div>
+  <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">€2,700</div><div class="sbl">max. per BBL student per year</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-blue)">RVO</div><div class="sbl">apply after end of school year</div></div>
 </div>
 <div class="pills">
@@ -1640,66 +1640,66 @@ const kbArticleDetailLang = {
   <span class="pill ok">Full school year supervised</span>
   <span class="pill ok">Application within period</span>
 </div>
-<div class="infobox ib-orange"><div class="ibt">ðŸ“‹ Apply after the school year</div><p>Keep: attendance records, supervision reports and copy of BPV agreement. Check <strong>rvo.nl</strong> for exact deadlines.</p></div>
-<div class="art-sources"><strong>Source</strong>: RVO.nl, Practical Learning Subsidy Â· Business.gov.nl</div>
+<div class="infobox ib-orange"><div class="ibt">📋 Apply after the school year</div><p>Keep: attendance records, supervision reports and copy of BPV agreement. Check <strong>rvo.nl</strong> for exact deadlines.</p></div>
+<div class="art-sources"><strong>Source</strong>: RVO.nl, Practical Learning Subsidy · Business.gov.nl</div>
 ` },
 
   esg: { en: () => `
 <h1 class="art-h1">ESG & interns: social impact for CSRD</h1>
-<p class="art-intro">The Corporate Sustainability Reporting Directive (CSRD) requires companies to report on social impact. Internships are direct, measurable contributions â€” if you track the data.</p>
+<p class="art-intro">The Corporate Sustainability Reporting Directive (CSRD) requires companies to report on social impact. Internships are direct, measurable contributions — if you track the data.</p>
 <div class="two-col">
-  <div class="mini"><div class="mini-icon">ðŸ‘¥</div><div class="mini-t">S: Talent development</div><div class="mini-d">Number of interns, learning goals achieved, progression to permanent position.</div></div>
-  <div class="mini"><div class="mini-icon">âš–ï¸</div><div class="mini-t">S: Equal opportunities</div><div class="mini-d">Diversity of interns, allowance paid/not paid, inclusivity policy.</div></div>
-  <div class="mini"><div class="mini-icon">ðŸ«</div><div class="mini-t">S: Community</div><div class="mini-d">Cooperation with schools, contribution to availability of internship places.</div></div>
-  <div class="mini"><div class="mini-icon">ðŸ“Š</div><div class="mini-t">G: Supervision quality</div><div class="mini-d">Trust Score, student satisfaction, learning goal realisation â€” measurable via Internly.</div></div>
+  <div class="mini"><div class="mini-icon">👥</div><div class="mini-t">S: Talent development</div><div class="mini-d">Number of interns, learning goals achieved, progression to permanent position.</div></div>
+  <div class="mini"><div class="mini-icon">⚖️</div><div class="mini-t">S: Equal opportunities</div><div class="mini-d">Diversity of interns, allowance paid/not paid, inclusivity policy.</div></div>
+  <div class="mini"><div class="mini-icon">🏫</div><div class="mini-t">S: Community</div><div class="mini-d">Cooperation with schools, contribution to availability of internship places.</div></div>
+  <div class="mini"><div class="mini-icon">📊</div><div class="mini-t">G: Supervision quality</div><div class="mini-d">Trust Score, student satisfaction, learning goal realisation — measurable via Internly.</div></div>
 </div>
-<div class="infobox ib-green"><div class="ibt">ðŸ“ˆ Ready-made export via Internly</div><p>Internly automatically generates a VSME-compliant ESG export for your annual report.</p></div>
-<div class="art-sources"><strong>Sources</strong>: CSRD, VSME standard Â· Internly ESG module Â· Business.gov.nl</div>
+<div class="infobox ib-green"><div class="ibt">📈 Ready-made export via Internly</div><p>Internly automatically generates a VSME-compliant ESG export for your annual report.</p></div>
+<div class="art-sources"><strong>Sources</strong>: CSRD, VSME standard · Internly ESG module · Business.gov.nl</div>
 ` },
 
   stagematching: { en: () => `
 <h1 class="art-h1">Internship matching: fairer internships for everyone</h1>
-<p class="art-intro">Traditionally students search for an internship themselves â€” with all the inequality that entails. Internship matching reverses this.</p>
+<p class="art-intro">Traditionally students search for an internship themselves — with all the inequality that entails. Internship matching reverses this.</p>
 <div class="stats-row">
   <div class="stat-box"><div class="sbn" style="color:var(--kb-green)">70%</div><div class="sbl">Dutch background: finds internship after 1st attempt (ROA)</div></div>
   <div class="stat-box"><div class="sbn" style="color:var(--kb-red)">50%</div><div class="sbl">non-western background: only after multiple attempts</div></div>
 </div>
 <div class="steps">
-  <div class="step"><div class="snum">1</div><div class="sbody"><h4>Student fills in learning goals</h4><p>No CV or photo â€” learning goals, motivation and ambitions form the matching profile.</p></div></div>
-  <div class="step"><div class="snum">2</div><div class="sbody"><h4>Algorithm matches on content</h4><p>Companies are matched on domain fit and Trust Score â€” not on name or appearance.</p></div></div>
+  <div class="step"><div class="snum">1</div><div class="sbody"><h4>Student fills in learning goals</h4><p>No CV or photo — learning goals, motivation and ambitions form the matching profile.</p></div></div>
+  <div class="step"><div class="snum">2</div><div class="sbody"><h4>Algorithm matches on content</h4><p>Companies are matched on domain fit and Trust Score — not on name or appearance.</p></div></div>
   <div class="step"><div class="snum">3</div><div class="sbody"><h4>School sees the dashboard</h4><p>Supervisors immediately see who is stuck and which companies are reliable.</p></div></div>
 </div>
-<div class="art-sources"><strong>Sources</strong>: ROA, School-leavers between education and labour market Â· Stage Pact MBO 2023â€“2027, internship matching toolbox Â· KIS</div>
+<div class="art-sources"><strong>Sources</strong>: ROA, School-leavers between education and labour market · Stage Pact MBO 2023–2027, internship matching toolbox · KIS</div>
 ` },
 
   internationaal: { en: () => `
 <h1 class="art-h1">International student: internship in the Netherlands</h1>
 <p class="art-intro">The rules for an internship in the Netherlands depend greatly on your nationality and situation. Here is an overview of what applies to you.</p>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-teal)"><div class="mini-icon">ðŸ‡ªðŸ‡º</div><div class="mini-t" style="color:var(--kb-teal)">EU / EEA / Switzerland</div><div class="mini-d">Freedom of movement. No work permit needed. Register at the municipality for a BSN number. Take out Dutch health insurance.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">ðŸ“„</div><div class="mini-t" style="color:var(--kb-amber)">Non-EU (studying in NL)</div><div class="mini-d">Internship as mandatory part of your programme: no separate permit needed. Check your residence permit (IND.nl).</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">âš ï¸</div><div class="mini-t" style="color:var(--kb-red)">Non-EU (coming from abroad)</div><div class="mini-d">GVVA (single permit) needed for internship longer than 90 days. Max 6 months for MBO. Allowance â‰¥50% minimum wage.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">ðŸŽ“</div><div class="mini-t" style="color:var(--kb-green-dk)">Orientation year (Zoekjaar)</div><div class="mini-d">Non-EU graduates (HBO/WO) can apply for an orientation year permit. 1 year to work or intern in NL. Apply via IND.nl.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-teal)"><div class="mini-icon">🇪🇺</div><div class="mini-t" style="color:var(--kb-teal)">EU / EEA / Switzerland</div><div class="mini-d">Freedom of movement. No work permit needed. Register at the municipality for a BSN number. Take out Dutch health insurance.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-amber)"><div class="mini-icon">📄</div><div class="mini-t" style="color:var(--kb-amber)">Non-EU (studying in NL)</div><div class="mini-d">Internship as mandatory part of your programme: no separate permit needed. Check your residence permit (IND.nl).</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-red)"><div class="mini-icon">⚠️</div><div class="mini-t" style="color:var(--kb-red)">Non-EU (coming from abroad)</div><div class="mini-d">GVVA (single permit) needed for internship longer than 90 days. Max 6 months for MBO. Allowance ≥50% minimum wage.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-green)"><div class="mini-icon">🎓</div><div class="mini-t" style="color:var(--kb-green-dk)">Orientation year (Zoekjaar)</div><div class="mini-d">Non-EU graduates (HBO/WO) can apply for an orientation year permit. 1 year to work or intern in NL. Apply via IND.nl.</div></div>
 </div>
-<div class="infobox ib-teal"><div class="ibt">âœˆï¸ Erasmus+ for EU students</div><p>Studying in an EU country and want to intern in the Netherlands? You may qualify for an <strong>Erasmus+ grant of â‚¬400â€“600/month</strong>. Ask at your educational institution.</p></div>
-<div class="infobox ib-green"><div class="ibt">ðŸ’¡ Practical tips</div><p>Apply for a BSN number immediately after arrival. Platforms like LinkedIn, Internly and Stagemarkt.nl also offer English-language vacancies. Amsterdam, Rotterdam and tech companies often work in English.</p></div>
-<div class="art-sources"><strong>Sources</strong>: IND.nl, Intern or apprentice in the Netherlands Â· StudyInNL.org Â· Government.nl, internships for foreign students Â· Erasmus+, erasmus.nl</div>
+<div class="infobox ib-teal"><div class="ibt">✈️ Erasmus+ for EU students</div><p>Studying in an EU country and want to intern in the Netherlands? You may qualify for an <strong>Erasmus+ grant of €400–600/month</strong>. Ask at your educational institution.</p></div>
+<div class="infobox ib-green"><div class="ibt">💡 Practical tips</div><p>Apply for a BSN number immediately after arrival. Platforms like LinkedIn, Internly and Stagemarkt.nl also offer English-language vacancies. Amsterdam, Rotterdam and tech companies often work in English.</p></div>
+<div class="art-sources"><strong>Sources</strong>: IND.nl, Intern or apprentice in the Netherlands · StudyInNL.org · Government.nl, internships for foreign students · Erasmus+, erasmus.nl</div>
 ` },
 
   buddy: { en: () => `
 <h1 class="art-h1">The internship buddy: who, what and why?</h1>
-<p class="art-intro">An internship buddy is a voluntary retired professional who supports you if you want. Not an assessor, not a reporter â€” just someone with experience who is there for you.</p>
+<p class="art-intro">An internship buddy is a voluntary retired professional who supports you if you want. Not an assessor, not a reporter — just someone with experience who is there for you.</p>
 <div class="two-col">
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸ’¬</div><div class="mini-t">Sounding board</div><div class="mini-d">Ask anything you'd rather not ask your supervisor or school. Neutral and confidential.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸ§­</div><div class="mini-t">Direction</div><div class="mini-d">How do you deal with difficult situations at work? A buddy has experienced this themselves.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸ““</div><div class="mini-t">Notes</div><div class="mini-d">Private notes that only you can see. Keep track of what you have discussed.</div></div>
-  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">ðŸŒ±</div><div class="mini-t">No assessment</div><div class="mini-d">Never a report. Never for school. Only your development as the goal.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">💬</div><div class="mini-t">Sounding board</div><div class="mini-d">Ask anything you'd rather not ask your supervisor or school. Neutral and confidential.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">🧭</div><div class="mini-t">Direction</div><div class="mini-d">How do you deal with difficult situations at work? A buddy has experienced this themselves.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">📓</div><div class="mini-t">Notes</div><div class="mini-d">Private notes that only you can see. Keep track of what you have discussed.</div></div>
+  <div class="mini" style="border-left:3px solid var(--kb-purple)"><div class="mini-icon">🌱</div><div class="mini-t">No assessment</div><div class="mini-d">Never a report. Never for school. Only your development as the goal.</div></div>
 </div>
-<div class="infobox" style="background:var(--kb-purple-bg);border-left:3px solid var(--kb-purple)"><div class="ibt" style="color:var(--kb-purple)">âœ“ Always opt-in, never compulsory</div><p style="color:var(--kb-ink2)">You request it yourself when you want it. Never compulsory. Explicit consent before matching. Always cancellable.</p></div>
+<div class="infobox" style="background:var(--kb-purple-bg);border-left:3px solid var(--kb-purple)"><div class="ibt" style="color:var(--kb-purple)">✓ Always opt-in, never compulsory</div><p style="color:var(--kb-ink2)">You request it yourself when you want it. Never compulsory. Explicit consent before matching. Always cancellable.</p></div>
 ` },
 };
 
-/* â”€â”€ Helpers â€” kbT(key), kbArtT(id, field), kbAUDT(key, field) â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Helpers — kbT(key), kbArtT(id, field), kbAUDT(key, field) ─────── */
 function kbTr(key) { return (kbT[kbLang.current] && kbT[kbLang.current][key]) || (kbT.nl[key] || key); }
 function kbArtT(id, field) {
   const lang = kbLang.current;
@@ -1715,7 +1715,7 @@ function kbAUDT(key, field) {
 }
 function kbCatLabel(cat) { return (kbCatLabelsLang[kbLang.current] && kbCatLabelsLang[kbLang.current][cat]) || kbCatLabels[cat]; }
 
-/* â”€â”€ Re-bind tickers/audience/featured/grid for new lang â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Re-bind tickers/audience/featured/grid for new lang ─────────────── */
 // Re-define the renderers so they read kbLang at runtime.
 // Override the original kbBuildTicker/kbBuildAud/kbBuildFeatured/kbBuildGrid.
 
@@ -1741,7 +1741,7 @@ function _kbBuildFeatured_v2() {
   const classes = ['feat-card-1','feat-card-2','feat-card-3'];
   document.getElementById('featGrid').innerHTML = toShow.map((a,i) => `
     <div class="feat-card ${classes[i%3]} reveal" onclick="kbOpenArt('${a.id}')" style="animation-delay:${i*.1}s">
-      <div class="feat-bg-num" aria-hidden="true">${a.stat.n.replace(/[â‚¬M%]/g,'').replace(' op ','').replace(' in ','')}</div>
+      <div class="feat-bg-num" aria-hidden="true">${a.stat.n.replace(/[€M%]/g,'').replace(' op ','').replace(' in ','')}</div>
       <div class="feat-tag">${a.cats[0]}</div>
       <div class="feat-title">${kbArtT(a.id,'title') || a.title}</div>
       <div class="feat-excerpt">${a.stat.n} ${kbArtT(a.id,'statL') || a.stat.l}</div>
@@ -1822,13 +1822,13 @@ kbCloseOverlay = function() {
   kbCurrentArticleId = null;
 };
 
-/* â”€â”€ kbApplyCTA â€” bilingual â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── kbApplyCTA — bilingual ─────────────────────────────────────────── */
 kbApplyCTA = function() {
   const c = kbCtaStrings[kbLang.current] || kbCtaStrings.nl;
   Object.entries(c).forEach(([k,v]) => { const el = document.getElementById(k); if (el) el.textContent = v; });
 };
 
-/* â”€â”€ kbApplyLang â€” set static labels via IDs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── kbApplyLang — set static labels via IDs ─────────────────────────── */
 function kbApplyLang() {
   const t = kbT[kbLang.current] || kbT.nl;
   // Static elements with ID = key
@@ -1845,7 +1845,7 @@ function kbApplyLang() {
   document.documentElement.lang = kbLang.current;
 }
 
-/* â”€â”€ kbToggleLang â€” switch + re-render alles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── kbToggleLang — switch + re-render alles ───────────────────────── */
 function kbToggleLang() {
   kbLang.current = (kbLang.current === 'nl') ? 'en' : 'nl';
   const btn = document.getElementById('kb-lang-btn');
@@ -1867,7 +1867,7 @@ function kbToggleLang() {
 }
 window.kbToggleLang = kbToggleLang;
 
-/* â”€â”€ EN-knop in kb-topbar injecteren na renderKBHeader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── EN-knop in kb-topbar injecteren na renderKBHeader ─────────────── */
 function kbInjectLangBtn() {
   const actions = document.querySelector('.kb-header-actions');
   if (!actions || document.getElementById('kb-lang-btn')) return;
@@ -1881,7 +1881,7 @@ function kbInjectLangBtn() {
   actions.insertBefore(btn, actions.firstChild);
 }
 
-/* â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── INIT ───────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
   await renderKBHeader('kb-header');
   kbInjectLangBtn();
@@ -1897,7 +1897,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -1955,14 +1955,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend â†’ publieke header blijft staan, geen warn
+    // role onbekend → publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }

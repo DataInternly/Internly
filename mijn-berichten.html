@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Mijn Berichten â€” Internly</title>
+  <title>Mijn Berichten — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
@@ -51,10 +51,10 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Outfit', sans-serif; background: #f4f3ef; -webkit-font-smoothing: antialiased; min-height: 100vh; }
 
-    /* â”€â”€ Student header placeholder â”€â”€ */
+    /* ── Student header placeholder ── */
     #student-header { min-height: 60px; }
 
-    /* â”€â”€ Page shell â”€â”€ */
+    /* ── Page shell ── */
     .page-wrap { max-width: 640px; margin: 0 auto; padding: 32px 20px 80px; }
 
     .page-title {
@@ -63,7 +63,7 @@
     }
     .page-sub { color: #6b7280; font-size: .95rem; margin-bottom: 24px; }
 
-    /* â”€â”€ Filter pills â”€â”€ */
+    /* ── Filter pills ── */
     .pill-bar {
       display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
     }
@@ -75,7 +75,7 @@
     .pill.active { background: #1a7a48; color: #fff; border-color: #1a7a48; }
     .pill:hover:not(.active) { border-color: #1a7a48; color: #1a7a48; }
 
-    /* â”€â”€ Verzoeken sectie â”€â”€ */
+    /* ── Verzoeken sectie ── */
     .requests-section { margin-bottom: 24px; }
     .section-label {
       font-size: .75rem; font-weight: 700; color: #9ca3af;
@@ -111,7 +111,7 @@
     }
     .btn-decline:hover { border-color: #b82020; color: #b82020; }
 
-    /* â”€â”€ Conversation cards â”€â”€ */
+    /* ── Conversation cards ── */
     .conv-card {
       background: #fff; border: 1.5px solid #f0f0ee; border-radius: 14px;
       padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
@@ -120,7 +120,7 @@
     }
     .conv-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); border-color: #d1d5db; }
     .conv-card.has-unread { border-color: #1a7a48; }
-    /* Buddy kleurcodering â€” backlog 30 apr 2026 */
+    /* Buddy kleurcodering — backlog 30 apr 2026 */
     .conv-card.type-buddy { border-left: 3px solid #7c3aed; }
 
     .conv-avatar {
@@ -153,7 +153,7 @@
       font-size: .68rem; font-weight: 700; padding: 2px 7px; min-width: 20px; text-align: center;
     }
 
-    /* â”€â”€ Begeleider-knop (link boven lijst) â”€â”€ */
+    /* ── Begeleider-knop (link boven lijst) ── */
     .begeleider-link {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: .82rem; color: #6b7280; text-decoration: none;
@@ -162,7 +162,7 @@
     }
     .begeleider-link:hover { color: #1a7a48; }
 
-    /* â”€â”€ Empty state â”€â”€ */
+    /* ── Empty state ── */
     .empty-state {
       text-align: center; padding: 60px 24px;
     }
@@ -183,7 +183,7 @@
     .empty-cta-btn.tertiary { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
     .empty-cta-btn.tertiary:hover { background: #ffedd5; }
 
-    /* â”€â”€ Modal â”€â”€ */
+    /* ── Modal ── */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(13,21,32,.45);
       backdrop-filter: blur(4px); z-index: 9000;
@@ -235,7 +235,7 @@
     .btn-invite:disabled { background: #d1d5db; cursor: default; }
     .modal-empty { text-align: center; color: #9ca3af; font-size: .85rem; padding: 24px 0; }
 
-    /* â”€â”€ Loading skeleton â”€â”€ */
+    /* ── Loading skeleton ── */
     .skeleton-card {
       background: #fff; border: 1.5px solid #f0f0ee; border-radius: 14px;
       padding: 14px 16px; margin-bottom: 10px;
@@ -249,7 +249,7 @@
     .skel-line.w60 { width: 60%; }
     .skel-line.w40 { width: 40%; }
 
-    /* â”€â”€ Notif toast â”€â”€ */
+    /* ── Notif toast ── */
     .notif { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(12px); background: #0d1520; color: #fff; padding: 10px 20px; border-radius: 10px; font-size: .88rem; box-shadow: 0 6px 20px rgba(0,0,0,.2); z-index: 9999; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; white-space: nowrap; }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -268,7 +268,7 @@
 
 <main class="page-wrap">
   <h1 class="page-title">Mijn Berichten</h1>
-  <p class="page-sub">Al je gesprekken op Ã©Ã©n plek</p>
+  <p class="page-sub">Al je gesprekken op één plek</p>
 
   <!-- Filter pills -->
   <div class="pill-bar" id="pillBar">
@@ -307,10 +307,10 @@
         <div class="modal-title">Voeg je stagebegeleider toe</div>
         <div class="modal-sub">Zoek je school of begeleider op naam.</div>
       </div>
-      <button class="modal-close-btn" onclick="closeBegeleiderModal()">Ã—</button>
+      <button class="modal-close-btn" onclick="closeBegeleiderModal()">×</button>
     </div>
     <input class="modal-search" id="begeleiderSearch" type="text"
-           placeholder="Zoek op naam of schoolâ€¦" oninput="_begeleiderSearchDebounce()"
+           placeholder="Zoek op naam of school…" oninput="_begeleiderSearchDebounce()"
            autocomplete="off">
     <div class="modal-results" id="begeleiderResults">
       <div class="modal-empty">Begin met typen om te zoeken.</div>
@@ -326,7 +326,7 @@
   let _hasBegeleider = false; // accepted/pending begeleider_link
   let _searchTimer = null;
 
-  // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Helpers ──────────────────────────────────────────────────────────────
 
   function formatRelativeTime(iso) {
     if (!iso) return '';
@@ -358,7 +358,7 @@
     return 'Bedrijf';
   }
 
-  // â”€â”€ Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Filter ───────────────────────────────────────────────────────────────
 
   function setFilter(f) {
     _activeFilter = f;
@@ -371,7 +371,7 @@
     return conv._type === _activeFilter;
   }
 
-  // â”€â”€ Render conversations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render conversations ──────────────────────────────────────────────────
 
   function renderConvList() {
     const el = document.getElementById('convList');
@@ -399,7 +399,7 @@
     const time    = escapeHtml(formatRelativeTime(conv._lastTime));
     const unread  = conv._unread || 0;
 
-    // RUN3 â€” gebruik sticker als avatar_key gezet, anders fallback initialen
+    // RUN3 — gebruik sticker als avatar_key gezet, anders fallback initialen
     const avatarInner = (conv._otherAvatarKey && typeof getAvatarSvg === 'function')
       ? getAvatarSvg(conv._otherAvatarKey, conv._otherName, 'sm')
       : escapeHtml(avatarInitials(conv._otherName));
@@ -431,7 +431,7 @@
     const begBtnHtml = (_isStudent && !_isBBL && !_hasBegeleider)
       ? `<button class="empty-cta-btn tertiary" onclick="openBegeleiderModal()">+ Voeg begeleider toe</button>`
       : '';
-    // Buddy-rol krijgt aangepaste CTA â€” geen "Vind een stage" maar terug naar dashboard
+    // Buddy-rol krijgt aangepaste CTA — geen "Vind een stage" maar terug naar dashboard
     const ctaHtml = _isStudent
       ? `<a href="/discover.html" class="empty-cta-btn primary">Vind een stage</a>
          <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>
@@ -442,7 +442,7 @@
       : 'Zodra een student je verzoek accepteert verschijnen jullie gesprekken hier.';
     return `
       <div class="empty-state">
-        <div class="empty-icon">ðŸ’¬</div>
+        <div class="empty-icon">💬</div>
         <div class="empty-title">Hier komen straks je gesprekken te staan.</div>
         <div class="empty-sub">${subText}</div>
         <div class="empty-ctas">
@@ -462,7 +462,7 @@
     });
   }
 
-  // â”€â”€ Verzoeken â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Verzoeken ─────────────────────────────────────────────────────────────
 
   function renderRequests(requests) {
     const section = document.getElementById('requestsSection');
@@ -472,7 +472,7 @@
     list.innerHTML = requests.map(r => {
       const name = escapeHtml(r._fromName || 'Onbekend');
       const sub  = r._fromRole === 'school' ? 'School' : 'Begeleider';
-      // RUN3 â€” sticker indien beschikbaar
+      // RUN3 — sticker indien beschikbaar
       const avatarInner = (r._fromAvatarKey && typeof getAvatarSvg === 'function')
         ? getAvatarSvg(r._fromAvatarKey, r._fromName, 'sm')
         : escapeHtml(avatarInitials(r._fromName));
@@ -498,20 +498,20 @@
     const { error: upErr } = await db.from('matches')
       .update({ status: 'accepted' })
       .eq('id', matchId);
-    if (upErr) { notify('Fout bij accepteren â€” probeer opnieuw'); if (btn) btn.disabled = false; return; }
+    if (upErr) { notify('Fout bij accepteren — probeer opnieuw'); if (btn) btn.disabled = false; return; }
 
     // Maak conversation aan
     const { error: convErr } = await db.from('conversations').insert({ match_id: matchId });
     if (convErr) {
       // Rollback: zet match terug naar pending
       await db.from('matches').update({ status: 'pending' }).eq('id', matchId);
-      notify('Chat kon niet worden aangemaakt â€” probeer opnieuw');
+      notify('Chat kon niet worden aangemaakt — probeer opnieuw');
       console.error('[mijn-berichten] conversation insert failed:', convErr);
       if (btn) btn.disabled = false;
       return;
     }
 
-    // Animatie â€” lees matchType uit data-attribuut van de card
+    // Animatie — lees matchType uit data-attribuut van de card
     const _reqCard = document.getElementById(`req-${CSS.escape(matchId)}`);
     if (_reqCard) {
       const _rawType = _reqCard.dataset.matchType || '';
@@ -543,7 +543,7 @@
       const { error: upErr } = await db.from('matches').update({ status: 'rejected' }).eq('id', matchId);
       if (upErr) {
         console.error('[declineRequest] match update fout:', upErr);
-        notify('Kon verzoek niet afwijzen â€” probeer opnieuw');
+        notify('Kon verzoek niet afwijzen — probeer opnieuw');
         if (btn) btn.disabled = false;
         return;
       }
@@ -558,12 +558,12 @@
       if (remaining.length === 0) document.getElementById('requestsSection').style.display = 'none';
     } catch (err) {
       console.error('[declineRequest] onverwachte fout:', err);
-      notify('Kon verzoek niet afwijzen â€” probeer opnieuw');
+      notify('Kon verzoek niet afwijzen — probeer opnieuw');
       if (btn) btn.disabled = false;
     }
   }
 
-  // â”€â”€ Data laden â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Data laden ───────────────────────────────────────────────────────────
 
   async function loadAll() {
     if (!currentUser) return;
@@ -596,7 +596,7 @@
       .limit(1)
       .maybeSingle();
     _hasBegeleider = !!anyBegeleider;
-    // RUN3 â€” begeleider-link alleen voor BOL-studenten
+    // RUN3 — begeleider-link alleen voor BOL-studenten
     const _isStudent = (window.__currentRole || 'student') === 'student';
     document.getElementById('addBegeleiderLink').style.display =
       (_isStudent && !_isBBL && !_hasBegeleider) ? 'inline-flex' : 'none';
@@ -719,7 +719,7 @@
     renderConvList();
   }
 
-  // â”€â”€ Begeleider modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Begeleider modal ─────────────────────────────────────────────────────
 
   function openBegeleiderModal() {
     document.getElementById('begeleiderModal').style.display = 'flex';
@@ -752,7 +752,7 @@
       results.innerHTML = '<div class="modal-empty">Begin met typen om te zoeken.</div>';
       return;
     }
-    results.innerHTML = '<div class="modal-empty">Zoekenâ€¦</div>';
+    results.innerHTML = '<div class="modal-empty">Zoeken…</div>';
 
     // Profiles (school of begeleider)
     const { data: profs } = await db.from('profiles')
@@ -793,7 +793,7 @@
 
   async function _sendBegeleiderInvite(targetId, targetName) {
     const btn = document.getElementById(`inv-${CSS.escape(targetId)}`);
-    if (btn) { btn.disabled = true; btn.textContent = 'â€¦'; }
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
 
     // Controleer of er al een uitnodiging is
     const { data: existing } = await db.from('matches')
@@ -818,7 +818,7 @@
     }).select('id').maybeSingle();
 
     if (error || !newMatch) {
-      notify('Fout bij versturen â€” probeer opnieuw');
+      notify('Fout bij versturen — probeer opnieuw');
       if (btn) { btn.disabled = false; btn.textContent = 'Uitnodig'; }
       return;
     }
@@ -833,10 +833,10 @@
     closeBegeleiderModal();
   }
 
-  // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Init ─────────────────────────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', async () => {
-    // RUN3 â€” role-aware: student Ã©n gepensioneerd toegelaten
+    // RUN3 — role-aware: student én gepensioneerd toegelaten
     const hasRole = await requireRole('student', 'gepensioneerd');
     if (!hasRole) return;
 
@@ -864,9 +864,9 @@
       _isBBL = false;
     }
 
-    // Rol-aware top-nav header â€” werkt voor student (BOL/BBL) Ã©n gepensioneerd
+    // Rol-aware top-nav header — werkt voor student (BOL/BBL) én gepensioneerd
     // Run 1.5 v2 Issue 3: BBL student hoort student_bbl key (5 items, eigen
-    // nav-config in HEADER_NAV_BY_ROLE) â€” anders krijgt BBL Daan BOL-header (7
+    // nav-config in HEADER_NAV_BY_ROLE) — anders krijgt BBL Daan BOL-header (7
     // items) wat visueel afwijkt van matchpool waar bbl_mode wel gedetecteerd wordt.
     const headerRole = (userRole === 'student' && _isBBL) ? 'student_bbl' : userRole;
     await renderRoleHeader(headerRole, 'berichten', {
@@ -877,6 +877,6 @@
   });
 </script>
 
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

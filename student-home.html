@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Welkom â€” Internly</title>
+  <title>Welkom — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -161,9 +161,9 @@
   <main class="sh-main">
 
     <section class="sh-hero">
-      <div class="sh-greeting" id="sh-greeting">Goedemorgen ðŸ‘‹</div>
+      <div class="sh-greeting" id="sh-greeting">Goedemorgen 👋</div>
       <div class="sh-name" id="sh-name">Welkom terug</div>
-      <div class="sh-meta" id="sh-meta">Internly Â· Jouw stageplek</div>
+      <div class="sh-meta" id="sh-meta">Internly · Jouw stageplek</div>
     </section>
 
     <section class="sh-progress-wrap" id="sh-progress-wrap" style="display:none">
@@ -177,42 +177,42 @@
     <section class="sh-cards">
 
       <a href="discover.html" class="sh-card">
-        <div class="sh-card-icon">ðŸ”</div>
+        <div class="sh-card-icon">🔍</div>
         <div class="sh-card-body">
           <div class="sh-card-title">Ontdek stages</div>
           <div class="sh-card-sub">Bekijk alle vacatures en vind jouw match</div>
         </div>
-        <div class="sh-card-arrow">â†’</div>
+        <div class="sh-card-arrow">→</div>
       </a>
 
       <a href="student-profile.html" class="sh-card" id="sh-profiel-card">
-        <div class="sh-card-icon">ðŸ‘¤</div>
+        <div class="sh-card-icon">👤</div>
         <div class="sh-card-body">
           <div class="sh-card-title">Profiel aanvullen</div>
           <div class="sh-card-sub">Hoe meer je invult, hoe beter de matches</div>
         </div>
-        <div class="sh-card-arrow">â†’</div>
+        <div class="sh-card-arrow">→</div>
       </a>
 
       <a href="mijn-sollicitaties.html" class="sh-card">
-        <div class="sh-card-icon">ðŸ“‹</div>
+        <div class="sh-card-icon">📋</div>
         <div class="sh-card-body">
           <div class="sh-card-title">Mijn sollicitaties</div>
           <div class="sh-card-sub" id="sh-sol-sub">Bekijk de status van je aanmeldingen</div>
         </div>
-        <div class="sh-card-arrow">â†’</div>
+        <div class="sh-card-arrow">→</div>
       </a>
 
     </section>
 
     <section class="sh-hub-wrap" id="sh-hub-wrap" style="display:none">
       <a href="match-dashboard.html" class="sh-hub-card" id="sh-hub-link">
-        <div class="sh-hub-icon">ðŸ“ˆ</div>
+        <div class="sh-hub-icon">📈</div>
         <div class="sh-hub-body">
           <div class="sh-hub-title">Stage Hub</div>
           <div class="sh-hub-stage" id="sh-hub-stage">Actieve stage</div>
         </div>
-        <div class="sh-hub-badge">Actief â†’</div>
+        <div class="sh-hub-badge">Actief →</div>
       </a>
     </section>
 
@@ -244,10 +244,10 @@
 
       const uur = new Date().getHours();
       const groet = uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
-      document.getElementById('sh-greeting').textContent = groet + ' ðŸ‘‹';
+      document.getElementById('sh-greeting').textContent = groet + ' 👋';
       document.getElementById('sh-name').textContent = sp.naam;
       document.getElementById('sh-meta').textContent =
-        [sp.opleiding, sp.school].filter(Boolean).join(' Â· ') || 'Internly Â· Jouw stageplek';
+        [sp.opleiding, sp.school].filter(Boolean).join(' · ') || 'Internly · Jouw stageplek';
 
       // Gewogen completeness via centrale helper (js/utils.js).
       const pct = window.calculateProfileCompleteness('student', sp);
@@ -265,14 +265,14 @@
           _sugEl.style.display = '';
           _sugEl.innerHTML = _ontbrekend.map(v => `
             <a href="bol-profile.html" class="sh-suggestie">
-              <span>+ ${v.impact}</span><span>â†’</span>
+              <span>+ ${v.impact}</span><span>→</span>
             </a>
           `).join('');
         }
       }
 
       // Parallel: header rendering + actieve match + sollicitatie-teller.
-      // Drie onafhankelijke calls â€” geen sequentiÃ«le afhankelijkheid.
+      // Drie onafhankelijke calls — geen sequentiële afhankelijkheid.
       const [, matchRes, solRes] = await Promise.all([
         renderStudentHeader({ activeTab: 'home' }),
         db.from('matches')
@@ -293,7 +293,7 @@
         const posting = match.internship_postings;
         if (posting?.title) {
           stageEl.textContent = posting.title +
-            (posting.company_name ? ' Â· ' + posting.company_name : '');
+            (posting.company_name ? ' · ' + posting.company_name : '');
         }
         document.getElementById('sh-hub-wrap').style.display = '';
         document.getElementById('sh-hub-link').href =

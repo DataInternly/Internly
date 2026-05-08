@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Berichten â€” Internly</title>
+  <title>Berichten — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
@@ -53,13 +53,13 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       DOTTED JOURNAL ACHTERGROND â€” Barry's verzoek (KRITIEK)
+    /* ═══════════════════════════════════════════════════════════════
+       DOTTED JOURNAL ACHTERGROND — Barry's verzoek (KRITIEK)
        Achtergrond zit op <body class="page-chat">, NIET op .chat-wrap
        of bubbles. background-attachment: fixed zorgt dat het patroon
        niet meescroll. Bubbles blijven semi-transparant zodat het
        journal-effect doorschemert.
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       ═══════════════════════════════════════════════════════════════ */
     body.page-chat {
       font-family: var(--font-body, 'Outfit', sans-serif);
       color: var(--fg-primary, #0d1520);
@@ -82,7 +82,7 @@
       overflow: hidden;
     }
 
-    /* â”€â”€ Topbar â€” translucent zodat journal doorschemert â”€â”€ */
+    /* ── Topbar — translucent zodat journal doorschemert ── */
     .topbar {
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(8px);
@@ -132,7 +132,7 @@
       background: #2bbf6a; flex-shrink: 0;
     }
 
-    /* Lang-switcher op witte topbar â€” overschrijft .lang-btn van style.css */
+    /* Lang-switcher op witte topbar — overschrijft .lang-btn van style.css */
     .topbar .lang-btn {
       background: transparent;
       border: 1px solid transparent;
@@ -152,7 +152,7 @@
       border-color: rgba(255,126,66,.25);
     }
 
-    /* â”€â”€ Chat layout â”€â”€ */
+    /* ── Chat layout ── */
     .chat-wrap {
       flex: 1; display: flex; flex-direction: column;
       max-width: 720px; width: 100%; margin: 0 auto;
@@ -160,7 +160,7 @@
       padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    /* â”€â”€ Messages area â€” geen eigen achtergrond, journal schemert door â”€â”€ */
+    /* ── Messages area — geen eigen achtergrond, journal schemert door ── */
     .messages-area {
       flex: 1; overflow-y: auto;
       padding: var(--s5, 20px) var(--s4, 16px);
@@ -172,7 +172,7 @@
     }
     .messages-area::-webkit-scrollbar-track { background: transparent; }
 
-    /* Day separator â€” Caveat in oranje, kantelt licht */
+    /* Day separator — Caveat in oranje, kantelt licht */
     .day-sep {
       text-align: center;
       font-family: var(--font-script, 'Caveat', cursive);
@@ -215,14 +215,14 @@
       font-size: .92rem; line-height: 1.5;
       word-break: break-word; white-space: pre-wrap;
     }
-    /* OWN: solid green â€” staat semi-transparant in blueprint maar
+    /* OWN: solid green — staat semi-transparant in blueprint maar
        voor leesbaarheid gebruiken we volle accent. */
     .msg-row.own .bubble {
       background: var(--c-green, #1a7a48);
       color: #fff;
       border-top-right-radius: 4px;
     }
-    /* OTHER: semi-transparant wit (alpha .94) â€” KRITIEK voor journal-effect */
+    /* OTHER: semi-transparant wit (alpha .94) — KRITIEK voor journal-effect */
     .msg-row.other .bubble {
       background: rgba(255,255,255,0.94);
       color: var(--fg-primary, #0d1520);
@@ -238,7 +238,7 @@
       margin-top: 3px; padding: 0 2px;
     }
 
-    /* â”€â”€ Input bar â€” eigen rustig wit, GEEN achtergrond doorschemering â”€â”€ */
+    /* ── Input bar — eigen rustig wit, GEEN achtergrond doorschemering ── */
     .input-bar {
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(8px);
@@ -283,7 +283,7 @@
     .send-btn:active { transform: scale(.94); }
     .send-btn:disabled { background: #d1d5db; cursor: not-allowed; box-shadow: none; transform: none; }
 
-    /* â”€â”€ Empty / Loading â”€â”€ */
+    /* ── Empty / Loading ── */
     .chat-empty {
       flex: 1; display: flex; align-items: center; justify-content: center;
       flex-direction: column; gap: 10px;
@@ -293,7 +293,7 @@
     }
     .chat-empty .icon { font-size: 2.5rem; }
 
-    /* â”€â”€ Notif â”€â”€ */
+    /* ── Notif ── */
     .notif {
       position: fixed; bottom: 80px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -314,7 +314,7 @@
       outline-offset: 2px;
     }
 
-    /* â”€â”€ Optimistic message states â”€â”€ */
+    /* ── Optimistic message states ── */
     .msg-row[data-status="pending"] .bubble { opacity: .55; }
     .msg-row[data-status="failed"]  .bubble { border: 1.5px solid #b82020; opacity: .85; }
     .msg-retry-btn {
@@ -327,7 +327,7 @@
     }
     .msg-retry-btn:hover { opacity: .75; }
 
-    /* â”€â”€ Emoji button â”€â”€ */
+    /* ── Emoji button ── */
     .emoji-btn {
       background: none; border: none; font-size: 1.22rem;
       width: 36px; height: 44px; flex-shrink: 0;
@@ -342,7 +342,7 @@
       color: var(--fg-secondary, #2e4038);
     }
 
-    /* â”€â”€ Emoji picker container â”€â”€ */
+    /* ── Emoji picker container ── */
     #emoji-picker-container {
       position: absolute;
       bottom: calc(100% + 8px);
@@ -356,7 +356,7 @@
       max-width: min(352px, calc(100vw - 32px));
     }
 
-    /* â”€â”€ Bubble chain (consecutive messages same sender) â”€â”€ */
+    /* ── Bubble chain (consecutive messages same sender) ── */
     .msg-row.own   .bubble.chain-top    { border-top-right-radius: 4px; }
     .msg-row.own   .bubble.chain-bottom { border-bottom-right-radius: 18px; }
     .msg-row.other .bubble.chain-top    { border-top-left-radius: 4px; }
@@ -373,7 +373,7 @@
       .day-sep { transform: none; }
     }
 
-    /* â”€â”€ Minesweeper â”€â”€ */
+    /* ── Minesweeper ── */
     .mine-btn {
       background: none; border: none; font-size: 1.22rem;
       width: 36px; height: 44px; flex-shrink: 0;
@@ -479,21 +479,21 @@
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <a id="chat-back-btn" href="matches.html" class="back-btn">â† Terug</a>
+  <a id="chat-back-btn" href="matches.html" class="back-btn">← Terug</a>
   <div class="topbar-match-info chat-topbar-meta">
     <div class="chat-topbar-avatar" id="chatTopbarAvatar" aria-hidden="true"></div>
     <div class="chat-topbar-meta-text">
-      <div class="topbar-match-name" id="topbarMatchName">Ladenâ€¦</div>
+      <div class="topbar-match-name" id="topbarMatchName">Laden…</div>
       <div class="topbar-match-sub" id="topbarMatchSub"></div>
     </div>
   </div>
-  <a id="match-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">ðŸ“Š Stage Hub</a>
+  <a id="match-hub-topbar-link" href="match-dashboard.html" style="display:none;font-size:.78rem;font-weight:700;color:#e05c1a;background:#fdf0e8;padding:5px 11px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0;">📊 Stage Hub</a>
   <a href="privacybeleid.html" style="flex-shrink:0;font-size:.72rem;color:var(--fg-tertiary,#6b8070);text-decoration:none;padding:5px 4px;">Privacy</a>
   <button onclick="performLogout()" style="
     flex-shrink:0;background:none;border:none;
     color:var(--fg-tertiary,#6b8070);font-size:.75rem;font-family:'Outfit',sans-serif;
     cursor:pointer;padding:5px 8px;border-radius:6px;
-    transition:color .15s;" title="Uitloggen">â†ª Uit</button>
+    transition:color .15s;" title="Uitloggen">↪ Uit</button>
   <div class="lang-switcher" style="margin-left:0;flex-shrink:0">
     <button onclick="switchLang('nl')" class="lang-btn" data-lang="nl">NL</button>
     <button onclick="switchLang('en')" class="lang-btn" data-lang="en">EN</button>
@@ -505,23 +505,23 @@
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
   <a href="discover.html" class="mt-tab">
-    <span class="mt-icon">ðŸ”</span>
+    <span class="mt-icon">🔍</span>
     <span class="mt-label">Ontdek</span>
   </a>
   <a href="matches.html" class="mt-tab">
-    <span class="mt-icon">ðŸ’«</span>
+    <span class="mt-icon">💫</span>
     <span class="mt-label">Matches</span>
   </a>
   <a href="mijn-sollicitaties.html" class="mt-tab active">
-    <span class="mt-icon">ðŸ“‹</span>
+    <span class="mt-icon">📋</span>
     <span class="mt-label">Stages</span>
   </a>
   <a id="mt-hub-link" href="match-dashboard.html" class="mt-tab">
-    <span class="mt-icon">ðŸ“Š</span>
+    <span class="mt-icon">📊</span>
     <span class="mt-label">Hub</span>
   </a>
   <a href="student-profile.html" class="mt-tab">
-    <span class="mt-icon">ðŸ‘¤</span>
+    <span class="mt-icon">👤</span>
     <span class="mt-label">Profiel</span>
   </a>
 </nav>
@@ -531,12 +531,12 @@
 
   <div class="messages-area" id="messagesArea">
     <div class="chat-empty">
-      <span class="icon">â³</span>
-      Berichten ladenâ€¦
+      <span class="icon">⏳</span>
+      Berichten laden…
     </div>
   </div>
 
-  <!-- â”€â”€ Chat templates panel â€” BOL Fix 30 apr 2026 â”€â”€ -->
+  <!-- ── Chat templates panel — BOL Fix 30 apr 2026 ── -->
   <div id="chat-templates" style="display:none;
     background:#faf7f3;border:1px solid rgba(13,21,32,.09);
     border-radius:8px;padding:.85rem;margin:0 12px .5rem">
@@ -552,26 +552,26 @@
     <button class="emoji-btn" id="emojiBtn"
             onclick="toggleEmojiPicker()"
             aria-label="Emoji toevoegen"
-            title="Emoji toevoegen">ðŸ˜Š</button>
+            title="Emoji toevoegen">😊</button>
     <button class="mine-btn" id="mineBtn"
             onclick="openMinesweeperInvite()"
             aria-label="Mijnenveger spelen"
-            title="Mijnenveger starten">ðŸ’£</button>
+            title="Mijnenveger starten">💣</button>
     <button id="templates-btn"
             onclick="toggleTemplates()"
             title="Gebruik een sjabloon"
             aria-label="Berichtsjablonen"
             style="padding:8px 10px;border-radius:8px;
             background:none;border:1px solid rgba(13,21,32,.12);
-            cursor:pointer;font-size:.9rem;flex-shrink:0">ðŸ“‹</button>
+            cursor:pointer;font-size:.9rem;flex-shrink:0">📋</button>
     <div id="emoji-picker-container" style="display:none"></div>
     <textarea
       class="msg-textarea"
       id="msgInput"
-      placeholder="Typ een berichtâ€¦ (Enter om te verzenden, Shift+Enter voor nieuwe regel)"
+      placeholder="Typ een bericht… (Enter om te verzenden, Shift+Enter voor nieuwe regel)"
       rows="1"
     ></textarea>
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Versturen">âž¤</button>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Versturen">➤</button>
   </div>
 
 </div>
@@ -588,7 +588,7 @@
   let otherPartyEmail = '';
 
 
-  // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Helpers ──────────────────────────────────────────────────────────────────
 
   function formatTime(iso) {
     return new Date(iso).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
@@ -611,10 +611,10 @@
   }
 
   // Offline/online listeners
-  window.addEventListener('offline', () => notify('Geen internetverbinding â€” wijzigingen worden niet opgeslagen'));
+  window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
   window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
 
-  // â”€â”€ Auto-resize textarea â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Auto-resize textarea ──────────────────────────────────────────────────
 
   const msgInput = document.getElementById('msgInput');
   msgInput.addEventListener('input', () => {
@@ -628,7 +628,7 @@
     }
   });
 
-  // â”€â”€ iOS keyboard: resize chat-wrap to keep input visible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── iOS keyboard: resize chat-wrap to keep input visible ─────────────────
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
@@ -643,7 +643,7 @@
     });
   }
 
-  // â”€â”€ Render messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Render messages ───────────────────────────────────────────────────────
 
   function renderMessages(messages) {
     const area = document.getElementById('messagesArea');
@@ -674,7 +674,7 @@
       const text       = escapeHtml(raw).replace(/\bbobba\b/g, '<span style="color:#E85D24;font-weight:500">bobba</span>');
       const time       = escapeHtml(formatTime(msg.created_at));
 
-      // Consecutive bubble detection â€” don't chain across day separators
+      // Consecutive bubble detection — don't chain across day separators
       const prev = i > 0 ? messages[i - 1] : null;
       const next = i < messages.length - 1 ? messages[i + 1] : null;
       const sameDay = (a, b) => formatDay(a.created_at) === formatDay(b.created_at);
@@ -711,13 +711,13 @@
     const text       = escapeHtml(raw).replace(/\bbobba\b/g, '<span style="color:#E85D24;font-weight:500">bobba</span>');
     const time       = escapeHtml(formatTime(msg.created_at));
 
-    // Check if the previous row is from the same sender â†’ apply chain styling
+    // Check if the previous row is from the same sender → apply chain styling
     const rows = area.querySelectorAll('.msg-row');
     const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
     const sameAsPrev = lastRow && lastRow.classList.contains(rowClass);
 
     if (sameAsPrev) {
-      // Previous message is no longer the last in its group â€” extend its chain
+      // Previous message is no longer the last in its group — extend its chain
       const prevBubble = lastRow.querySelector('.bubble');
       if (prevBubble) prevBubble.classList.add('chain-bottom');
       // Hide previous row's timestamp (it's no longer the end of the group)
@@ -737,13 +737,13 @@
     area.scrollTop = area.scrollHeight;
   }
 
-  // â”€â”€ Meeting cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Meeting cards ────────────────────────────────────────────────────────────
 
   function renderMeetingCard(meeting) {
-    const typeLabel    = meeting.type === 'video' ? 'ðŸ“¹ Video'
-                       : meeting.type === 'call'  ? 'ðŸ“ž Bellen'
-                       : 'ðŸ¢ Fysiek';
-    const contactLine  = meeting.contact_info ? ` Â· ${escapeHtml(meeting.contact_info)}` : '';
+    const typeLabel    = meeting.type === 'video' ? '📹 Video'
+                       : meeting.type === 'call'  ? '📞 Bellen'
+                       : '🏢 Fysiek';
+    const contactLine  = meeting.contact_info ? ` · ${escapeHtml(meeting.contact_info)}` : '';
     const isAttendee   = meeting.attendee_id === currentUser?.id;
     const isPending    = meeting.status === 'openstaand';
     const id           = escapeHtml(String(meeting.id));
@@ -756,23 +756,23 @@
         <button onclick="acceptMeetingFromChat('${id}')"
           style="flex:1;padding:7px 12px;background:#1a7a48;color:#fff;border:none;
             border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;
-            font-family:'Outfit',sans-serif;">âœ“ Accepteren</button>
+            font-family:'Outfit',sans-serif;">✓ Accepteren</button>
         <button onclick="declineMeetingFromChat('${id}')"
           style="flex:1;padding:7px 12px;background:#fff;color:#b82020;
             border:1.5px solid #fca5a5;border-radius:7px;font-size:.82rem;
-            font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;">âœ• Afwijzen</button>
+            font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;">✕ Afwijzen</button>
       </div>` :
       (!isPending ? `<div style="margin-top:.5rem;font-size:.78rem;font-weight:500;
         color:${meeting.status === 'bevestigd' ? '#1a7a48' : '#b82020'};">
-        ${meeting.status === 'bevestigd' ? 'âœ“ Bevestigd' : 'âœ• Afgewezen'}
+        ${meeting.status === 'bevestigd' ? '✓ Bevestigd' : '✕ Afgewezen'}
       </div>` : '');
 
     return `
       <div id="mtg-card-${id}"
         style="background:var(--bg2,#f0ede8);border-radius:8px;padding:.75rem 1rem;
           font-size:.85rem;border-left:3px solid var(--accent,#e05c1a);color:#0d1520;">
-        <div style="font-weight:500;margin-bottom:.25rem;">ðŸ“… Afspraak aangevraagd</div>
-        <div style="color:#3a4455;">${escapeHtml(meeting.subject)} Â· ${escapeHtml(nlDate)} Â· ${escapeHtml(meeting.time_start || '')}â€“${escapeHtml(meeting.time_end || '')}</div>
+        <div style="font-weight:500;margin-bottom:.25rem;">📅 Afspraak aangevraagd</div>
+        <div style="color:#3a4455;">${escapeHtml(meeting.subject)} · ${escapeHtml(nlDate)} · ${escapeHtml(meeting.time_start || '')}–${escapeHtml(meeting.time_end || '')}</div>
         <div style="font-size:.78rem;color:#7a8799;margin-top:.25rem;">${typeLabel}${contactLine}</div>
         ${statusLine}
       </div>`;
@@ -843,7 +843,7 @@
       .subscribe((status, err) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn('[chat] meetings realtime verbinding verbroken:', err?.message);
-          notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
+          notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
         }
       });
   }
@@ -880,7 +880,7 @@
       if (btns) btns.remove();
       const status = document.createElement('div');
       status.style.cssText = 'margin-top:.5rem;font-size:.78rem;color:#1a7a48;font-weight:500;';
-      status.textContent = 'âœ“ Bevestigd';
+      status.textContent = '✓ Bevestigd';
       card.appendChild(status);
     }
   }
@@ -917,12 +917,12 @@
       if (btns) btns.remove();
       const status = document.createElement('div');
       status.style.cssText = 'margin-top:.5rem;font-size:.78rem;color:#b82020;font-weight:500;';
-      status.textContent = 'âœ• Afgewezen';
+      status.textContent = '✕ Afgewezen';
       card.appendChild(status);
     }
   }
 
-  // â”€â”€ Emoji Picker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Emoji Picker ─────────────────────────────────────────────────────────────
 
   let _emojiPickerOpen = false;
 
@@ -985,7 +985,7 @@
     if (e.key === 'Escape' && _emojiPickerOpen) toggleEmojiPicker(false);
   });
 
-  // â”€â”€ Load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Load ──────────────────────────────────────────────────────────────────
 
   async function loadConversation(mId) {
     const { data: match } = await db
@@ -997,7 +997,7 @@
     if (!match) {
       document.getElementById('messagesArea').innerHTML = `
         <div class="chat-empty">
-          <span class="icon">âš ï¸</span>Match niet gevonden.
+          <span class="icon">⚠️</span>Match niet gevonden.
         </div>`;
       return;
     }
@@ -1005,7 +1005,7 @@
     if (match.party_a !== currentUser.id && match.party_b !== currentUser.id) {
       document.getElementById('messagesArea').innerHTML = `
         <div class="chat-empty">
-          <span class="icon">ðŸ”’</span>Je hebt geen toegang tot dit gesprek.
+          <span class="icon">🔒</span>Je hebt geen toegang tot dit gesprek.
         </div>`;
       return;
     }
@@ -1036,7 +1036,7 @@
       if (profile) {
         otherPartyName  = getDisplayName(profile) || 'Gesprekspartner'; // SPRINT5 NOTE: getDisplayName checkt naam en email maar niet profile.name; 'Gesprekspartner' onbereikbaar (getDisplayName geeft altijd string)
         otherPartyEmail = profile.email || '';
-        // RUN7 Cat 8 â€” avatar in topbar
+        // RUN7 Cat 8 — avatar in topbar
         const _avSlot = document.getElementById('chatTopbarAvatar');
         if (_avSlot) {
           if (profile.avatar_key && typeof getAvatarSvg === 'function') {
@@ -1067,7 +1067,7 @@
 
     if (!conv) {
       document.getElementById('messagesArea').innerHTML = `
-        <div class="chat-empty"><span class="icon">âš ï¸</span>Gesprek kon niet worden geladen.</div>`;
+        <div class="chat-empty"><span class="icon">⚠️</span>Gesprek kon niet worden geladen.</div>`;
       return;
     }
 
@@ -1086,7 +1086,7 @@
     await maybePostPendingMotivatie(mId);
   }
 
-  // â”€â”€ Chat templates â€” BOL Fix 30 apr 2026 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Chat templates — BOL Fix 30 apr 2026 ─────────────────────────────
   const CHAT_TEMPLATES = {
     student: [
       {
@@ -1124,7 +1124,7 @@
     if (!list) return;
     const tpls = CHAT_TEMPLATES[role];
     if (!tpls || !tpls.length) {
-      // Geen sjablonen voor deze rol â€” verberg knop
+      // Geen sjablonen voor deze rol — verberg knop
       if (btn) btn.style.display = 'none';
       return;
     }
@@ -1154,7 +1154,7 @@
     input.dispatchEvent(new Event('input'));
   }
 
-  // â”€â”€ Pending-motivatie auto-post â€” BOL Fix 30 apr 2026 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pending-motivatie auto-post — BOL Fix 30 apr 2026 ────────────────
   async function maybePostPendingMotivatie(mId) {
     if (!convId || !currentUser) return;
     try {
@@ -1175,12 +1175,12 @@
         .select('id', { count: 'exact', head: true })
         .eq('conversation_id', convId);
       if (existingCount && existingCount > 0) {
-        // Te laat â€” opruimen zonder posten
+        // Te laat — opruimen zonder posten
         try { localStorage.removeItem(storageKey); } catch (_) {}
         return;
       }
 
-      const body = 'ðŸ’¬ Motivatie student: ' + motivatie;
+      const body = '💬 Motivatie student: ' + motivatie;
       const { error: insErr } = await db.from('messages').insert({
         conversation_id: convId,
         sender_id:       currentUser.id,
@@ -1208,7 +1208,7 @@
     if (error) {
       console.error('Berichten laden fout:', error?.message || 'onbekende fout');
       const area = document.getElementById('messagesArea');
-      if (area) area.innerHTML = `<div class="chat-empty"><span class="icon">âš ï¸</span>Berichten konden niet worden geladen. Probeer de pagina te verversen.</div>`;
+      if (area) area.innerHTML = `<div class="chat-empty"><span class="icon">⚠️</span>Berichten konden niet worden geladen. Probeer de pagina te verversen.</div>`;
       return;
     }
     const annotated = (messages || []).map(m => ({
@@ -1229,7 +1229,7 @@
       .eq('read', false);
   }
 
-  // â”€â”€ Realtime â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Realtime ──────────────────────────────────────────────────────────────
 
   function subscribeRealtime() {
     if (realtimeSub) realtimeSub.unsubscribe();
@@ -1249,19 +1249,19 @@
       .subscribe((status, err) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn('[chat] berichten realtime verbinding verbroken:', err?.message);
-          notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
+          notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
         }
       });
   }
 
-  // â”€â”€ Send â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Send ──────────────────────────────────────────────────────────────────
 
   async function sendMessage() {
     toggleEmojiPicker(false); // close picker if open
     if (!convId || !currentUser) return;
     const input = document.getElementById('msgInput');
     const content = input.value
-      .replace(/[â€‹â€Œâ€â€Žâ€ï»¿Â ]/g, '')
+      .replace(/[​‌‍‎‏﻿ ]/g, '')
       .trim();
     if (!content) return;
 
@@ -1333,13 +1333,13 @@
     }
   }
 
-  // â”€â”€ All-conversations view â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── All-conversations view ────────────────────────────────────────────────
 
   async function loadAllConversations(userId) {
     const main = document.getElementById('messagesArea');
-    if (main) main.innerHTML = '<div class="chat-empty"><span class="icon">â³</span>Gesprekken ladenâ€¦</div>';
+    if (main) main.innerHTML = '<div class="chat-empty"><span class="icon">⏳</span>Gesprekken laden…</div>';
 
-    // Step 1: fetch only match IDs for this user â€” DB-level filter so we never
+    // Step 1: fetch only match IDs for this user — DB-level filter so we never
     // receive other users' conversations even if RLS on conversations is absent.
     const { data: userMatches, error: matchErr } = await db
       .from('matches')
@@ -1385,7 +1385,7 @@
         justify-content:center; height:100%; padding:48px 24px;
         text-align:center;
       ">
-        <div style="font-size:3rem; margin-bottom:16px;">ðŸ’¬</div>
+        <div style="font-size:3rem; margin-bottom:16px;">💬</div>
         <div style="
           font-family:'Bricolage Grotesque',sans-serif;
           font-size:1.2rem; font-weight:700;
@@ -1402,7 +1402,7 @@
           background:#FF7E42; color:#fff; text-decoration:none;
           padding:11px 28px; border-radius:50px;
           font-family:'Outfit',sans-serif; font-size:.9rem; font-weight:700;
-        ">Ga naar Matches â†’</a>
+        ">Ga naar Matches →</a>
       </div>
     `;
   }
@@ -1475,7 +1475,7 @@
               <div style="
                 font-size:.8rem; color:#6b7280;
                 white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-              ">${lastMsg ? escapeHtml(lastMsg.content.slice(0, 50)) + (lastMsg.content.length > 50 ? 'â€¦' : '') : 'Nog geen berichten'}</div>
+              ">${lastMsg ? escapeHtml(lastMsg.content.slice(0, 50)) + (lastMsg.content.length > 50 ? '…' : '') : 'Nog geen berichten'}</div>
             </div>
             ${unread ? `<div style="
               width:10px; height:10px; border-radius:50%;
@@ -1487,7 +1487,7 @@
     `;
   }
 
-  // â”€â”€ Buddy pair chat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Buddy pair chat ───────────────────────────────────────────────────────
   // Vereist SQL-migratie: ALTER TABLE conversations ADD COLUMN IF NOT EXISTS
   //   buddy_pair_id UUID REFERENCES buddy_pairs(id);
   // Totdat die kolom bestaat valt de INSERT terug op match_id = null.
@@ -1506,15 +1506,15 @@
 
     if (pErr || !pair) {
       document.getElementById('messagesArea').innerHTML =
-        '<div class="chat-empty"><span class="icon">ðŸ”’</span>Buddy-koppeling niet gevonden.</div>';
+        '<div class="chat-empty"><span class="icon">🔒</span>Buddy-koppeling niet gevonden.</div>';
       return;
     }
 
-    // 2. Toegangscheck â€” alleen de twee betrokkenen
+    // 2. Toegangscheck — alleen de twee betrokkenen
     const uid = currentUser.id;
     if (pair.req?.id !== uid && pair.rec?.id !== uid) {
       document.getElementById('messagesArea').innerHTML =
-        '<div class="chat-empty"><span class="icon">ðŸ”’</span>Je hebt geen toegang tot dit gesprek.</div>';
+        '<div class="chat-empty"><span class="icon">🔒</span>Je hebt geen toegang tot dit gesprek.</div>';
       return;
     }
 
@@ -1525,14 +1525,14 @@
     otherPartyName = other?.naam || 'Buddy';
     otherPartyEmail = null;
 
-    // 4. Topbar invullen â€” buddy kleurcodering (backlog 30 apr 2026)
+    // 4. Topbar invullen — buddy kleurcodering (backlog 30 apr 2026)
     const _topName = document.getElementById('topbarMatchName');
     if (_topName) {
       _topName.innerHTML = escapeHtml(otherPartyName) +
         ' <span style="background:#ede9fe;color:#7c3aed;font-size:.7rem;font-weight:500;padding:2px 8px;border-radius:20px;display:inline-block;margin-left:6px;vertical-align:middle">Buddy</span>';
     }
-    document.getElementById('topbarMatchSub').textContent  = 'Buddy-chat Â· ' + (pair.type || 'gepensioneerd');
-    // Stage Hub-pil verbergen â€” niet van toepassing bij buddy-chat
+    document.getElementById('topbarMatchSub').textContent  = 'Buddy-chat · ' + (pair.type || 'gepensioneerd');
+    // Stage Hub-pil verbergen — niet van toepassing bij buddy-chat
     const stageHubLink = document.getElementById('match-hub-topbar-link');
     if (stageHubLink) stageHubLink.style.display = 'none';
 
@@ -1547,14 +1547,14 @@
     if (existing) {
       conv = existing;
     } else {
-      // Kolom bestaat nog niet of conversation bestaat nog niet â€” aanmaken
+      // Kolom bestaat nog niet of conversation bestaat nog niet — aanmaken
       const { data: newConv, error: cErr } = await db
         .from('conversations')
         .insert({ buddy_pair_id: pairId })
         .select('id')
         .maybeSingle();
       if (cErr) {
-        // Fallback: kolom bestaat nog niet â†’ sla op als match_id-loze conversatie
+        // Fallback: kolom bestaat nog niet → sla op als match_id-loze conversatie
         console.warn('[chat] buddy_pair_id kolom ontbreekt');
         const { data: fb } = await db
           .from('conversations')
@@ -1569,7 +1569,7 @@
 
     if (!conv) {
       document.getElementById('messagesArea').innerHTML =
-        '<div class="chat-empty"><span class="icon">âš ï¸</span>Gesprek kon niet worden geladen.</div>';
+        '<div class="chat-empty"><span class="icon">⚠️</span>Gesprek kon niet worden geladen.</div>';
       return;
     }
 
@@ -1580,7 +1580,7 @@
     markMessagesRead();
   }
 
-  // Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+  // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
   window.addEventListener('unhandledrejection', function(e) {
     if (e.reason && (
       e.reason.code === 'PGRST301' ||
@@ -1593,10 +1593,10 @@
     }
   });
 
-  // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Init ──────────────────────────────────────────────────────────────────
 
   window.addEventListener('DOMContentLoaded', async () => {
-    // â”€â”€ Laag 1: rol guard â”€â”€
+    // ── Laag 1: rol guard ──
     const hasValidRole = await requireRole('student', 'bedrijf', 'school');
     if (!hasValidRole) return;
 
@@ -1604,7 +1604,7 @@
     if (!user) { window.location.replace('auth.html'); return; }
     currentUser = user;
 
-    // Profile guard â€” audit fix 2026-04-30
+    // Profile guard — audit fix 2026-04-30
     const { data: _profRow } = await db.from('profiles')
       .select('role').eq('id', user.id).maybeSingle();
     if (_profRow?.role === 'student') {
@@ -1619,7 +1619,7 @@
     // BOL Fix 3: chat templates per rol
     loadChatTemplates(_profRow?.role);
 
-    // Rol-aware terug-knop + mobile-tabs (audit 2026-05-04 â€” Item 10)
+    // Rol-aware terug-knop + mobile-tabs (audit 2026-05-04 — Item 10)
     // Reden: chat.html is gedeeld over rollen; back-btn en mobile-tabs
     // wezen voorheen onvoorwaardelijk naar student-pagina's.
     const _userRole = _profRow?.role;
@@ -1637,12 +1637,12 @@
 
     const params = new URLSearchParams(window.location.search);
     matchId = params.get('match');
-    // Run 2 4.3 â€” accepteer beide varianten voor legacy-bookmarks
+    // Run 2 4.3 — accepteer beide varianten voor legacy-bookmarks
     // (bbl-hub.html gebruikte voorheen ?buddy_pair= zonder _id; nu gefixt
     //  maar legacy-links + cached browser-bookmarks moeten blijven werken)
     const buddyPairId = params.get('buddy_pair_id') || params.get('buddy_pair');
 
-    // â”€â”€ Laag 2: match partij guard (alleen bij directe match URL) â”€â”€
+    // ── Laag 2: match partij guard (alleen bij directe match URL) ──
     if (matchId && !buddyPairId) {
       const { data: matchRow, error: mErr } = await db.from('matches')
         .select('party_a, party_b')
@@ -1666,7 +1666,7 @@
     } else if (matchId) {
       await loadConversation(matchId);
     } else {
-      // List view â€” hide the input bar, update topbar title
+      // List view — hide the input bar, update topbar title
       const inputBar = document.querySelector('.input-bar');
       if (inputBar) inputBar.style.display = 'none';
       document.getElementById('topbarMatchName').textContent = 'Berichten';
@@ -1681,7 +1681,7 @@
     if (_msChannel)      _msChannel.unsubscribe();
   });
 
-  // â”€â”€ Minesweeper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Minesweeper ───────────────────────────────────────────────────────────
 
   const MS = { ROWS: 15, COLS: 15, MINES: 30, MAX_PER_HOUR: 3 };
   let _msChannel = null;
@@ -1776,10 +1776,10 @@
   function openMinesweeperInvite() {
     _msCh();
     _msShow(`<div class="mine-invite-box">
-      <div style="font-size:2rem">ðŸ’£</div>
+      <div style="font-size:2rem">💣</div>
       <div style="font-weight:600;margin:8px 0">Mijnenveger</div>
-      <div style="font-size:.82rem;color:#555;margin-bottom:14px">Beurten Â· 15Ã—15 Â· 30 mijnen Â· 1 pt per veilige cel</div>
-      <button onclick="_msSendInvite()" style="background:#000080;color:#fff;border:none;padding:7px 18px;font-size:.88rem;cursor:pointer;font-family:'Outfit',sans-serif">Uitdagen ðŸŽ®</button>
+      <div style="font-size:.82rem;color:#555;margin-bottom:14px">Beurten · 15×15 · 30 mijnen · 1 pt per veilige cel</div>
+      <button onclick="_msSendInvite()" style="background:#000080;color:#fff;border:none;padding:7px 18px;font-size:.88rem;cursor:pointer;font-family:'Outfit',sans-serif">Uitdagen 🎮</button>
       <button onclick="closeMinesweeper()" style="background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:6px 14px;margin-left:8px;cursor:pointer;font-family:'Outfit',sans-serif">Annuleren</button>
     </div>`);
   }
@@ -1790,8 +1790,8 @@
     _msState = { role: 'inviter', myTurn: true, scores: { inviter: 0, receiver: 0 }, board: null, seed: null, flagMode: false, done: false };
     let s = 60;
     _msShow(`<div class="mine-invite-box">
-      <div style="font-size:1.5rem">â³</div>
-      <div style="font-weight:600;margin:8px 0">Wacht op ${escapeHtml(otherPartyName)}â€¦</div>
+      <div style="font-size:1.5rem">⏳</div>
+      <div style="font-weight:600;margin:8px 0">Wacht op ${escapeHtml(otherPartyName)}…</div>
       <div id="ms-cd" style="font-size:.82rem;color:#555">Verloopt over <b>${s}</b>s</div>
       <button onclick="_msCancelInvite()" style="margin-top:10px;background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:5px 12px;cursor:pointer;font-family:'Outfit',sans-serif">Annuleren</button>
     </div>`);
@@ -1812,11 +1812,11 @@
     _msCh();
     _msState = { role: 'receiver', myTurn: false, scores: { inviter: 0, receiver: 0 }, board: null, seed: null, flagMode: false, done: false };
     _msShow(`<div class="mine-invite-box">
-      <div style="font-size:1.5rem">ðŸ’£</div>
+      <div style="font-size:1.5rem">💣</div>
       <div style="font-weight:600;margin:8px 0">${escapeHtml(p.name)} daagt je uit!</div>
-      <div style="font-size:.82rem;color:#555;margin-bottom:12px">Beurt-gebaseerd Mijnenveger Â· 15Ã—15 Â· 30 mijnen</div>
-      <button onclick="_msAcceptInvite()" style="background:#000080;color:#fff;border:none;padding:7px 16px;font-size:.88rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-right:8px">âœ“ Accepteren</button>
-      <button onclick="_msDeclineInvite()" style="background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:6px 14px;cursor:pointer;font-family:'Outfit',sans-serif">âœ• Weigeren</button>
+      <div style="font-size:.82rem;color:#555;margin-bottom:12px">Beurt-gebaseerd Mijnenveger · 15×15 · 30 mijnen</div>
+      <button onclick="_msAcceptInvite()" style="background:#000080;color:#fff;border:none;padding:7px 16px;font-size:.88rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-right:8px">✓ Accepteren</button>
+      <button onclick="_msDeclineInvite()" style="background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080;padding:6px 14px;cursor:pointer;font-family:'Outfit',sans-serif">✕ Weigeren</button>
     </div>`);
   }
 
@@ -1857,7 +1857,7 @@
     const myScore    = s.scores[s.role];
     const theirScore = s.scores[theirRole];
     const flagsLeft  = MS.MINES - s.board.filter(c => c.flagged).length;
-    const face       = s.done ? (myScore >= theirScore ? 'ðŸ˜Ž' : 'ðŸ˜µ') : 'ðŸ™‚';
+    const face       = s.done ? (myScore >= theirScore ? '😎' : '😵') : '🙂';
 
     const hud = `
       <div class="mine-hud">
@@ -1866,10 +1866,10 @@
         <div class="mine-led">${myScore}-${theirScore}</div>
       </div>
       <div class="mine-turn-bar" style="color:${s.myTurn && !s.done ? '#1a7a48' : '#b82020'}">
-        ${s.done ? 'ðŸ Spel voorbij' : s.myTurn ? 'ðŸŸ¢ Jouw beurt' : `ðŸ”´ Beurt van ${escapeHtml(otherPartyName)}`}
+        ${s.done ? '🏁 Spel voorbij' : s.myTurn ? '🟢 Jouw beurt' : `🔴 Beurt van ${escapeHtml(otherPartyName)}`}
       </div>
       <div style="display:flex;justify-content:center;margin:3px 0">
-        <button class="mine-flag-btn${s.flagMode ? ' active' : ''}" onclick="_msFlagToggle()">ðŸš© Vlag-modus</button>
+        <button class="mine-flag-btn${s.flagMode ? ' active' : ''}" onclick="_msFlagToggle()">🚩 Vlag-modus</button>
         ${s.flagMode ? '<span style="font-size:.68rem;color:#9ca3af;margin-left:6px;">vlaggen kost een beurt</span>' : ''}
       </div>`;
 
@@ -1878,9 +1878,9 @@
         let cls = 'mine-cell', content = '', dn = '';
         if (c.revealed) {
           cls += ' revealed';
-          if (c.mine) { cls += ' mine-explode'; content = 'ðŸ’¥'; }
+          if (c.mine) { cls += ' mine-explode'; content = '💥'; }
           else if (c.adjacent) { content = c.adjacent; dn = ` data-n="${c.adjacent}"`; }
-        } else if (c.flagged) { cls += ' flagged'; content = 'ðŸš©'; }
+        } else if (c.flagged) { cls += ' flagged'; content = '🚩'; }
         const canClick = s.myTurn && !s.done && !c.revealed;
         const onclick  = canClick ? `onclick="_msReveal(${i})"` : '';
         return `<div class="${cls}"${dn} ${onclick} oncontextmenu="_msFlag(event,${i})">${content}</div>`;
@@ -1907,7 +1907,7 @@
       _msRenderGame();
       _msCh().send({ type: 'broadcast', event: 'mine_hit', payload: { scores: s.scores } });
       const theirRole = s.role === 'inviter' ? 'receiver' : 'inviter';
-      _msSendChat(`ðŸ’£ ${escapeHtml(getDisplayName(currentUser))} raapte een mijn op! ${escapeHtml(otherPartyName)} wint ${s.scores[theirRole]}-${s.scores[s.role]}.`);
+      _msSendChat(`💣 ${escapeHtml(getDisplayName(currentUser))} raapte een mijn op! ${escapeHtml(otherPartyName)} wint ${s.scores[theirRole]}-${s.scores[s.role]}.`);
       setTimeout(closeMinesweeper, 3000);
       return;
     }
@@ -1975,7 +1975,7 @@
     if (!s) return;
     s.scores = p.scores; s.done = true;
     _msRevealMines(); _msRenderGame();
-    notify(escapeHtml(otherPartyName) + ' raapte een mijn op â€” jij wint! ðŸŽ‰');
+    notify(escapeHtml(otherPartyName) + ' raapte een mijn op — jij wint! 🎉');
     setTimeout(closeMinesweeper, 3000);
   }
 
@@ -1991,16 +1991,16 @@
     const theirRole = myRole === 'inviter' ? 'receiver' : 'inviter';
     const mine = scores[myRole], theirs = scores[theirRole];
     let msg;
-    if (mine > theirs)       msg = `ðŸ† ${escapeHtml(getDisplayName(currentUser))} wint Mijnenveger! ${mine}-${theirs}.`;
-    else if (theirs > mine)  msg = `ðŸ† ${escapeHtml(otherPartyName)} wint Mijnenveger! ${theirs}-${mine}.`;
-    else                     msg = `ðŸ¤ Gelijkspel in Mijnenveger! ${mine}-${theirs}.`;
+    if (mine > theirs)       msg = `🏆 ${escapeHtml(getDisplayName(currentUser))} wint Mijnenveger! ${mine}-${theirs}.`;
+    else if (theirs > mine)  msg = `🏆 ${escapeHtml(otherPartyName)} wint Mijnenveger! ${theirs}-${mine}.`;
+    else                     msg = `🤝 Gelijkspel in Mijnenveger! ${mine}-${theirs}.`;
     _msSendChat(msg);
   }
 
   function _msQuit() {
     if (_msState && !_msState.done) {
       _msCh().send({ type: 'broadcast', event: 'quit', payload: { name: getDisplayName(currentUser) } });
-      _msSendChat(`ðŸ³ï¸ ${escapeHtml(getDisplayName(currentUser))} heeft de Mijnenveger opgegeven.`);
+      _msSendChat(`🏳️ ${escapeHtml(getDisplayName(currentUser))} heeft de Mijnenveger opgegeven.`);
     }
     closeMinesweeper();
   }
@@ -2048,8 +2048,8 @@
 <div id="mine-panel" class="mine-panel" style="display:none">
   <div class="mine-chrome">
     <div class="mine-titlebar">
-      <span>ðŸ’£ Mijnenveger</span>
-      <button class="mine-close-x" onclick="closeMinesweeper()">âœ•</button>
+      <span>💣 Mijnenveger</span>
+      <button class="mine-close-x" onclick="closeMinesweeper()">✕</button>
     </div>
     <div id="mine-body"></div>
   </div>
@@ -2057,6 +2057,6 @@
 
 <script src="js/translate.js"></script>
 <script src="js/calendar.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

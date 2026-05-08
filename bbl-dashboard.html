@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
-  BBL DASHBOARD â€” Internly
-  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  BBL DASHBOARD — Internly
+  ─────────────────────────────────────────────────────────────────────────────
   Overzichtspagina voor BBL-deelnemers. Laadt na login als bbl_mode = true.
   Navigeert door naar bbl-hub.html voor chat/kalender/evaluatie/verlenging.
-  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  ─────────────────────────────────────────────────────────────────────────────
 -->
 <html lang="nl">
 <head>
@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>BBL Dashboard â€” Internly</title>
+  <title>BBL Dashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
@@ -63,7 +63,7 @@
       min-height: 100vh;
     }
 
-    /* â”€â”€ Topbar (cream-warm + backdrop-blur per blueprint) â”€â”€ */
+    /* ── Topbar (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
       background: rgba(244,243,239,.92);
       backdrop-filter: blur(8px);
@@ -105,10 +105,10 @@
     .topbar-privacy { font-size: .72rem; color: var(--c-ink3, #6b7280); text-decoration: none; padding: 5px 4px; transition: color .15s; }
     .topbar-privacy:hover { color: var(--c-ink, #0d1520); }
 
-    /* â”€â”€ Page shell â”€â”€ */
+    /* ── Page shell ── */
     .dash-shell { max-width: 760px; margin: 0 auto; padding: 20px 16px 80px; }
 
-    /* â”€â”€ Welkom header â”€â”€ */
+    /* ── Welkom header ── */
     .dash-welcome {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 1.3rem; font-weight: 600; color: #0d1520;
@@ -116,7 +116,7 @@
     }
     .dash-sub { font-size: .88rem; color: #6b7280; margin-bottom: 18px; }
 
-    /* â”€â”€ Contract strip â”€â”€ */
+    /* ── Contract strip ── */
     .contract-strip {
       display: flex; align-items: center; justify-content: space-between;
       gap: 10px; flex-wrap: wrap;
@@ -139,7 +139,7 @@
     }
     .cs-action:hover { background: rgba(0,0,0,.12); }
 
-    /* â”€â”€ Card grid â”€â”€ */
+    /* ── Card grid ── */
     .card-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -154,13 +154,13 @@
     }
     .dash-card.full { grid-column: 1 / -1; }
 
-    /* â”€â”€ Card header â”€â”€ */
+    /* ── Card header ── */
     .dc-label {
       font-size: 11px; font-weight: 600; text-transform: uppercase;
       letter-spacing: .07em; color: #9ca3af; margin-bottom: 12px;
     }
 
-    /* â”€â”€ Person row â”€â”€ */
+    /* ── Person row ── */
     .person { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .person:last-child { margin-bottom: 0; }
     .av {
@@ -175,13 +175,13 @@
     .p-name { font-size: 13px; font-weight: 500; color: #0d1520; }
     .p-role { font-size: 11px; color: #9ca3af; }
 
-    /* â”€â”€ Stat grid (contract info) â”€â”€ */
+    /* ── Stat grid (contract info) ── */
     .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .stat-item { }
     .stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #9ca3af; margin-bottom: 3px; }
     .stat-val { font-size: 14px; font-weight: 500; color: #0d1520; }
 
-    /* â”€â”€ Meeting list â”€â”€ */
+    /* ── Meeting list ── */
     .meeting-row {
       display: flex; align-items: center; gap: 10px;
       padding: 7px 0; border-bottom: 1px solid rgba(15,17,23,.07);
@@ -207,7 +207,7 @@
     .mb-drie  { background: #fdf3e3; color: #a0600a; }
     .mb-urg   { background: #fdecea; color: #b8291a; }
 
-    /* â”€â”€ Leerdoel preview â”€â”€ */
+    /* ── Leerdoel preview ── */
     .ld-row {
       display: flex; align-items: center; gap: 8px;
       padding: 5px 0; font-size: 12px; color: #4b5563;
@@ -220,9 +220,9 @@
       flex-shrink: 0; display: flex; align-items: center; justify-content: center;
     }
     .ld-check.done { background: #eaf5ed; border-color: rgba(26,122,74,.4); }
-    .ld-check.done::after { content: 'âœ“'; font-size: 9px; color: #1a7a48; }
+    .ld-check.done::after { content: '✓'; font-size: 9px; color: #1a7a48; }
 
-    /* â”€â”€ Quick action buttons â”€â”€ */
+    /* ── Quick action buttons ── */
     .quick-grid {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
     }
@@ -243,7 +243,7 @@
     .qbtn-title { font-size: 13px; font-weight: 500; }
     .qbtn-sub   { font-size: 11px; color: #9ca3af; }
 
-    /* â”€â”€ Empty & skeleton states â”€â”€ */
+    /* ── Empty & skeleton states ── */
     .empty-block {
       padding: 10px 0; font-size: 12px; color: #9ca3af; text-align: center;
     }
@@ -254,7 +254,7 @@
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    /* â”€â”€ Notif toast â”€â”€ */
+    /* ── Notif toast ── */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -286,13 +286,13 @@
 <div class="dash-shell">
 
   <div class="dash-welcome" id="welcomeMsg">Goedemorgen</div>
-  <div class="dash-sub" id="welcomeSub">Je BBL-traject in Ã©Ã©n overzicht.</div>
+  <div class="dash-sub" id="welcomeSub">Je BBL-traject in één overzicht.</div>
 
   <!-- Contract strip -->
   <div class="contract-strip cs-ok" id="contractStrip" style="display:none;">
     <div class="cs-left">
       <div class="cs-dot"></div>
-      <span id="contractStripText">Contract ladenâ€¦</span>
+      <span id="contractStripText">Contract laden…</span>
     </div>
     <a href="bbl-hub.html" class="cs-action" onclick="sessionStorage.setItem('bblView','verlenging')">Bekijk verlenging</a>
   </div>
@@ -364,19 +364,19 @@
     <div class="dc-label">Snel naar</div>
     <div class="quick-grid">
       <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','berichten')">
-        <div class="qbtn-icon">ðŸ’¬</div>
+        <div class="qbtn-icon">💬</div>
         <div><div class="qbtn-title">Berichten</div><div class="qbtn-sub">Chat met je begeleiders</div></div>
       </a>
       <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','kalender')">
-        <div class="qbtn-icon">ðŸ“…</div>
+        <div class="qbtn-icon">📅</div>
         <div><div class="qbtn-title">Kalender</div><div class="qbtn-sub">Plan een afspraak</div></div>
       </a>
       <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','evaluatie')">
-        <div class="qbtn-icon">âœï¸</div>
+        <div class="qbtn-icon">✍️</div>
         <div><div class="qbtn-title">Evaluatie</div><div class="qbtn-sub">Leerdoelen + handtekening</div></div>
       </a>
       <a class="qbtn" href="bbl-hub.html" onclick="sessionStorage.setItem('bblView','verlenging')">
-        <div class="qbtn-icon">ðŸ“‹</div>
+        <div class="qbtn-icon">📋</div>
         <div><div class="qbtn-title">Verlenging</div><div class="qbtn-sub">Jouw keuze voor volgend jaar</div></div>
       </a>
     </div>
@@ -384,7 +384,7 @@
 
   <!-- Account -->
   <div class="dash-card full" style="margin-top:18px;">
-    <div class="dc-label">âš™ï¸ Account</div>
+    <div class="dc-label">⚙️ Account</div>
     <div id="account-container"></div>
   </div>
 
@@ -392,7 +392,7 @@
 
 <script>
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers ─────────────────────────────────────────────────────────────────
 
 function showLoading(containerId, tekst) {
   const el = document.getElementById(containerId);
@@ -401,7 +401,7 @@ function showLoading(containerId, tekst) {
 }
 
 function formatDate(iso) {
-  if (!iso) return 'â€”';
+  if (!iso) return '—';
   return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
@@ -416,7 +416,7 @@ function formatDateShort(iso) {
 
 function signOut() { performLogout(); }
 
-// â”€â”€ Contract strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Contract strip ───────────────────────────────────────────────────────────
 
 function updateContractStrip(contractEndDate) {
   const strip = document.getElementById('contractStrip');
@@ -428,25 +428,25 @@ function updateContractStrip(contractEndDate) {
   strip.style.display = '';
   strip.className = 'contract-strip ' + (days > 60 ? 'cs-ok' : days > 30 ? 'cs-warn' : 'cs-danger');
   if (days > 60) {
-    txt.innerHTML = `Jouw recht: vÃ³Ã³r <strong>${decisionDateStr}</strong> moet het bedrijf bevestigen of je mag blijven. Internly herinnert je.`;
+    txt.innerHTML = `Jouw recht: vóór <strong>${decisionDateStr}</strong> moet het bedrijf bevestigen of je mag blijven. Internly herinnert je.`;
   } else if (days > 0) {
-    txt.innerHTML = `Jouw recht: vÃ³Ã³r <strong>${decisionDateStr}</strong> moet het bedrijf bevestigen of je mag blijven. Internly herinnert je.`;
+    txt.innerHTML = `Jouw recht: vóór <strong>${decisionDateStr}</strong> moet het bedrijf bevestigen of je mag blijven. Internly herinnert je.`;
   } else {
-    txt.innerHTML = `<strong>Contract verlopen</strong> â€” neem contact op met je begeleider`;
+    txt.innerHTML = `<strong>Contract verlopen</strong> — neem contact op met je begeleider`;
   }
 }
 
-// â”€â”€ Traject card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Traject card ─────────────────────────────────────────────────────────────
 
 function renderTraject(match) {
   const ip = match?.internship_postings;
-  document.getElementById('statBedrijf').textContent = ip?.company_name || 'â€”';
-  document.getElementById('statUren').textContent    = ip?.hours_per_week ? ip.hours_per_week + ' uur' : 'â€”';
+  document.getElementById('statBedrijf').textContent = ip?.company_name || '—';
+  document.getElementById('statUren').textContent    = ip?.hours_per_week ? ip.hours_per_week + ' uur' : '—';
   document.getElementById('statStart').textContent   = formatDate(ip?.contract_start || match?.contract_start || null);
   document.getElementById('statEinde').textContent   = formatDate(match?.contract_end_date || ip?.contract_end || null);
 }
 
-// â”€â”€ Begeleiders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Begeleiders ─────────────────────────────────────────────────────────────
 
 function renderBegeleiders(pb, roc) {
   const container = document.getElementById('begeleidersContent');
@@ -463,7 +463,7 @@ function renderBegeleiders(pb, roc) {
     </div>`;
 }
 
-// â”€â”€ Afspraken â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Afspraken ────────────────────────────────────────────────────────────────
 
 function renderMeetings(meetings) {
   const container = document.getElementById('meetingsList');
@@ -485,19 +485,19 @@ function renderMeetings(meetings) {
         </div>
         <div class="meet-info">
           <div class="meet-title">${escapeHtml(m.subject || tl)}</div>
-          <div class="meet-sub">${escapeHtml(m.time_start || '')}${m.time_start ? ' Â· ' : ''}${escapeHtml(m.status || '')}</div>
+          <div class="meet-sub">${escapeHtml(m.time_start || '')}${m.time_start ? ' · ' : ''}${escapeHtml(m.status || '')}</div>
         </div>
         <span class="meet-badge ${bc}">${tl}</span>
       </div>`;
   }).join('');
 }
 
-// â”€â”€ Leerdoelen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Leerdoelen ───────────────────────────────────────────────────────────────
 
 async function renderLeerdoelen(skills, userId) {
   const container = document.getElementById('leerdoelenContent');
   if (!skills || skills.length === 0) {
-    container.innerHTML = '<div class="empty-block">Nog geen leerdoelen â€” vul ze in op je profiel.</div>';
+    container.innerHTML = '<div class="empty-block">Nog geen leerdoelen — vul ze in op je profiel.</div>';
     return;
   }
   // Laad voortgang uit DB (skills JSONB)
@@ -529,16 +529,16 @@ async function renderLeerdoelen(skills, userId) {
   }
 }
 
-// â”€â”€ Welkomstgroet op basis van tijdstip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Welkomstgroet op basis van tijdstip ──────────────────────────────────────
 
 function setWelcome(naam) {
   const h = new Date().getHours();
   const greeting = h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
   document.getElementById('welcomeMsg').textContent = `${greeting}, ${naam}`;
-  document.getElementById('welcomeSub').textContent = 'Je BBL-traject in Ã©Ã©n overzicht.';
+  document.getElementById('welcomeSub').textContent = 'Je BBL-traject in één overzicht.';
 }
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -551,7 +551,7 @@ window.addEventListener('unhandledrejection', function(e) {
   }
 });
 
-// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── INIT ─────────────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', async () => {
 
@@ -559,7 +559,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
 
-  // Role guard â€” Bundel A 30 apr 2026
+  // Role guard — Bundel A 30 apr 2026
   const { data: _bblProf } = await db
     .from('profiles')
     .select('role')
@@ -584,7 +584,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (spErr) {
     console.error('[bbl-dashboard] student_profiles fout:', spErr.message);
-    // Bij query-fout niet automatisch doorsturen â€” gebruiker kan wel BBL zijn.
+    // Bij query-fout niet automatisch doorsturen — gebruiker kan wel BBL zijn.
     // Toon hersteloptie zodat de gebruiker kan herladen.
     document.body.insertAdjacentHTML('afterbegin',
       '<div style="position:fixed;top:0;left:0;right:0;background:#b82020;color:#fff;' +
@@ -601,7 +601,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   sessionStorage.setItem('internly_role', 'bbl');
 
-  // 2b. AccountModule render â€” pas nu draaien, BBL-rol bevestigd
+  // 2b. AccountModule render — pas nu draaien, BBL-rol bevestigd
   window._currentUserId = user.id;
   AccountModule.renderAccountScreen('account-container', 'nl');
 
@@ -633,9 +633,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (contractEnd) updateContractStrip(contractEnd);
   } else {
     document.getElementById('statBedrijf').textContent = 'Geen actieve koppeling';
-    document.getElementById('statUren').textContent    = 'â€”';
-    document.getElementById('statStart').textContent   = 'â€”';
-    document.getElementById('statEinde').textContent   = 'â€”';
+    document.getElementById('statUren').textContent    = '—';
+    document.getElementById('statStart').textContent   = '—';
+    document.getElementById('statEinde').textContent   = '—';
   }
 
   // 5. Praktijkbegeleider naam
@@ -692,6 +692,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

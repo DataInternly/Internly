@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="description" content="Schrijf een review over je stageervaringen via Internly.">
-  <title>Review schrijven â€” Internly</title>
+  <title>Review schrijven — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
@@ -75,7 +75,7 @@
       min-height: 100vh;
     }
 
-    /* â”€â”€ TOPBAR â”€â”€ */
+    /* ── TOPBAR ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(255,255,255,.95); backdrop-filter: blur(8px);
@@ -86,7 +86,7 @@
     .logo { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--ink); text-decoration: none; }
     .logo span { color: var(--green); }
 
-    /* â”€â”€ PAGE LAYOUT â”€â”€ */
+    /* ── PAGE LAYOUT ── */
     .page-wrap {
       max-width: 640px;
       margin: 0 auto;
@@ -100,7 +100,7 @@
     }
     .page-sub { font-size: .9rem; color: var(--ink3); margin-bottom: 32px; }
 
-    /* â”€â”€ FORM CARD â”€â”€ */
+    /* ── FORM CARD ── */
     .form-card {
       background: #fff;
       border-radius: 20px;
@@ -116,7 +116,7 @@
     }
     .field-hint { font-size: .78rem; color: var(--ink3); font-weight: 400; margin-left: 6px; }
 
-    /* â”€â”€ STAR PICKER â”€â”€ */
+    /* ── STAR PICKER ── */
     .star-picker { display: flex; gap: 8px; margin-bottom: 24px; }
     .star-picker button {
       background: none; border: none; cursor: pointer;
@@ -127,7 +127,7 @@
     .star-picker button.active { color: #f59e0b; }
     .star-picker button:hover { transform: scale(1.15); }
 
-    /* â”€â”€ TEXT INPUTS â”€â”€ */
+    /* ── TEXT INPUTS ── */
     .form-input, .form-textarea {
       width: 100%; padding: 12px 16px;
       border: 1.5px solid var(--border2); border-radius: 12px;
@@ -142,7 +142,7 @@
     .char-counter { font-size: .75rem; color: var(--ink4); text-align: right; margin-bottom: 20px; }
     .char-counter.warn { color: var(--red); }
 
-    /* â”€â”€ GUIDELINES â”€â”€ */
+    /* ── GUIDELINES ── */
     .guidelines-box {
       background: #f8f9fa; border-radius: 12px;
       padding: 16px 20px; margin-bottom: 24px;
@@ -150,15 +150,15 @@
     }
     .guidelines-box ul { list-style: none; padding: 0; }
     .guidelines-box li { font-size: .83rem; color: var(--ink2); padding: 3px 0; }
-    .guidelines-box li::before { content: 'âœ“ '; color: var(--green); font-weight: 700; }
+    .guidelines-box li::before { content: '✓ '; color: var(--green); font-weight: 700; }
 
-    /* â”€â”€ CHECKBOX â”€â”€ */
+    /* ── CHECKBOX ── */
     .tos-row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 28px; }
     .tos-row input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
     .tos-row label { font-size: .84rem; color: var(--ink2); cursor: pointer; line-height: 1.5; }
     .tos-row a { color: var(--green); text-decoration: underline; }
 
-    /* â”€â”€ SUBMIT â”€â”€ */
+    /* ── SUBMIT ── */
     .btn-submit {
       width: 100%; padding: 15px;
       background: var(--green); color: #fff;
@@ -169,14 +169,14 @@
     .btn-submit:hover:not(:disabled) { background: var(--green-dark); }
     .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; }
 
-    /* â”€â”€ ERROR / SUCCESS â”€â”€ */
+    /* ── ERROR / SUCCESS ── */
     .form-error { font-size: .85rem; color: var(--red); margin-bottom: 16px; display: none; }
     .form-error.show { display: block; }
 
-    /* â”€â”€ STAR LABEL â”€â”€ */
+    /* ── STAR LABEL ── */
     .star-label { font-size: .85rem; color: var(--ink3); margin-bottom: 16px; min-height: 20px; }
 
-    /* â”€â”€ NOTIF â”€â”€ */
+    /* ── NOTIF ── */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -187,7 +187,7 @@
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* â”€â”€ STATE BOXES â”€â”€ */
+    /* ── STATE BOXES ── */
     .state-box { text-align: center; padding: 64px 20px; color: var(--ink3); font-size: .95rem; line-height: 2; }
     .state-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
     .state-box.error { color: var(--red); }
@@ -203,7 +203,7 @@
 
 <div class="page-wrap">
   <div id="page-state">
-    <div class="state-box"><span class="state-icon">â³</span>Controlerenâ€¦</div>
+    <div class="state-box"><span class="state-icon">⏳</span>Controleren…</div>
   </div>
 
   <div id="review-form-wrap" style="display:none">
@@ -215,11 +215,11 @@
       <!-- Star picker -->
       <label class="field-label">Beoordeling <span class="field-hint">(verplicht)</span></label>
       <div class="star-picker" id="star-picker" role="group" aria-label="Sterren beoordeling">
-        <button type="button" data-val="1" aria-label="1 ster">â˜…</button>
-        <button type="button" data-val="2" aria-label="2 sterren">â˜…</button>
-        <button type="button" data-val="3" aria-label="3 sterren">â˜…</button>
-        <button type="button" data-val="4" aria-label="4 sterren">â˜…</button>
-        <button type="button" data-val="5" aria-label="5 sterren">â˜…</button>
+        <button type="button" data-val="1" aria-label="1 ster">★</button>
+        <button type="button" data-val="2" aria-label="2 sterren">★</button>
+        <button type="button" data-val="3" aria-label="3 sterren">★</button>
+        <button type="button" data-val="4" aria-label="4 sterren">★</button>
+        <button type="button" data-val="5" aria-label="5 sterren">★</button>
       </div>
       <div class="star-label" id="star-label">Klik om een beoordeling te geven</div>
 
@@ -229,7 +229,7 @@
       <div class="char-counter" id="title-counter">0 / 100</div>
 
       <!-- Body -->
-      <label class="field-label" for="rev-body">Jouw ervaring <span class="field-hint">(20â€“1000 tekens, verplicht)</span></label>
+      <label class="field-label" for="rev-body">Jouw ervaring <span class="field-hint">(20–1000 tekens, verplicht)</span></label>
       <textarea id="rev-body" class="form-textarea" maxlength="1000" placeholder="Beschrijf je stage-ervaring. Wat ging goed? Wat had beter gekund? Hoe was de begeleiding?"></textarea>
       <div class="char-counter" id="body-counter">0 / 1000</div>
 
@@ -239,7 +239,7 @@
           <li>Schrijf vanuit je eigen ervaring</li>
           <li>Vermijd naam, adres of andere persoonsgegevens</li>
           <li>Geen beledigingen of discriminerende taal</li>
-          <li>Reviews worden gemodereerd â€” ongepaste content wordt verwijderd</li>
+          <li>Reviews worden gemodereerd — ongepaste content wordt verwijderd</li>
         </ul>
       </div>
 
@@ -259,7 +259,7 @@
     </div>
 
     <p style="font-size:.78rem;color:var(--ink4);text-align:center;margin-top:12px">
-      Je review kan door ons team worden beoordeeld vÃ³Ã³r publicatie.
+      Je review kan door ons team worden beoordeeld vóór publicatie.
     </p>
   </div>
 </div>
@@ -267,7 +267,7 @@
 <script>
 'use strict';
 
-const STAR_LABELS = ['', 'Slecht', 'Matig', 'OkÃ©', 'Goed', 'Uitstekend'];
+const STAR_LABELS = ['', 'Slecht', 'Matig', 'Oké', 'Goed', 'Uitstekend'];
 let _rating = 0;
 let _companyId = null;
 let _matchId   = null;
@@ -283,7 +283,7 @@ function clearError() {
   el.classList.remove('show');
 }
 
-// â”€â”€ Star picker â”€â”€
+// ── Star picker ──
 document.getElementById('star-picker').addEventListener('click', function(e) {
   const btn = e.target.closest('button[data-val]');
   if (!btn) return;
@@ -295,7 +295,7 @@ document.getElementById('star-picker').addEventListener('click', function(e) {
   updateSubmitState();
 });
 
-// â”€â”€ Char counters â”€â”€
+// ── Char counters ──
 document.getElementById('rev-title').addEventListener('input', function() {
   const len = this.value.length;
   const el  = document.getElementById('title-counter');
@@ -320,38 +320,38 @@ function updateSubmitState() {
   document.getElementById('submit-btn').disabled = !(_rating >= 1 && bodyLen >= 20 && tosOk);
 }
 
-// â”€â”€ Submit â”€â”€
+// ── Submit ──
 async function handleSubmit() {
   clearError();
   const title = document.getElementById('rev-title').value.trim() || null;
   const body  = document.getElementById('rev-body').value.trim();
 
-  if (_rating < 1 || _rating > 5) { showError('Kies een beoordeling (1â€“5 sterren).'); return; }
+  if (_rating < 1 || _rating > 5) { showError('Kies een beoordeling (1–5 sterren).'); return; }
   if (body.length < 20)            { showError('Je review is te kort (minimaal 20 tekens).'); return; }
   if (!document.getElementById('tos-check').checked) { showError('Accepteer de spelregels om door te gaan.'); return; }
 
   const btn = document.getElementById('submit-btn');
   btn.disabled    = true;
-  btn.textContent = 'Bezigâ€¦';
+  btn.textContent = 'Bezig…';
 
   const result = await submitReview({ companyId: _companyId, rating: _rating, title, body, matchId: _matchId });
 
   if (result.ok) {
     document.getElementById('review-form-wrap').innerHTML = `
       <div class="state-box">
-        <span class="state-icon">ðŸŽ‰</span>
+        <span class="state-icon">🎉</span>
         <strong>Bedankt voor je review!</strong><br>
         <span style="font-size:.9rem">Je bijdrage helpt andere studenten.<br>
-        <a href="vacature-detail.html" style="color:var(--green)">â† Terug naar overzicht</a></span>
+        <a href="vacature-detail.html" style="color:var(--green)">← Terug naar overzicht</a></span>
       </div>`;
   } else {
-    showError('Review plaatsen mislukt â€” probeer het opnieuw.');
+    showError('Review plaatsen mislukt — probeer het opnieuw.');
     btn.disabled    = false;
     btn.textContent = 'Review plaatsen';
   }
 }
 
-// â”€â”€ Init â”€â”€
+// ── Init ──
 window.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   _companyId   = params.get('company');
@@ -361,7 +361,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const formEl  = document.getElementById('review-form-wrap');
 
   if (!_companyId || !_matchId) {
-    stateEl.innerHTML = `<div class="state-box error"><span class="state-icon">âš ï¸</span>Ongeldige URL â€” geen bedrijf of match opgegeven.<br><a href="discover.html" style="color:var(--green)">Terug naar overzicht â†’</a></div>`;
+    stateEl.innerHTML = `<div class="state-box error"><span class="state-icon">⚠️</span>Ongeldige URL — geen bedrijf of match opgegeven.<br><a href="discover.html" style="color:var(--green)">Terug naar overzicht →</a></div>`;
     return;
   }
 
@@ -395,7 +395,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       self_review:      'Je kunt geen review schrijven over je eigen bedrijf.',
       error:            'Er is een fout opgetreden. Probeer het opnieuw.',
     };
-    stateEl.innerHTML = `<div class="state-box error"><span class="state-icon">ðŸš«</span>${messages[eligibility.reason] || 'Je kunt op dit moment geen review plaatsen.'}<br><br><a href="discover.html" style="color:var(--green)">â† Terug naar vacatures</a></div>`;
+    stateEl.innerHTML = `<div class="state-box error"><span class="state-icon">🚫</span>${messages[eligibility.reason] || 'Je kunt op dit moment geen review plaatsen.'}<br><br><a href="discover.html" style="color:var(--green)">← Terug naar vacatures</a></div>`;
     return;
   }
 
@@ -413,7 +413,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -421,8 +421,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

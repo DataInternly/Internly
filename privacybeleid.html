@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
@@ -8,8 +8,8 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-<title>Privacybeleid â€” Internly</title>
-<meta property="og:title" content="Privacybeleid â€” Internly">
+<title>Privacybeleid — Internly</title>
+<meta property="og:title" content="Privacybeleid — Internly">
 <meta property="og:description" content="Hoe Internly omgaat met persoonsgegevens, AVG-rechten en sub-verwerkers.">
 <meta property="og:image" content="https://internly.pro/og-image.png">
 <meta property="og:url" content="https://internly.pro/privacybeleid.html">
@@ -22,13 +22,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Outfit:wght@400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   Subpage archetype (privacybeleid) â€” lange tekst, reading-frame.
+/* ═══════════════════════════════════════════════════════════════
+   Subpage archetype (privacybeleid) — lange tekst, reading-frame.
    Geen pull-quote, geen three-up. Globale tokens uit css/style.css.
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ═══════════════════════════════════════════════════════════════ */
 
 :root{
-  /* Pagina-aliassen â†’ globale tokens */
+  /* Pagina-aliassen → globale tokens */
   --green:    var(--c-green);
   --green-mid:var(--c-green-glow);
   --green-bg: #e8f5ee;
@@ -57,7 +57,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* â”€â”€â”€ HEADER â€” translucent cream blueprint â”€â”€â”€ */
+/* ─── HEADER — translucent cream blueprint ─── */
 .header{
   background: rgba(244,243,239,.92);
   backdrop-filter: blur(8px);
@@ -88,7 +88,7 @@ body{
   background: var(--c-cream);
 }
 
-/* â”€â”€â”€ MINI-HERO (blueprint pattern) â”€â”€â”€ */
+/* ─── MINI-HERO (blueprint pattern) ─── */
 .hero{
   background:
     radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
@@ -152,20 +152,20 @@ body{
 .badge-groen{background:rgba(34,168,94,.25);color:#9eecbb;}
 .badge-grijs{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);}
 
-/* â”€â”€â”€ DIVIDER (subtieler dan v1) â”€â”€â”€ */
+/* ─── DIVIDER (subtieler dan v1) ─── */
 .divider{
   height: 3px;
   background: linear-gradient(90deg, var(--c-green-glow, #22a85e), var(--c-orange-deep));
 }
 
-/* â”€â”€â”€ READING-FRAME LAYOUT â”€â”€â”€ */
+/* ─── READING-FRAME LAYOUT ─── */
 .main{
   max-width:760px;
   margin:0 auto;
   padding: var(--s8, 56px) var(--s7, 40px) var(--s9, 88px);
 }
 
-/* â”€â”€â”€ SECTIES â”€â”€â”€ */
+/* ─── SECTIES ─── */
 .sectie{margin-bottom: var(--s8, 56px);}
 .sectie:last-child{margin-bottom:0;}
 .sectie-kop{
@@ -190,7 +190,7 @@ body{
   flex-shrink:0;
 }
 
-/* â”€â”€â”€ TEKST â”€â”€â”€ */
+/* ─── TEKST ─── */
 p{
   font-size:.95rem;
   color: var(--fg-secondary);
@@ -223,7 +223,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   margin-left:3px;
 }
 
-/* â”€â”€â”€ CONTACTBLOK â”€â”€â”€ */
+/* ─── CONTACTBLOK ─── */
 .contactblok{
   background: var(--green-bg);
   border:1px solid rgba(26,122,72,.2);
@@ -244,7 +244,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   margin-bottom:4px;
 }
 
-/* â”€â”€â”€ CATEGORIE-KAARTEN â”€â”€â”€ */
+/* ─── CATEGORIE-KAARTEN ─── */
 .cat-grid{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
 .cat{
   background: var(--bg-surface);
@@ -285,7 +285,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   line-height:1.72;
 }
 
-/* â”€â”€â”€ BEWAARTABEL â”€â”€â”€ */
+/* ─── BEWAARTABEL ─── */
 .bewaar-tabel{
   width:100%;
   border-collapse:collapse;
@@ -318,7 +318,7 @@ strong{font-weight:600; color: var(--fg-primary);}
 }
 .bewaar-tabel tr:last-child td{border-bottom:none;}
 
-/* â”€â”€â”€ DERDEN â”€â”€â”€ */
+/* ─── DERDEN ─── */
 .derden-lijst{display:flex;flex-direction:column;gap:9px;margin:16px 0;}
 .derde{
   background: var(--bg-surface);
@@ -347,7 +347,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   line-height:1.7;
 }
 
-/* â”€â”€â”€ RECHTEN â”€â”€â”€ */
+/* ─── RECHTEN ─── */
 .rechten{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -381,7 +381,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   line-height:1.6;
 }
 
-/* â”€â”€â”€ INFO-BLOK (orange) â”€â”€â”€ */
+/* ─── INFO-BLOK (orange) ─── */
 .info{
   background: var(--accent-soft, rgba(224,92,26,.08));
   border:1px solid rgba(224,92,26,.18);
@@ -395,7 +395,7 @@ strong{font-weight:600; color: var(--fg-primary);}
 }
 .info strong{ color: var(--fg-primary); }
 
-/* â”€â”€â”€ FOOTER (blueprint dark green) â”€â”€â”€ */
+/* ─── FOOTER (blueprint dark green) ─── */
 .footer{
   background: var(--c-green-deep);
   padding: var(--s5, 20px) var(--s7, 40px);
@@ -436,7 +436,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   outline-offset: 2px;
 }
 
-/* â”€â”€â”€ PRINT â”€â”€â”€ */
+/* ─── PRINT ─── */
 @media print{
   .header,.footer,.divider{display:none;}
   .main{padding:0;max-width:100%;}
@@ -446,7 +446,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   .sectie{break-inside:avoid;}
 }
 
-/* â”€â”€â”€ RESPONSIVE â”€â”€â”€ */
+/* ─── RESPONSIVE ─── */
 @media(max-width:768px){
   .header,.hero,.main,.footer{padding-left:16px;padding-right:16px;}
   .main{padding-top:32px;padding-bottom:52px;}
@@ -469,7 +469,7 @@ strong{font-weight:600; color: var(--fg-primary);}
 <!-- HEADER -->
 <header class="header" data-public-header>
   <a class="logo" href="index.html">intern<span class="logo-ly">ly</span></a>
-  <a class="back" href="index.html" onclick="if(document.referrer)event.preventDefault(),history.back()">â† Terug</a>
+  <a class="back" href="index.html" onclick="if(document.referrer)event.preventDefault(),history.back()">← Terug</a>
 </header>
 
 <!-- HERO -->
@@ -478,10 +478,10 @@ strong{font-weight:600; color: var(--fg-primary);}
     <span class="hero-script-eyebrow">privacy</span>
     <div class="hero-eyebrow">Jouw privacy</div>
     <h1 class="hero-title">Wat we doen met je data</h1>
-    <p class="hero-sub">We verwerken zo min mogelijk gegevens en zijn daar transparant over. Studenten betalen nooit mee â€” ook niet indirect via hun data.</p>
+    <p class="hero-sub">We verwerken zo min mogelijk gegevens en zijn daar transparant over. Studenten betalen nooit mee — ook niet indirect via hun data.</p>
     <div class="hero-badges">
-      <span class="badge badge-groen">âœ“ AVG-compliant</span>
-      <span class="badge badge-grijs">Versie 1.0 Â· april 2026</span>
+      <span class="badge badge-groen">✓ AVG-compliant</span>
+      <span class="badge badge-grijs">Versie 1.0 · april 2026</span>
     </div>
   </div>
 </div>
@@ -512,18 +512,18 @@ strong{font-weight:600; color: var(--fg-primary);}
     <div class="cat-grid">
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ“§</span>
+          <span class="cat-ico">📧</span>
           <span class="cat-naam">Wachtlijst en nieuwsbrief</span>
           <span class="cat-basis">Jij geeft toestemming</span>
         </div>
         <div class="cat-body">
-          <p>Je e-mailadres â€” om je op de hoogte te houden van de ontwikkeling van het platform. Je geeft hiervoor zelf toestemming en je kunt je altijd uitschrijven via de afmeldlink in elke mail of via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
+          <p>Je e-mailadres — om je op de hoogte te houden van de ontwikkeling van het platform. Je geeft hiervoor zelf toestemming en je kunt je altijd uitschrijven via de afmeldlink in elke mail of via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
         </div>
       </div>
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ‘¤</span>
+          <span class="cat-ico">👤</span>
           <span class="cat-naam">Account aanmaken (alle gebruikers)</span>
           <span class="cat-basis">Nodig voor het platform</span>
         </div>
@@ -534,41 +534,41 @@ strong{font-weight:600; color: var(--fg-primary);}
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸŽ“</span>
+          <span class="cat-ico">🎓</span>
           <span class="cat-naam">Studentprofiel</span>
           <span class="cat-basis">Nodig voor het platform</span>
         </div>
         <div class="cat-body">
-          <p>Opleiding, studieniveau, regio, leerdoelen en motivatie. Hiermee koppelen we je aan stages die Ã©cht bij je passen.</p>
+          <p>Opleiding, studieniveau, regio, leerdoelen en motivatie. Hiermee koppelen we je aan stages die écht bij je passen.</p>
         </div>
       </div>
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ¢</span>
+          <span class="cat-ico">🏢</span>
           <span class="cat-naam">Bedrijfsprofiel</span>
           <span class="cat-basis">Nodig voor het platform</span>
         </div>
         <div class="cat-body">
-          <p>Bedrijfsnaam, sector, vestigingsplaats en vacaturegegevens, zodat studenten kunnen zien wat er bij jullie te leren is. Reactietijden op sollicitaties en beoordelingen van studenten gebruiken we voor de Trust Score. Zie sectie 3. Geanonimiseerde en geaggregeerde stagegegevens kunnen worden gebruikt voor ESG- en CSRD-rapportages van aangesloten bedrijven. Er worden nooit persoonsgegevens gedeeld â€” alleen samengevoegde statistieken.</p>
+          <p>Bedrijfsnaam, sector, vestigingsplaats en vacaturegegevens, zodat studenten kunnen zien wat er bij jullie te leren is. Reactietijden op sollicitaties en beoordelingen van studenten gebruiken we voor de Trust Score. Zie sectie 3. Geanonimiseerde en geaggregeerde stagegegevens kunnen worden gebruikt voor ESG- en CSRD-rapportages van aangesloten bedrijven. Er worden nooit persoonsgegevens gedeeld — alleen samengevoegde statistieken.</p>
         </div>
       </div>
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ«</span>
+          <span class="cat-ico">🏫</span>
           <span class="cat-naam">Schoolprofiel en begeleidersdashboard</span>
           <span class="cat-basis">Nodig voor het platform</span>
         </div>
         <div class="cat-body">
           <p>Naam begeleider, schoolnaam en voortgangsgegevens van begeleide studenten. Hiermee kunnen begeleiders het stageproces volgen en vroeg signaleren waar het mis dreigt te gaan.</p>
-          <p style="margin-top:.75rem">Bij een goedgekeurde bundeling worden studenten van meerdere opleidingen samengevoegd onder Ã©Ã©n schoolaccount op verzoek van de schoolbeheerder. Alleen de stagebegeleiders van de betreffende school krijgen toegang tot het samengevoegde overzicht. Er worden geen extra persoonsgegevens gedeeld met bedrijven of andere partijen. De bundeling wordt uitsluitend geactiveerd na een schriftelijk verzoek en expliciete goedkeuring door Internly.</p>
+          <p style="margin-top:.75rem">Bij een goedgekeurde bundeling worden studenten van meerdere opleidingen samengevoegd onder één schoolaccount op verzoek van de schoolbeheerder. Alleen de stagebegeleiders van de betreffende school krijgen toegang tot het samengevoegde overzicht. Er worden geen extra persoonsgegevens gedeeld met bedrijven of andere partijen. De bundeling wordt uitsluitend geactiveerd na een schriftelijk verzoek en expliciete goedkeuring door Internly.</p>
         </div>
       </div>
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ’¬</span>
+          <span class="cat-ico">💬</span>
           <span class="cat-naam">Berichten en afspraken</span>
           <span class="cat-basis">Nodig voor het platform</span>
         </div>
@@ -579,7 +579,7 @@ strong{font-weight:600; color: var(--fg-primary);}
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ›¡ï¸</span>
+          <span class="cat-ico">🛡️</span>
           <span class="cat-naam">Beveiliging</span>
           <span class="cat-basis">Grondslag: gerechtvaardigd belang</span>
         </div>
@@ -590,7 +590,7 @@ strong{font-weight:600; color: var(--fg-primary);}
 
       <div class="cat">
         <div class="cat-kop">
-          <span class="cat-ico">ðŸ§¾</span>
+          <span class="cat-ico">🧾</span>
           <span class="cat-naam">Betalingen</span>
           <span class="cat-basis">Grondslag: wettelijke verplichting</span>
         </div>
@@ -601,15 +601,15 @@ strong{font-weight:600; color: var(--fg-primary);}
     </div>
 
     <div class="info">
-      <strong>Je gegevens worden nooit verkocht.</strong> Studenten betalen ook niet indirect mee via hun data. We tonen geen advertenties van derden en doen niet aan commerciÃ«le profilering.
+      <strong>Je gegevens worden nooit verkocht.</strong> Studenten betalen ook niet indirect mee via hun data. We tonen geen advertenties van derden en doen niet aan commerciële profilering.
     </div>
   </section>
 
   <!-- 3. ALGORITME -->
   <section class="sectie" id="algoritme">
     <h2 class="sectie-kop"><span class="kop-nr">3</span>Geautomatiseerde besluitvorming</h2>
-    <p><strong>Matching.</strong> Ons algoritme vergelijkt je studentprofiel met stageplekken op basis van niveau, regio en leerdoelen. Het resultaat zijn suggesties. Jij beslist altijd zelf â€” er zijn geen rechtsgevolgen verbonden aan wat het algoritme voorstelt. <span class="art">(art. 22 AVG)</span></p>
-    <p><strong>Trust Score.</strong> Voor bedrijven berekenen we automatisch een betrouwbaarheidsscore, gebaseerd op meetbaar gedrag: hoe snel reageert een bedrijf op sollicitaties, en wat zeggen studenten die er stage hebben gelopen? Een lage score kan de zichtbaarheid van een bedrijf in zoekresultaten verlagen. Studenten hebben hier geen last van â€” de score gaat over bedrijven, niet over hen. Bedrijven die het niet eens zijn met hun score kunnen contact opnemen via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
+    <p><strong>Matching.</strong> Ons algoritme vergelijkt je studentprofiel met stageplekken op basis van niveau, regio en leerdoelen. Het resultaat zijn suggesties. Jij beslist altijd zelf — er zijn geen rechtsgevolgen verbonden aan wat het algoritme voorstelt. <span class="art">(art. 22 AVG)</span></p>
+    <p><strong>Trust Score.</strong> Voor bedrijven berekenen we automatisch een betrouwbaarheidsscore, gebaseerd op meetbaar gedrag: hoe snel reageert een bedrijf op sollicitaties, en wat zeggen studenten die er stage hebben gelopen? Een lage score kan de zichtbaarheid van een bedrijf in zoekresultaten verlagen. Studenten hebben hier geen last van — de score gaat over bedrijven, niet over hen. Bedrijven die het niet eens zijn met hun score kunnen contact opnemen via <a href="mailto:data@internly.pro">data@internly.pro</a>.</p>
   </section>
 
   <!-- 4. BEWAARTERMIJNEN -->
@@ -626,10 +626,10 @@ strong{font-weight:600; color: var(--fg-primary);}
         <tr><td>Betalings- en factuurgegevens</td><td>7 jaar <span class="art">(fiscale bewaarplicht)</span></td></tr>
         <tr><td>Nieuwsbrief e-mailadressen</td><td>Tot uitschrijving</td></tr>
         <tr><td>IP-adressen in logs</td><td>Maximaal 90 dagen</td></tr>
-        <tr><td>ESG-rapportagedata (bedrijven)</td><td>Minimaal 12 maanden na beÃ«indiging abonnement</td></tr>
+        <tr><td>ESG-rapportagedata (bedrijven)</td><td>Minimaal 12 maanden na beëindiging abonnement</td></tr>
       </tbody>
     </table>
-    <p>Bedrijven behouden toegang tot hun ESG-rapportagedata gedurende minimaal 12 maanden na beÃ«indiging van het abonnement, in verband met jaarlijkse CSRD-verplichtingen.</p>
+    <p>Bedrijven behouden toegang tot hun ESG-rapportagedata gedurende minimaal 12 maanden na beëindiging van het abonnement, in verband met jaarlijkse CSRD-verplichtingen.</p>
   </section>
 
   <!-- 5. DERDEN -->
@@ -640,7 +640,7 @@ strong{font-weight:600; color: var(--fg-primary);}
       <div class="derde">
         <div>
           <div class="derde-naam">Supabase Inc.</div>
-          <div class="derde-land">VS Â· EU-dataopslag</div>
+          <div class="derde-land">VS · EU-dataopslag</div>
         </div>
         <div class="derde-info">Database, authenticatie en berichtopslag. Je data staat op servers in Frankfurt (EU). Doorgifte naar de VS is gewaarborgd via Standard Contractual Clauses.</div>
       </div>
@@ -664,7 +664,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   <!-- 6. RECHTEN -->
   <section class="sectie" id="rechten">
     <h2 class="sectie-kop"><span class="kop-nr">6</span>Jouw rechten</h2>
-    <p>Je kunt onderstaande rechten altijd uitoefenen. Stuur een mail naar <a href="mailto:data@internly.pro">data@internly.pro</a>. We vragen om een bevestiging via je geregistreerde e-mailadres â€” zodat we zeker weten dat we met de juiste persoon spreken. We reageren binnen Ã©Ã©n maand. Altijd gratis.</p>
+    <p>Je kunt onderstaande rechten altijd uitoefenen. Stuur een mail naar <a href="mailto:data@internly.pro">data@internly.pro</a>. We vragen om een bevestiging via je geregistreerde e-mailadres — zodat we zeker weten dat we met de juiste persoon spreken. We reageren binnen één maand. Altijd gratis.</p>
     <div class="rechten">
       <div class="recht">
         <div class="recht-naam">Inzage</div>
@@ -676,7 +676,7 @@ strong{font-weight:600; color: var(--fg-primary);}
       </div>
       <div class="recht">
         <div class="recht-naam">Verwijdering</div>
-        <div class="recht-desc">Je gegevens laten wissen â€” tenzij we ze wettelijk moeten bewaren, zoals facturen. <span class="art">Art. 17</span></div>
+        <div class="recht-desc">Je gegevens laten wissen — tenzij we ze wettelijk moeten bewaren, zoals facturen. <span class="art">Art. 17</span></div>
       </div>
       <div class="recht">
         <div class="recht-naam">Beperking</div>
@@ -692,7 +692,7 @@ strong{font-weight:600; color: var(--fg-primary);}
       </div>
       <div class="recht">
         <div class="recht-naam">Toestemming intrekken</div>
-        <div class="recht-desc">Gegeven toestemming â€” zoals voor de nieuwsbrief â€” altijd intrekken. Niet met terugwerkende kracht. <span class="art">Art. 7 lid 3</span></div>
+        <div class="recht-desc">Gegeven toestemming — zoals voor de nieuwsbrief — altijd intrekken. Niet met terugwerkende kracht. <span class="art">Art. 7 lid 3</span></div>
       </div>
       <div class="recht">
         <div class="recht-naam">Klacht indienen</div>
@@ -705,11 +705,11 @@ strong{font-weight:600; color: var(--fg-primary);}
   <!-- 7. COOKIES -->
   <section class="sectie" id="cookies">
     <h2 class="sectie-kop"><span class="kop-nr">7</span>Cookies en browseropslag</h2>
-    <p>We gebruiken geen tracking-cookies, geen advertentiecookies en geen Google Analytics. Wat we wÃ©l in je browser opslaan:</p>
+    <p>We gebruiken geen tracking-cookies, geen advertentiecookies en geen Google Analytics. Wat we wél in je browser opslaan:</p>
     <ul>
-      <li><strong>Sessie-token</strong> â€” houdt je ingelogd. Noodzakelijk voor de werking van het platform.</li>
-      <li><strong>Geselecteerd niveau en rol</strong> â€” zodat je keuze onthouden wordt tijdens je bezoek. Wordt niet naar onze servers gestuurd.</li>
-      <li><strong>Google Translate</strong> â€” plaatst cookies als je de vertaalfunctie activeert. Je kiest zelf of je die functie gebruikt.</li>
+      <li><strong>Sessie-token</strong> — houdt je ingelogd. Noodzakelijk voor de werking van het platform.</li>
+      <li><strong>Geselecteerd niveau en rol</strong> — zodat je keuze onthouden wordt tijdens je bezoek. Wordt niet naar onze servers gestuurd.</li>
+      <li><strong>Google Translate</strong> — plaatst cookies als je de vertaalfunctie activeert. Je kiest zelf of je die functie gebruikt.</li>
     </ul>
   </section>
 
@@ -725,7 +725,7 @@ strong{font-weight:600; color: var(--fg-primary);}
   <section class="sectie" id="wijzigingen">
     <h2 class="sectie-kop"><span class="kop-nr">9</span>Wijzigingen</h2>
     <p>Het platform groeit en deze verklaring groeit mee. De actuele versie staat altijd op <a href="https://internly.pro/privacybeleid.html">internly.pro/privacybeleid.html</a>. Als er iets wezenlijks verandert, laten we je dat per e-mail weten.</p>
-    <p>Versie 1.0 â€” april 2026.</p>
+    <p>Versie 1.0 — april 2026.</p>
   </section>
 
   <!-- 10. CONTACT -->
@@ -736,7 +736,7 @@ strong{font-weight:600; color: var(--fg-primary);}
       <p><strong>Sasubo Holding B.V.</strong></p>
       <p>Appelgaard 48, 4033 JD Lienden</p>
       <p><a href="mailto:data@internly.pro">data@internly.pro</a></p>
-      <p>Reactie binnen 5 werkdagen â€” wettelijk verplicht binnen 1 maand.</p>
+      <p>Reactie binnen 5 werkdagen — wettelijk verplicht binnen 1 maand.</p>
       <p style="margin-top:8px">Kom je er niet uit? Je kunt ook een klacht indienen bij de <a href="https://www.autoriteitpersoonsgegevens.nl/klacht-indienen" target="_blank" rel="noopener noreferrer">Autoriteit Persoonsgegevens</a>.</p>
     </div>
   </section>
@@ -754,19 +754,19 @@ strong{font-weight:600; color: var(--fg-primary);}
     <li><a href="cookiebeleid.html">Cookiebeleid</a></li>
     <li><a href="#" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences(); return false;">Cookie-instellingen</a></li>
   </ul>
-  <div class="footer-disc">Internly.pro is onderdeel van Sasubo Holding B.V. Â· Privacyverklaring v1.0 Â· April 2026</div>
-  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
+  <div class="footer-disc">Internly.pro is onderdeel van Sasubo Holding B.V. · Privacyverklaring v1.0 · April 2026</div>
+  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
 </footer>
 
 <script src="js/consent.js" defer></script>
 
-<!-- Run 1.8 â€” scripts toegevoegd voor hybrid header
+<!-- Run 1.8 — scripts toegevoegd voor hybrid header
      (autoRefreshToken=false op publieke pagina's via js/supabase.js Run 1.5 v2). -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
 
-<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -826,14 +826,14 @@ strong{font-weight:600; color: var(--fg-primary);}
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend â†’ publieke header blijft staan, geen warn
+    // role onbekend → publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }

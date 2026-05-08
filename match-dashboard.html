@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>Stage Hub â€” Internly</title>
+  <title>Stage Hub — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -54,7 +54,7 @@
   })();
   </script>
   <style>
-    /* â”€â”€ Design tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Design tokens ───────────────────────────────────────────── */
     :root {
       /* Core */
       --primary:     #1a7a48;
@@ -102,14 +102,14 @@
       --red-bg:      #fdeaea;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       Dashboard archetype (match-dashboard / Stage Hub) â€” multi-role
+    /* ═══════════════════════════════════════════════════════════════
+       Dashboard archetype (match-dashboard / Stage Hub) — multi-role
        (student/bedrijf/school) shared dashboard.
        MINIMALE rewrite per fase D-strategie: 6145 regels totaal,
        1892 regels eigen CSS. Body+fonts via globale tokens, rest
        behouden i.v.m. risico op regressie en sprint-restrictie
        (eindverslag-flow + jspdf PDF-export NIET aanraken).
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       ═══════════════════════════════════════════════════════════════ */
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -125,7 +125,7 @@
       outline-offset: 2px;
     }
 
-    /* â”€â”€ Role picker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Role picker ─────────────────────────────────────────────── */
     #role-picker {
       min-height: 100vh;
       display: flex;
@@ -213,7 +213,7 @@
       color: var(--muted);
     }
 
-    /* â”€â”€ App shell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── App shell ───────────────────────────────────────────────── */
     #app-shell {
       display: none;
       min-height: 100vh;
@@ -233,7 +233,7 @@
       gap: 16px;
     }
 
-    /* Stage context-strip â€” toont stage-naam dynamisch onder student-header */
+    /* Stage context-strip — toont stage-naam dynamisch onder student-header */
     .hub-context-strip {
       position: sticky;
       top: 54px;
@@ -475,7 +475,7 @@
       max-width: calc(100% - var(--sidebar-w));
     }
 
-    /* â”€â”€ Shared components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Shared components ───────────────────────────────────────── */
     .page-head {
       display: flex;
       align-items: flex-start;
@@ -692,7 +692,7 @@
       margin-bottom: 8px;
     }
 
-    /* Bedrijf observerend-rol uitleg (audit 2026-05-04 â€” Item 11) */
+    /* Bedrijf observerend-rol uitleg (audit 2026-05-04 — Item 11) */
     .bedrijf-empty-state {
       padding: 1.25rem;
       background: var(--green-bg);
@@ -1169,7 +1169,7 @@
       z-index: 80;
     }
 
-    /* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Responsive ──────────────────────────────────────────────── */
     @media (max-width: 768px) {
       :root { --sidebar-w: 220px; }
 
@@ -1205,9 +1205,9 @@
       .rp-card { min-width: unset; }
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       MEETING SCHEDULER â€” component CSS
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ══════════════════════════════════════════════════════
+       MEETING SCHEDULER — component CSS
+       ══════════════════════════════════════════════════════ */
 
     /* Meeting card */
     .meeting-card {
@@ -1578,7 +1578,7 @@
       #app-shell { display: block !important; }
     }
 
-    /* â”€â”€ Animaties & micro-interacties â”€â”€ */
+    /* ── Animaties & micro-interacties ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -1612,10 +1612,10 @@
     /* Shake on validation error */
     .shake { animation: shakeIn 0.3s ease; }
 
-    /* â”€â”€ Hide role-picker during auth boot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Hide role-picker during auth boot ───────────────────────────────── */
     body.auth-boot #role-picker { display: none !important; }
 
-    /* â”€â”€ Loading spinner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Loading spinner ──────────────────────────────────────────────────── */
     #hub-spinner {
       display: none;
       position: fixed; inset: 0;
@@ -1633,7 +1633,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* â”€â”€ Match indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Match indicator ──────────────────────────────────────────────────── */
     .match-indicator {
       background: var(--white);
       border: 1px solid var(--border);
@@ -1697,7 +1697,7 @@
       font-size: .74rem; font-weight: 700; color: var(--ink2);
       white-space: nowrap; min-width: 32px; text-align: right;
     }
-    /* â”€â”€ Milestone tracker (CC Instructie 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Milestone tracker (CC Instructie 2) ─────────────── */
     .milestone-row {
       display: grid;
       grid-template-columns: 36px 1fr;
@@ -1761,7 +1761,7 @@
       background: var(--green); display: inline-block; flex-shrink: 0;
     }
 
-    /* â”€â”€ Kalender â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Kalender ─────────────────────────────────────────────────────────── */
     .kal-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 14px;
@@ -1857,7 +1857,7 @@
       font-size: 1.1rem; color: var(--muted); line-height: 1;
     }
 
-    /* â”€â”€ Stageplan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Stageplan ────────────────────────────────────────────────────────── */
     .sp-section-head {
       display: flex; align-items: center; gap: 8px;
       font-family: 'Bricolage Grotesque', sans-serif;
@@ -1900,7 +1900,7 @@
     }
     .sp-field-val { padding: 6px 0; font-size: .88rem; color: var(--text); line-height: 1.55; }
 
-    /* â”€â”€ Planning urgency â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Planning urgency ─────────────────────────────────────────────────── */
     .dl-item {
       display: flex; gap: 12px; align-items: flex-start;
       padding: 11px 14px; border-radius: var(--r-sm);
@@ -1946,7 +1946,7 @@
     .dl-urgency.overdue { background: var(--red-bg); color: var(--red); }
     .dl-urgency.soon    { background: var(--amber-bg); color: var(--amber); }
 
-    /* â”€â”€ Taken â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Taken ────────────────────────────────────────────────────────────── */
     .task-party-counts {
       display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px;
     }
@@ -1970,7 +1970,7 @@
       background: none;
     }
     .task-check.done { background: var(--green); border-color: var(--green); }
-    .task-check.done::after { content: 'âœ“'; font-size: .65rem; color: #fff; font-weight: 700; }
+    .task-check.done::after { content: '✓'; font-size: .65rem; color: #fff; font-weight: 700; }
     .task-body { flex: 1; min-width: 0; }
     .task-title { font-weight: 600; font-size: .9rem; color: var(--ink); line-height: 1.3; }
     .task-item.done .task-title { text-decoration: line-through; color: var(--muted); }
@@ -1981,7 +1981,7 @@
     .priority.medium { background: var(--amber-bg); color: var(--amber); }
     .priority.laag   { background: var(--green-bg); color: var(--green); }
 
-    /* â”€â”€ Voortgang â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Voortgang ────────────────────────────────────────────────────────── */
     .ld-card {
       background: var(--white); border: 1px solid var(--border);
       border-radius: var(--r-sm); padding: 14px 16px; margin-bottom: 10px;
@@ -2009,7 +2009,7 @@
     .avg-labels { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: .75rem; color: var(--muted); }
     .avg-label-item { display: flex; align-items: center; gap: 5px; }
 
-    /* â”€â”€ Skeleton loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Skeleton loading ─────────────────────────────────────────────────── */
     .skeleton {
       background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
       background-size: 200% 100%;
@@ -2018,14 +2018,14 @@
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    /* â”€â”€ Toast (typed) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Toast (typed) ────────────────────────────────────────────────────── */
     #toast {
       background: var(--ink); color: #fff;
     }
     #toast.success { background: var(--green); }
     #toast.error   { background: var(--red); }
 
-    /* â”€â”€ Info help icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ── Info help icons ──────────────────────────────────────────────────── */
     .info-btn {
       display: inline-flex; align-items: center; justify-content: center;
       width: 17px; height: 17px; border-radius: 50%;
@@ -2063,43 +2063,43 @@
 </head>
 <body>
 
-<!-- â•â• Spinner â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══ Spinner ═══════════════════════════════════════════════════════════════ -->
 <div id="hub-spinner"><div class="spinner-ring"></div></div>
 
-<!-- â•â• Role picker â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══ Role picker ══════════════════════════════════════════════════════════ -->
 <div id="role-picker">
   <div class="rp-logo">Internly<span>.</span></div>
-  <div class="rp-subtitle">Stage Hub â€” gedeeld stagedashboard</div>
+  <div class="rp-subtitle">Stage Hub — gedeeld stagedashboard</div>
 
   <div class="rp-heading">Bekijk als</div>
   <div class="rp-desc">Kies je rol om het dashboard in de juiste context te zien.</div>
 
   <div class="rp-cards">
     <div class="rp-card" onclick="startHub('student')">
-      <div class="rp-card-icon">ðŸŽ“</div>
+      <div class="rp-card-icon">🎓</div>
       <div class="rp-card-title">Student</div>
       <div class="rp-card-hint">Lena Hartman</div>
     </div>
     <div class="rp-card" onclick="startHub('bedrijf')">
-      <div class="rp-card-icon">ðŸ¢</div>
+      <div class="rp-card-icon">🏢</div>
       <div class="rp-card-title">Bedrijf</div>
       <div class="rp-card-hint">NIOZ Zeewetenschappen</div>
     </div>
     <div class="rp-card" onclick="startHub('school')">
-      <div class="rp-card-icon">ðŸ«</div>
+      <div class="rp-card-icon">🏫</div>
       <div class="rp-card-title">School</div>
-      <div class="rp-card-hint">M. Jansen Â· HBO Communicatie</div>
+      <div class="rp-card-hint">M. Jansen · HBO Communicatie</div>
     </div>
   </div>
 </div>
 
-<!-- â•â• App shell â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══ App shell ════════════════════════════════════════════════════════════ -->
 <div id="app-shell">
 
-  <!-- Student header â€” TYPE B (renderStudentHeader vult dit voor role==='student') -->
+  <!-- Student header — TYPE B (renderStudentHeader vult dit voor role==='student') -->
   <div id="student-header"></div>
 
-  <!-- Multi-role topbar â€” bedrijf/school/begeleider/demo-modus.
+  <!-- Multi-role topbar — bedrijf/school/begeleider/demo-modus.
        Voor role==='student' verbergt CSS dit element via body[data-role]. -->
   <header id="hub-topbar">
     <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="hub-topbar-logo" style="cursor:pointer">Internly<span>.</span></a>
@@ -2115,19 +2115,19 @@
     <div class="hub-topbar-right">
       <span id="role-badge-display" class="role-badge"></span>
       <select id="student-switcher" class="student-switcher-select" style="display:none;" onchange="switchStudent(this.value)" aria-label="Wissel student"></select>
-      <a id="back-to-dash" href="#" class="role-switch-btn" style="display:none;text-decoration:none;">â† Dashboard</a>
+      <a id="back-to-dash" href="#" class="role-switch-btn" style="display:none;text-decoration:none;">← Dashboard</a>
       <button class="role-switch-btn" id="demo-switch-btn" onclick="switchRole()">Wissel rol</button>
     </div>
   </header>
 
-  <!-- Stage context-strip â€” toont stage-naam + bedrijfsnaam dynamisch (gevuld door loadMatchFromDB) -->
+  <!-- Stage context-strip — toont stage-naam + bedrijfsnaam dynamisch (gevuld door loadMatchFromDB) -->
   <div class="hub-context-strip" id="hub-context-strip" style="display:none">
     <div class="hcs-inner">
       <div class="hcs-stage">
         <span class="hcs-label">Stage</span>
-        <span class="hcs-name" id="hub-stage-naam">â€”</span>
+        <span class="hcs-name" id="hub-stage-naam">—</span>
       </div>
-      <div class="hcs-bedrijf" id="hub-bedrijf-naam">â€”</div>
+      <div class="hcs-bedrijf" id="hub-bedrijf-naam">—</div>
     </div>
   </div>
 
@@ -2153,7 +2153,7 @@
           <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
         Planning
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Planning">â“˜<span class="info-pop">Deadlines en mijlpalen voor je stage. Voeg deadlines toe zodat jij, je bedrijfsbegeleider en school niets vergeten. Zichtbaar voor alle betrokken partijen.</span></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Planning">ⓘ<span class="info-pop">Deadlines en mijlpalen voor je stage. Voeg deadlines toe zodat jij, je bedrijfsbegeleider en school niets vergeten. Zichtbaar voor alle betrokken partijen.</span></span>
       </button>
       <button class="sidebar-item" data-tab="kalender" onclick="switchTab('kalender')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2163,7 +2163,7 @@
           <circle cx="16" cy="16" r="1" fill="currentColor"/>
         </svg>
         Kalender
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Kalender">â“˜<span class="info-pop">Maandoverzicht van alle deadlines en afspraken. Voeg een deadline of afspraak toe via de knoppen bovenaan.</span></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Kalender">ⓘ<span class="info-pop">Maandoverzicht van alle deadlines en afspraken. Voeg een deadline of afspraak toe via de knoppen bovenaan.</span></span>
       </button>
       <button class="sidebar-item" data-tab="stageplan" onclick="switchTab('stageplan')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2173,7 +2173,7 @@
           <polyline points="10 9 9 9 8 9"/>
         </svg>
         Stageplan
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Stageplan">â“˜<span class="info-pop">Het officiÃ«le stageplan met doelstellingen en leerdoelen. Door jou en je begeleider(s) ingevuld en goedgekeurd.</span></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Stageplan">ⓘ<span class="info-pop">Het officiële stageplan met doelstellingen en leerdoelen. Door jou en je begeleider(s) ingevuld en goedgekeurd.</span></span>
       </button>
       <button class="sidebar-item" data-tab="taken" onclick="switchTab('taken')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2181,14 +2181,14 @@
         </svg>
         Taken
         <span id="sidebar-badge-taken" class="sidebar-badge" style="display:none"></span>
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Taken">â“˜<span class="info-pop">Gedeelde takenlijst voor student, bedrijf en school. Maak taken aan, stel een prioriteit in en vink ze af als ze klaar zijn. Iedereen ziet dezelfde lijst.</span></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Taken">ⓘ<span class="info-pop">Gedeelde takenlijst voor student, bedrijf en school. Maak taken aan, stel een prioriteit in en vink ze af als ze klaar zijn. Iedereen ziet dezelfde lijst.</span></span>
       </button>
       <button class="sidebar-item" data-tab="voortgang" onclick="switchTab('voortgang')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
         </svg>
         Voortgang
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Voortgang">â“˜<span class="info-pop">Overzicht van behaalde competenties en leerdoelen. Je begeleiders kunnen hier feedback achterlaten en je voortgang beoordelen.</span></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Voortgang">ⓘ<span class="info-pop">Overzicht van behaalde competenties en leerdoelen. Je begeleiders kunnen hier feedback achterlaten en je voortgang beoordelen.</span></span>
       </button>
       <button class="sidebar-item" data-tab="afspraken" onclick="switchTab('afspraken')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2199,7 +2199,7 @@
         </svg>
         Afspraken
         <span id="sidebar-badge-afspraken" class="sidebar-badge" style="display:none"></span>
-        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Afspraken">â“˜<span class="info-pop">Plan gesprekken in met je bedrijfsbegeleider of schoolbegeleider. Alle partijen zien de afspraken en kunnen nieuwe toevoegen.</span></span>
+        <span class="info-btn info-btn--inv" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Afspraken">ⓘ<span class="info-pop">Plan gesprekken in met je bedrijfsbegeleider of schoolbegeleider. Alle partijen zien de afspraken en kunnen nieuwe toevoegen.</span></span>
       </button>
       <button class="sidebar-item" data-tab="account" onclick="switchTab('account')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2220,7 +2220,7 @@
           border-radius:8px;color:rgba(255,255,255,.5);
           font-family:'Outfit',sans-serif;font-size:.78rem;
           cursor:pointer;text-align:left;transition:background .15s,color .15s;">
-          â†ª Uitloggen
+          ↪ Uitloggen
         </button>
       </div>
     </nav>
@@ -2233,7 +2233,7 @@
   </div>
 </div>
 
-<!-- â•â• Modal â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ══ Modal ════════════════════════════════════════════════════════════════ -->
 <div id="modal-overlay" onclick="closeModalOnOverlay(event)">
   <div class="modal" id="modal-box">
     <!-- Filled by JS -->
@@ -2257,24 +2257,24 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ══════════════════════════════════════════════════════════════════════════
      JavaScript
-     â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+     ══════════════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
 
-/* â”€â”€ Supabase client â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Supabase client ─────────────────────────────────────────────────────── */
 
-// Match ID from URL (?match=UUID) â€” null in demo mode
+// Match ID from URL (?match=UUID) — null in demo mode
 const MATCH_ID = new URLSearchParams(window.location.search).get('match');
 // Always hide role-picker immediately; removed below only if not logged in (demo mode)
 document.body.classList.add('auth-boot');
 
-// Auth-mode globals â€” set in loadMatchFromDB, null in demo mode
+// Auth-mode globals — set in loadMatchFromDB, null in demo mode
 let currentUser = null;
 let hubPartyIds = { student: null, bedrijf: null, school: null, roc: null };
 
-// Map role string â†” user UUID
+// Map role string ↔ user UUID
 function roleToUserId(role) { return hubPartyIds[role] || null; }
 function roleFromUserId(uid) {
   if (!uid) return null;
@@ -2283,20 +2283,20 @@ function roleFromUserId(uid) {
   if (uid === hubPartyIds.school)  return 'school';
   return null;
 }
-// Map DB status â†’ local status label
+// Map DB status → local status label
 function mapDbStatus(s) {
   if (s === 'bevestigd') return 'geaccepteerd';
   return s || 'openstaand';
 }
 
-/* â”€â”€ Kalender state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Kalender state ──────────────────────────────────────────────────────── */
 let kalState = {
   year:  new Date().getFullYear(),
   month: new Date().getMonth(),  // 0-indexed
   filter: 'alles'                // 'alles' | 'deadlines' | 'meetings'
 };
 
-/* â”€â”€ Demo profiles (matchpool) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Demo profiles (matchpool) ──────────────────────────────────────────── */
 
 const DEMO_PROFILES = [
   {
@@ -2314,7 +2314,7 @@ const DEMO_PROFILES = [
     info_steps: [
       { title: 'Bedrijfsprofiel', body: 'Elk bedrijf in de matchpool heeft een volledig profiel: sector, stad, beschrijving en openstaande stageplekken.' },
       { title: 'Trust Score', body: 'De Trust Score is gebaseerd op beoordelingen van eerdere stagiairs. Hoe hoger, hoe beter de begeleiding.' },
-      { title: 'Specialisaties', body: 'Tags tonen in welke vakgebieden je ervaring opdoet â€” handig om je keuze te matchen aan je leerdoelen.' },
+      { title: 'Specialisaties', body: 'Tags tonen in welke vakgebieden je ervaring opdoet — handig om je keuze te matchen aan je leerdoelen.' },
       { title: 'Koppeling aanvragen', body: 'Als het bedrijf bij jou past, kun je een kennismakingsgesprek aanvragen. Je school ziet dit altijd mee.' },
     ],
   },
@@ -2332,7 +2332,7 @@ const DEMO_PROFILES = [
     gem_score: 87,
     info_steps: [
       { title: 'Schoolprofiel', body: 'Scholen in de pool bieden actieve begeleiding. Je ziet welke opleiding ze vertegenwoordigen en hoeveel stages ze momenteel begeleiden.' },
-      { title: 'Begeleiders', body: 'Elke school heeft Ã©Ã©n of meerdere stagebegeleiders. Zij zijn je contactpersoon voor vragen en beoordelingen.' },
+      { title: 'Begeleiders', body: 'Elke school heeft één of meerdere stagebegeleiders. Zij zijn je contactpersoon voor vragen en beoordelingen.' },
       { title: 'Gemiddelde score', body: 'De gemiddelde score is gebaseerd op tevredenheidsonderzoeken bij eerdere stagiairs van deze school.' },
       { title: 'Verbinding leggen', body: 'Je koppelt automatisch aan je eigen school bij registratie. Dit profiel laat zien hoe schoolprofielen eruitzien in de pool.' },
     ],
@@ -2349,7 +2349,7 @@ const DEMO_PROFILES = [
     beschikbaarheid: ['Maandag', 'Woensdag', 'Vrijdag'],
     talen: ['Nederlands', 'Engels'],
     info_steps: [
-      { title: 'Buddy profiel', body: 'Een buddy is een professional die je informeel begeleidt naast je officiÃ«le stagebegeleider â€” denk aan een mentor.' },
+      { title: 'Buddy profiel', body: 'Een buddy is een professional die je informeel begeleidt naast je officiële stagebegeleider — denk aan een mentor.' },
       { title: 'Beschikbaarheid', body: 'Buddy\'s geven aan op welke dagen ze beschikbaar zijn voor een check-in, call of koffiemoment.' },
       { title: 'Talen', body: 'Je ziet in welke talen een buddy communiceert, handig als je stage deels in het Engels verloopt.' },
       { title: 'Buddy koppelen', body: 'Je kunt een buddy-verzoek sturen. Als de buddy akkoord gaat, verschijnt hij of zij in jouw Stage Hub.' },
@@ -2357,7 +2357,7 @@ const DEMO_PROFILES = [
   },
 ];
 
-/* â”€â”€ Demo data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Demo data ──────────────────────────────────────────────────────────── */
 
 const match = {
   student: {
@@ -2423,7 +2423,7 @@ let hubState = {
   reflecties: [
     {
       id: 'r1',
-      period: 'Week 1â€“2 reflectie',
+      period: 'Week 1–2 reflectie',
       date: '2026-03-14',
       situatie:   'De eerste twee weken bij NIOZ Zeewetenschappen. Ik werd gekoppeld aan het communicatieteam en mijn begeleider legde de interne werkwijze uit.',
       taak:       'Kennismaken met het team, de lopende projecten begrijpen en mijn eerste schrijfopdracht afronden: een korte introductie-tekst voor de NIOZ-nieuwsbrief.',
@@ -2439,7 +2439,7 @@ let hubState = {
       period: 'Maand 1 evaluatie',
       date: '2026-04-01',
       situatie:   'Na een maand stage. Ik heb twee artikelen gepubliceerd en werk nu aan een langere feature over zeebodemonderzoek.',
-      taak:       'De feature schrijven Ã©n tegelijk de samenwerking met onderzoekers efficiÃ«nter organiseren dan bij de vorige opdrachten.',
+      taak:       'De feature schrijven én tegelijk de samenwerking met onderzoekers efficiënter organiseren dan bij de vorige opdrachten.',
       actie:      'Ik heb een vaste interviewtijd ingepland met de hoofdonderzoeker, een schrijfplanning gemaakt en een woordenlijst aangelegd van veelgebruikte wetenschappelijke termen.',
       resultaat:  'Mijn schrijfstijl is merkbaar toegankelijker geworden. De feature staat ingepland voor publicatie volgende week. De planning werkte goed.',
       leermoment: 'Vroeg plannen maakt een groot verschil. Door de interviewtijd vast in te stellen had ik minder last van last-minute afhankelijkheden. Dit ga ik voor alle opdrachten zo doen.',
@@ -2452,9 +2452,9 @@ let hubState = {
   log: [
     { id: 'lg1', msg: 'Lena Hartman heeft taak "Onderzoeksvoorstel schrijven" afgerond.',     time: '15 mrt, 11:23', color: 'green'  },
     { id: 'lg2', msg: 'M. Jansen (school) is uitgenodigd voor het Stage Hub dashboard.',      time: '2 mrt, 09:05',  color: 'blue'   },
-    { id: 'lg3', msg: 'Stage gestart op 1 maart 2026 â€” hub aangemaakt.',                      time: '1 mrt, 08:00',  color: 'orange' },
+    { id: 'lg3', msg: 'Stage gestart op 1 maart 2026 — hub aangemaakt.',                      time: '1 mrt, 08:00',  color: 'orange' },
     { id: 'lg4', msg: 'Bedrijfsbegeleider heeft deadline "Halverwege presentatie" toegevoegd.',time: '3 mrt, 14:30',  color: 'blue'   },
-    { id: 'lg5', msg: 'Reflectie "Week 1â€“2" ingediend door Lena Hartman.',                    time: '14 mrt, 16:00', color: 'green'  }
+    { id: 'lg5', msg: 'Reflectie "Week 1–2" ingediend door Lena Hartman.',                    time: '14 mrt, 16:00', color: 'green'  }
   ],
 
   nextMeetingId: 4,
@@ -2466,7 +2466,7 @@ let hubState = {
     onderzoekstype:     'mixed',
     context:            'NIOZ publiceert veel onderzoek maar bereikt vooral een wetenschappelijk publiek. Er is behoefte aan een strategie om ook burgers, scholieren en beleidsmakers te bereiken.',
     methode:            'mixed',
-    methodeomschrijving:'Combinatie van diepte-interviews met communicatiemedewerkers en een online enquÃªte onder volgers van het NIOZ sociale media-kanaal.',
+    methodeomschrijving:'Combinatie van diepte-interviews met communicatiemedewerkers en een online enquête onder volgers van het NIOZ sociale media-kanaal.',
     resultaattype:      'advies',
     doelgroep:          'Communicatieteam NIOZ, directie en externe stakeholders',
     deelvragen: [
@@ -2549,7 +2549,7 @@ let hubState = {
   }
 };
 
-/* â”€â”€ Permissions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Permissions ────────────────────────────────────────────────────────── */
 
 const CAN = {
   student: {
@@ -2580,7 +2580,7 @@ const CAN = {
     viewLog: true, viewScores: true
   },
   begeleider: {
-    // Read-only â€” same as school
+    // Read-only — same as school
     // Hub fix 2026-04-30
     addTask: false, editTask: false, deleteTask: false, checkTask: false,
     addDeadline: false, editDeadline: false,
@@ -2599,7 +2599,7 @@ function roleName() {
   return { student: match.student.name, bedrijf: match.company.name, school: match.school.name }[hubState.role] || hubState.role || '';
 }
 
-/* â”€â”€ Bootstrap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Bootstrap ──────────────────────────────────────────────────────────── */
 
 function startHub(role) {
   hubState.role = role;
@@ -2627,12 +2627,12 @@ function switchRole() {
   hubState.role = null;
 }
 
-/* â”€â”€ Spinner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Spinner ──────────────────────────────────────────────────────────────── */
 
 function showSpinner() { document.getElementById('hub-spinner').classList.add('show'); }
 function hideSpinner() { document.getElementById('hub-spinner').classList.remove('show'); }
 
-/* â”€â”€ Match indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Match indicator ──────────────────────────────────────────────────────── */
 
 function renderMatchIndicator() {
   const role = hubState.role;
@@ -2642,7 +2642,7 @@ function renderMatchIndicator() {
     ? Math.round(hubState.leerdoelen.reduce((s, l) => s + l.progress, 0) / hubState.leerdoelen.length)
     : 0;
 
-  // Milestone-based progress â€” CC Instructie 2
+  // Milestone-based progress — CC Instructie 2
   const _msPct = typeof calcProgress === 'function' &&
     hubState.milestones?.length
     ? calcProgress(hubState.milestones)
@@ -2679,8 +2679,8 @@ function renderMatchIndicator() {
         <div class="mi-stage-name">${escapeHtml(match.company.vacature)}</div>
         <div class="mi-stage-meta">
           <span class="mi-status-dot"></span>
-          Lopend &nbsp;Â·&nbsp; Week ${wk.current} van ${wk.total}
-          &nbsp;Â·&nbsp; ${escapeHtml(match.company.start)} â€“ ${escapeHtml(match.company.eind)}
+          Lopend &nbsp;·&nbsp; Week ${wk.current} van ${wk.total}
+          &nbsp;·&nbsp; ${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}
         </div>
       </div>
       <div class="progress-stage-wrap">
@@ -2692,7 +2692,7 @@ function renderMatchIndicator() {
     </div>`;
 }
 
-/* â”€â”€ DB loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── DB loader ────────────────────────────────────────────────────────────── */
 
 async function loadHubFromDB() {
   if (!MATCH_ID) return;
@@ -2771,7 +2771,7 @@ async function loadHubFromDB() {
       }));
     }
 
-    // Milestone tracker â€” CC Instructie 2
+    // Milestone tracker — CC Instructie 2
     try {
       hubState.milestones = typeof getMilestones === 'function'
         ? await getMilestones(MATCH_ID)
@@ -2816,7 +2816,7 @@ async function loadHubFromDB() {
   }
 }
 
-/* â”€â”€ Auth boot (runs only when ?match=UUID is present) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Auth boot (runs only when ?match=UUID is present) ────────────────────── */
 
 // Herlaad hub-data bij terugkeer naar tab (stale data preventie)
 document.addEventListener('visibilitychange', () => {
@@ -2842,7 +2842,7 @@ async function markMatchCompleted(matchId) {
   }
 }
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -2857,7 +2857,7 @@ window.addEventListener('unhandledrejection', function(e) {
 
 window.addEventListener('DOMContentLoaded', async () => {
   if (MATCH_ID) {
-    // Auth mode â€” load real match from DB
+    // Auth mode — load real match from DB
     showSpinner();
     const { data: { user } } = await db.auth.getUser();
     if (!user) {
@@ -2867,7 +2867,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     initSessionTimeout();
     await loadMatchFromDB(user);
   } else {
-    // Demo mode â€” auto-pick role if logged in, otherwise show role picker
+    // Demo mode — auto-pick role if logged in, otherwise show role picker
     const { data: { user } } = await db.auth.getUser();
     if (user) {
       const { data: prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
@@ -2882,7 +2882,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const roleMap = { student: 'student', bedrijf: 'bedrijf', school: 'school', begeleider: 'begeleider' };
       const mappedRole = roleMap[dbRole];
       if (mappedRole) {
-        // Profile guard â€” audit fix 2026-04-30
+        // Profile guard — audit fix 2026-04-30
         let _spForWelcome = null;
         if (mappedRole === 'student') {
           const { data: sp } = await db.from('student_profiles')
@@ -2894,8 +2894,8 @@ window.addEventListener('DOMContentLoaded', async () => {
           _spForWelcome = sp;
         }
 
-        // Welkom overlay â€” eenmalig na eerste login (alleen student)
-        // welcome-overlay.js â€” 1 mei 2026
+        // Welkom overlay — eenmalig na eerste login (alleen student)
+        // welcome-overlay.js — 1 mei 2026
         if (mappedRole === 'student' && typeof maybeShowWelcomeOverlay === 'function') {
           maybeShowWelcomeOverlay(
             user.id,
@@ -2915,13 +2915,13 @@ window.addEventListener('DOMContentLoaded', async () => {
           backBtn.style.display = '';
         }
 
-        // Hide "Wissel rol" â€” authenticated users go directly to their role
+        // Hide "Wissel rol" — authenticated users go directly to their role
         const demoBtn = document.getElementById('demo-switch-btn');
         if (demoBtn) demoBtn.style.display = 'none';
         return;
       }
     }
-    // Not logged in or unrecognised role â€” show role picker
+    // Not logged in or unrecognised role — show role picker
     document.body.classList.remove('auth-boot');
   }
 });
@@ -2930,7 +2930,7 @@ async function loadMatchFromDB(user) {
   // Spinner already showing from DOMContentLoaded handler.
   // loadHubFromDB (called via startHub) will hide it when done.
   try {
-    // 0. Role guard â€” wrong-role doorsturen via canon
+    // 0. Role guard — wrong-role doorsturen via canon
     //    (replace ipv href om history schoon te houden)
     const { data: _prof } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
     const allowedRoles = [
@@ -2997,7 +2997,7 @@ async function loadMatchFromDB(user) {
       match.student.name      = s.naam      || match.student.name;
       match.student.opleiding = s.opleiding || match.student.opleiding;
       match.student.avatar    = (s.naam || match.student.name).trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
-      match.student.avatarKey = s.avatar_key || null; // RUN3 â€” avatar sweep
+      match.student.avatarKey = s.avatar_key || null; // RUN3 — avatar sweep
     }
 
     if (companyRes.data) {
@@ -3023,7 +3023,7 @@ async function loadMatchFromDB(user) {
     const bedrijfEl = document.getElementById('hub-bedrijf-naam');
     const contextStrip = document.getElementById('hub-context-strip');
     if (stageEl)   stageEl.textContent   = match.company.vacature;
-    if (bedrijfEl) bedrijfEl.textContent = match.company.name + ' Â· ' + match.company.start + ' â€“ ' + match.company.eind;
+    if (bedrijfEl) bedrijfEl.textContent = match.company.name + ' · ' + match.company.start + ' – ' + match.company.eind;
     if (contextStrip) contextStrip.style.display = '';
 
     // 4. Set global auth state for DB meeting ops
@@ -3042,7 +3042,7 @@ async function loadMatchFromDB(user) {
   }
 }
 
-// â”€â”€ Student-switcher (bedrijf met meerdere studenten) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Student-switcher (bedrijf met meerdere studenten) ──────────────────────
 async function buildStudentSwitcher(companyUserId, currentMatchId) {
   try {
     const { data: allMatches } = await db
@@ -3051,7 +3051,7 @@ async function buildStudentSwitcher(companyUserId, currentMatchId) {
       .eq('party_b', companyUserId)
       .eq('status', 'accepted');
 
-    if (!allMatches || allMatches.length <= 1) return; // slechts Ã©Ã©n student â€” geen switcher nodig
+    if (!allMatches || allMatches.length <= 1) return; // slechts één student — geen switcher nodig
 
     const ids = allMatches.map(m => m.party_a);
     const { data: profiles } = await db
@@ -3084,7 +3084,7 @@ function switchStudent(matchId) {
   }
 }
 
-// â”€â”€ School-switcher (school begeleider met meerdere studenten) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── School-switcher (school begeleider met meerdere studenten) ─────────────
 async function buildSchoolSwitcher(schoolUserId, currentMatchId) {
   try {
     // Haal de schoolnaam op van de ingelogde begeleider
@@ -3135,7 +3135,7 @@ async function buildSchoolSwitcher(schoolUserId, currentMatchId) {
 
 function updateRoleBadge() {
   const el = document.getElementById('role-badge-display');
-  const labels = { student: 'ðŸŽ“ Student', bedrijf: 'ðŸ¢ Bedrijf', school: 'ðŸ« School' };
+  const labels = { student: '🎓 Student', bedrijf: '🏢 Bedrijf', school: '🏫 School' };
   el.textContent = labels[hubState.role] || '';
   el.className = `role-badge ${hubState.role}`;
 }
@@ -3163,7 +3163,7 @@ function updateTakenBadge() {
   }
 }
 
-/* â”€â”€ Tab routing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Tab routing ────────────────────────────────────────────────────────── */
 
 function switchTab(tab) {
   hubState.currentTab = tab;
@@ -3185,11 +3185,11 @@ function switchTab(tab) {
     account:     renderAccountTab,
   };
   const tabHtml = renderers[tab] ? renderers[tab]() : '<p>Onbekende tab.</p>';
-  // Account tab is privÃ© â€” geen visibility-bar of match-indicator
+  // Account tab is privé — geen visibility-bar of match-indicator
   const isAccount = tab === 'account';
   const visibilityBar = isAccount
     ? ''
-    : '<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink3,#7a8799);background:var(--bg2,#eceae4);padding:5px 12px;border-radius:6px;margin-bottom:.75rem;"><span>ðŸ‘</span><span>Zichtbaar voor:</span> <span style="color:var(--blue,#1756a8);">Student</span> Â· <span style="color:var(--green,#1a7a48);">Bedrijf</span> Â· <span style="color:var(--amber,#a06010);">School</span></div>';
+    : '<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink3,#7a8799);background:var(--bg2,#eceae4);padding:5px 12px;border-radius:6px;margin-bottom:.75rem;"><span>👁</span><span>Zichtbaar voor:</span> <span style="color:var(--blue,#1756a8);">Student</span> · <span style="color:var(--green,#1a7a48);">Bedrijf</span> · <span style="color:var(--amber,#a06010);">School</span></div>';
   const indicator = isAccount ? '' : renderMatchIndicator();
   mc.innerHTML = visibilityBar + indicator + tabHtml;
   if (isAccount) {
@@ -3209,7 +3209,7 @@ function renderAccountTab() {
   `;
 }
 
-/* â”€â”€ Sidebar toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Sidebar toggle ─────────────────────────────────────────────────────── */
 
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
@@ -3221,7 +3221,7 @@ function closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
 
-/* â”€â”€ Overzicht tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Overzicht tab ──────────────────────────────────────────────────────── */
 
 function renderOverzicht() {
   const role = hubState.role;
@@ -3287,19 +3287,19 @@ function renderOverzicht() {
     <div class="page-head">
       <div>
         <div class="page-title">Overzicht</div>
-        <div class="page-sub">${escapeHtml(match.company.vacature || 'Actieve stage')} Â· ${escapeHtml(match.company.name)}</div>
+        <div class="page-sub">${escapeHtml(match.company.vacature || 'Actieve stage')} · ${escapeHtml(match.company.name)}</div>
       </div>
     </div>
 
     ${schoolBanner}
 
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-      <button class="btn btn-ghost btn-sm" onclick="switchTab('planning')">ðŸ“… Planning</button>
-      <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">ðŸ—“ Kalender</button>
-      <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken')">ðŸ’¬ Afspraken</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('planning')">📅 Planning</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">🗓 Kalender</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('afspraken')">💬 Afspraken</button>
       ${can('addTask') ? `<button type="button" class="btn btn-primary btn-sm" onclick="switchTab('taken');setTimeout(()=>openTaakModal(null),50)">+ Taak</button>` : ''}
       ${can('addDeadline') ? `<button type="button" class="btn btn-primary btn-sm" onclick="switchTab('planning');setTimeout(()=>openDeadlineModal(null),50)">+ Deadline</button>` : ''}
-      ${role === 'bedrijf' && match.completionStatus !== 'completed' ? `<button type="button" class="btn btn-ghost btn-sm" onclick="markMatchCompleted('${MATCH_ID}')">âœ“ Markeer stage als afgerond</button>` : ''}
+      ${role === 'bedrijf' && match.completionStatus !== 'completed' ? `<button type="button" class="btn btn-ghost btn-sm" onclick="markMatchCompleted('${MATCH_ID}')">✓ Markeer stage als afgerond</button>` : ''}
     </div>
 
     <!-- Stats row -->
@@ -3327,7 +3327,7 @@ function renderOverzicht() {
           <div class="card-head">
             <div>
               <div class="card-title">Stagegegevens</div>
-              <div class="card-sub">${escapeHtml(match.company.duur)} Â· ${escapeHtml(match.company.start)} â€“ ${escapeHtml(match.company.eind)}</div>
+              <div class="card-sub">${escapeHtml(match.company.duur)} · ${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}</div>
             </div>
             <div class="avatar" style="background:${match.student.avatarKey ? 'transparent' : 'var(--blue-bg)'};color:var(--blue);overflow:hidden;">${match.student.avatarKey && typeof getAvatarSvg === 'function' ? getAvatarSvg(match.student.avatarKey, match.student.name, 'md') : match.student.avatar}</div>
           </div>
@@ -3338,7 +3338,7 @@ function renderOverzicht() {
             <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Student</span><strong style="color:var(--text);">${escapeHtml(match.student.name)}</strong></div>
             <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Opleiding</span><strong style="color:var(--text);">${escapeHtml(match.student.opleiding)}</strong></div>
             <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="width:90px;">Bedrijf</span><strong style="color:var(--text);">${escapeHtml(match.company.name)}</strong></div>
-            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${escapeHtml(match.school.name)} Â· ${escapeHtml(match.school.opleiding)}</strong></div>
+            <div style="display:flex;gap:8px;"><span style="width:90px;">School</span><strong style="color:var(--text);">${escapeHtml(match.school.name)} · ${escapeHtml(match.school.opleiding)}</strong></div>
           </div>
         </div>
 
@@ -3385,7 +3385,7 @@ function renderOverzicht() {
           </div>
           <div class="volledigheid-label" id="refl-voortgang-label">${pct}% volledig ingevuld</div>
           <div style="font-size:.78rem;color:var(--muted);margin-top:2px;" id="refl-voortgang-count">${volledig} van ${total} reflecties volledig (STARR)</div>
-          ${can('addReflectie') ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="exportReflectieverslag()">ðŸ“„ Exporteer verslag</button>` : ''}
+          ${can('addReflectie') ? `<button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%;" onclick="exportReflectieverslag()">📄 Exporteer verslag</button>` : ''}
         </div>`;
         })() : ''}
 
@@ -3407,13 +3407,13 @@ function renderOverzicht() {
     </div>`;
 }
 
-/* â”€â”€ Planning tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Planning tab ───────────────────────────────────────────────────────── */
 
 function renderPlanning() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
   const deadlinesHtml = hubState.deadlines.length === 0
-    ? `<div class="empty-state"><div class="empty-icon">ðŸ“…</div>Nog geen deadlines toegevoegd.</div>`
+    ? `<div class="empty-state"><div class="empty-icon">📅</div>Nog geen deadlines toegevoegd.</div>`
     : hubState.deadlines.map((d) => {
         const dDate = new Date(d.date); dDate.setHours(0, 0, 0, 0);
         const diffDays = Math.ceil((dDate - today) / 86400000);
@@ -3471,7 +3471,7 @@ function renderPlanning() {
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         ${addDeadlineBtn}
-        <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">ðŸ—“ Kalender</button>
+        <button class="btn btn-ghost btn-sm" onclick="switchTab('kalender')">🗓 Kalender</button>
       </div>
     </div>
 
@@ -3509,7 +3509,7 @@ function renderPlanning() {
     </div>`;
 }
 
-/* â”€â”€ Taken tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Taken tab ──────────────────────────────────────────────────────────── */
 
 let takenFilter = 'all';
 
@@ -3541,7 +3541,7 @@ function renderTaken() {
     : tasks.filter(t => t.assignee === takenFilter);
 
   const tasksHtml = filtered.length === 0
-    ? `<div class="empty-state"><div class="empty-icon">âœ…</div>Geen taken gevonden.</div>`
+    ? `<div class="empty-state"><div class="empty-icon">✅</div>Geen taken gevonden.</div>`
     : filtered.map(t => renderTaskItem(t)).join('');
 
   const addBtn = can('addTask') ? `
@@ -3612,7 +3612,7 @@ function renderTaskItem(t) {
         <div class="task-meta">
           <span class="tag ${assigneeColor}">${t.assignee.charAt(0).toUpperCase()+t.assignee.slice(1)}</span>
           <span class="priority ${priority}">${prioLabel}</span>
-          <span style="color:var(--muted);font-size:.75rem;">Â· ${formatDate(t.deadline)}</span>
+          <span style="color:var(--muted);font-size:.75rem;">· ${formatDate(t.deadline)}</span>
         </div>
       </div>
       <div class="task-actions">
@@ -3634,7 +3634,7 @@ async function toggleTaskDone(id) {
   task.status = task.status === 'done' ? 'todo' : 'done';
   if (MATCH_ID && task._dbId) {
     const { error } = await db.from('stage_tasks').update({ status: task.status }).eq('id', task._dbId);
-    if (error) { toast('Opslaan mislukt â€” probeer opnieuw.', 'error'); return; }
+    if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
   }
   const logMsg = task.status === 'done'
     ? `Taak "${task.title}" afgerond door ${roleName()}.`
@@ -3662,14 +3662,14 @@ async function deleteTask(id) {
     return;
   }
 
-  // Second tap â€” confirmed
+  // Second tap — confirmed
   clearTimeout(_pendingDeleteTimer);
   _pendingDeleteTaskId = null;
 
   hubState.tasks = hubState.tasks.filter(t => t.id !== id);
   if (MATCH_ID && task._dbId) {
     const { error } = await db.from('stage_tasks').delete().eq('id', task._dbId).eq('match_id', MATCH_ID);
-    if (error) { toast('Verwijderen mislukt â€” probeer opnieuw.', 'error'); hubState.tasks.push(task); switchTab('taken'); return; }
+    if (error) { toast('Verwijderen mislukt — probeer opnieuw.', 'error'); hubState.tasks.push(task); switchTab('taken'); return; }
   }
   addLog(`Taak "${task.title}" verwijderd.`, 'orange');
   updateTakenBadge();
@@ -3677,7 +3677,7 @@ async function deleteTask(id) {
   toast('Taak verwijderd.');
 }
 
-/* â”€â”€ Milestone helpers (CC Instructie 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Milestone helpers (CC Instructie 2) ───────────────────────────────── */
 
 function renderMilestoneAction(milestone, role) {
   if (!milestone) return '';
@@ -3727,7 +3727,7 @@ async function handleSubmitMilestone(milestoneId) {
   }
   try {
     await submitMilestone(milestoneId, currentUser?.id, MATCH_ID);
-    notify('Stap ingediend â€” school ontvangt bericht');
+    notify('Stap ingediend — school ontvangt bericht');
     try {
       hubState.milestones = await getMilestones(MATCH_ID);
     } catch (reloadErr) {
@@ -3769,7 +3769,7 @@ async function handleConfirmMilestone(milestoneId) {
   }
 }
 
-/* â”€â”€ Voortgang tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Voortgang tab ──────────────────────────────────────────────────────── */
 
 function renderVoortgang() {
   const avgPct = hubState.leerdoelen.length
@@ -3824,7 +3824,7 @@ function renderVoortgang() {
 
   const reflectiesHtml = hubState.reflecties.length === 0 ? `
     <div class="empty-state">
-      <div class="empty-icon">ðŸ“</div>
+      <div class="empty-icon">📝</div>
       Nog geen reflecties ingediend.
     </div>` : hubState.reflecties.map(r => {
     const filledCount = STARR_DEFS.filter(([,,k]) => r[k]).length;
@@ -3863,10 +3863,10 @@ function renderVoortgang() {
       </div>
       <div class="starr-chips">${chips}</div>
       <div class="refl-completeness${isVolledig ? ' done' : ''}">
-        ${isVolledig ? 'âœ“ Volledig ingevuld' : `${filledCount}/5 velden ingevuld`}
+        ${isVolledig ? '✓ Volledig ingevuld' : `${filledCount}/5 velden ingevuld`}
       </div>
-      ${r.leerdoel ? `<div class="leerdoel-chip">ðŸ“Ž ${escapeHtml(r.leerdoel)}</div>` : ''}
-      <button class="refl-toggle-btn" onclick="toggleStarrBody('${r.id}')">Bekijk STARR-analyse â–¾</button>
+      ${r.leerdoel ? `<div class="leerdoel-chip">📎 ${escapeHtml(r.leerdoel)}</div>` : ''}
+      <button class="refl-toggle-btn" onclick="toggleStarrBody('${r.id}')">Bekijk STARR-analyse ▾</button>
       <div class="starr-body" id="starr-${r.id}">
         ${starrSections}
       </div>
@@ -3884,7 +3884,7 @@ function renderVoortgang() {
       Je bekijkt de voortgang als ${hubState.role === 'begeleider' ? 'praktijkbegeleider' : 'schoolbegeleider'}. Beoordelingen zijn alleen-lezen.
     </div>` : '';
 
-  // Milestone tracker (CC Instructie 2) â€” boven leerdoelen
+  // Milestone tracker (CC Instructie 2) — boven leerdoelen
   const _ms = Array.isArray(hubState.milestones) ? hubState.milestones : [];
   let milestonesBlock = '';
   if (_ms.length > 0 && typeof getNextMilestone === 'function') {
@@ -3896,14 +3896,14 @@ function renderVoortgang() {
            ${renderMilestoneAction(next, hubState.role)}
          </div>`
       : `<div class="milestone-next-banner milestone-done">
-           âœ“ Je bent bij â€” wacht op de andere partij.
+           ✓ Je bent bij — wacht op de andere partij.
          </div>`;
 
     const rows = _ms.map(m => `
       <div class="milestone-row milestone-${m.status}">
         <div class="milestone-dot">
-          ${m.status === 'bevestigd' ? 'âœ“'
-            : m.status === 'ingediend' ? 'â³'
+          ${m.status === 'bevestigd' ? '✓'
+            : m.status === 'ingediend' ? '⏳'
             : m.seq}
         </div>
         <div class="milestone-body">
@@ -3912,7 +3912,7 @@ function renderVoortgang() {
             ${m.status === 'bevestigd'
               ? 'Bevestigd op ' + escapeHtml(formatNLDate(m.confirmed_at) || '')
               : m.status === 'ingediend'
-                ? 'Ingediend â€” wacht op bevestiging'
+                ? 'Ingediend — wacht op bevestiging'
                 : m.category === 'meeting'
                   ? 'Wordt ingepland als driegesprek'
                   : 'Nog niet gestart'}
@@ -3928,7 +3928,7 @@ function renderVoortgang() {
 
     milestonesBlock = `
       <div class="card" style="margin-bottom:16px">
-        <div class="sec-label">Stagevoortgang â€” 8 mijlpalen</div>
+        <div class="sec-label">Stagevoortgang — 8 mijlpalen</div>
         ${nextBanner}
         ${rows}
       </div>`;
@@ -3984,7 +3984,7 @@ function renderVoortgang() {
         <div class="card" style="margin-bottom:16px;">
           <div class="card-head">
             <div class="card-title">Reflecties</div>
-            ${can('addReflectie') && reflTotal > 0 ? `<button type="button" class="btn btn-ghost btn-sm" onclick="exportReflectieverslag()">ðŸ“„ PDF</button>` : ''}
+            ${can('addReflectie') && reflTotal > 0 ? `<button type="button" class="btn btn-ghost btn-sm" onclick="exportReflectieverslag()">📄 PDF</button>` : ''}
           </div>
           ${hubState.role === 'bedrijf' ? `
             <div class="bedrijf-empty-state">
@@ -4012,7 +4012,7 @@ function renderVoortgang() {
     </div>`;
 }
 
-/* â”€â”€ Modals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Modals ─────────────────────────────────────────────────────────────── */
 
 function openModal(html) {
   document.getElementById('modal-box').innerHTML = html;
@@ -4046,15 +4046,15 @@ function openTaakModal(id) {
   const isNew = !task;
 
   openModal(`
-    <button class="modal-close" onclick="closeModal()">Ã—</button>
+    <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title">${isNew ? 'Taak toevoegen' : 'Taak bewerken'}</div>
     <div class="form-group">
       <label class="form-label">Taak omschrijving</label>
-      <input class="form-input" id="m-task-title" value="${escapeHtml(task?.title || '')}" placeholder="Bijv. Verslag schrijvenâ€¦" />
+      <input class="form-input" id="m-task-title" value="${escapeHtml(task?.title || '')}" placeholder="Bijv. Verslag schrijven…" />
     </div>
     <div class="form-group">
       <label class="form-label">Beschrijving (optioneel)</label>
-      <textarea class="form-textarea" id="m-task-desc" placeholder="Extra contextâ€¦">${escapeHtml(task?.desc || '')}</textarea>
+      <textarea class="form-textarea" id="m-task-desc" placeholder="Extra context…">${escapeHtml(task?.desc || '')}</textarea>
     </div>
     <div class="form-group">
       <label class="form-label">Deadline</label>
@@ -4110,7 +4110,7 @@ async function saveTaak(id) {
       task.assignee = assignee; task.status = status; task.priority = priority;
       if (MATCH_ID && task._dbId) {
         const { error } = await db.from('stage_tasks').update({ title, desc, deadline, assignee, status, priority }).eq('id', task._dbId);
-        if (error) { Object.assign(task, prev); toast('Bijwerken mislukt â€” probeer opnieuw.', 'error'); return; }
+        if (error) { Object.assign(task, prev); toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     addLog(`Taak "${title}" bewerkt.`, 'blue');
@@ -4121,7 +4121,7 @@ async function saveTaak(id) {
       const { data, error } = await db.from('stage_tasks')
         .insert({ match_id: MATCH_ID, title, desc, deadline, assignee, status, priority, maker: hubState.role })
         .select().maybeSingle();
-      if (error) { toast('Opslaan mislukt â€” probeer opnieuw.', 'error'); return; }
+      if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newTask._dbId = data.id;
     }
     hubState.tasks.push(newTask);
@@ -4140,11 +4140,11 @@ function openDeadlineModal(id) {
   const isNew = !d;
 
   openModal(`
-    <button class="modal-close" onclick="closeModal()">Ã—</button>
+    <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title">${isNew ? 'Deadline toevoegen' : 'Deadline bewerken'}</div>
     <div class="form-group">
       <label class="form-label">Omschrijving</label>
-      <input class="form-input" id="m-dl-title" value="${escapeHtml(d?.title || '')}" placeholder="Bijv. Eindpresentatieâ€¦" />
+      <input class="form-input" id="m-dl-title" value="${escapeHtml(d?.title || '')}" placeholder="Bijv. Eindpresentatie…" />
     </div>
     <div class="form-group">
       <label class="form-label">Datum</label>
@@ -4170,7 +4170,7 @@ async function saveDeadline(id) {
       d.title = title; d.date = date;
       if (MATCH_ID && d._dbId) {
         const { error } = await db.from('stage_deadlines').update({ title, date }).eq('id', d._dbId);
-        if (error) { Object.assign(d, prev); toast('Bijwerken mislukt â€” probeer opnieuw.', 'error'); return; }
+        if (error) { Object.assign(d, prev); toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     toast('Deadline bijgewerkt!');
@@ -4180,7 +4180,7 @@ async function saveDeadline(id) {
       const { data, error } = await db.from('stage_deadlines')
         .insert({ match_id: MATCH_ID, title, date, type: 'future' })
         .select().maybeSingle();
-      if (error) { toast('Opslaan mislukt â€” probeer opnieuw.', 'error'); return; }
+      if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newD._dbId = data.id;
     }
     hubState.deadlines.push(newD);
@@ -4199,7 +4199,7 @@ function openLeerdoelModal(id) {
   if (!l) return;
 
   openModal(`
-    <button class="modal-close" onclick="closeModal()">Ã—</button>
+    <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title">Voortgang bijwerken</div>
     <div class="form-group">
       <label class="form-label">Leerdoel</label>
@@ -4213,7 +4213,7 @@ function openLeerdoelModal(id) {
     </div>
     <div class="form-group">
       <label class="form-label">Notitie</label>
-      <textarea class="form-textarea" id="m-ld-notes" placeholder="Beschrijf de huidige standâ€¦">${escapeHtml(l.notes || '')}</textarea>
+      <textarea class="form-textarea" id="m-ld-notes" placeholder="Beschrijf de huidige stand…">${escapeHtml(l.notes || '')}</textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Annuleren</button>
@@ -4228,7 +4228,7 @@ async function saveLeerdoel(id) {
   l.notes    = document.getElementById('m-ld-notes').value.trim();
   if (MATCH_ID && l._dbId) {
     const { error } = await db.from('stage_leerdoelen').update({ progress: l.progress, notes: l.notes }).eq('id', l._dbId);
-    if (error) { toast('Opslaan mislukt â€” probeer opnieuw.', 'error'); return; }
+    if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
   }
   addLog(`Leerdoel "${l.title}" bijgewerkt naar ${l.progress}%.`, 'green');
   toast('Leerdoel bijgewerkt!', 'success');
@@ -4243,7 +4243,7 @@ async function quickSetLeerdoel(id, pct) {
   l.progress = pct;
   if (MATCH_ID && l._dbId) {
     const { error } = await db.from('stage_leerdoelen').update({ progress: pct }).eq('id', l._dbId);
-    if (error) { toast('Opslaan mislukt â€” probeer opnieuw.', 'error'); return; }
+    if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
   }
   addLog(`Leerdoel "${l.title}" bijgewerkt naar ${pct}%.`, 'green');
   toast(`${pct}% ingesteld`, 'success');
@@ -4260,12 +4260,12 @@ function openReflectieModal(id) {
   ).join('');
 
   openModal(`
-    <button class="modal-close" onclick="closeModal()">Ã—</button>
+    <button class="modal-close" onclick="closeModal()">×</button>
     <div class="modal-title">${isNew ? 'Reflectie toevoegen' : 'Reflectie bewerken'}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div class="form-group" style="margin:0;">
         <label class="form-label">Periode</label>
-        <input class="form-input" id="m-r-period" value="${escapeHtml(r?.period || '')}" placeholder="Bijv. Week 3â€“4" />
+        <input class="form-input" id="m-r-period" value="${escapeHtml(r?.period || '')}" placeholder="Bijv. Week 3–4" />
       </div>
       <div class="form-group" style="margin:0;">
         <label class="form-label">Datum</label>
@@ -4275,7 +4275,7 @@ function openReflectieModal(id) {
     ${leerdoelOptions ? `<div class="form-group" style="margin-top:12px;">
       <label class="form-label">Gekoppeld leerdoel <span style="color:var(--muted);font-weight:400;">(optioneel)</span></label>
       <select class="form-input" id="m-r-leerdoel">
-        <option value="">â€” geen koppeling â€”</option>
+        <option value="">— geen koppeling —</option>
         ${leerdoelOptions}
       </select>
     </div>` : ''}
@@ -4332,7 +4332,7 @@ async function saveReflectie(id) {
       Object.assign(r, payload);
       if (MATCH_ID && r._dbId) {
         const { error } = await db.from('stage_reflecties').update(payload).eq('id', r._dbId);
-        if (error) { toast('Bijwerken mislukt â€” probeer opnieuw.', 'error'); return; }
+        if (error) { toast('Bijwerken mislukt — probeer opnieuw.', 'error'); return; }
       }
     }
     toast('Reflectie bijgewerkt!');
@@ -4342,7 +4342,7 @@ async function saveReflectie(id) {
       const { data, error } = await db.from('stage_reflecties')
         .insert({ match_id: MATCH_ID, author_role: hubState.role, ...payload })
         .select().maybeSingle();
-      if (error) { toast('Opslaan mislukt â€” probeer opnieuw.', 'error'); return; }
+      if (error) { toast('Opslaan mislukt — probeer opnieuw.', 'error'); return; }
       if (data) newR._dbId = data.id;
     }
     hubState.reflecties.unshift(newR);
@@ -4365,7 +4365,7 @@ async function deleteReflectie(id) {
   if (MATCH_ID && r._dbId) {
     const { error } = await db.from('stage_reflecties').delete().eq('id', r._dbId).eq('match_id', MATCH_ID);
     if (error) {
-      toast('Verwijderen mislukt â€” probeer opnieuw.', 'error');
+      toast('Verwijderen mislukt — probeer opnieuw.', 'error');
       hubState.reflecties.unshift(r);
       switchTab('voortgang');
       return;
@@ -4383,11 +4383,11 @@ function toggleStarrBody(id) {
   const isOpen = body.classList.toggle('open');
   const btn = body.previousElementSibling;
   if (btn && btn.classList.contains('refl-toggle-btn')) {
-    btn.textContent = isOpen ? 'Verberg STARR-analyse â–´' : 'Bekijk STARR-analyse â–¾';
+    btn.textContent = isOpen ? 'Verberg STARR-analyse ▴' : 'Bekijk STARR-analyse ▾';
   }
 }
 
-/* â”€â”€ Reflectie voortgang & export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Reflectie voortgang & export ───────────────────────────────────────── */
 
 function updateReflectieVoortgang() {
   const total = hubState.reflecties.length;
@@ -4439,7 +4439,7 @@ function exportReflectieverslag() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9.5);
       doc.setTextColor(200, 235, 215);
-      doc.text(`${match.student.name}  Â·  ${match.company.name}  Â·  ${dateNl}`, margin, 31);
+      doc.text(`${match.student.name}  ·  ${match.company.name}  ·  ${dateNl}`, margin, 31);
       y = 46;
     } else {
       doc.setFillColor(26, 122, 72);
@@ -4466,7 +4466,7 @@ function exportReflectieverslag() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7.5);
       doc.setTextColor(160, 163, 175);
-      doc.text('internly.pro  Â·  Reflectieverslag', margin, FOOTER_Y + 5);
+      doc.text('internly.pro  ·  Reflectieverslag', margin, FOOTER_Y + 5);
       doc.text(`Pagina ${p} van ${total}`, pageW - margin, FOOTER_Y + 5, { align: 'right' });
     }
   }
@@ -4490,10 +4490,10 @@ function exportReflectieverslag() {
     y += 3;
   }
 
-  // â”€â”€ Page 1 header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Page 1 header ─────────────────────────────────────────────────────────
   drawPageHeader(true);
 
-  // â”€â”€ Samenvatting (3-column stat row) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Samenvatting (3-column stat row) ──────────────────────────────────────
   const total    = hubState.reflecties.length;
   const volledig = hubState.reflecties.filter(r =>
     r.situatie && r.taak && r.actie && r.resultaat && r.leermoment).length;
@@ -4530,7 +4530,7 @@ function exportReflectieverslag() {
   });
   y += 30;
 
-  // â”€â”€ Leerdoelen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Leerdoelen ────────────────────────────────────────────────────────────
   if (hubState.leerdoelen.length > 0) {
     sectionHeader('Leerdoelen & Voortgang');
     hubState.leerdoelen.forEach(l => {
@@ -4564,7 +4564,7 @@ function exportReflectieverslag() {
     y += 4;
   }
 
-  // â”€â”€ Reflecties â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Reflecties ────────────────────────────────────────────────────────────
   sectionHeader('Reflecties');
 
   if (hubState.reflecties.length === 0) {
@@ -4653,7 +4653,7 @@ function exportReflectieverslag() {
   toast('PDF gedownload!', 'success');
 }
 
-/* â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Helpers ────────────────────────────────────────────────────────────── */
 
 async function inviteSchool() {
   hubState.schoolInvited = true;
@@ -4680,7 +4680,7 @@ function addLog(msg, color) {
     now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
   hubState.log.unshift({ id: 'lg' + hubState.nextId++, msg, time, color });
   if (hubState.log.length > 20) hubState.log.pop();
-  // Persist to DB (fire-and-forget â€” does not block the caller)
+  // Persist to DB (fire-and-forget — does not block the caller)
   if (MATCH_ID) {
     db.from('stage_log').insert({ match_id: MATCH_ID, msg, time, color }).then(({ error }) => {
       if (error) console.warn('[stage_log] insert failed:', error.message);
@@ -4696,14 +4696,14 @@ function toast(msg, type = '') {
   el._toastTimer = setTimeout(() => { el.className = ''; }, 2800);
 }
 
-/* â”€â”€ Utility: colour from progress % â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Utility: colour from progress % ───────────────────────────────── */
 function pctColor(pct) {
   if (pct >= 60) return 'var(--green)';
   if (pct >= 35) return 'var(--amber)';
   return 'var(--red)';
 }
 
-/* â”€â”€ Utility: parse Dutch date strings ('1 maart 2026') â†’ Date â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Utility: parse Dutch date strings ('1 maart 2026') → Date ─────── */
 function parseDutchDate(str) {
   if (!str) return null;
   const months = { januari:0, februari:1, maart:2, april:3, mei:4, juni:5,
@@ -4719,7 +4719,7 @@ function parseDutchDate(str) {
   return isNaN(iso.getTime()) ? null : iso;
 }
 
-/* â”€â”€ Utility: current + total stage week numbers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Utility: current + total stage week numbers ────────────────────── */
 function stageWeekNum() {
   const start = parseDutchDate(match.company.start);
   const eind  = parseDutchDate(match.company.eind);
@@ -4733,33 +4733,33 @@ function stageWeekNum() {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return 'â€”';
+  if (!dateStr) return '—';
   const d = new Date(dateStr);
   return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function formatDateShort(dateStr) {
-  if (!dateStr) return 'â€”';
+  if (!dateStr) return '—';
   const d = new Date(dateStr);
   const parts = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }).split(' ');
   return `<span>${parts[0]}</span><span>${parts[1] || ''}</span>`;
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════════════
    STAGEPLAN TAB
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════════════════════════ */
 
 function renderStageplan() {
   const sp = hubState.stageplan;
   const editable = can('editStageplan');
-  // Bedrijf toegevoegd aan readonly (audit 2026-05-04 â€” Item 11) zodat
+  // Bedrijf toegevoegd aan readonly (audit 2026-05-04 — Item 11) zodat
   // field()/sel()-helpers de leesweergave renderen i.p.v. inputs zonder save-knop.
   const readonly = hubState.role === 'school' || hubState.role === 'begeleider' || hubState.role === 'bedrijf';
 
   const readonlyBanner = hubState.role === 'school' || hubState.role === 'begeleider' ? `
     <div class="sp-readonly-note">
-      <span style="font-size:1rem;">ðŸ«</span>
-      Je bekijkt het stageplan als ${hubState.role === 'begeleider' ? 'praktijkbegeleider' : 'schoolbegeleider'} â€” alleen lezen.
+      <span style="font-size:1rem;">🏫</span>
+      Je bekijkt het stageplan als ${hubState.role === 'begeleider' ? 'praktijkbegeleider' : 'schoolbegeleider'} — alleen lezen.
     </div>` : '';
 
   const bedrijfBanner = hubState.role === 'bedrijf' ? `
@@ -4775,7 +4775,7 @@ function renderStageplan() {
     if (readonly) {
       return `<div class="form-group">
         <label class="form-label">${label}</label>
-        <div class="sp-field-val">${escapeHtml(value || 'â€”')}</div>
+        <div class="sp-field-val">${escapeHtml(value || '—')}</div>
       </div>`;
     }
     if (type === 'textarea') {
@@ -4796,7 +4796,7 @@ function renderStageplan() {
       const match_opt = opts.find(o => o.v === value);
       return `<div class="form-group">
         <label class="form-label">${label}</label>
-        <div class="sp-field-val">${escapeHtml(match_opt ? match_opt.l : value || 'â€”')}</div>
+        <div class="sp-field-val">${escapeHtml(match_opt ? match_opt.l : value || '—')}</div>
       </div>`;
     }
     const options = opts.map(o => `<option value="${o.v}"${value === o.v ? ' selected' : ''}>${o.l}</option>`).join('');
@@ -4811,23 +4811,23 @@ function renderStageplan() {
     <div class="deelvraag-row">
       <div class="deelvraag-num">${i + 1}</div>
       ${readonly
-        ? `<div style="flex:1;font-size:.88rem;padding:6px 0;color:var(--text)">${escapeHtml(dv.tekst || 'â€”')}</div>`
+        ? `<div style="flex:1;font-size:.88rem;padding:6px 0;color:var(--text)">${escapeHtml(dv.tekst || '—')}</div>`
         : `<input class="form-input" value="${escapeHtml(dv.tekst || '')}"
              oninput="hubState.stageplan.deelvragen[${i}].tekst=this.value" />`
       }
-      ${!readonly ? `<button type="button" class="deelvraag-remove btn btn-ghost btn-sm" onclick="removeDeelvraag(${i})">âœ•</button>` : ''}
+      ${!readonly ? `<button type="button" class="deelvraag-remove btn btn-ghost btn-sm" onclick="removeDeelvraag(${i})">✕</button>` : ''}
     </div>`).join('') || `<div class="empty-state" style="font-size:.82rem;padding:8px 0">Nog geen deelvragen toegevoegd.</div>`;
 
   const addDvBtn = !readonly ? `
-    <button class="btn btn-ghost btn-sm add-deelvraag" onclick="addDeelvraag()">ï¼‹ Deelvraag toevoegen</button>` : '';
+    <button class="btn btn-ghost btn-sm add-deelvraag" onclick="addDeelvraag()">＋ Deelvraag toevoegen</button>` : '';
 
-  // School annotation â€” alleen school/begeleider mogen deze noot
+  // School annotation — alleen school/begeleider mogen deze noot
   // schrijven. Bedrijf valt nu ook onder `readonly` (Item 11), dus
   // expliciete role-check ipv `readonly` ter voorkoming van leak.
   const schoolNote = (hubState.role === 'school' || hubState.role === 'begeleider') ? `
     <div class="card" style="margin-top:16px">
       <div class="card-head"><div class="card-title">Notitie schoolbegeleider</div></div>
-      <textarea class="form-textarea" id="sp-schoolnoot" placeholder="Voeg een notitie toeâ€¦">${escapeHtml(sp.schoolnoot || '')}</textarea>
+      <textarea class="form-textarea" id="sp-schoolnoot" placeholder="Voeg een notitie toe…">${escapeHtml(sp.schoolnoot || '')}</textarea>
       <div style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveSchoolnoot()">Notitie opslaan</button>
       </div>
@@ -4855,16 +4855,16 @@ function renderStageplan() {
             <div><span style="color:var(--muted);display:inline-block;width:110px;">Opleiding</span>${escapeHtml(match.student.opleiding)}</div>
             <div><span style="color:var(--muted);display:inline-block;width:110px;">Bedrijf</span><strong>${escapeHtml(match.company.name)}</strong></div>
             <div><span style="color:var(--muted);display:inline-block;width:110px;">Vacature</span>${escapeHtml(match.company.vacature)}</div>
-            <div><span style="color:var(--muted);display:inline-block;width:110px;">Periode</span>${escapeHtml(match.company.start)} â€“ ${escapeHtml(match.company.eind)}</div>
+            <div><span style="color:var(--muted);display:inline-block;width:110px;">Periode</span>${escapeHtml(match.company.start)} – ${escapeHtml(match.company.eind)}</div>
           </div>
         </div>
 
         <!-- Stageopdracht -->
         <div class="card">
           <div class="card-head">
-            <div class="card-title"><span class="sp-section-icon">ðŸ“Ž</span>Stageopdracht</div>
+            <div class="card-title"><span class="sp-section-icon">📎</span>Stageopdracht</div>
           </div>
-          ${field('Omschrijving van de opdracht', 'sp-stageopdracht', sp.stageopdracht, 'textarea', 'Beschrijf de stageopdrachtâ€¦')}
+          ${field('Omschrijving van de opdracht', 'sp-stageopdracht', sp.stageopdracht, 'textarea', 'Beschrijf de stageopdracht…')}
         </div>
 
         ${schoolNote}
@@ -4874,7 +4874,7 @@ function renderStageplan() {
         <!-- Onderzoeksvraag -->
         <div class="card">
           <div class="card-head">
-            <div class="card-title"><span class="sp-section-icon">ðŸ”¬</span>Onderzoeksvraag</div>
+            <div class="card-title"><span class="sp-section-icon">🔬</span>Onderzoeksvraag</div>
           </div>
 
           ${field('Hoofdvraag', 'sp-hoofdvraag', sp.hoofdvraag, 'textarea', 'Wat is de centrale onderzoeksvraag?')}
@@ -4894,18 +4894,18 @@ function renderStageplan() {
           </div>
 
           <div class="card-head" style="padding-top:8px;padding-bottom:4px;border-top:1px solid var(--border);margin-top:8px;">
-            <div class="card-title" style="font-size:.85rem;"><span class="sp-section-icon">ðŸ§ª</span>Methode &amp; resultaat</div>
+            <div class="card-title" style="font-size:.85rem;"><span class="sp-section-icon">🧪</span>Methode &amp; resultaat</div>
           </div>
           ${sel('Methode', 'sp-methode', sp.methode, [
             { v: 'interviews',  l: 'Diepte-interviews' },
-            { v: 'enquete',     l: 'EnquÃªte / survey' },
+            { v: 'enquete',     l: 'Enquête / survey' },
             { v: 'observatie',  l: 'Observatie' },
             { v: 'literatuur',  l: 'Literatuuronderzoek' },
             { v: 'experiment',  l: 'Experiment' },
             { v: 'mixed',       l: 'Combinatie van methoden' }
           ])}
 
-          ${field('Toelichting methode', 'sp-methodeomschrijving', sp.methodeomschrijving, 'textarea', 'Beschrijf hoe je de methode toepastâ€¦')}
+          ${field('Toelichting methode', 'sp-methodeomschrijving', sp.methodeomschrijving, 'textarea', 'Beschrijf hoe je de methode toepast…')}
 
           ${sel('Resultaattype', 'sp-resultaattype', sp.resultaattype, [
             { v: 'rapport',      l: 'Rapport / scriptie' },
@@ -4981,11 +4981,11 @@ async function saveSchoolnoot() {
   if (MATCH_ID) {
     const sp = hubState.stageplan;
     if (sp._dbId) {
-      // Plan row exists â€” targeted UPDATE (don't overwrite other fields)
+      // Plan row exists — targeted UPDATE (don't overwrite other fields)
       const { error } = await db.from('stage_plans').update({ schoolnoot: val }).eq('id', sp._dbId);
       if (error) { toast('Fout bij opslaan: ' + (error?.message || 'onbekende fout'), 'error'); return; }
     } else {
-      // No plan row yet â€” UPSERT with only required fields
+      // No plan row yet — UPSERT with only required fields
       const { data, error } = await db.from('stage_plans')
         .upsert({ match_id: MATCH_ID, schoolnoot: val }, { onConflict: 'match_id' })
         .select('id').maybeSingle();
@@ -4996,9 +4996,9 @@ async function saveSchoolnoot() {
   toast('Notitie opgeslagen!', 'success');
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════════════
    KALENDER TAB
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════════════════════════ */
 
 function buildKalDateMap() {
   const map = {};
@@ -5117,7 +5117,7 @@ function renderKalender() {
     <div class="page-head">
       <div>
         <div class="page-title">Kalender</div>
-        <div class="page-sub">Deadlines en afspraken in Ã©Ã©n overzicht</div>
+        <div class="page-sub">Deadlines en afspraken in één overzicht</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         ${can('addDeadline') ? `<button type="button" class="btn btn-primary btn-sm" onclick="openDeadlineModal(null)">+ Deadline</button>` : ''}
@@ -5174,7 +5174,7 @@ function openKalPopup(dateStr, e) {
   const popup = document.getElementById('kal-popup');
   if (!popup) return;
   popup.innerHTML = `
-    <button class="kal-popup-close" onclick="document.getElementById('kal-popup').style.display='none'" aria-label="Sluiten">Ã—</button>
+    <button class="kal-popup-close" onclick="document.getElementById('kal-popup').style.display='none'" aria-label="Sluiten">×</button>
     <div class="kal-popup-title">${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</div>
     ${items}`;
   popup.style.display = 'block';
@@ -5188,19 +5188,19 @@ function openKalPopup(dateStr, e) {
   }, 10);
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════════════════════════════════════
    AFSPRAKEN SYSTEM
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ══════════════════════════════════════════════════════════════════ */
 
-/* â”€â”€ Transient state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-let selectedTimeOpts = {};   // meetingId â†’ dateId
+/* ── Transient state ─────────────────────────────────────────────── */
+let selectedTimeOpts = {};   // meetingId → dateId
 let newMeeting = {};         // form state across modal steps
 let modalTimeSlots = [];     // [{date,from,to}] built in step 2
 let archievedOpen = false;   // accordion state
 
-/* â”€â”€ Pure helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Pure helpers ─────────────────────────────────────────────────── */
 function typeIcon(type) {
-  return { call: 'ðŸ“ž', video: 'ðŸŽ¥', fysiek: 'ðŸ¢' }[type] || 'ðŸ“…';
+  return { call: '📞', video: '🎥', fysiek: '🏢' }[type] || '📅';
 }
 function typeName(type) {
   return { call: 'Telefonisch gesprek', video: 'Videocall', fysiek: 'Fysiek gesprek' }[type] || type;
@@ -5209,17 +5209,17 @@ function statusTag(s) {
   return {
     openstaand:   { label: 'Openstaand',  cls: 'orange'  },
     geaccepteerd: { label: 'Bevestigd',   cls: 'green'   },
-    tegenbod:     { label: 'Tegenbod ðŸŸ¡', cls: 'yellow'  },
+    tegenbod:     { label: 'Tegenbod 🟡', cls: 'yellow'  },
     afgewezen:    { label: 'Afgewezen',   cls: 'red'     },
     geannuleerd:  { label: 'Geannuleerd', cls: 'neutral' }
   }[s] || { label: s, cls: 'neutral' };
 }
 function formatMeetingDate(dateStr, from, to) {
-  if (!dateStr) return 'â€”';
+  if (!dateStr) return '—';
   const d = new Date(dateStr);
   const day  = d.toLocaleDateString('nl-NL', { weekday: 'long' });
   const date = d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
-  return `${day[0].toUpperCase() + day.slice(1)} ${date} Â· ${from}â€“${to}`;
+  return `${day[0].toUpperCase() + day.slice(1)} ${date} · ${from}–${to}`;
 }
 function roleDisplay(role) {
   return { student: match.student.name, bedrijf: match.company.name, school: match.school.name }[role] || role;
@@ -5231,7 +5231,7 @@ function receiverOf(m) {
   return m.toAll ? 'alle partijen' : roleDisplay(m.to);
 }
 
-/* â”€â”€ Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Badge ────────────────────────────────────────────────────────── */
 function updateMeetingBadge() {
   const role = hubState.role;
   if (!role) return;
@@ -5246,7 +5246,7 @@ function updateMeetingBadge() {
   else           { badge.style.display = 'none'; }
 }
 
-/* â”€â”€ Availability grid (read-only or read-write) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Availability grid (read-only or read-write) ─────────────────── */
 function renderAvailabilityGrid(role, readonly) {
   const days = ['maandag','dinsdag','woensdag','donderdag','vrijdag'];
   const slots = hubState.availability[role]?.slots || [];
@@ -5255,12 +5255,12 @@ function renderAvailabilityGrid(role, readonly) {
     if (daySlots.length === 0) {
       return `<div class="avail-day">
         <div class="avail-day-name">${day.slice(0,2).toUpperCase()}</div>
-        <div class="avail-empty">â€”</div>
+        <div class="avail-empty">—</div>
       </div>`;
     }
     const slotsHtml = daySlots.map(s => `
       <div class="avail-slot ${s.type}">
-        ${s.type === 'bezet' ? 'Bezet' : `${s.from}â€“${s.to}`}
+        ${s.type === 'bezet' ? 'Bezet' : `${s.from}–${s.to}`}
       </div>`).join('');
     return `<div class="avail-day">
       <div class="avail-day-name">${day.slice(0,2).toUpperCase()}</div>
@@ -5270,7 +5270,7 @@ function renderAvailabilityGrid(role, readonly) {
   return `<div class="avail-grid">${cols.join('')}</div>`;
 }
 
-/* â”€â”€ Meeting card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Meeting card ─────────────────────────────────────────────────── */
 function renderMeetingCard(m) {
   const role = hubState.role;
   const st   = statusTag(m.status);
@@ -5280,7 +5280,7 @@ function renderMeetingCard(m) {
   // Confirmed date display
   let confirmedHtml = '';
   if (m.status === 'geaccepteerd') {
-    let dateLabel = 'â€”';
+    let dateLabel = '—';
     if (m.counterProposal && m.selectedDate === 'counter') {
       dateLabel = formatMeetingDate(m.counterProposal.date, m.counterProposal.from, m.counterProposal.to);
     } else if (m.selectedDate) {
@@ -5288,7 +5288,7 @@ function renderMeetingCard(m) {
       if (pd) dateLabel = formatMeetingDate(pd.date, pd.from, pd.to);
     }
     confirmedHtml = `<div class="mcard-confirmed">
-      âœ“ ${escapeHtml(dateLabel)}
+      ✓ ${escapeHtml(dateLabel)}
       <div class="mcard-contact">${typeIcon(m.type)} ${escapeHtml(m.contactInfo)}</div>
     </div>`;
   }
@@ -5309,7 +5309,7 @@ function renderMeetingCard(m) {
   } else if (m.status === 'openstaand' && isSender && m.proposedDates.length > 0) {
     const opts = m.proposedDates.map(pd =>
       `<div style="font-size:.85rem;color:var(--muted);padding:4px 0">
-        â—‹ ${formatMeetingDate(pd.date, pd.from, pd.to)}
+        ○ ${formatMeetingDate(pd.date, pd.from, pd.to)}
       </div>`).join('');
     datesHtml = `<div class="meeting-dates-label">Jouw voorgestelde tijdstippen:</div>${opts}`;
   }
@@ -5334,9 +5334,9 @@ function renderMeetingCard(m) {
       <div class="meeting-actions">
         <button class="btn btn-primary btn-sm" id="accept-btn-${m.id}"
           ${sel ? '' : 'disabled style="opacity:.4;cursor:not-allowed"'}
-          onclick="acceptMeeting(${m.id})">âœ“ Accepteren</button>
-        <button class="btn btn-ghost btn-sm" onclick="openCounterForm(${m.id})">â†© Tegenbod</button>
-        <button class="btn btn-danger btn-sm" onclick="confirmDecline(${m.id})">âœ• Afwijzen</button>
+          onclick="acceptMeeting(${m.id})">✓ Accepteren</button>
+        <button class="btn btn-ghost btn-sm" onclick="openCounterForm(${m.id})">↩ Tegenbod</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDecline(${m.id})">✕ Afwijzen</button>
       </div>
       <div id="counter-form-${m.id}" class="counter-form" style="display:none">
         <div class="form-row">
@@ -5370,7 +5370,7 @@ function renderMeetingCard(m) {
   } else if (m.status === 'openstaand' && isSender) {
     actionsHtml = `
       <div class="meeting-actions">
-        <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">âœ• Verzoek annuleren</button>
+        <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">✕ Verzoek annuleren</button>
       </div>
       <div id="confirm-cancel-${m.id}" class="confirm-dialog" style="display:none">
         <span>Weet je zeker dat je dit verzoek <strong>annuleert</strong>?</span>
@@ -5382,8 +5382,8 @@ function renderMeetingCard(m) {
   } else if (m.status === 'tegenbod' && isSender) {
     actionsHtml = `
       <div class="meeting-actions">
-        <button class="btn btn-primary btn-sm" onclick="acceptCounter(${m.id})">âœ“ Accepteer tegenbod</button>
-        <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">âœ• Verzoek annuleren</button>
+        <button class="btn btn-primary btn-sm" onclick="acceptCounter(${m.id})">✓ Accepteer tegenbod</button>
+        <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">✕ Verzoek annuleren</button>
       </div>
       <div id="confirm-cancel-${m.id}" class="confirm-dialog" style="display:none">
         <span>Weet je zeker dat je dit verzoek <strong>annuleert</strong>?</span>
@@ -5394,7 +5394,7 @@ function renderMeetingCard(m) {
 
   } else if (m.status === 'geaccepteerd' && isSender) {
     actionsHtml = `<div class="meeting-actions">
-      <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">âœ• Annuleren</button>
+      <button class="btn btn-ghost btn-sm" onclick="confirmCancel(${m.id})">✕ Annuleren</button>
     </div>
     <div id="confirm-cancel-${m.id}" class="confirm-dialog" style="display:none">
       <span>Weet je zeker dat je deze afspraak <strong>annuleert</strong>?</span>
@@ -5406,13 +5406,13 @@ function renderMeetingCard(m) {
 
   return `<div class="meeting-card ${m.status}" id="mcard-${m.id}">
     <div class="mcard-head">
-      <div class="mcard-title">ðŸ“… ${escapeHtml(m.subject)}</div>
+      <div class="mcard-title">📅 ${escapeHtml(m.subject)}</div>
       <span class="tag ${st.cls}">${st.label}</span>
     </div>
     <div class="mcard-meta">
       <span>Van: ${escapeHtml(roleDisplay(m.from))} (${roleLabel(m.from)})</span>
       <span>${typeIcon(m.type)} ${typeName(m.type)}</span>
-      ${m.status === 'geaccepteerd' ? '' : `<span title="contactgegevens">ðŸ”’ Zichtbaar na bevestiging</span>`}
+      ${m.status === 'geaccepteerd' ? '' : `<span title="contactgegevens">🔒 Zichtbaar na bevestiging</span>`}
     </div>
     <hr class="divider">
     ${confirmedHtml}
@@ -5424,7 +5424,7 @@ function renderMeetingCard(m) {
   </div>`;
 }
 
-/* â”€â”€ Main tab renderer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Main tab renderer ────────────────────────────────────────────── */
 function renderAfspraken() {
   const role = hubState.role;
 
@@ -5455,7 +5455,7 @@ function renderAfspraken() {
   return `
     <div class="page-head">
       <div>
-        <div class="page-title">ðŸ“… Afspraken</div>
+        <div class="page-title">📅 Afspraken</div>
         <div class="page-sub">Verzoeken en beschikbaarheid voor deze stage</div>
       </div>
       <button class="btn btn-primary" onclick="openMeetingModal()">+ Nieuw verzoek</button>
@@ -5475,10 +5475,10 @@ function renderAfspraken() {
       <div class="card">
         <div class="card-head">
           <div>
-            <div class="card-title">ðŸ—“ ${escapeHtml(availLabel)}</div>
+            <div class="card-title">🗓 ${escapeHtml(availLabel)}</div>
             <div class="card-sub">Jouw beschikbaarheid per dag van de week</div>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="openAvailModal()">âš™ Bewerken</button>
+          <button class="btn btn-ghost btn-sm" onclick="openAvailModal()">⚙ Bewerken</button>
         </div>
         ${renderAvailabilityGrid(role, true)}
       </div>
@@ -5500,14 +5500,14 @@ function toggleArchief() {
   switchTab('afspraken');
 }
 
-/* â”€â”€ Time option selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Time option selection ────────────────────────────────────────── */
 function selectTimeOpt(meetingId, dateId) {
   selectedTimeOpts[meetingId] = dateId;
   // Re-render the tab so the selection state and button disabled state update
   switchTab('afspraken');
 }
 
-/* â”€â”€ Accept â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Accept ───────────────────────────────────────────────────────── */
 async function acceptMeeting(id) {
   const m = hubState.meetings.find(m => m.id === id);
   if (!m) return;
@@ -5534,19 +5534,19 @@ async function acceptMeeting(id) {
         type:     'meeting_accepted',
         ref_id:   m._dbId,
         ref_type: 'meeting',
-        message:  `${senderName} heeft je afspraak bevestigd: ${m.subject} â€” ${dateLabel}.`,
+        message:  `${senderName} heeft je afspraak bevestigd: ${m.subject} — ${dateLabel}.`,
         read:     false,
       }).catch(err => console.warn('[hub] notif skipped:', err));
     }
   }
 
-  addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek geaccepteerd â€” ${dateLabel}`, 'green');
-  toast(`âœ“ Afspraak bevestigd â€” ${dateLabel}`);
+  addLog(`${roleDisplay(hubState.role)} heeft het meeting-verzoek geaccepteerd — ${dateLabel}`, 'green');
+  toast(`✓ Afspraak bevestigd — ${dateLabel}`);
   delete selectedTimeOpts[id];
   switchTab('afspraken');
 }
 
-/* â”€â”€ Counter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Counter ──────────────────────────────────────────────────────── */
 function openCounterForm(id) {
   const el = document.getElementById(`counter-form-${id}`);
   if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
@@ -5568,7 +5568,7 @@ function submitCounter(id) {
   switchTab('afspraken');
 }
 
-/* â”€â”€ Decline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Decline ──────────────────────────────────────────────────────── */
 function confirmDecline(id) {
   const el = document.getElementById(`confirm-decline-${id}`);
   if (el) el.style.display = '';
@@ -5602,7 +5602,7 @@ async function declineMeeting(id) {
   switchTab('afspraken');
 }
 
-/* â”€â”€ Cancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Cancel ───────────────────────────────────────────────────────── */
 function confirmCancel(id) {
   const el = document.getElementById(`confirm-cancel-${id}`);
   if (el) el.style.display = '';
@@ -5636,7 +5636,7 @@ async function cancelMeeting(id) {
   switchTab('afspraken');
 }
 
-/* â”€â”€ Accept counter proposal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Accept counter proposal ──────────────────────────────────────── */
 function acceptCounter(id) {
   const m = hubState.meetings.find(m => m.id === id);
   if (!m || !m.counterProposal) return;
@@ -5645,12 +5645,12 @@ function acceptCounter(id) {
   m.updatedAt    = nowStr();
   const cp        = m.counterProposal;
   const dateLabel = formatMeetingDate(cp.date, cp.from, cp.to);
-  addLog(`${roleDisplay(hubState.role)} heeft het tegenbod geaccepteerd â€” ${dateLabel}`, 'green');
-  toast(`âœ“ Afspraak bevestigd â€” ${dateLabel}`);
+  addLog(`${roleDisplay(hubState.role)} heeft het tegenbod geaccepteerd — ${dateLabel}`, 'green');
+  toast(`✓ Afspraak bevestigd — ${dateLabel}`);
   switchTab('afspraken');
 }
 
-/* â”€â”€ Meeting request modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Meeting request modal ────────────────────────────────────────── */
 function openMeetingModal() {
   newMeeting    = { type: 'video' };
   modalTimeSlots = [{ date: '', from: '10:00', to: '11:00' }];
@@ -5680,18 +5680,18 @@ function renderModalStep1() {
   document.getElementById('modal-inner').innerHTML = `
     <div class="modal-header">
       <div class="modal-title">Afspraak verzoeken</div>
-      <button class="modal-close" onclick="closeMeetingModal()">âœ•</button>
+      <button class="modal-close" onclick="closeMeetingModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="step-indicator">
-        <span class="step active">â‘  Details</span>
-        <span class="sep">â†’</span>
-        <span class="step">â‘¡ Tijdstip</span>
+        <span class="step active">① Details</span>
+        <span class="sep">→</span>
+        <span class="step">② Tijdstip</span>
       </div>
       <div class="form-row">
         <label class="form-label">Aan</label>
         <select class="form-select" id="m-to" onchange="newMeeting.to=this.value">
-          <option value="">â€” Kies ontvanger â€”</option>
+          <option value="">— Kies ontvanger —</option>
           ${toOpts}${toAllOpt}
         </select>
       </div>
@@ -5720,7 +5720,7 @@ function renderModalStep1() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeMeetingModal()">Annuleren</button>
-      <button class="btn btn-primary" onclick="nextStep()">Volgende â†’</button>
+      <button class="btn btn-primary" onclick="nextStep()">Volgende →</button>
     </div>`;
 }
 
@@ -5758,20 +5758,20 @@ function renderModalStep2() {
       <span class="slot-sep">tot</span>
       <input type="time" value="${s.to}"   onchange="modalTimeSlots[${i}].to=this.value">
       ${modalTimeSlots.length > 1
-        ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeTimeSlot(${i})" style="padding:4px 8px">âœ•</button>`
+        ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeTimeSlot(${i})" style="padding:4px 8px">✕</button>`
         : ''}
     </div>`).join('');
 
   document.getElementById('modal-inner').innerHTML = `
     <div class="modal-header">
       <div class="modal-title">Afspraak verzoeken</div>
-      <button class="modal-close" onclick="closeMeetingModal()">âœ•</button>
+      <button class="modal-close" onclick="closeMeetingModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="step-indicator">
-        <span class="step">â‘  Details</span>
-        <span class="sep">â†’</span>
-        <span class="step active">â‘¡ Tijdstip</span>
+        <span class="step">① Details</span>
+        <span class="sep">→</span>
+        <span class="step active">② Tijdstip</span>
       </div>
       <div class="modal-2col">
         <div>
@@ -5788,8 +5788,8 @@ function renderModalStep2() {
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="renderModalStep1()">â† Terug</button>
-      <button class="btn btn-primary" onclick="saveMeeting()">Verzoek versturen â†’</button>
+      <button class="btn btn-ghost" onclick="renderModalStep1()">← Terug</button>
+      <button class="btn btn-primary" onclick="saveMeeting()">Verzoek versturen →</button>
     </div>`;
 }
 
@@ -5809,7 +5809,7 @@ async function saveMeeting() {
   window._isSavingMeeting = true;
   try {
     const filled = modalTimeSlots.filter(s => s.date && s.from && s.to);
-    if (filled.length === 0) { toast('Voeg minimaal Ã©Ã©n tijdstip toe.', 'error'); return; }
+    if (filled.length === 0) { toast('Voeg minimaal één tijdstip toe.', 'error'); return; }
     const _today = new Date().toISOString().split('T')[0];
     const _invalidDates = filled.filter(s => s.date && s.date < _today);
     if (_invalidDates.length > 0) {
@@ -5867,7 +5867,7 @@ async function saveMeeting() {
         attendee_email:  attendeeEmail,
       }).select('id').maybeSingle();
       if (!dbRow) {
-        toast('Er ging iets mis â€” probeer opnieuw', 'error');
+        toast('Er ging iets mis — probeer opnieuw', 'error');
         return;
       }
       if (dbRow?.id) {
@@ -5901,7 +5901,7 @@ async function saveMeeting() {
   }
 }
 
-/* â”€â”€ Availability modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Availability modal ───────────────────────────────────────────── */
 function openAvailModal() {
   renderAvailModal();
   document.getElementById('avail-modal-root').style.display = 'flex';
@@ -5928,11 +5928,11 @@ function renderAvailModal() {
         </select>
         ${s.type !== 'bezet' ? `
           <input type="time" value="${s.from}" onchange="updateAvailSlot('${day}', ${si}, 'from', this.value)">
-          <span style="font-size:.8rem;color:var(--muted)">â€“</span>
+          <span style="font-size:.8rem;color:var(--muted)">–</span>
           <input type="time" value="${s.to}"   onchange="updateAvailSlot('${day}', ${si}, 'to', this.value)">
         ` : ''}
         <button class="btn btn-ghost btn-sm" style="padding:4px 8px"
-          onclick="removeAvailSlot('${day}', ${si})">âœ•</button>
+          onclick="removeAvailSlot('${day}', ${si})">✕</button>
       </div>`).join('');
 
     return `<div class="avail-edit-day">
@@ -5946,7 +5946,7 @@ function renderAvailModal() {
   document.getElementById('avail-modal-inner').innerHTML = `
     <div class="modal-header">
       <div class="modal-title">Beschikbaarheid instellen</div>
-      <button class="modal-close" onclick="closeAvailModal()">âœ•</button>
+      <button class="modal-close" onclick="closeAvailModal()">✕</button>
     </div>
     <div class="modal-body">${dayRows}</div>
     <div class="modal-footer">
@@ -5986,7 +5986,7 @@ function saveAvailability() {
   const slots = hubState.availability[role]?.slots || [];
   const invalid = slots.filter(s => !s.from || !s.to || s.from >= s.to);
   if (invalid.length > 0) {
-    toast('Ongeldige tijden: van moet vÃ³Ã³r tot liggen.', 'error');
+    toast('Ongeldige tijden: van moet vóór tot liggen.', 'error');
     return;
   }
   addLog(`${roleDisplay(role)} heeft beschikbaarheid bijgewerkt.`, 'blue');
@@ -5995,21 +5995,21 @@ function saveAvailability() {
   switchTab('afspraken');
 }
 
-/* â”€â”€ CSV Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── CSV Export ───────────────────────────────────────────────────── */
 function exportCSV() {
   const csv = rows => rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
   const statusNl = s => ({ done: 'Afgerond', 'in-progress': 'Bezig', todo: 'Open' }[s] || s);
   const rows = [
     ['Type', 'Omschrijving', 'Datum / Details', 'Status', 'Partij'],
     ['', '=== STAGEGEGEVENS ===', '', '', ''],
-    ['Stage',   match.company.vacature,  `${match.company.start} â€“ ${match.company.eind}`, 'Lopend', 'Alle partijen'],
+    ['Stage',   match.company.vacature,  `${match.company.start} – ${match.company.eind}`, 'Lopend', 'Alle partijen'],
     ['Student', match.student.name,       match.student.opleiding, '', 'Student'],
     ['Bedrijf', match.company.name,        match.company.sector,   '', 'Bedrijf'],
     ['School',  match.school.name,         match.school.opleiding, '', 'School'],
     ['', '=== LEERDOELEN ===', '', '', ''],
     ...hubState.leerdoelen.map(l => [
       'Leerdoel', l.title,
-      l.progress + '%' + (l.notes ? ' â€” ' + l.notes : ''),
+      l.progress + '%' + (l.notes ? ' — ' + l.notes : ''),
       l.progress >= 60 ? 'Op schema' : l.progress >= 35 ? 'In ontwikkeling' : 'Aandacht nodig',
       match.student.name
     ]),
@@ -6021,10 +6021,10 @@ function exportCSV() {
     ...hubState.meetings.map(m => {
       const pd = m.selectedDate && m.selectedDate !== 'counter'
         ? m.proposedDates.find(d => d.id === m.selectedDate) : null;
-      const dt = pd ? `${pd.date} ${pd.from}â€“${pd.to}`
-        : m.counterProposal ? `${m.counterProposal.date} ${m.counterProposal.from}â€“${m.counterProposal.to}`
-        : 'â€”';
-      return ['Afspraak', m.subject, dt, m.status, `${m.from} â†’ ${m.toAll ? 'alle' : m.to}`];
+      const dt = pd ? `${pd.date} ${pd.from}–${pd.to}`
+        : m.counterProposal ? `${m.counterProposal.date} ${m.counterProposal.from}–${m.counterProposal.to}`
+        : '—';
+      return ['Afspraak', m.subject, dt, m.status, `${m.from} → ${m.toAll ? 'alle' : m.to}`];
     }),
   ];
   const blob = new Blob(['\uFEFF' + csv(rows)], { type: 'text/csv;charset=utf-8;' });
@@ -6035,10 +6035,10 @@ function exportCSV() {
   toast('CSV gedownload');
 }
 
-/* â”€â”€ PDF Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── PDF Export ───────────────────────────────────────────────────── */
 function exportPDF() {
   if (typeof window.jspdf === 'undefined') {
-    toast('PDF-bibliotheek niet geladen â€” gebruik Ctrl+P om af te drukken');
+    toast('PDF-bibliotheek niet geladen — gebruik Ctrl+P om af te drukken');
     window.print();
     return;
   }
@@ -6067,11 +6067,11 @@ function exportPDF() {
       doc.text('internly', pageW - margin, 9, { align: 'right' });
       doc.setFontSize(20);
       doc.setTextColor(255, 255, 255);
-      doc.text('Stage Hub â€” Overzicht', margin, 21);
+      doc.text('Stage Hub — Overzicht', margin, 21);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9.5);
       doc.setTextColor(200, 235, 215);
-      doc.text(`${match?.student?.name || 'Onbekend'}  Â·  ${match.company.name}  Â·  ${dateNl}`, margin, 31);
+      doc.text(`${match?.student?.name || 'Onbekend'}  ·  ${match.company.name}  ·  ${dateNl}`, margin, 31);
       y = 46;
     } else {
       doc.setFillColor(26, 122, 72);
@@ -6079,7 +6079,7 @@ function exportPDF() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(255, 255, 255);
-      doc.text('Stage Hub â€” Overzicht', margin, 9);
+      doc.text('Stage Hub — Overzicht', margin, 9);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(200, 235, 215);
@@ -6098,7 +6098,7 @@ function exportPDF() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(7.5);
       doc.setTextColor(160, 163, 175);
-      doc.text('internly.pro  Â·  Stage Hub', margin, FOOTER_Y + 5);
+      doc.text('internly.pro  ·  Stage Hub', margin, FOOTER_Y + 5);
       doc.text(`Pagina ${p} van ${total}`, pageW - margin, FOOTER_Y + 5, { align: 'right' });
     }
   }
@@ -6134,7 +6134,7 @@ function exportPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.setTextColor(opts.color ? opts.color[0] : 13, opts.color ? opts.color[1] : 21, opts.color ? opts.color[2] : 32);
-    const lines = doc.splitTextToSize(String(value ?? 'â€”'), valueW);
+    const lines = doc.splitTextToSize(String(value ?? '—'), valueW);
     lines.forEach((l, li) => { if (li > 0) check(6); doc.text(l, valueX, y + (li === 0 ? 0 : li * 5.5)); });
     y += lines.length * 5.5 + 2;
   }
@@ -6154,17 +6154,17 @@ function exportPDF() {
     doc.text(s.label, x + 11, yy + 0.8, { align: 'center' });
   }
 
-  // â”€â”€ Draw first page header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Draw first page header ─────────────────────────────────────────────────
   drawPageHeader(true);
 
-  // â”€â”€ Stage info cards (2-column grid) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Stage info cards (2-column grid) ──────────────────────────────────────
   sectionHeader('Stagegegevens');
   const infoItems = [
     ['Student',   match?.student?.name || 'Onbekend'],
-    ['Opleiding', match?.student?.opleiding || 'â€”'],
+    ['Opleiding', match?.student?.opleiding || '—'],
     ['Bedrijf',   match.company.name],
     ['Vacature',  match.company.vacature],
-    ['Periode',   `${match.company.start} â€“ ${match.company.eind}`],
+    ['Periode',   `${match.company.start} – ${match.company.eind}`],
     ['Duur',      match.company.duur],
     ['School',    match.school.name],
     ['Sector',    match.company.sector],
@@ -6185,7 +6185,7 @@ function exportPDF() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9.5);
     doc.setTextColor(13, 21, 32);
-    doc.text(doc.splitTextToSize(String(val1 || 'â€”'), colHalf - 6)[0], margin + 3, y + 7);
+    doc.text(doc.splitTextToSize(String(val1 || '—'), colHalf - 6)[0], margin + 3, y + 7);
     // Right cell
     if (lbl2) {
       const rx = margin + colHalf + 8;
@@ -6198,13 +6198,13 @@ function exportPDF() {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9.5);
       doc.setTextColor(13, 21, 32);
-      doc.text(doc.splitTextToSize(String(val2 || 'â€”'), colHalf - 6)[0], rx + 3, y + 7);
+      doc.text(doc.splitTextToSize(String(val2 || '—'), colHalf - 6)[0], rx + 3, y + 7);
     }
     y += 13;
   }
   y += 4;
 
-  // â”€â”€ Leerdoelen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Leerdoelen ────────────────────────────────────────────────────────────
   if (hubState.leerdoelen.length > 0) {
     sectionHeader('Leerdoelen & Voortgang');
     hubState.leerdoelen.forEach(l => {
@@ -6236,7 +6236,7 @@ function exportPDF() {
     y += 3;
   }
 
-  // â”€â”€ Deadlines â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Deadlines ─────────────────────────────────────────────────────────────
   if (hubState.deadlines.length > 0) {
     sectionHeader('Planning & Deadlines');
     hubState.deadlines.forEach(d => {
@@ -6250,13 +6250,13 @@ function exportPDF() {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(133, 77, 14);
-      doc.text(d.date || 'â€”', pageW - margin - 2, y + 3, { align: 'right' });
+      doc.text(d.date || '—', pageW - margin - 2, y + 3, { align: 'right' });
       y += 10;
     });
     y += 3;
   }
 
-  // â”€â”€ Taken â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Taken ─────────────────────────────────────────────────────────────────
   if (hubState.tasks.length > 0) {
     sectionHeader('Taken');
     hubState.tasks.forEach(t => {
@@ -6277,20 +6277,20 @@ function exportPDF() {
     y += 3;
   }
 
-  // â”€â”€ Afspraken â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Afspraken ─────────────────────────────────────────────────────────────
   if (hubState.meetings.length > 0) {
     sectionHeader('Afspraken');
     hubState.meetings.forEach(m => {
       check(12);
       const pd = m.selectedDate && m.selectedDate !== 'counter'
         ? m.proposedDates?.find(d => d.id === m.selectedDate) : null;
-      const dt = pd ? `${pd.date} ${pd.from}â€“${pd.to}`
-        : m.counterProposal ? `${m.counterProposal.date} ${m.counterProposal.from}â€“${m.counterProposal.to}`
-        : 'â€”';
+      const dt = pd ? `${pd.date} ${pd.from}–${pd.to}`
+        : m.counterProposal ? `${m.counterProposal.date} ${m.counterProposal.from}–${m.counterProposal.to}`
+        : '—';
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.setTextColor(13, 21, 32);
-      doc.text(m.subject || 'â€”', margin + 2, y + 2);
+      doc.text(m.subject || '—', margin + 2, y + 2);
       doc.setFontSize(8.5);
       doc.setTextColor(107, 114, 128);
       doc.text(dt, margin + 2, y + 7.5);
@@ -6303,7 +6303,7 @@ function exportPDF() {
     y += 3;
   }
 
-  // â”€â”€ Activiteitenlog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Activiteitenlog ───────────────────────────────────────────────────────
   if (hubState.log.length > 0) {
     sectionHeader('Activiteitenlog (laatste 10)');
     hubState.log.slice(0, 10).forEach(l => {
@@ -6328,27 +6328,27 @@ function exportPDF() {
   toast('PDF gedownload');
 }
 
-/* â”€â”€ Utility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Utility ──────────────────────────────────────────────────────── */
 
-/* â”€â”€ SESSION IMPLEMENTATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-   TASK:           Stage Hub 2.0 â€” Match-indicator + Kalender + Stageplan + DB
+/* ── SESSION IMPLEMENTATION ──────────────────────────────────────────────
+   TASK:           Stage Hub 2.0 — Match-indicator + Kalender + Stageplan + DB
    ADDED:
-     1. Match-indicator bar â€” rendered at top of every tab via renderMatchIndicator()
+     1. Match-indicator bar — rendered at top of every tab via renderMatchIndicator()
         Shows student/company/school avatars; active user gets orange ring
-     2. Kalender tab â€” month grid with deadline (orange) + meeting (green) dots,
+     2. Kalender tab — month grid with deadline (orange) + meeting (green) dots,
         day-click popup, prev/next month nav, filter pills (Alles/Deadlines/Meetings)
-     3. Stageplan tab â€” stageopdracht + onderzoeksvraag form with deelvragen
+     3. Stageplan tab — stageopdracht + onderzoeksvraag form with deelvragen
         dynamic list; school gets read-only view + annotation field
-     4. DB persistence â€” loadHubFromDB() on page load when ?match=UUID present;
+     4. DB persistence — loadHubFromDB() on page load when ?match=UUID present;
         saveTaak/saveDeadline/saveLeerdoel/saveReflectie/saveStageplan write to DB
         using _dbId field (numeric IDs retained for in-page JS compatibility)
    SQL REQUIRED:
      ALTER TABLE stage_plans ADD COLUMN IF NOT EXISTS deelvragen jsonb NOT NULL DEFAULT '[]';
    DEMO FALLBACK:
-     All demo data unchanged â€” page works fully without ?match= param
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+     All demo data unchanged — page works fully without ?match= param
+   ──────────────────────────────────────────────────────────────────────── */
 
-/* â”€â”€ Matchpool demo toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Matchpool demo toggle ────────────────────────────────────────────────── */
 
 let _demoEnabled = localStorage.getItem('internly_demo_profiles') === 'true';
 let _guideStep = 0;
@@ -6421,7 +6421,7 @@ function renderDemoCard(p, idx) {
           ${p.beschikbaarheid.map(d => `<span style="font-size:.72rem;padding:2px 8px;background:var(--blue-bg,#e8f0fc);color:var(--blue,#1756a8);border-radius:20px;">${escapeHtml(d)}</span>`).join('')}
         </div>
       </div>
-      <div style="font-size:.72rem;color:var(--muted);">${p.talen.join(' Â· ')}</div>`;
+      <div style="font-size:.72rem;color:var(--muted);">${p.talen.join(' · ')}</div>`;
   }
 
   const typeLabel = { bedrijf: 'Bedrijf', school: 'School', buddy: 'Buddy' }[p.type] || p.type;
@@ -6431,13 +6431,13 @@ function renderDemoCard(p, idx) {
   return `
   <div style="background:#fff;border:1px solid var(--border,#e5e3de);border-radius:var(--r,14px);padding:16px;position:relative;">
     <div style="position:absolute;top:10px;right:10px;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;background:${typeBg};color:${typeColor};">
-      ${typeLabel} Â· Voorbeeld
+      ${typeLabel} · Voorbeeld
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;">${escapeHtml(p.avatar)}</div>
       <div>
         <div style="font-size:.9rem;font-weight:600;color:var(--ink);">${escapeHtml(p.naam)}</div>
-        <div style="font-size:.75rem;color:var(--muted);">${escapeHtml(p.stad)}${p.sector ? ' Â· ' + escapeHtml(p.sector) : p.beroep ? ' Â· ' + escapeHtml(p.beroep) : p.opleiding ? ' Â· ' + escapeHtml(p.opleiding) : ''}</div>
+        <div style="font-size:.75rem;color:var(--muted);">${escapeHtml(p.stad)}${p.sector ? ' · ' + escapeHtml(p.sector) : p.beroep ? ' · ' + escapeHtml(p.beroep) : p.opleiding ? ' · ' + escapeHtml(p.opleiding) : ''}</div>
       </div>
     </div>
     <div style="font-size:.78rem;color:var(--ink3,#6b7280);margin-bottom:12px;line-height:1.45;">${escapeHtml(p.beschrijving)}</div>
@@ -6454,28 +6454,28 @@ function renderDemoCard(p, idx) {
       <a href="auth.html" style="
         font-size:.75rem; color:var(--accent, #e05c1a);
         text-decoration:none; font-weight:500;
-      ">Maak je profiel aan â†’</a>
+      ">Maak je profiel aan →</a>
     </div>
   </div>`;
 }
 
-/* â”€â”€ Matchpool tab â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Matchpool tab ────────────────────────────────────────────────────────── */
 
 function renderMatchpool() {
   const toggleBar = `
     <div id="demo-toggle-bar" style="display:flex;align-items:center;gap:10px;padding:.6rem .85rem;background:var(--amber-bg,#fdf3e0);border:0.5px solid rgba(160,96,16,.2);border-radius:var(--r-sm,8px);margin-bottom:1rem;">
       <label class="demo-switch" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;color:var(--amber,#a06010);font-weight:500;" onclick="toggleDemoProfiles()">
-        <span style="font-size:16px;">ðŸŽ“</span> Voorbeeldprofielen tonen
+        <span style="font-size:16px;">🎓</span> Voorbeeldprofielen tonen
         <div id="demo-toggle" style="width:36px;height:20px;border-radius:10px;background:${_demoEnabled ? 'var(--amber,#a06010)' : '#d1d5db'};position:relative;transition:background .2s;flex-shrink:0;">
           <div id="demo-knob" style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;transform:${_demoEnabled ? 'translateX(18px)' : 'translateX(0)'};box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
         </div>
       </label>
-      <button onclick="openDemoGuide()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--amber,#a06010);padding:2px 6px;border-radius:4px;" title="Uitleg matchpool">â„¹ï¸ Uitleg</button>
+      <button onclick="openDemoGuide()" style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--amber,#a06010);padding:2px 6px;border-radius:4px;" title="Uitleg matchpool">ℹ️ Uitleg</button>
     </div>`;
 
   const emptyState = !_demoEnabled ? `
     <div class="empty-state" style="padding:40px 20px;">
-      <div style="font-size:2rem;margin-bottom:12px;">ðŸ”</div>
+      <div style="font-size:2rem;margin-bottom:12px;">🔍</div>
       <div style="font-size:.95rem;font-weight:600;color:var(--ink2);margin-bottom:6px;">Matchpool</div>
       <div style="font-size:.82rem;color:var(--muted);max-width:320px;margin:0 auto 16px;">Hier verschijnen beschikbare bedrijven, scholen en buddy's zodra er profielen zijn gekoppeld. Zet voorbeeldprofielen aan om te zien hoe de pool eruitziet.</div>
       <button class="btn btn-ghost btn-sm" onclick="toggleDemoProfiles()">Voorbeeldprofielen tonen</button>
@@ -6493,7 +6493,7 @@ function renderMatchpool() {
     ${emptyState}`;
 }
 
-/* â”€â”€ Demo guide overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Demo guide overlay ───────────────────────────────────────────────────── */
 
 function openDemoGuide() {
   _guideStep = 0;
@@ -6527,11 +6527,11 @@ function renderGuideStep() {
     <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:10px;">${escapeHtml(s.title)}</div>
     <div style="font-size:.87rem;color:var(--ink2);line-height:1.55;">${escapeHtml(s.body)}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
-      <button onclick="demoGuideStep(-1)" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.82rem;cursor:pointer;${_guideStep === 0 ? 'opacity:.4;pointer-events:none;' : ''}">â† Vorige</button>
+      <button onclick="demoGuideStep(-1)" style="padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.82rem;cursor:pointer;${_guideStep === 0 ? 'opacity:.4;pointer-events:none;' : ''}">← Vorige</button>
       <span style="font-size:.75rem;color:var(--muted);">${_guideStep + 1} / ${tot}</span>
       ${isLast
-        ? `<button type="button" onclick="closeDemoGuide()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Sluiten âœ“</button>`
-        : `<button type="button" onclick="demoGuideStep(1)" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Volgende â†’</button>`}
+        ? `<button type="button" onclick="closeDemoGuide()" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Sluiten ✓</button>`
+        : `<button type="button" onclick="demoGuideStep(1)" style="padding:6px 16px;border-radius:6px;border:none;background:var(--primary);color:#fff;font-size:.82rem;cursor:pointer;">Volgende →</button>`}
     </div>`;
 
   // Update dot indicators
@@ -6550,7 +6550,7 @@ function nowStr() {
   <div style="background:#fff;border-radius:var(--r,14px);width:100%;max-width:420px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);">
     <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between;">
       <div style="font-size:.78rem;font-weight:600;color:var(--muted);">Matchpool uitleg</div>
-      <button onclick="closeDemoGuide()" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--muted);line-height:1;">Ã—</button>
+      <button onclick="closeDemoGuide()" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--muted);line-height:1;">×</button>
     </div>
     <div id="guide-body" style="padding:16px 20px 20px;"></div>
     <div style="padding:0 20px 16px;display:flex;justify-content:center;gap:6px;">
@@ -6570,6 +6570,6 @@ function nowStr() {
   </div>
 </div>
 <script src="js/info.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

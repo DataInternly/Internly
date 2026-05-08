@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
   <meta name="description" content="Log in op Internly of maak een account aan als student, bedrijf of school.">
-  <title>Inloggen â€” Internly</title>
+  <title>Inloggen — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -20,9 +20,9 @@
   <script src="js/push.js"></script>
   <script src="js/toast.js"></script>
   <script>
-    // Pre-load shim â€” telemetry.js overschrijft dit bij succesvolle load.
+    // Pre-load shim — telemetry.js overschrijft dit bij succesvolle load.
     // Als telemetry.js 404't of geblokkeerd wordt, blijft deze stub staan
-    // en geeft _init Ã©Ã©n luide warn (geen silent failure).
+    // en geeft _init één luide warn (geen silent failure).
     window._fCtx = {
       _init: function(p) {
         console.warn('[telemetry] js/telemetry.js niet geladen, ' +
@@ -62,7 +62,7 @@
   })();
   </script>
   <style>
-    /* Pagina-specifieke vars â€” globale tokens komen uit css/style.css */
+    /* Pagina-specifieke vars — globale tokens komen uit css/style.css */
     :root {
       --green:      var(--c-green);
       --green-dark: var(--c-green-deep);
@@ -102,7 +102,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* â”€â”€ Topbar â”€â”€ */
+    /* ── Topbar ── */
     .auth-topbar {
       padding: var(--s5);
       display: flex; align-items: center; justify-content: space-between;
@@ -144,14 +144,14 @@
       border-color: rgba(255,126,66,.25);
     }
 
-    /* â”€â”€ Frame â”€â”€ */
+    /* ── Frame ── */
     .auth-frame {
       flex: 1;
       display: flex; align-items: center; justify-content: center;
       padding: var(--s5);
     }
 
-    /* â”€â”€ Auth card â”€â”€ */
+    /* ── Auth card ── */
     .auth-card {
       width: 100%; max-width: 480px;
       background: #fff;
@@ -186,7 +186,7 @@
       line-height: 1.6; margin-bottom: var(--s5);
     }
 
-    /* â”€â”€ Tabs (pill) â”€â”€ */
+    /* ── Tabs (pill) ── */
     .tabs {
       display: grid; grid-template-columns: 1fr 1fr;
       background: var(--c-cream);
@@ -210,10 +210,10 @@
       box-shadow: 0 2px 8px rgba(0,0,0,.06);
     }
 
-    /* â”€â”€ ROLE PICKER â”€â”€
-       NB: .card-body heeft geen eigen CSS-regel â€” class staat alleen op
+    /* ── ROLE PICKER ──
+       NB: .card-body heeft geen eigen CSS-regel — class staat alleen op
        het HTML-element zodat JS '.card-body input' querySelector werkt
-       voor de shake-animatie bij invoerfouten. â”€â”€ */
+       voor de shake-animatie bij invoerfouten. ── */
     .role-title {
       font-family: var(--font-mono);
       font-size: .72rem; font-weight: 500;
@@ -272,7 +272,7 @@
     .buddy-extra { display: none; margin-top: 4px; }
     .buddy-extra.show { display: block; }
 
-    /* â”€â”€ FORM â”€â”€ */
+    /* ── FORM ── */
     .field { margin-bottom: var(--s4); }
     .field label {
       display: block; font-size: .82rem; font-weight: 600;
@@ -289,7 +289,7 @@
     .field input:focus,
     .field select:focus { border-color: var(--c-green); }
 
-    /* â”€â”€ SUBMIT â”€â”€ */
+    /* ── SUBMIT ── */
     .btn-submit {
       width: 100%; padding: 13px;
       background: var(--c-orange-deep); color: #fff; border: none;
@@ -305,7 +305,7 @@
     .btn-submit:active { transform: translateY(0); }
     .btn-submit:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-    /* â”€â”€ ERROR / SUCCESS â”€â”€ */
+    /* ── ERROR / SUCCESS ── */
     .error-box {
       background: var(--red-bg); color: var(--red);
       border: 1px solid rgba(184,32,32,.2); border-radius: var(--r-md);
@@ -321,7 +321,7 @@
     }
     .success-box.show { display: block; }
 
-    /* â”€â”€ Footer note in card â”€â”€ */
+    /* ── Footer note in card ── */
     .auth-footer-note {
       margin-top: var(--s5); font-size: .8rem; color: var(--fg-tertiary);
       text-align: center; line-height: 1.6;
@@ -332,7 +332,7 @@
     }
     .auth-footer-note a:hover { color: var(--c-green-deep); }
 
-    /* â”€â”€ Trust strip â”€â”€ */
+    /* ── Trust strip ── */
     .trust-strip {
       display: flex; justify-content: center; gap: var(--s5);
       padding: var(--s4) var(--s5) var(--s5);
@@ -345,7 +345,7 @@
       background: var(--c-green-deep);
     }
 
-    /* â”€â”€ LOADING â”€â”€ */
+    /* ── LOADING ── */
     .spinner {
       display: inline-block; width: 14px; height: 14px;
       border: 2px solid rgba(255,255,255,.4);
@@ -355,7 +355,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* â”€â”€ ANIMATIES â”€â”€ */
+    /* ── ANIMATIES ── */
     @keyframes authIn {
       from { opacity: 0; transform: translateY(24px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0)    scale(1);    }
@@ -396,7 +396,7 @@
       <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
       <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
     </div>
-    <a href="index.html" class="topbar-link">â† terug naar home</a>
+    <a href="index.html" class="topbar-link">← terug naar home</a>
   </div>
 </header>
 
@@ -408,7 +408,7 @@
 
     <span class="auth-eyebrow">eerlijk stages</span>
     <h1 class="auth-title">Welkom op Internly</h1>
-    <p class="auth-sub">Log in of maak een profiel aan. Studenten blijven gratis â€” altijd.</p>
+    <p class="auth-sub">Log in of maak een profiel aan. Studenten blijven gratis — altijd.</p>
 
     <!-- Error / success -->
     <div class="error-box" id="errorBox"></div>
@@ -416,10 +416,10 @@
 
     <!-- Al ingelogd panel (verborgen tenzij actieve sessie) -->
     <div id="alreadyLoggedIn" style="display:none;text-align:center;padding:4px 0 16px;">
-      <div style="font-size:2rem;margin-bottom:12px;">ðŸ‘¤</div>
+      <div style="font-size:2rem;margin-bottom:12px;">👤</div>
       <div style="font-size:1rem;font-weight:700;color:var(--fg-primary);margin-bottom:3px;" id="alreadyName"></div>
       <div style="font-size:.82rem;color:var(--fg-tertiary);margin-bottom:22px;" id="alreadyRole"></div>
-      <a id="alreadyDashBtn" href="#" style="display:block;width:100%;padding:13px;background:var(--c-orange-deep);color:#fff;border-radius:var(--r-pill);font-family:var(--font-body);font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box;margin-bottom:10px;text-align:center;box-shadow:0 10px 30px rgba(255,126,66,.32);">Ga naar dashboard â†’</a>
+      <a id="alreadyDashBtn" href="#" style="display:block;width:100%;padding:13px;background:var(--c-orange-deep);color:#fff;border-radius:var(--r-pill);font-family:var(--font-body);font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box;margin-bottom:10px;text-align:center;box-shadow:0 10px 30px rgba(255,126,66,.32);">Ga naar dashboard →</a>
       <button onclick="switchAccount()" style="width:100%;padding:11px;background:transparent;border:1.5px solid var(--line-default);border-radius:var(--r-pill);font-family:var(--font-body);font-size:.88rem;font-weight:500;color:var(--fg-secondary);cursor:pointer;">Ander account / uitloggen</button>
     </div>
 
@@ -428,11 +428,11 @@
       align-items:center;justify-content:center;gap:.5rem">
       <a href="hoe-het-werkt.html"
          style="color:#1a7a48;text-decoration:underline;
-                text-underline-offset:2px">ðŸ‡³ðŸ‡± Nederlands</a>
-      <span>Â·</span>
+                text-underline-offset:2px">🇳🇱 Nederlands</a>
+      <span>·</span>
       <a href="internly-worldwide.html"
          style="color:#1a7a48;text-decoration:underline;
-                text-underline-offset:2px">ðŸŒ English</a>
+                text-underline-offset:2px">🌍 English</a>
     </div>
 
     <p style="text-align:center;margin-bottom:1rem;
@@ -440,7 +440,7 @@
       <a href="hoe-het-werkt.html"
          style="color:#1a7a48;text-decoration:underline;
                 text-underline-offset:2px">
-        Hoe werkt Internly? â†’
+        Hoe werkt Internly? →
       </a>
     </p>
 
@@ -450,15 +450,15 @@
       <button class="tab" id="tab-register" onclick="switchTab('register')">Account aanmaken</button>
     </div>
 
-    <!-- Body â€” JS queries '.card-body input' -->
+    <!-- Body — JS queries '.card-body input' -->
     <div class="card-body">
 
-      <!-- Rol kiezen â€” alleen zichtbaar bij registreren -->
+      <!-- Rol kiezen — alleen zichtbaar bij registreren -->
       <div id="role-picker-section" style="display:none">
       <div class="role-title">Kies je rol</div>
       <div class="role-cards">
         <div class="role-card" id="rc-student" onclick="selectRole('student')">
-          <div class="role-icon-wrap">ðŸ‘¤</div>
+          <div class="role-icon-wrap">👤</div>
           <div>
             <div class="role-name">Student</div>
             <div class="role-desc">Zoek een stage op basis van jouw leerdoelen en ambitie.</div>
@@ -470,7 +470,7 @@
             <div style="font-weight:600;color:var(--c-green);margin-bottom:6px;font-size:.78rem;">Welke stage zoek je?</div>
             <label style="display:flex;align-items:center;gap:8px;margin-bottom:5px;cursor:pointer;">
               <input type="radio" name="student_type" value="BOL" style="accent-color:var(--c-green);" checked>
-              <span>BOL â€” fulltime school + stage zoeken (MBO)</span>
+              <span>BOL — fulltime school + stage zoeken (MBO)</span>
             </label>
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
               <input type="radio" name="student_type" value="HBO_WO" style="accent-color:var(--c-green);">
@@ -479,15 +479,15 @@
           </div>
         </div>
         <div class="role-card bbl-role" id="rc-bbl" onclick="selectRole('bbl')">
-          <div class="role-icon-wrap">ðŸ—</div>
+          <div class="role-icon-wrap">🏗</div>
           <div>
-            <div class="role-name">Student â€” BBL</div>
+            <div class="role-name">Student — BBL</div>
             <div class="role-desc">Beheer je BBL-traject en bescherm je rechten als leerling-werknemer.</div>
           </div>
           <div class="role-check" id="check-bbl"></div>
         </div>
         <div class="role-card blue-role" id="rc-bedrijf" onclick="selectRole('bedrijf')">
-          <div class="role-icon-wrap">ðŸ¢</div>
+          <div class="role-icon-wrap">🏢</div>
           <div>
             <div class="role-name">Bedrijf</div>
             <div class="role-desc">Vind gemotiveerde stagiairs en bouw je reputatie op.</div>
@@ -495,7 +495,7 @@
           <div class="role-check" id="check-bedrijf"></div>
         </div>
         <div class="role-card amber-role" id="rc-school" onclick="selectRole('school')">
-          <div class="role-icon-wrap">ðŸŽ“</div>
+          <div class="role-icon-wrap">🎓</div>
           <div>
             <div class="role-name">School</div>
             <div class="role-desc">Monitor je studenten en verifieer welke bedrijven betrouwbaar zijn.</div>
@@ -503,7 +503,7 @@
           <div class="role-check" id="check-school"></div>
         </div>
         <div class="role-card begeleider-role" id="rc-begeleider" onclick="selectRole('begeleider')">
-          <div class="role-icon-wrap">ðŸ“‹</div>
+          <div class="role-icon-wrap">📋</div>
           <div>
             <div class="role-name">Ik ben stagebegeleider</div>
             <div class="role-desc">Begeleid studenten bij hun stagetraject, per sessie.</div>
@@ -511,7 +511,7 @@
           <div class="role-check" id="check-begeleider"></div>
         </div>
         <div class="role-card buddy-role" id="rc-gepensioneerd" onclick="selectRole('gepensioneerd')">
-          <div class="role-icon-wrap">ðŸ¤</div>
+          <div class="role-icon-wrap">🤝</div>
           <div>
             <div class="role-name">Gepensioneerde buddy</div>
             <div class="role-desc">Deel je ervaring als buddy met een student die dat nodig heeft.</div>
@@ -519,7 +519,7 @@
           <div class="role-check" id="check-gepensioneerd"></div>
         </div>
         <div class="role-card blue-role" id="rc-student-international" onclick="selectRole('student-international')">
-          <div class="role-icon-wrap">âœˆï¸</div>
+          <div class="role-icon-wrap">✈️</div>
           <div>
             <div class="role-name">International Student</div>
             <div class="role-desc">Find an internship in the Netherlands from abroad.</div>
@@ -527,7 +527,7 @@
           <div class="role-check" id="check-student-international"></div>
         </div>
         <div class="role-card amber-role" id="rc-school-international" onclick="selectRole('school-international')">
-          <div class="role-icon-wrap">ðŸŒ</div>
+          <div class="role-icon-wrap">🌐</div>
           <div>
             <div class="role-name">University / School (International)</div>
             <div class="role-desc">Monitor your students' international internships.</div>
@@ -545,10 +545,10 @@
         </div>
         <div class="field">
           <label>Wachtwoord</label>
-          <input type="password" id="login-pass" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
         </div>
         <button class="btn-submit" id="loginBtn" onclick="doLogin()">
-          Inloggen â†’
+          Inloggen →
         </button>
         <p style="text-align:center;margin-top:.75rem">
           <a href="#" onclick="showForgotPassword();return false;"
@@ -585,11 +585,11 @@
           <ul style="list-style:none;padding:0;margin:.4rem 0 0;
                      display:flex;flex-direction:column;gap:.15rem">
             <li id="req-length"  style="font-size:.78rem;
-                color:var(--fg-tertiary,#7a8799)">âœ— Minimaal 8 tekens</li>
+                color:var(--fg-tertiary,#7a8799)">✗ Minimaal 8 tekens</li>
             <li id="req-upper"   style="font-size:.78rem;
-                color:var(--fg-tertiary,#7a8799)">âœ— Minimaal 1 hoofdletter</li>
+                color:var(--fg-tertiary,#7a8799)">✗ Minimaal 1 hoofdletter</li>
             <li id="req-number"  style="font-size:.78rem;
-                color:var(--fg-tertiary,#7a8799)">âœ— Minimaal 1 cijfer</li>
+                color:var(--fg-tertiary,#7a8799)">✗ Minimaal 1 cijfer</li>
           </ul>
         </div>
 
@@ -632,10 +632,10 @@
             Wat ziet jouw leerbedrijf op Internly?
           </p>
           <div style="font-size:.75rem;color:#2e5c4a;line-height:1.6;">
-            âœ“ Je voortgang op leerdoelen<br>
-            âœ“ Geplande afspraken en evaluaties<br>
-            âœ— <strong>Jouw beoordeling van hen â€” die blijft anoniem</strong><br>
-            âœ— Berichten met je buddy
+            ✓ Je voortgang op leerdoelen<br>
+            ✓ Geplande afspraken en evaluaties<br>
+            ✗ <strong>Jouw beoordeling van hen — die blijft anoniem</strong><br>
+            ✗ Berichten met je buddy
           </div>
         </div>
 
@@ -659,7 +659,7 @@
         </label>
 
         <button class="btn-submit" id="registerBtn" onclick="doRegister()">
-          Account aanmaken â†’
+          Account aanmaken →
         </button>
       </div>
 
@@ -668,9 +668,9 @@
     <!-- Footer-note in card -->
     <p class="auth-footer-note">
       <a href="spelregels.html">Spelregels</a>
-      &nbsp;Â·&nbsp;
+      &nbsp;·&nbsp;
       <a href="kennisbank.html">Kennisbank</a>
-      &nbsp;Â·&nbsp;
+      &nbsp;·&nbsp;
       <a href="privacybeleid.html">Privacybeleid</a>
     </p>
 
@@ -689,27 +689,27 @@
   </div>
   <div class="trust-item">
     <span class="trust-dot"></span>
-    Â© 2026 Sasubo Holding B.V.
+    © 2026 Sasubo Holding B.V.
   </div>
 </footer>
 
 <script>
-// â”€â”€ B3+B7: Wis URL-parameters direct bij load â”€â”€
-// Sla params op vÃ³Ã³r wissen â€” voorkomt logging door Google Translate.
+// ── B3+B7: Wis URL-parameters direct bij load ──
+// Sla params op vóór wissen — voorkomt logging door Google Translate.
 // ?role= is uitsluitend een UI-hint, nooit voor authenticatie-beslissingen.
 const _initParams = new URLSearchParams(window.location.search);
 if (window.location.search) {
   window.history.replaceState({}, '', window.location.pathname);
 }
 
-// â”€â”€ Registreer-tab activeren via ?mode=signup â”€â”€
+// ── Registreer-tab activeren via ?mode=signup ──
 if (_initParams.get('mode') === 'signup') {
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof switchTab === 'function') switchTab('register');
   });
 }
 
-// â”€â”€ Sessie verlopen melding â”€â”€
+// ── Sessie verlopen melding ──
 if (_initParams.get('expired') === '1') {
   document.addEventListener('DOMContentLoaded', () => {
     const box = document.getElementById('errorBox');
@@ -717,7 +717,7 @@ if (_initParams.get('expired') === '1') {
   });
 }
 
-// â”€â”€ Wachtwoord-reset landing (?type=recovery) â”€â”€
+// ── Wachtwoord-reset landing (?type=recovery) ──
 if (_initParams.get('type') === 'recovery') {
   const accessToken = window.location.hash.match(/access_token=([^&]+)/)?.[1];
   if (accessToken) {
@@ -736,7 +736,7 @@ if (_initParams.get('type') === 'recovery') {
                    oninput="onRegPassInput(this.value)">
           </div>
           <button class="btn-submit" onclick="doSetNewPassword()">
-            Wachtwoord opslaan â†’
+            Wachtwoord opslaan →
           </button>
         </div>`;
       const container = document.querySelector('.card-body') ||
@@ -752,18 +752,18 @@ if (_initParams.get('type') === 'recovery') {
   }
 }
 
-// â”€â”€ State â”€â”€
+// ── State ──
 var selectedRole    = null;
 let activeTab       = 'login';
 let isBBL           = false;
 let isInternational = false;
 
-// â”€â”€ Rate limiting â”€â”€
+// ── Rate limiting ──
 let _loginAttempts = 0;
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS   = 60 * 1000; // 60 seconds
 
-// â”€â”€ Tab switch â”€â”€
+// ── Tab switch ──
 function switchTab(tab) {
   activeTab = tab;
   document.getElementById('tab-login').classList.toggle('active', tab === 'login');
@@ -786,9 +786,9 @@ function switchTab(tab) {
   clearMessages();
 }
 
-// â”€â”€ Role select â”€â”€
+// ── Role select ──
 function selectRole(role) {
-  // 5.H: 3 rollen zijn nog niet livetest-klaar â€” direct redirect naar
+  // 5.H: 3 rollen zijn nog niet livetest-klaar — direct redirect naar
   // Coming Soon i.p.v. supabase signup. Zie HANDOVER.md Run 5.H.
   if (role === 'begeleider') {
     window.location.href = 'coming-soon-stagebegeleider.html';
@@ -803,7 +803,7 @@ function selectRole(role) {
     return;
   }
 
-  // BBL is een student met bbl_mode=true â€” niet een aparte DB-rol
+  // BBL is een student met bbl_mode=true — niet een aparte DB-rol
   // 'student-international' / 'school-international' mappen op DB-rol student/school
   // met flag isInternational=true (parallel patroon aan isBBL)
   if (role === 'bbl') {
@@ -836,7 +836,7 @@ function selectRole(role) {
   const activeCard  = document.getElementById('rc-' + role);
   const activeCheck = document.getElementById('check-' + role);
   if (activeCard)  activeCard.classList.add('selected');
-  if (activeCheck) activeCheck.textContent = 'âœ“';
+  if (activeCheck) activeCheck.textContent = '✓';
 
   // BBL-toestemmingsblok tonen/verbergen
   const bblBlock = document.getElementById('bbl-consent-block');
@@ -844,7 +844,7 @@ function selectRole(role) {
     bblBlock.style.display = (role === 'bbl') ? 'block' : 'none';
   }
 
-  // Student-extra velden (BOL/HBO-WO keuze) tonen/verbergen â€” alleen bij rol 'student' (NL)
+  // Student-extra velden (BOL/HBO-WO keuze) tonen/verbergen — alleen bij rol 'student' (NL)
   const studentExtra = document.getElementById('studentExtraFields');
   if (studentExtra) {
     studentExtra.style.display = (role === 'student' && activeTab === 'register') ? 'block' : 'none';
@@ -873,13 +873,13 @@ function onRegPassInput(val) {
 function _setReq(id, ok, label) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = (ok ? 'âœ“ ' : 'âœ— ') + label;
+  el.textContent = (ok ? '✓ ' : '✗ ') + label;
   el.style.color = ok
     ? 'var(--c-green,#1a7a48)'
     : 'var(--fg-tertiary,#7a8799)';
 }
 
-// â”€â”€ Wachtwoord vergeten â”€â”€
+// ── Wachtwoord vergeten ──
 async function showForgotPassword() {
   const email = document.getElementById('login-email').value.trim();
   if (!email) {
@@ -903,7 +903,7 @@ async function showForgotPassword() {
 async function doSetNewPassword() {
   const pass = document.getElementById('new-pass')?.value || '';
   if (!validatePassword(pass).valid) {
-    showError('Wachtwoord moet minimaal 8 tekens hebben, Ã©Ã©n hoofdletter en Ã©Ã©n cijfer.');
+    showError('Wachtwoord moet minimaal 8 tekens hebben, één hoofdletter en één cijfer.');
     return;
   }
   const btn = document.querySelector('#reset-password-form .btn-submit');
@@ -918,10 +918,10 @@ async function doSetNewPassword() {
   }
 }
 
-// â”€â”€ Login â”€â”€
+// ── Login ──
 async function doLogin() {
   if (typeof _fCtx !== 'undefined' && _fCtx.blockIfFilled && _fCtx.blockIfFilled('login submit')) {
-    showError('Er is iets misgegaan â€” probeer het opnieuw.');
+    showError('Er is iets misgegaan — probeer het opnieuw.');
     return;
   }
   const email = document.getElementById('login-email').value.trim();
@@ -933,7 +933,7 @@ async function doLogin() {
   if (btn.disabled) return; // locked out
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Inloggenâ€¦';
+  btn.innerHTML = '<span class="spinner"></span>Inloggen…';
 
   // Run 1.6: paranoid pre-login cleanup. Voorkomt dat reststate van een
   // vorige user (saved_vacatures, dismissed-flags, in-memory globals)
@@ -945,7 +945,7 @@ async function doLogin() {
   const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
 
   btn.disabled = false;
-  btn.textContent = 'Inloggen â†’';
+  btn.textContent = 'Inloggen →';
 
   if (error) {
     _loginAttempts++;
@@ -959,7 +959,7 @@ async function doLogin() {
           clearInterval(countdown);
           _loginAttempts = 0;
           btn.disabled = false;
-          btn.textContent = 'Inloggen â†’';
+          btn.textContent = 'Inloggen →';
           clearMessages();
         } else {
           showError(`Te veel mislukte pogingen. Wacht nog ${remaining} seconden.`);
@@ -972,7 +972,7 @@ async function doLogin() {
   }
   _loginAttempts = 0; // reset on success
 
-  // Haal rol op uit profiles tabel â€” DB-rol heeft altijd prioriteit
+  // Haal rol op uit profiles tabel — DB-rol heeft altijd prioriteit
   const { data: profile } = await db
     .from('profiles')
     .select('role')
@@ -984,9 +984,9 @@ async function doLogin() {
   if (!role) { showError('Rol kon niet worden bepaald. Kies een rol en probeer opnieuw.'); return; }
   sessionStorage.setItem('internly_role', role);
 
-  showSuccess('Inloggen gelukt! Je wordt doorgestuurdâ€¦');
+  showSuccess('Inloggen gelukt! Je wordt doorgestuurd…');
 
-  // Centrale student routing â€” student_type bepaalt international vs nl
+  // Centrale student routing — student_type bepaalt international vs nl
   let _sp = null;
   let _intlSchool = null;
   if (role === 'student') {
@@ -1017,44 +1017,44 @@ async function doLogin() {
     }
   }
 
-  // Push registration â€” fire-and-forget, never blocks redirect
+  // Push registration — fire-and-forget, never blocks redirect
   // Show browser native dialog only on first login (student role).
   // Company/school see a soft banner on their dashboard instead.
   setTimeout(() => {
     if (role === 'student') {
       if (_sp && typeof _sp.bbl_mode === 'boolean') {
-        // Bestaand profiel â€” gebruik centrale resolver (single source of truth)
-        // js/roles.js gegarandeerd geladen via Â§Laadvolgorde
-        // BBL routing â€” resolved 2026-04-30 CC Instruction B
+        // Bestaand profiel — gebruik centrale resolver (single source of truth)
+        // js/roles.js gegarandeerd geladen via §Laadvolgorde
+        // BBL routing — resolved 2026-04-30 CC Instruction B
         // resolveStudentDashboard checks naam in _sp:
-        //   BBL + naam null/empty â†’ bbl-profile.html (onboarding)
-        //   BBL + naam filled     â†’ bbl-hub.html
+        //   BBL + naam null/empty → bbl-profile.html (onboarding)
+        //   BBL + naam filled     → bbl-hub.html
         window.location.replace(resolveStudentDashboard({ role: 'student' }, _sp));
       } else {
-        // Onboarding-guard: student zonder profiel â†’ profiel-form
+        // Onboarding-guard: student zonder profiel → profiel-form
         // Resolved 2026-04-30 (CC Instruction B): identiek patroon
-        // als discover.html:1406 â€” geen conflict met canon B2.
+        // als discover.html:1406 — geen conflict met canon B2.
         window.location.replace('student-profile.html');
       }
     } else if (role === 'school' && _intlSchool) {
-      // International school â†’ eigen dashboard
+      // International school → eigen dashboard
       window.location.replace('international-school-dashboard.html');
     } else {
       window.location.replace(getRoleLanding(role, false));
     }
   }, 1000);
 
-  // Push registration â€” only if permission already granted (no dialog â†’ no race with redirect).
+  // Push registration — only if permission already granted (no dialog → no race with redirect).
   // First-time permission request is handled by discover.html where there's no redirect pressure.
   if (role === 'student' && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
     registerPushNotifications(db, data.user.id).catch(() => {});
   }
 }
 
-// â”€â”€ Register â”€â”€
+// ── Register ──
 async function doRegister() {
   if (typeof _fCtx !== 'undefined' && _fCtx.blockIfFilled && _fCtx.blockIfFilled('register submit')) {
-    showError('Er is iets misgegaan â€” probeer het opnieuw.');
+    showError('Er is iets misgegaan — probeer het opnieuw.');
     return;
   }
   const consent = document.getElementById('consentCheck');
@@ -1072,17 +1072,17 @@ async function doRegister() {
   if (!validateEmail(email)) { showError('Vul een geldig e-mailadres in.'); return; }
   if (!pass) { showError('Vul een wachtwoord in.'); return; }
   if (!validatePassword(pass).valid) {
-    showError('Wachtwoord moet minimaal 8 tekens hebben, Ã©Ã©n hoofdletter en Ã©Ã©n cijfer.');
+    showError('Wachtwoord moet minimaal 8 tekens hebben, één hoofdletter en één cijfer.');
     return;
   }
   if (selectedRole === 'gepensioneerd') {
     const sector = document.getElementById('reg-sector')?.value;
-    if (!sector) { showError('Kies je sector â€” studenten zoeken op dit gebied.'); return; }
+    if (!sector) { showError('Kies je sector — studenten zoeken op dit gebied.'); return; }
   }
 
   const btn = document.getElementById('registerBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Account aanmakenâ€¦';
+  btn.innerHTML = '<span class="spinner"></span>Account aanmaken…';
 
   // 1. Registreer in Supabase Auth
   const { data, error } = await db.auth.signUp({
@@ -1092,7 +1092,7 @@ async function doRegister() {
   });
 
   btn.disabled = false;
-  btn.textContent = 'Account aanmaken â†’';
+  btn.textContent = 'Account aanmaken →';
 
   if (error) {
     const msg = error.message || '';
@@ -1103,7 +1103,7 @@ async function doRegister() {
     } else if (msg.toLowerCase().includes('email') && (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('format') || error.code === 'invalid_email')) {
       showError('Dit lijkt geen geldig e-mailadres.');
     } else {
-      showError('Aanmelden mislukt â€” probeer het nog eens, of mail ons op hallo@internly.pro');
+      showError('Aanmelden mislukt — probeer het nog eens, of mail ons op hallo@internly.pro');
     }
     return;
   }
@@ -1117,11 +1117,11 @@ async function doRegister() {
       email: email,
     });
     if (profileError && profileError.code !== '23505') {
-      // 23505 = profiel bestaat al (bijv. herregistratie) â€” stilzwijgend doorgaan
+      // 23505 = profiel bestaat al (bijv. herregistratie) — stilzwijgend doorgaan
       console.warn('[auth] Profile insert fout:', profileError.message);
     }
 
-    // 2b. Genereer ILY-code (Run 5 â€” 7 mei 2026)
+    // 2b. Genereer ILY-code (Run 5 — 7 mei 2026)
     let codeAttempts = 0;
     const maxCodeAttempts = 10;
     while (codeAttempts < maxCodeAttempts) {
@@ -1156,14 +1156,14 @@ async function doRegister() {
     }
 
     // 4. BBL-student: zet bbl_mode=true + onderwijsniveau op student_profiles
-    // Gebruik upsert â€” bij registratie bestaat de rij nog niet, UPDATE zou 0 rijen raken.
+    // Gebruik upsert — bij registratie bestaat de rij nog niet, UPDATE zou 0 rijen raken.
     if (isBBL) {
       try {
         const { error: bblErr } = await db.from('student_profiles')
           .upsert({ profile_id: data.user.id, bbl_mode: true, onderwijsniveau: 'MBO_BBL' }, { onConflict: 'profile_id' });
         if (bblErr) {
           console.error('[auth] BBL student_profile upsert fout:', bblErr.message);
-          notify('Profiel deels opgeslagen â€” probeer later te bewerken', false);
+          notify('Profiel deels opgeslagen — probeer later te bewerken', false);
         }
       } catch (err) {
         console.error('[auth] BBL upsert exception:', err?.message || err);
@@ -1180,7 +1180,7 @@ async function doRegister() {
         }, { onConflict: 'profile_id' });
         if (intlErr) {
           console.error('[auth] intl student_profile upsert fout:', intlErr.message);
-          notify('Profile partially saved â€” please try editing later', false);
+          notify('Profile partially saved — please try editing later', false);
         }
       } catch (err) {
         console.error('[auth] intl student upsert exception:', err?.message || err);
@@ -1200,7 +1200,7 @@ async function doRegister() {
         }, { onConflict: 'profile_id' });
         if (nlErr) {
           console.error('[auth] NL student_profile upsert fout:', nlErr.message);
-          notify('Profiel deels opgeslagen â€” probeer later te bewerken', false);
+          notify('Profiel deels opgeslagen — probeer later te bewerken', false);
         }
       } catch (err) {
         console.error('[auth] NL student upsert exception:', err?.message || err);
@@ -1217,7 +1217,7 @@ async function doRegister() {
         }, { onConflict: 'profile_id' });
         if (intlSchErr) {
           console.error('[auth] intl school profile upsert fout:', intlSchErr.message);
-          notify('Account created â€” please complete your school details after login', false);
+          notify('Account created — please complete your school details after login', false);
         }
       } catch (err) {
         console.error('[auth] intl school upsert exception:', err?.message || err);
@@ -1238,7 +1238,7 @@ async function doRegister() {
         buddy_type:     'gepensioneerd',        // extended BBL-migration column
         sector:         sector || null,
         expertise_tags: expertise.length ? expertise : null,
-        // bio is not a waitlist column â€” stored in profiles via user_metadata
+        // bio is not a waitlist column — stored in profiles via user_metadata
       });
       if (wErr) console.warn('[auth] Waitlist insert fout (non-blocking):', wErr.message);
     }
@@ -1247,7 +1247,7 @@ async function doRegister() {
   showSuccess('Account aangemaakt! Controleer je e-mail en klik op de bevestigingslink om in te loggen.');
 }
 
-// â”€â”€ Seed free subscription â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Seed free subscription ────────────────────────────────────────────────────
 async function seedFreeSubscription(userId, role) {
   if (role !== 'bedrijf' && role !== 'school') return;
   const plan = role === 'bedrijf' ? 'company_starter' : 'school_freemium';
@@ -1257,7 +1257,7 @@ async function seedFreeSubscription(userId, role) {
   );
 }
 
-// â”€â”€ Helpers â”€â”€
+// ── Helpers ──
 function showError(msg) {
   const el = document.getElementById('errorBox');
   el.textContent = msg;
@@ -1287,10 +1287,10 @@ function clearMessages() {
   document.getElementById('successBox').classList.remove('show');
 }
 
-// â”€â”€ Check of al ingelogd + pre-select rol via URL param â”€â”€
+// ── Check of al ingelogd + pre-select rol via URL param ──
 async function switchAccount() {
   await db.auth.signOut();
-  // Run 1.6: full state cleanup bij account-wissel â€” voorheen alleen
+  // Run 1.6: full state cleanup bij account-wissel — voorheen alleen
   // sessionStorage.removeItem('internly_role').
   if (typeof clearUserState === 'function') {
     clearUserState();
@@ -1308,7 +1308,7 @@ async function switchAccount() {
   if (logoSub) logoSub.textContent = 'welkom terug';
 }
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.message?.includes('JWT') ||
@@ -1321,7 +1321,7 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // Telemetry init â€” zie CLAUDE.md voor codenames
+  // Telemetry init — zie CLAUDE.md voor codenames
   if (typeof _fCtx !== 'undefined' && _fCtx._init) _fCtx._init('auth');
 
   // Honeypot: plant verborgen valkuil-veld in login-container.
@@ -1345,7 +1345,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           .select('bbl_mode, naam, onderwijsniveau')
           .eq('profile_id', user.id)
           .maybeSingle();
-        // BBL routing â€” consistent met post-login flow (resolved 2026-04-30)
+        // BBL routing — consistent met post-login flow (resolved 2026-04-30)
         if (sp?.bbl_mode === true) { dest = sp?.naam ? 'bbl-hub.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
         else if (!sp?.naam) { dest = 'student-profile.html'; }
       }
@@ -1366,7 +1366,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Lees ?role= param van index.html
-  const urlRole = _initParams.get('role'); // URL al gewist â€” gebruik opgeslagen params
+  const urlRole = _initParams.get('role'); // URL al gewist — gebruik opgeslagen params
   if (urlRole) {
     const mapping = { student: 'student', bbl: 'bbl', bedrijf: 'bedrijf', school: 'school', gepensioneerd: 'gepensioneerd' };
     const mapped = mapping[urlRole];

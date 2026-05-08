@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,25 +8,25 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FF7E42">
-  <meta name="description" content="Het verhaal achter Internly â€” waarom we de stagemarkt eerlijker willen maken voor studenten, scholen en bedrijven.">
-  <meta property="og:title" content="Over Internly â€” Eerlijkheid in het stageproces">
-  <meta property="og:description" content="Het verhaal achter Internly â€” waarom we de stagemarkt eerlijker willen maken voor studenten, scholen en bedrijven.">
+  <meta name="description" content="Het verhaal achter Internly — waarom we de stagemarkt eerlijker willen maken voor studenten, scholen en bedrijven.">
+  <meta property="og:title" content="Over Internly — Eerlijkheid in het stageproces">
+  <meta property="og:description" content="Het verhaal achter Internly — waarom we de stagemarkt eerlijker willen maken voor studenten, scholen en bedrijven.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
   <meta property="og:url" content="https://internly.pro/about.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Internly">
   <meta name="twitter:card" content="summary_large_image">
-  <title>Over ons â€” Internly</title>
+  <title>Over ons — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       Subpage archetype (about) â€” pagina-specifieke styling.
+    /* ═══════════════════════════════════════════════════════════════
+       Subpage archetype (about) — pagina-specifieke styling.
        Globale tokens uit css/style.css. Behoudt rijke content
        (origin story, founders, frustraties, missie, voor wie,
-       contact, newsletter) â€” alleen visuele schil herschreven.
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       contact, newsletter) — alleen visuele schil herschreven.
+       ═══════════════════════════════════════════════════════════════ */
 
     :root {
       /* Pagina-specifieke aliassen mappen op globale tokens */
@@ -58,7 +58,7 @@
     }
     p { line-height: 1.7; }
 
-    /* â”€â”€ TOPBAR â€” translucent cream met backdrop-blur (blueprint) â”€â”€ */
+    /* ── TOPBAR — translucent cream met backdrop-blur (blueprint) ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(244,243,239,.92);
@@ -123,7 +123,7 @@
       border-color: rgba(255,126,66,.25);
     }
 
-    /* â”€â”€ MINI-HERO (subpage archetype) â”€â”€ */
+    /* ── MINI-HERO (subpage archetype) ── */
     .hero {
       background:
         radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
@@ -143,7 +143,7 @@
       pointer-events: none;
     }
     .hero > * { position: relative; z-index: 1; }
-    /* Caveat eyebrow â€” blueprint pattern */
+    /* Caveat eyebrow — blueprint pattern */
     .hero-eyebrow {
       font-family: var(--font-script, 'Caveat', cursive);
       font-size: 1.2rem;
@@ -152,7 +152,7 @@
       transform: rotate(-1deg);
       margin-bottom: 8px;
     }
-    /* Legacy .hero-label (display:flex met dashes) â€” alternatieve eyebrow,
+    /* Legacy .hero-label (display:flex met dashes) — alternatieve eyebrow,
        behouden voor bestaande markup */
     .hero-label {
       display: inline-flex; align-items: center; gap: 8px;
@@ -188,7 +188,7 @@
       line-height: 1.7;
     }
 
-    /* â”€â”€ Breadcrumb (blueprint) â”€â”€ */
+    /* ── Breadcrumb (blueprint) ── */
     .breadcrumb {
       background: var(--c-cream-warm);
       border-bottom: 1px solid var(--line-subtle);
@@ -208,7 +208,7 @@
       color: var(--line-default);
     }
 
-    /* â”€â”€ SECTIONS â”€â”€ */
+    /* ── SECTIONS ── */
     .section {
       padding: var(--s8, 80px) var(--s5, 24px);
       max-width: 860px;
@@ -253,7 +253,7 @@
       font-weight: 600;
     }
 
-    /* â”€â”€ ORIGIN STORY â”€â”€ */
+    /* ── ORIGIN STORY ── */
     .origin {
       background: var(--bg-surface);
       border: 1px solid var(--line-subtle);
@@ -277,7 +277,7 @@
       .origin::before { font-size: 6rem; }
     }
 
-    /* â”€â”€ FOUNDERS â”€â”€ */
+    /* ── FOUNDERS ── */
     .founders-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -342,14 +342,14 @@
       line-height: 1.7;
     }
 
-    /* â”€â”€ DIVIDER â”€â”€ */
+    /* ── DIVIDER ── */
     .divider {
       border: none;
       border-top: 1px solid var(--line-subtle);
       margin: 0;
     }
 
-    /* â”€â”€ FRUSTRATIES (donker) â”€â”€ */
+    /* ── FRUSTRATIES (donker) ── */
     .frustrations {
       background: var(--c-ink);
       padding: var(--s8, 72px) var(--s5, 24px);
@@ -387,7 +387,7 @@
       line-height: 1.6;
     }
 
-    /* â”€â”€ MISSIE (groen blok) â”€â”€ */
+    /* ── MISSIE (groen blok) ── */
     .missie-block {
       background: var(--c-green);
       border-radius: var(--r-lg, 20px);
@@ -419,7 +419,7 @@
     }
     @media (max-width: 768px) { .missie-block { padding: 36px 24px; } }
 
-    /* â”€â”€ VOOR WIE â”€â”€ */
+    /* ── VOOR WIE ── */
     .voor-wie-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -454,7 +454,7 @@
       line-height: 1.6;
     }
 
-    /* â”€â”€ CONTACT â”€â”€ */
+    /* ── CONTACT ── */
     .contact-section {
       background: var(--bg-surface);
       border: 1px solid var(--line-subtle);
@@ -508,7 +508,7 @@
     }
     .btn-contact:hover { background: #b94613; transform: translateY(-1px); }
 
-    /* â”€â”€ BLOG CTA â”€â”€ */
+    /* ── BLOG CTA ── */
     .blog-cta {
       background: linear-gradient(135deg, #fdf0e8, #fff3ec);
       border: 1px solid rgba(255,126,66,.2);
@@ -546,7 +546,7 @@
     }
     .btn-blog:hover { background: #b94613; }
 
-    /* â”€â”€ FOOTER (blueprint dark green) â”€â”€ */
+    /* ── FOOTER (blueprint dark green) ── */
     footer {
       background: var(--c-green-deep);
       padding: var(--s5, 24px) var(--s6, 32px);
@@ -591,7 +591,7 @@
       color: rgba(255,255,255,.4);
     }
 
-    /* â”€â”€ ANIMATIONS â”€â”€ */
+    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -603,13 +603,13 @@
     .hero-sub       { animation-delay: .12s; }
     .hero-eyebrow   { animation-delay: .02s; }
 
-    /* â”€â”€ Google Translate branding suppression â”€â”€ */
+    /* ── Google Translate branding suppression ── */
     .goog-te-banner-frame { display: none !important; }
     .skiptranslate        { display: none !important; }
     .goog-te-gadget       { display: none !important; }
     body                  { top: 0 !important; position: static !important; }
 
-    /* â”€â”€ Animaties â”€â”€ */
+    /* ── Animaties ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
@@ -641,7 +641,7 @@
       <button onclick="switchLang('de')" class="lang-btn" data-lang="de">DE</button>
       <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
     </div>
-    <a href="auth.html" class="topbar-cta">Inloggen â†’</a>
+    <a href="auth.html" class="topbar-cta">Inloggen →</a>
   </div>
 </nav>
 
@@ -650,7 +650,7 @@
   <span class="hero-eyebrow">ons verhaal</span>
   <h1>Gebouwd door mensen die<br><em>de stagemarkt van binnen kennen</em></h1>
   <p class="hero-sub">
-    Internly is geen startup idee op een whiteboard. Het is het antwoord op jaren frustratie â€” van twee kanten tegelijk bekeken.
+    Internly is geen startup idee op een whiteboard. Het is het antwoord op jaren frustratie — van twee kanten tegelijk bekeken.
   </p>
 </div>
 
@@ -668,20 +668,20 @@
 
   <div class="origin">
     <p class="body-text">
-      Internly is een <strong>familieproject</strong> â€” letterlijk. Een vader met jarenlange ervaring in het begeleiden van studenten en het werken met bedrijven, en een dochter die zelf door het stageproces heen is gegaan en van binnenuit heeft meegemaakt wat er misgaat.
+      Internly is een <strong>familieproject</strong> — letterlijk. Een vader met jarenlange ervaring in het begeleiden van studenten en het werken met bedrijven, en een dochter die zelf door het stageproces heen is gegaan en van binnenuit heeft meegemaakt wat er misgaat.
     </p>
     <p class="body-text">
       We hebben het allebei gezien. Studenten die weken wachten op een reactie die nooit komt. Vage onderzoeksvoorstellen die nergens op slaan. Bedrijven die een stagiair zoeken maar geen idee hebben wat ze de student kunnen bieden. Scholen die pas in actie komen als het al te laat is.
     </p>
     <p class="body-text" style="margin-bottom:0">
-      Uit die kennis, die frustratie â€” en de overtuiging dat het anders moet â€” is <strong>Internly</strong> ontstaan.
+      Uit die kennis, die frustratie — en de overtuiging dat het anders moet — is <strong>Internly</strong> ontstaan.
     </p>
   </div>
 
   <div class="founders-grid">
     <div class="founder-card vader">
       <div class="founder-avatar" style="font-size:.95rem;">PV</div>
-      <div class="founder-role">Medeoprichter â€” Vaderperspectief</div>
+      <div class="founder-role">Medeoprichter — Vaderperspectief</div>
       <div class="founder-title">Jarenlange ervaring met de stagebegeleiding</div>
       <p class="founder-text">
         Heeft honderden studenten begeleid en tientallen bedrijven van binnenuit meegemaakt. Zag hoe goede studenten vastliepen op slechte communicatie, en hoe bedrijven met de beste intenties toch teleurstelden door gebrek aan structuur.
@@ -689,10 +689,10 @@
     </div>
     <div class="founder-card dochter">
       <div class="founder-avatar" style="font-size:.95rem;">SV</div>
-      <div class="founder-role">Medeoprichter â€” Dochterperspectief</div>
+      <div class="founder-role">Medeoprichter — Dochterperspectief</div>
       <div class="founder-title">De stage-ervaring van de student zelf</div>
       <p class="founder-text">
-        Heeft het stageproces van dichtbij meegemaakt als student. De onzekerheid, het ghosting, de vage verwachtingen. En ook: de zeldzame stage die wÃ©l klopte â€” en hoe groot het verschil is als je bij een bedrijf terechtkomt dat echt investeert in jou.
+        Heeft het stageproces van dichtbij meegemaakt als student. De onzekerheid, het ghosting, de vage verwachtingen. En ook: de zeldzame stage die wél klopte — en hoe groot het verschil is als je bij een bedrijf terechtkomt dat echt investeert in jou.
       </p>
     </div>
   </div>
@@ -708,32 +708,32 @@
 
     <div class="frustration-list">
       <div class="frustration-item">
-        <span class="f-icon">ðŸ“­</span>
+        <span class="f-icon">📭</span>
         <div class="f-title">Ghosting door bedrijven</div>
         <p class="f-text">Studenten sturen tientallen berichten en horen niets. Weken voorbij, geen reactie, geen reden.</p>
       </div>
       <div class="frustration-item">
-        <span class="f-icon">ðŸ“‹</span>
+        <span class="f-icon">📋</span>
         <div class="f-title">Vage onderzoeksvoorstellen</div>
         <p class="f-text">Opdrachten die nergens op slaan, zonder duidelijke leerdoelen of concrete resultaten.</p>
       </div>
       <div class="frustration-item">
-        <span class="f-icon">ðŸŽ­</span>
+        <span class="f-icon">🎭</span>
         <div class="f-title">Verwachtingen die niet kloppen</div>
-        <p class="f-text">Vacatureteksten beloven begeleiding en verantwoordelijkheid â€” de praktijk is koffie halen en Excel.</p>
+        <p class="f-text">Vacatureteksten beloven begeleiding en verantwoordelijkheid — de praktijk is koffie halen en Excel.</p>
       </div>
       <div class="frustration-item">
-        <span class="f-icon">ðŸ«</span>
+        <span class="f-icon">🏫</span>
         <div class="f-title">Scholen die te laat signaleren</div>
         <p class="f-text">Begeleiders die pas ingrijpen als de student al drie weken vastloopt en de stage op springen staat.</p>
       </div>
       <div class="frustration-item">
-        <span class="f-icon">ðŸ”</span>
+        <span class="f-icon">🔍</span>
         <div class="f-title">Geen transparantie vooraf</div>
         <p class="f-text">Studenten solliciteren zonder enig idee hoe betrouwbaar een bedrijf is als stagebegeleider.</p>
       </div>
       <div class="frustration-item">
-        <span class="f-icon">ðŸ”„</span>
+        <span class="f-icon">🔄</span>
         <div class="f-title">Matching op trefwoorden</div>
         <p class="f-text">Platforms koppelen op cv-trefwoorden, niet op motivatie, leerdoelen of werkelijke fit.</p>
       </div>
@@ -746,7 +746,7 @@
   <div class="missie-block">
     <span class="label">Onze missie</span>
     <blockquote>
-      "Stages fixen door eerlijkheid te bouwen â€” voor studenten, bedrijven <em>&</em> scholen tegelijk."
+      "Stages fixen door eerlijkheid te bouwen — voor studenten, bedrijven <em>&</em> scholen tegelijk."
     </blockquote>
   </div>
 </div>
@@ -756,21 +756,21 @@
 <div class="section-sm">
   <span class="label">Het platform</span>
   <h2 class="section-title">Voor iedereen die een stage <em>serieus neemt</em></h2>
-  <p class="body-text">Internly is gebouwd als een driezijdig platform. Niet voor Ã©Ã©n partij, maar voor het hele ecosysteem tegelijk.</p>
+  <p class="body-text">Internly is gebouwd als een driezijdig platform. Niet voor één partij, maar voor het hele ecosysteem tegelijk.</p>
 
   <div class="voor-wie-grid">
     <div class="vw-card">
-      <span class="vw-icon">ðŸ‘¤</span>
+      <span class="vw-icon">👤</span>
       <div class="vw-title">Studenten</div>
       <p class="vw-text">Vind een stage bij bedrijven die je vooraf al kunt beoordelen. Geen ghosting meer, transparante Trust Scores en begeleiding die klopt.</p>
     </div>
     <div class="vw-card">
-      <span class="vw-icon">ðŸ¢</span>
+      <span class="vw-icon">🏢</span>
       <div class="vw-title">Bedrijven</div>
       <p class="vw-text">Bouw je reputatie op als betrouwbare stagebegeleider. Vind gemotiveerde studenten die echt passen bij jouw opdracht en cultuur.</p>
     </div>
     <div class="vw-card">
-      <span class="vw-icon">ðŸŽ“</span>
+      <span class="vw-icon">🎓</span>
       <div class="vw-title">Scholen</div>
       <p class="vw-text">Monitor studenten proactief, signaleer problemen vroeg en werk samen met bedrijven op basis van harde data.</p>
     </div>
@@ -790,10 +790,10 @@
         Vragen over het platform, interesse in samenwerking of gewoon nieuwsgierig? We horen graag van je.
       </p>
       <a href="mailto:hallo@internly.pro" class="contact-email">
-        âœ‰ï¸ hallo@internly.pro
+        ✉️ hallo@internly.pro
       </a>
     </div>
-    <a href="mailto:hallo@internly.pro" class="btn-contact">Stuur een bericht â†’</a>
+    <a href="mailto:hallo@internly.pro" class="btn-contact">Stuur een bericht →</a>
   </div>
 
   <!-- Blog CTA -->
@@ -801,14 +801,14 @@
     <div class="blog-cta-text">
       <span class="label">Blog</span>
       <div class="blog-cta-title">De ins en outs van de stagemarkt</div>
-      <p class="blog-cta-sub">Laatste updates, tips voor studenten, bedrijven en scholen â€” en de ontwikkelingen achter Internly.</p>
+      <p class="blog-cta-sub">Laatste updates, tips voor studenten, bedrijven en scholen — en de ontwikkelingen achter Internly.</p>
     </div>
-    <a href="https://internly.pro/blog" class="btn-blog">Lees de blog â†’</a>
+    <a href="https://internly.pro/blog" class="btn-blog">Lees de blog →</a>
   </div>
 
 </div>
 
-<!-- â”€â”€ BLIJF OP DE HOOGTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── BLIJF OP DE HOOGTE ──────────────────────────────────────────────────── -->
 <section class="anim-card" style="background:#f4f3ef;padding:80px 24px;border-top:1px solid var(--border)">
   <div style="max-width:560px;margin:0 auto;text-align:center;">
     <p style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px;">Geen spam, beloofd</p>
@@ -816,7 +816,7 @@
       Blijf op de hoogte van Internly
     </h2>
     <p style="font-size:.95rem;color:var(--ink3);line-height:1.65;margin-bottom:32px;max-width:440px;margin-left:auto;margin-right:auto;">
-      Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal Ã©Ã©n mail per maand.
+      Ontvang updates over nieuwe features, stages en de ontwikkeling van het platform. Maximaal één mail per maand.
     </p>
 
     <div id="about-wl-form" style="display:flex;gap:8px;max-width:440px;margin:0 auto 12px;flex-wrap:wrap;">
@@ -835,7 +835,7 @@
         font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;
         cursor:pointer;white-space:nowrap;flex-shrink:0;
         transition:background .15s;">
-        Schrijf je in â†’
+        Schrijf je in →
       </button>
     </div>
 
@@ -849,7 +849,7 @@
     </p>
   </div>
 </section>
-<!-- â”€â”€ EINDE BLIJF OP DE HOOGTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── EINDE BLIJF OP DE HOOGTE ───────────────────────────────────────────── -->
 
 <!-- FOOTER -->
 <footer>
@@ -868,13 +868,13 @@
     <a href="cookiebeleid.html">Cookiebeleid</a>
     <a href="#" onclick="window.InternlyConsent && window.InternlyConsent.showPreferences(); return false;">Cookie-instellingen</a>
   </div>
-  <div class="footer-copy">Â© 2026 Sasubo Holding B.V. â€” Alle rechten voorbehouden</div>
-  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
+  <div class="footer-copy">© 2026 Sasubo Holding B.V. — Alle rechten voorbehouden</div>
+  <p class="footer-tagline" style="width:100%;text-align:center;margin-top:8px;">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
 </footer>
 <script src="js/consent.js" defer></script>
 
 
-<!-- â”€â”€ WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
 <div id="waitlist-overlay" style="
   display:none; position:fixed; inset:0; z-index:9998;
   background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
@@ -896,7 +896,7 @@
       background:rgba(255,255,255,.15);border:none;
       color:#fff;width:28px;height:28px;border-radius:50%;
       font-size:1rem;cursor:pointer;line-height:1;
-      display:flex;align-items:center;justify-content:center;">Ã—</button>
+      display:flex;align-items:center;justify-content:center;">×</button>
     <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
       intern<span style="color:#FF7E42;">ly</span>
     </div>
@@ -911,7 +911,7 @@
       Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
     </p>
     <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
-      Geen spam. Maximaal Ã©Ã©n mail per maand. Altijd makkelijk uitschrijven.
+      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
     </p>
 
     <div id="wl-form">
@@ -930,12 +930,12 @@
         border-radius:50px;font-family:'Outfit',sans-serif;
         font-size:.95rem;font-weight:700;cursor:pointer;
         transition:background .15s;">
-        Houd me op de hoogte â†’
+        Houd me op de hoogte →
       </button>
     </div>
 
     <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
-      <div style="font-size:1.8rem;margin-bottom:8px;">ðŸŽ‰</div>
+      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
       <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
       <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
     </div>
@@ -993,7 +993,7 @@
     }
 
     btn.disabled    = true;
-    btn.textContent = 'Bezigâ€¦';
+    btn.textContent = 'Bezig…';
 
     // H1 fix 1 mei 2026: gebruik gedeelde window.db
     const client = window.db;
@@ -1003,7 +1003,7 @@
       .insert({ email, source: window.location.pathname });
 
     btn.disabled    = false;
-    btn.textContent = 'Houd me op de hoogte â†’';
+    btn.textContent = 'Houd me op de hoogte →';
 
     if (error) {
       if (error.code === '23505') {
@@ -1023,7 +1023,7 @@
   };
 })();
 </script>
-<!-- â”€â”€ EINDE WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
 
 <script>
 // Static email signup on about page
@@ -1042,7 +1042,7 @@
     }
 
     btn.disabled    = true;
-    btn.textContent = 'Bezigâ€¦';
+    btn.textContent = 'Bezig…';
 
     // H1 fix 1 mei 2026: gebruik gedeelde window.db
     const client = window.db;
@@ -1051,7 +1051,7 @@
       .insert({ email, source: window.location.pathname });
 
     btn.disabled    = false;
-    btn.textContent = 'Schrijf je in â†’';
+    btn.textContent = 'Schrijf je in →';
 
     if (error && error.code !== '23505') {
       err.textContent   = 'Er ging iets mis. Probeer het opnieuw.';
@@ -1115,7 +1115,7 @@ window.addEventListener('load', function() {
 })();
 </script>
 
-<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -1175,14 +1175,14 @@ window.addEventListener('load', function() {
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend â†’ publieke header blijft staan, geen warn
+    // role onbekend → publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }

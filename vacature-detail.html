@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="description" content="Bekijk vacaturedetails en solliciteer op stages via Internly.">
-  <title>Vacature â€” Internly</title>
+  <title>Vacature — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
@@ -49,11 +49,11 @@
   </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       Detail archetype (vacature-detail) â€” variant op Subpage met
+    /* ═══════════════════════════════════════════════════════════════
+       Detail archetype (vacature-detail) — variant op Subpage met
        reading-column + opslaan/sollicitatie CTA. Globale tokens uit
        css/style.css. Reviews via js/reviews.js (.rev-* classes).
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       ═══════════════════════════════════════════════════════════════ */
 
     :root {
       --green:      var(--c-green);
@@ -93,7 +93,7 @@
       outline-offset: 2px;
     }
 
-    /* â”€â”€ TOPBAR â€” translucent cream blueprint â”€â”€ */
+    /* ── TOPBAR — translucent cream blueprint ── */
     .topbar {
       background: rgba(244,243,239,.92);
       backdrop-filter: blur(8px);
@@ -146,14 +146,14 @@
       border-color: rgba(255,126,66,.25);
     }
 
-    /* â”€â”€ LAYOUT â”€â”€ */
+    /* ── LAYOUT ── */
     .container {
       max-width: 760px;
       margin: 0 auto;
       padding: var(--s7, 44px) var(--s5, 24px) var(--s9, 80px);
     }
 
-    /* â”€â”€ BACK LINK â”€â”€ */
+    /* ── BACK LINK ── */
     .back-link {
       display: inline-flex; align-items: center; gap: 6px;
       color: var(--fg-tertiary);
@@ -164,7 +164,7 @@
     }
     .back-link:hover { color: var(--c-orange-deep); }
 
-    /* â”€â”€ CARD â”€â”€ */
+    /* ── CARD ── */
     .detail-card {
       background: var(--bg-surface);
       border: 1px solid var(--line-subtle);
@@ -175,7 +175,7 @@
     }
     @media(max-width:480px) { .detail-card { padding: 20px 18px; } }
 
-    /* â”€â”€ SECTION HEADING â”€â”€ */
+    /* ── SECTION HEADING ── */
     .sec-head {
       font-family: var(--font-mono, 'DM Mono', monospace);
       font-size: .72rem; font-weight: 500;
@@ -185,7 +185,7 @@
       margin-bottom: 14px;
     }
 
-    /* â”€â”€ HEADER â”€â”€ */
+    /* ── HEADER ── */
     .vac-header {
       display: flex; justify-content: space-between;
       align-items: flex-start; gap: 14px; margin-bottom: 8px;
@@ -220,7 +220,7 @@
       margin-bottom: 20px;
     }
 
-    /* â”€â”€ META ROW â”€â”€ */
+    /* ── META ROW ── */
     .meta-row {
       display: flex; flex-wrap: wrap; gap: 10px;
       margin-bottom: 16px;
@@ -238,7 +238,7 @@
       font-weight: 600;
     }
 
-    /* â”€â”€ TAGS â”€â”€ */
+    /* ── TAGS ── */
     .tag-row {
       display: flex; flex-wrap: wrap; gap: 6px;
       margin-bottom: 4px;
@@ -256,7 +256,7 @@
       font-weight: 600;
     }
 
-    /* â”€â”€ TRUST BADGE â”€â”€ */
+    /* ── TRUST BADGE ── */
     .trust-badge {
       display: inline-flex; align-items: center; gap: 4px;
       font-size: .75rem; font-weight: 700;
@@ -268,7 +268,7 @@
     .trust-b { background: var(--amber-bg); color: var(--amber); }
     .trust-c { background: var(--red-bg);   color: var(--red); }
 
-    /* â”€â”€ TRUST DETAIL â”€â”€ */
+    /* ── TRUST DETAIL ── */
     .trust-detail {
       display: flex; align-items: flex-start;
       gap: 16px; margin-top: 14px;
@@ -319,7 +319,7 @@
     .tgr-c { background: var(--red-bg);   color: var(--fg-primary); }
     .tgr-c .grade-letter { color: var(--red); }
 
-    /* â”€â”€ TIPS â”€â”€ */
+    /* ── TIPS ── */
     .tips-list { list-style: none; margin-top: 6px; }
     .tips-list li {
       display: flex; gap: 12px;
@@ -332,7 +332,7 @@
     .tips-list li:last-child { border-bottom: none; }
     .tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
 
-    /* â”€â”€ SAVE BUTTON â€” orange-deep met box-shadow accent â”€â”€ */
+    /* ── SAVE BUTTON — orange-deep met box-shadow accent ── */
     .btn-save {
       display: flex; align-items: center; gap: 10px;
       background: var(--c-orange-deep);
@@ -375,7 +375,7 @@
       color: var(--fg-primary);
     }
 
-    /* â”€â”€ LOADING / ERROR â”€â”€ */
+    /* ── LOADING / ERROR ── */
     .state-box {
       text-align: center;
       padding: 64px 20px;
@@ -385,7 +385,7 @@
     .state-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
     .state-box.error { color: var(--red); }
 
-    /* â”€â”€ NOTIF â”€â”€ */
+    /* ── NOTIF ── */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -402,7 +402,7 @@
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* â”€â”€ REVIEWS (gerendered door js/reviews.js, classes frozen) â”€â”€ */
+    /* ── REVIEWS (gerendered door js/reviews.js, classes frozen) ── */
     #reviews-wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 80px; }
     .rev-section-title {
       font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
@@ -546,10 +546,10 @@
 <div class="topbar">
   <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="logo" style="cursor:pointer">intern<span>ly</span></a>
   <nav class="topbar-nav">
-    <a href="discover.html">â† Vacatures</a>
+    <a href="discover.html">← Vacatures</a>
     <a href="matches.html">Matches</a>
     <a href="mijn-sollicitaties.html">Mijn Stages</a>
-    <a href="match-dashboard.html">ðŸ“Š Stage Hub</a>
+    <a href="match-dashboard.html">📊 Stage Hub</a>
     <a href="student-profile.html">Mijn profiel</a>
   </nav>
   <div class="lang-switcher">
@@ -563,23 +563,23 @@
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs">
   <a href="discover.html" class="mt-tab active">
-    <span class="mt-icon">ðŸ”</span>
+    <span class="mt-icon">🔍</span>
     <span class="mt-label">Ontdek</span>
   </a>
   <a href="matches.html" class="mt-tab">
-    <span class="mt-icon">ðŸ’«</span>
+    <span class="mt-icon">💫</span>
     <span class="mt-label">Matches</span>
   </a>
   <a href="mijn-sollicitaties.html" class="mt-tab">
-    <span class="mt-icon">ðŸ“‹</span>
+    <span class="mt-icon">📋</span>
     <span class="mt-label">Stages</span>
   </a>
   <a href="match-dashboard.html" class="mt-tab">
-    <span class="mt-icon">ðŸ“Š</span>
+    <span class="mt-icon">📊</span>
     <span class="mt-label">Hub</span>
   </a>
   <a href="student-profile.html" class="mt-tab">
-    <span class="mt-icon">ðŸ‘¤</span>
+    <span class="mt-icon">👤</span>
     <span class="mt-label">Profiel</span>
   </a>
 </nav>
@@ -598,7 +598,7 @@
   justify-content:space-between;
   gap:12px;
   flex-wrap:wrap;">
-  <span>ðŸ”’ Log in om te solliciteren en vacatures op te slaan.</span>
+  <span>🔒 Log in om te solliciteren en vacatures op te slaan.</span>
   <div style="display:flex;gap:8px;flex-shrink:0;">
     <a href="auth.html" style="
       background:var(--green);color:#fff;padding:7px 16px;
@@ -607,18 +607,18 @@
     </a>
     <button onclick="document.getElementById('auth-banner').style.display='none'" style="
       background:none;border:none;cursor:pointer;font-size:1.1rem;
-      color:var(--amber);padding:4px 6px;line-height:1;">Ã—</button>
+      color:var(--amber);padding:4px 6px;line-height:1;">×</button>
   </div>
 </div>
 
 <div class="container">
-  <a href="discover.html" class="back-link">â† Alle vacatures</a>
+  <a href="discover.html" class="back-link">← Alle vacatures</a>
   <div id="content">
-    <div class="state-box"><span class="state-icon">â³</span>Vacature ladenâ€¦</div>
+    <div class="state-box"><span class="state-icon">⏳</span>Vacature laden…</div>
   </div>
 </div>
 
-<!-- â”€â”€ REVIEWS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── REVIEWS ─────────────────────────────────────────────────────────────── -->
 <div id="reviews-wrap" style="display:none">
   <div class="rev-section-title">Ervaringen met dit bedrijf</div>
   <div id="rev-summary-container"></div>
@@ -628,79 +628,79 @@
 
 <script>
 
-// â”€â”€ Sector tips â”€â”€
+// ── Sector tips ──
 const SECTOR_TIPS = {
   'engineering': [
-    { icon: 'âœï¸', text: 'Schrijf jezelf aan met een concreet technisch vraagstuk dat jij wilt oplossen. Wees specifiek over welke technologieÃ«n je beheerst en welke je wilt leren.' },
-    { icon: 'ðŸ”©', text: 'Bedrijven in Engineering zoeken stagiairs die analytisch denken, nauwkeurig werken en zelfstandig problemen kunnen structureren. Noem voorbeelden van projecten waar je dit hebt gedaan.' },
-    { icon: 'ðŸ“„', text: 'Stem je motivatiebrief af op het type engineering (civiel, mechatronica, software). Verwijs naar een specifiek project of product van het bedrijf om te laten zien dat je hebt ingelezen.' },
+    { icon: '✍️', text: 'Schrijf jezelf aan met een concreet technisch vraagstuk dat jij wilt oplossen. Wees specifiek over welke technologieën je beheerst en welke je wilt leren.' },
+    { icon: '🔩', text: 'Bedrijven in Engineering zoeken stagiairs die analytisch denken, nauwkeurig werken en zelfstandig problemen kunnen structureren. Noem voorbeelden van projecten waar je dit hebt gedaan.' },
+    { icon: '📄', text: 'Stem je motivatiebrief af op het type engineering (civiel, mechatronica, software). Verwijs naar een specifiek project of product van het bedrijf om te laten zien dat je hebt ingelezen.' },
   ],
   'high-tech': [
-    { icon: 'âœï¸', text: 'Benadruk in je aanschrijving aantoonbare technische vaardigheden: programmeerervaring, hardware-kennis of R&D-ervaring. Voeg een link toe naar je GitHub of portfolio.' },
-    { icon: 'ðŸ”¬', text: 'High-Tech bedrijven waarderen nieuwsgierigheid en het vermogen om snel te leren. Noem een recente technologische ontwikkeling in de sector die jou heeft aangesproken.' },
-    { icon: 'ðŸ“„', text: 'Houd je motivatiebrief helder en direct. Focus op wat jij technisch bijdraagt aan hun product of onderzoek â€” niet op algemene motivatie.' },
+    { icon: '✍️', text: 'Benadruk in je aanschrijving aantoonbare technische vaardigheden: programmeerervaring, hardware-kennis of R&D-ervaring. Voeg een link toe naar je GitHub of portfolio.' },
+    { icon: '🔬', text: 'High-Tech bedrijven waarderen nieuwsgierigheid en het vermogen om snel te leren. Noem een recente technologische ontwikkeling in de sector die jou heeft aangesproken.' },
+    { icon: '📄', text: 'Houd je motivatiebrief helder en direct. Focus op wat jij technisch bijdraagt aan hun product of onderzoek — niet op algemene motivatie.' },
   ],
   'it': [
-    { icon: 'âœï¸', text: 'Vermeld je technische stack duidelijk en link naar relevante projecten of repositories. Specifieke ervaring weegt zwaarder dan algemene interesse.' },
-    { icon: 'ðŸ’»', text: 'IT-bedrijven zoeken stagiairs die zelfstandig werken, snel debuggen en gewend zijn aan agile/scrum methodes. Benoem dit als je er ervaring mee hebt.' },
-    { icon: 'ðŸ“„', text: 'Pas je brief aan op het type IT-bedrijf: product, consultancy of in-house. Laat zien dat je de context begrijpt waarin je gaat werken.' },
+    { icon: '✍️', text: 'Vermeld je technische stack duidelijk en link naar relevante projecten of repositories. Specifieke ervaring weegt zwaarder dan algemene interesse.' },
+    { icon: '💻', text: 'IT-bedrijven zoeken stagiairs die zelfstandig werken, snel debuggen en gewend zijn aan agile/scrum methodes. Benoem dit als je er ervaring mee hebt.' },
+    { icon: '📄', text: 'Pas je brief aan op het type IT-bedrijf: product, consultancy of in-house. Laat zien dat je de context begrijpt waarin je gaat werken.' },
   ],
   'data': [
-    { icon: 'âœï¸', text: 'Schrijf jezelf aan met een concreet data-vraagstuk: welke analyse wil je uitvoeren en welke tools gebruik je? Benoem Python, SQL, R of BI-tools die je beheerst.' },
-    { icon: 'ðŸ“Š', text: 'Data-bedrijven zoeken studenten die kritisch denken over data-kwaliteit en conclusies kunnen vertalen naar zakelijke inzichten. Beschrijf hoe je dat aanpakt.' },
-    { icon: 'ðŸ“„', text: 'Voeg in je brief een kort voorbeeld toe van een dataset die je hebt geanalyseerd of een dashboard dat je hebt gebouwd. Concrete output maakt het verschil.' },
+    { icon: '✍️', text: 'Schrijf jezelf aan met een concreet data-vraagstuk: welke analyse wil je uitvoeren en welke tools gebruik je? Benoem Python, SQL, R of BI-tools die je beheerst.' },
+    { icon: '📊', text: 'Data-bedrijven zoeken studenten die kritisch denken over data-kwaliteit en conclusies kunnen vertalen naar zakelijke inzichten. Beschrijf hoe je dat aanpakt.' },
+    { icon: '📄', text: 'Voeg in je brief een kort voorbeeld toe van een dataset die je hebt geanalyseerd of een dashboard dat je hebt gebouwd. Concrete output maakt het verschil.' },
   ],
   'finance': [
-    { icon: 'âœï¸', text: 'Benadruk analytische vaardigheden, Excel/Power BI-kennis en interesse in financiÃ«le markten. Vermeld relevante vakken zoals Financieel Management of Beleggingsleer.' },
-    { icon: 'ðŸ“ˆ', text: 'Finance-bedrijven zoeken nauwkeurige, detailgerichte stagiairs die snel grote hoeveelheden data kunnen verwerken en duidelijk kunnen rapporteren.' },
-    { icon: 'ðŸ“„', text: 'Schrijf een formele, gestructureerde motivatiebrief zonder spelling- of stijlfouten. In Finance is precisie een signaal van karakter. Vermeld je GPA of relevante cijfers.' },
+    { icon: '✍️', text: 'Benadruk analytische vaardigheden, Excel/Power BI-kennis en interesse in financiële markten. Vermeld relevante vakken zoals Financieel Management of Beleggingsleer.' },
+    { icon: '📈', text: 'Finance-bedrijven zoeken nauwkeurige, detailgerichte stagiairs die snel grote hoeveelheden data kunnen verwerken en duidelijk kunnen rapporteren.' },
+    { icon: '📄', text: 'Schrijf een formele, gestructureerde motivatiebrief zonder spelling- of stijlfouten. In Finance is precisie een signaal van karakter. Vermeld je GPA of relevante cijfers.' },
   ],
   'duurzaamheid': [
-    { icon: 'âœï¸', text: 'Laat in je aanschrijving zien dat je oprecht gedreven bent door impact â€” niet alleen door het woord duurzaamheid. Benoem specifieke thema\'s: circulaire economie, COâ‚‚-reductie, biodiversiteit.' },
-    { icon: 'ðŸŒ±', text: 'Duurzaamheidsbedrijven zoeken stagiairs die systemisch kunnen denken, verbanden leggen tussen beleid en praktijk, en kunnen omgaan met complexe stakeholderbelangen.' },
-    { icon: 'ðŸ“„', text: 'Koppel je motivatiebrief aan de duurzaamheidsdoelen van het bedrijf (SDGs, CSRD-rapportage, B Corp). Lees hun duurzaamheidsverslag en verwijs er concreet naar.' },
+    { icon: '✍️', text: 'Laat in je aanschrijving zien dat je oprecht gedreven bent door impact — niet alleen door het woord duurzaamheid. Benoem specifieke thema\'s: circulaire economie, CO₂-reductie, biodiversiteit.' },
+    { icon: '🌱', text: 'Duurzaamheidsbedrijven zoeken stagiairs die systemisch kunnen denken, verbanden leggen tussen beleid en praktijk, en kunnen omgaan met complexe stakeholderbelangen.' },
+    { icon: '📄', text: 'Koppel je motivatiebrief aan de duurzaamheidsdoelen van het bedrijf (SDGs, CSRD-rapportage, B Corp). Lees hun duurzaamheidsverslag en verwijs er concreet naar.' },
   ],
   'marketing': [
-    { icon: 'âœï¸', text: 'Laat in je aanschrijving zien dat je zelf een sterk persoonlijk merk hebt of hebt opgebouwd. Link naar eigen content, campagnes of een portfolio.' },
-    { icon: 'ðŸ“£', text: 'Marketing-bedrijven zoeken stagiairs met creativiteit Ã©n analytisch inzicht. Laat zien dat je niet alleen ideeÃ«n hebt, maar ook meet of ze werken.' },
-    { icon: 'ðŸ“„', text: 'Schrijf je motivatiebrief met hetzelfde gevoel voor toon en doelgroep dat je in je marketingwerk toepast. Maak het memorabel zonder generiek te klinken.' },
+    { icon: '✍️', text: 'Laat in je aanschrijving zien dat je zelf een sterk persoonlijk merk hebt of hebt opgebouwd. Link naar eigen content, campagnes of een portfolio.' },
+    { icon: '📣', text: 'Marketing-bedrijven zoeken stagiairs met creativiteit én analytisch inzicht. Laat zien dat je niet alleen ideeën hebt, maar ook meet of ze werken.' },
+    { icon: '📄', text: 'Schrijf je motivatiebrief met hetzelfde gevoel voor toon en doelgroep dat je in je marketingwerk toepast. Maak het memorabel zonder generiek te klinken.' },
   ],
   'design': [
-    { icon: 'âœï¸', text: 'Stuur altijd een portfolio mee, zelfs als er niet om gevraagd wordt. Zorg dat het werk spreekt voordat je jezelf aanschrijft â€” een goede eerste indruk is hier alles.' },
-    { icon: 'ðŸŽ¨', text: 'Design-studios zoeken stagiairs die hun creatieve keuzes kunnen uitleggen en openstaan voor feedback. Toon in je brief dat je procesgedreven werkt, niet alleen resultaatgericht.' },
-    { icon: 'ðŸ“„', text: 'Laat je motivatiebrief qua typografie, witruimte en opmaak zien wie je bent als designer. Sla de standaard template over en maak iets dat past bij de studio\'s identiteit.' },
+    { icon: '✍️', text: 'Stuur altijd een portfolio mee, zelfs als er niet om gevraagd wordt. Zorg dat het werk spreekt voordat je jezelf aanschrijft — een goede eerste indruk is hier alles.' },
+    { icon: '🎨', text: 'Design-studios zoeken stagiairs die hun creatieve keuzes kunnen uitleggen en openstaan voor feedback. Toon in je brief dat je procesgedreven werkt, niet alleen resultaatgericht.' },
+    { icon: '📄', text: 'Laat je motivatiebrief qua typografie, witruimte en opmaak zien wie je bent als designer. Sla de standaard template over en maak iets dat past bij de studio\'s identiteit.' },
   ],
   'hospitality': [
-    { icon: 'âœï¸', text: 'Benadruk gastvrijheid, klantgerichtheid en flexibiliteit. Vertel in je aanschrijving over situaties waar je onder druk uitstekend hebt gepresteerd voor gasten of klanten.' },
-    { icon: 'ðŸ¨', text: 'Hospitality-bedrijven zoeken stagiairs met een positieve uitstraling, teamgeest en bereidheid om onregelmatige uren te draaien. Wees hierover open en realistisch.' },
-    { icon: 'ðŸ“„', text: 'Schrijf een warme, persoonlijke motivatiebrief â€” maar houd hem professioneel. Laat zien dat je het bedrijf kent door een concrete gast- of klantervaring te noemen.' },
+    { icon: '✍️', text: 'Benadruk gastvrijheid, klantgerichtheid en flexibiliteit. Vertel in je aanschrijving over situaties waar je onder druk uitstekend hebt gepresteerd voor gasten of klanten.' },
+    { icon: '🏨', text: 'Hospitality-bedrijven zoeken stagiairs met een positieve uitstraling, teamgeest en bereidheid om onregelmatige uren te draaien. Wees hierover open en realistisch.' },
+    { icon: '📄', text: 'Schrijf een warme, persoonlijke motivatiebrief — maar houd hem professioneel. Laat zien dat je het bedrijf kent door een concrete gast- of klantervaring te noemen.' },
   ],
   'hr': [
-    { icon: 'âœï¸', text: 'Schrijf jezelf aan door te laten zien dat je mensen begrijpt: empathisch, discreet en tegelijk resultaatgericht. Noem ervaringen met groepen, coaching of conflictbemiddeling.' },
-    { icon: 'ðŸ¤', text: 'HR-afdelingen zoeken stagiairs die betrouwbaar zijn met vertrouwelijke informatie en snel kunnen schakelen tussen administratieve taken en mensgerichte gesprekken.' },
-    { icon: 'ðŸ“„', text: 'Zorg dat je brief foutloos is â€” in HR is je communicatie je visitekaartje. Gebruik een heldere, empathische toon en focus op wat je wilt leren over people management.' },
+    { icon: '✍️', text: 'Schrijf jezelf aan door te laten zien dat je mensen begrijpt: empathisch, discreet en tegelijk resultaatgericht. Noem ervaringen met groepen, coaching of conflictbemiddeling.' },
+    { icon: '🤝', text: 'HR-afdelingen zoeken stagiairs die betrouwbaar zijn met vertrouwelijke informatie en snel kunnen schakelen tussen administratieve taken en mensgerichte gesprekken.' },
+    { icon: '📄', text: 'Zorg dat je brief foutloos is — in HR is je communicatie je visitekaartje. Gebruik een heldere, empathische toon en focus op wat je wilt leren over people management.' },
   ],
   'gezondheid': [
-    { icon: 'âœï¸', text: 'Benadruk je interesse in het snijvlak van zorg en jouw studierichting. Wees concreet over welk type organisatie je zoekt: kliniek, GGZ, e-health, of preventie.' },
-    { icon: 'ðŸ¥', text: 'Zorginstellingen zoeken stagiairs die kunnen omgaan met gevoelige situaties, protocol-gedreven werken Ã©n menselijkheid behouden. Noem ethische dilemma\'s die je hebt doorgedacht.' },
-    { icon: 'ðŸ“„', text: 'Schrijf een rustige, serieuze brief zonder hypes of marketingtaal. Verwijzen naar specifieke zorgvraagstukken (bijv. digitalisering van dossiers, preventie in de wijk) geeft je een voorsprong.' },
+    { icon: '✍️', text: 'Benadruk je interesse in het snijvlak van zorg en jouw studierichting. Wees concreet over welk type organisatie je zoekt: kliniek, GGZ, e-health, of preventie.' },
+    { icon: '🏥', text: 'Zorginstellingen zoeken stagiairs die kunnen omgaan met gevoelige situaties, protocol-gedreven werken én menselijkheid behouden. Noem ethische dilemma\'s die je hebt doorgedacht.' },
+    { icon: '📄', text: 'Schrijf een rustige, serieuze brief zonder hypes of marketingtaal. Verwijzen naar specifieke zorgvraagstukken (bijv. digitalisering van dossiers, preventie in de wijk) geeft je een voorsprong.' },
   ],
   'dieren': [
-    { icon: 'âœï¸', text: 'Vertel in je aanschrijving over directe ervaring met dieren â€” vrijwilligerswerk, eigen huisdieren of opleiding. Passie is hier even belangrijk als kennis.' },
-    { icon: 'ðŸ¾', text: 'Organisaties in de diersector zoeken stagiairs die fysiek belastbaar zijn, zorgzaam en verantwoordelijk. Ze willen zien dat je begrijpt hoe zwaar het werk soms kan zijn.' },
-    { icon: 'ðŸ“„', text: 'Wees authentiek in je brief en vermijd clichÃ©s als "ik hou van dieren". Vertel een specifiek verhaal over een situatie met een dier die jouw keuze voor dit vakgebied versterkte.' },
+    { icon: '✍️', text: 'Vertel in je aanschrijving over directe ervaring met dieren — vrijwilligerswerk, eigen huisdieren of opleiding. Passie is hier even belangrijk als kennis.' },
+    { icon: '🐾', text: 'Organisaties in de diersector zoeken stagiairs die fysiek belastbaar zijn, zorgzaam en verantwoordelijk. Ze willen zien dat je begrijpt hoe zwaar het werk soms kan zijn.' },
+    { icon: '📄', text: 'Wees authentiek in je brief en vermijd clichés als "ik hou van dieren". Vertel een specifiek verhaal over een situatie met een dier die jouw keuze voor dit vakgebied versterkte.' },
   ],
   'niche': [
-    { icon: 'âœï¸', text: 'Doe diepgaand onderzoek naar het bedrijf vÃ³Ã³r je aanschrijft. Nichebedrijven merken direct of een kandidaat het vak Ã©cht begrijpt of generiek solliciteert.' },
-    { icon: 'ðŸ”', text: 'Laat zien dat je de specifieke context van de niche begrijpt: regelgeving, doelgroep, concurrentiepositie. Dit onderscheidt jou van brede kandidaten.' },
-    { icon: 'ðŸ“„', text: 'Schrijf een sterk gepersonaliseerde brief. In een nichemarkting zijn relaties en geloofwaardigheid alles â€” laat zien dat jij de cultuur al een beetje kent.' },
+    { icon: '✍️', text: 'Doe diepgaand onderzoek naar het bedrijf vóór je aanschrijft. Nichebedrijven merken direct of een kandidaat het vak écht begrijpt of generiek solliciteert.' },
+    { icon: '🔍', text: 'Laat zien dat je de specifieke context van de niche begrijpt: regelgeving, doelgroep, concurrentiepositie. Dit onderscheidt jou van brede kandidaten.' },
+    { icon: '📄', text: 'Schrijf een sterk gepersonaliseerde brief. In een nichemarkting zijn relaties en geloofwaardigheid alles — laat zien dat jij de cultuur al een beetje kent.' },
   ],
 };
 
 const DEFAULT_TIPS = [
-  { icon: 'âœï¸', text: 'Schrijf jezelf persoonlijk en concreet aan. Vertel welk specifiek vraagstuk je wilt aanpakken en waarom dit bedrijf daarvoor de beste plek is.' },
-  { icon: 'ðŸŽ¯', text: 'Bedrijven zoeken stagiairs die initiatief tonen, zelfstandig werken en bereid zijn om buiten hun comfortzone te treden. Onderbouw dit met voorbeelden.' },
-  { icon: 'ðŸ“„', text: 'Pas je motivatiebrief aan per bedrijf. Een generieke brief wordt direct herkend. Verwijs naar een concreet project, product of waarde van de organisatie.' },
+  { icon: '✍️', text: 'Schrijf jezelf persoonlijk en concreet aan. Vertel welk specifiek vraagstuk je wilt aanpakken en waarom dit bedrijf daarvoor de beste plek is.' },
+  { icon: '🎯', text: 'Bedrijven zoeken stagiairs die initiatief tonen, zelfstandig werken en bereid zijn om buiten hun comfortzone te treden. Onderbouw dit met voorbeelden.' },
+  { icon: '📄', text: 'Pas je motivatiebrief aan per bedrijf. Een generieke brief wordt direct herkend. Verwijs naar een concreet project, product of waarde van de organisatie.' },
 ];
 
 function getTips(sector) {
@@ -714,14 +714,14 @@ function getTips(sector) {
 
 function trustLabel(grade) {
   return {
-    A: 'Betrouwbaar â€” reageert snel en komt afspraken na',
-    B: 'Gemiddeld â€” redelijke ervaringen, let op verwachtingen',
-    C: 'Let op â€” trage respons of negatieve ervaringen gesignaleerd',
+    A: 'Betrouwbaar — reageert snel en komt afspraken na',
+    B: 'Gemiddeld — redelijke ervaringen, let op verwachtingen',
+    C: 'Let op — trage respons of negatieve ervaringen gesignaleerd',
   }[grade] || 'Geen Trust Score beschikbaar';
 }
 
 function trustTitle(grade) {
-  return { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || 'â€”';
+  return { A: 'Betrouwbaar', B: 'Gemiddeld', C: 'Let op' }[grade] || '—';
 }
 
 function formatDate(d) {
@@ -767,15 +767,15 @@ function render(v, source) {
   const eSector   = escapeHtml(v.sector || '');
   const eTitle    = escapeHtml(v.title || 'Stageplaats');
   const eDesc     = escapeHtml(v.description || '').replace(/\n/g, '<br>');
-  const eDuration = escapeHtml(v.duration || 'â€”');
-  const eGrade    = escapeHtml(v.trust_grade || 'â€”');
-  const eScore    = escapeHtml(String(v.trust_score ?? 'â€”'));
+  const eDuration = escapeHtml(v.duration || '—');
+  const eGrade    = escapeHtml(v.trust_grade || '—');
+  const eScore    = escapeHtml(String(v.trust_score ?? '—'));
 
-  document.title = `${v.title || 'Vacature'} â€” Internly`;
+  document.title = `${v.title || 'Vacature'} — Internly`;
 
   document.getElementById('content').innerHTML = `
 
-    <!-- â”€â”€ SECTIE 1: Vacature info â”€â”€ -->
+    <!-- ── SECTIE 1: Vacature info ── -->
     <div class="detail-card">
       <div class="sec-head">Vacature</div>
       <div class="vac-header">
@@ -784,7 +784,7 @@ function render(v, source) {
           <div class="vac-sector">${eSector}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-          ${source === 'internship_postings' ? '<span style="font-size:.72rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 10px;border-radius:20px">ðŸ¢ Bedrijfsposting</span>' : ''}
+          ${source === 'internship_postings' ? '<span style="font-size:.72rem;font-weight:600;background:#fdf0e8;color:#FF7E42;padding:3px 10px;border-radius:20px">🏢 Bedrijfsposting</span>' : ''}
           ${renderTrustBadge(v.trust_grade, v.trust_score, true)}
         </div>
       </div>
@@ -793,9 +793,9 @@ function render(v, source) {
       <p class="vac-desc">${eDesc}</p>
 
       <div class="meta-row">
-        <span class="meta-chip">â± ${eDuration}</span>
-        <span class="meta-chip">ðŸ“… ${formatDate(v.start_date)}</span>
-        ${v.guarantee ? '<span class="meta-chip green">âš¡ Responsgarantie</span>' : ''}
+        <span class="meta-chip">⏱ ${eDuration}</span>
+        <span class="meta-chip">📅 ${formatDate(v.start_date)}</span>
+        ${v.guarantee ? '<span class="meta-chip green">⚡ Responsgarantie</span>' : ''}
       </div>
 
       ${tags.length > 0 ? `
@@ -805,21 +805,21 @@ function render(v, source) {
     </div>
 
     ${source === 'internship_postings' && v.vestigingen ? `
-    <!-- â”€â”€ SECTIE 1B: Vestiging â”€â”€ -->
+    <!-- ── SECTIE 1B: Vestiging ── -->
     <div class="detail-card">
       <div class="sec-head">Vestiging</div>
       <div style="display:flex;align-items:center;gap:12px">
-        <span style="font-size:1.5rem">ðŸ“</span>
+        <span style="font-size:1.5rem">📍</span>
         <div>
           <div style="font-weight:700;color:var(--ink)">${escapeHtml(v.vestigingen.naam || '')}</div>
           <div style="font-size:.85rem;color:var(--ink3);margin-top:2px">
-            ${v.vestigingen.adres ? escapeHtml(v.vestigingen.adres) + ' &nbsp;Â·&nbsp; ' : ''}${escapeHtml(v.vestigingen.stad || '')} &nbsp;Â·&nbsp; ${escapeHtml(v.vestigingen.postcode || '')}
+            ${v.vestigingen.adres ? escapeHtml(v.vestigingen.adres) + ' &nbsp;·&nbsp; ' : ''}${escapeHtml(v.vestigingen.stad || '')} &nbsp;·&nbsp; ${escapeHtml(v.vestigingen.postcode || '')}
           </div>
         </div>
       </div>
     </div>` : ''}
 
-    <!-- â”€â”€ SECTIE 2: Trust Score uitleg â”€â”€ -->
+    <!-- ── SECTIE 2: Trust Score uitleg ── -->
     <div class="detail-card">
       <div class="sec-head">Trust Score uitleg</div>
       <div class="trust-detail">
@@ -832,44 +832,44 @@ function render(v, source) {
       <div class="trust-grades">
         <div class="trust-grade-row tgr-a">
           <span class="grade-letter">A</span>
-          <span><strong>Betrouwbaar</strong> â€” reageert snel, nakomt afspraken. Aanbevolen voor plaatsing.</span>
+          <span><strong>Betrouwbaar</strong> — reageert snel, nakomt afspraken. Aanbevolen voor plaatsing.</span>
         </div>
         <div class="trust-grade-row tgr-b">
           <span class="grade-letter">B</span>
-          <span><strong>Gemiddeld</strong> â€” redelijke ervaringen, let op verwachtingen en maak duidelijke afspraken.</span>
+          <span><strong>Gemiddeld</strong> — redelijke ervaringen, let op verwachtingen en maak duidelijke afspraken.</span>
         </div>
         <div class="trust-grade-row tgr-c">
           <span class="grade-letter">C</span>
-          <span><strong>Let op</strong> â€” trage respons of negatieve ervaringen gesignaleerd. Bespreek dit met je begeleider voor je solliciteert.</span>
+          <span><strong>Let op</strong> — trage respons of negatieve ervaringen gesignaleerd. Bespreek dit met je begeleider voor je solliciteert.</span>
         </div>
       </div>
     </div>
 
-    <!-- â”€â”€ SECTIE 3: Tips â”€â”€ -->
+    <!-- ── SECTIE 3: Tips ── -->
     <div class="detail-card">
-      <div class="sec-head">Tips voor jou${v.sector ? ' â€” ' + eSector : ''}</div>
+      <div class="sec-head">Tips voor jou${v.sector ? ' — ' + eSector : ''}</div>
       <ul class="tips-list">
         ${tips.map(t => `<li><span class="tip-icon">${t.icon}</span><span>${t.text}</span></li>`).join('')}
       </ul>
     </div>
 
-    <!-- â”€â”€ SECTIE 4: Opslaan â”€â”€ -->
+    <!-- ── SECTIE 4: Opslaan ── -->
     <div class="detail-card">
       <div class="sec-head">Bewaar deze vacature</div>
       <p style="font-size:.9rem;color:var(--ink3);margin-bottom:18px;line-height:1.6">
         Sla de vacature op in je profiel zodat je hem later rustig kunt bekijken of vergelijken.
       </p>
-      ${v.trust_grade === 'C' ? '<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-bottom:12px;border-left:3px solid var(--red,#b82020);">âš  Dit bedrijf reageert gemiddeld na 7+ dagen</div>' : ''}
+      ${v.trust_grade === 'C' ? '<div style="font-size:.8rem;color:var(--amber,#a06010);background:var(--amber-bg,#fdf3e0);padding:5px 10px;border-radius:0 var(--radius-sm,8px) var(--radius-sm,8px) 0;margin-bottom:12px;border-left:3px solid var(--red,#b82020);">⚠ Dit bedrijf reageert gemiddeld na 7+ dagen</div>' : ''}
       <div class="btn-row">
         <button class="btn-save" id="saveBtn"
           onclick="openMotivatieModal()"
           ${already ? 'disabled' : ''}>
-          ${already ? 'âœ“ Opgeslagen' : 'ðŸ”– Solliciteer â†’'}
+          ${already ? '✓ Opgeslagen' : '🔖 Solliciteer →'}
         </button>
-        <a href="discover.html" class="btn-back-detail">â† Terug naar overzicht</a>
+        <a href="discover.html" class="btn-back-detail">← Terug naar overzicht</a>
       </div>
 
-      <!-- â”€â”€ Motivatiebrief modal â€” BOL Fix 30 apr 2026 â”€â”€ -->
+      <!-- ── Motivatiebrief modal — BOL Fix 30 apr 2026 ── -->
       <div id="motivatie-modal" style="display:none;
         position:fixed;inset:0;background:rgba(13,21,32,.45);
         z-index:9000;align-items:center;justify-content:center;
@@ -913,7 +913,7 @@ function render(v, source) {
               background:#e05c1a;color:#fff;border:none;
               cursor:pointer;font-family:'Outfit',sans-serif;
               font-size:.85rem;font-weight:500">
-              Verstuur sollicitatie â†’
+              Verstuur sollicitatie →
             </button>
           </div>
         </div>
@@ -926,7 +926,7 @@ function render(v, source) {
   window.__currentSource   = source;
 }
 
-// â”€â”€ Motivatiebrief modal-flow â€” BOL Fix 30 apr 2026 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Motivatiebrief modal-flow — BOL Fix 30 apr 2026 ───────────────────────────
 function openMotivatieModal() {
   const m = document.getElementById('motivatie-modal');
   if (!m) return;
@@ -956,7 +956,7 @@ function verstuurSollicitatie() {
 
 async function handleSave(motivatieText) {
   if (isApplying()) {
-    notify('Je hebt al een sollicitatie in behandeling â€” wacht even');
+    notify('Je hebt al een sollicitatie in behandeling — wacht even');
     return;
   }
   setApplying(true);
@@ -967,7 +967,7 @@ async function handleSave(motivatieText) {
 
   const btn = document.getElementById('saveBtn');
   btn.disabled    = true;
-  btn.textContent = 'Bezigâ€¦';
+  btn.textContent = 'Bezig…';
 
   // 1. Always write to localStorage
   saveVacature(v, source);
@@ -1030,18 +1030,18 @@ async function handleSave(motivatieText) {
             'internly_motiv_pending_internship_' + v.id,
             motivatie
           );
-        } catch (_) { /* private mode of quota â€” niet-blokkerend */ }
+        } catch (_) { /* private mode of quota — niet-blokkerend */ }
       }
 
-      btn.textContent = 'âœ“ Opgeslagen in profiel';
+      btn.textContent = '✓ Opgeslagen in profiel';
       notify(
         _dbOk
-          ? 'âœ“ Aanvraag verzonden â€” volg je status in Mijn Sollicitaties'
-          : 'Opgeslagen in profiel â€” neem contact op als je de aanvraag niet ziet',
+          ? '✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties'
+          : 'Opgeslagen in profiel — neem contact op als je de aanvraag niet ziet',
         _dbOk ? true : null
       );
     } else {
-      // internship_postings â€” insert into applications table (localStorage already saved above)
+      // internship_postings — insert into applications table (localStorage already saved above)
       let _dbOk = true;
       try {
         const { data: existing } = await db
@@ -1080,20 +1080,20 @@ async function handleSave(motivatieText) {
             'internly_motiv_pending_posting_' + v.id,
             motivatie
           );
-        } catch (_) { /* private mode of quota â€” niet-blokkerend */ }
+        } catch (_) { /* private mode of quota — niet-blokkerend */ }
       }
 
-      btn.textContent = 'âœ“ Opgeslagen in profiel';
+      btn.textContent = '✓ Opgeslagen in profiel';
       notify(
         _dbOk
-          ? 'âœ“ Aanvraag verzonden â€” volg je status in Mijn Sollicitaties'
-          : 'Aanvraag lokaal opgeslagen â€” mogelijk niet zichtbaar in Mijn Sollicitaties',
+          ? '✓ Aanvraag verzonden — volg je status in Mijn Sollicitaties'
+          : 'Aanvraag lokaal opgeslagen — mogelijk niet zichtbaar in Mijn Sollicitaties',
         _dbOk ? true : false
       );
     }
   } catch(e) {
     console.error('handleSave error:', e?.message || 'onbekende fout');
-    notify('Er is iets misgegaan â€” probeer het opnieuw', false);
+    notify('Er is iets misgegaan — probeer het opnieuw', false);
     btn.disabled    = false;
     btn.textContent = 'Opslaan voor later';
   } finally {
@@ -1101,7 +1101,7 @@ async function handleSave(motivatieText) {
   }
 }
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -1115,7 +1115,7 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 window.addEventListener('DOMContentLoaded', async () => {
-  // Auth-guard: pagina is publiek bereikbaar â€” banner toont alleen als user NIET ingelogd is.
+  // Auth-guard: pagina is publiek bereikbaar — banner toont alleen als user NIET ingelogd is.
   // Geen requireRole hier: ingelogde non-students mogen vacatures ook bekijken.
   const { data: { user: _guestCheck } } = await db.auth.getUser();
   const banner = document.getElementById('auth-banner');
@@ -1128,7 +1128,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const validSources = ['internships', 'internship_postings'];
   if (!id || !validSources.includes(source)) {
     document.getElementById('content').innerHTML =
-      '<div class="state-box error"><span class="state-icon">âš ï¸</span>Ongeldige vacature-URL. <a href="discover.html" style="color:#1a7a48">Terug naar overzicht â†’</a></div>';
+      '<div class="state-box error"><span class="state-icon">⚠️</span>Ongeldige vacature-URL. <a href="discover.html" style="color:#1a7a48">Terug naar overzicht →</a></div>';
     return;
   }
 
@@ -1142,7 +1142,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (error) {
     document.getElementById('content').innerHTML =
-      `<div class="state-box error"><span class="state-icon">âš ï¸</span>Vacature niet gevonden.<br><a href="discover.html" style="color:#1a7a48">Terug naar overzicht â†’</a></div>`;
+      `<div class="state-box error"><span class="state-icon">⚠️</span>Vacature niet gevonden.<br><a href="discover.html" style="color:#1a7a48">Terug naar overzicht →</a></div>`;
     return;
   }
   if (!data) {
@@ -1153,8 +1153,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   render(data, source);
 
-  // â”€â”€ JobPosting structured data voor Google for Jobs â”€â”€
-  // 1 mei 2026 â€” Sprint Tickoff FIX 4. Helpt organische SEO-indexering
+  // ── JobPosting structured data voor Google for Jobs ──
+  // 1 mei 2026 — Sprint Tickoff FIX 4. Helpt organische SEO-indexering
   // voor /vacature-detail?id=...&source=... shareable URLs.
   try {
     const _vest = data.vestigingen || {};
@@ -1195,9 +1195,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   } catch (ldErr) {
     console.warn('[seo] JobPosting JSON-LD injectie mislukt:', ldErr.message);
   }
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────
 
-  // â”€â”€ Reviews sectie (alleen voor company postings met een bedrijfs-ID) â”€â”€
+  // ── Reviews sectie (alleen voor company postings met een bedrijfs-ID) ──
   if (source === 'internship_postings' && data.created_by) {
     const companyId = data.created_by;
     const wrap = document.getElementById('reviews-wrap');
@@ -1218,9 +1218,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (eligibility.ok) {
           ctaEl.innerHTML = `
             <a href="review-form.html?company=${encodeURIComponent(companyId)}&match=${encodeURIComponent(eligibility.match_id)}" class="rev-write-btn">
-              âœï¸ Schrijf een review
+              ✍️ Schrijf een review
             </a>
-            <p class="rev-write-note">Je kunt Ã©Ã©n review schrijven per afgeronde of geaccepteerde stage.</p>`;
+            <p class="rev-write-note">Je kunt één review schrijven per afgeronde of geaccepteerde stage.</p>`;
         } else if (eligibility.reason === 'already_reviewed') {
           ctaEl.innerHTML = `<p class="rev-write-note">Je hebt al een review geschreven voor dit bedrijf.</p>`;
         } else if (eligibility.reason === 'not_authenticated') {
@@ -1234,7 +1234,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-<!-- â”€â”€ WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── WAITLIST POPUP ──────────────────────────────────────────────────────── -->
 <div id="waitlist-overlay" style="
   display:none; position:fixed; inset:0; z-index:9998;
   background:rgba(13,21,32,.55); backdrop-filter:blur(4px);
@@ -1256,7 +1256,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       background:rgba(255,255,255,.15);border:none;
       color:#fff;width:28px;height:28px;border-radius:50%;
       font-size:1rem;cursor:pointer;line-height:1;
-      display:flex;align-items:center;justify-content:center;">Ã—</button>
+      display:flex;align-items:center;justify-content:center;">×</button>
     <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.6rem;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">
       intern<span style="color:#FF7E42;">ly</span>
     </div>
@@ -1271,7 +1271,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       Ontvang updates over <strong>nieuwe stages</strong>, <strong>studentprofielen</strong> en de ontwikkeling van het platform.
     </p>
     <p style="font-size:.82rem;color:#9ca3af;margin:0 0 22px;">
-      Geen spam. Maximaal Ã©Ã©n mail per maand. Altijd makkelijk uitschrijven.
+      Geen spam. Maximaal één mail per maand. Altijd makkelijk uitschrijven.
     </p>
 
     <div id="wl-form">
@@ -1290,12 +1290,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         border-radius:50px;font-family:'Outfit',sans-serif;
         font-size:.95rem;font-weight:700;cursor:pointer;
         transition:background .15s;">
-        Houd me op de hoogte â†’
+        Houd me op de hoogte →
       </button>
     </div>
 
     <div id="wl-success" style="display:none;text-align:center;padding:12px 0;">
-      <div style="font-size:1.8rem;margin-bottom:8px;">ðŸŽ‰</div>
+      <div style="font-size:1.8rem;margin-bottom:8px;">🎉</div>
       <div style="font-size:.95rem;font-weight:600;color:#1a7a48;margin-bottom:4px;">Je staat op de lijst!</div>
       <div style="font-size:.82rem;color:#6b7280;">We houden je op de hoogte van alle ontwikkelingen.</div>
     </div>
@@ -1348,7 +1348,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     btn.disabled    = true;
-    btn.textContent = 'Bezigâ€¦';
+    btn.textContent = 'Bezig…';
 
     const client = (typeof db !== 'undefined') ? db
       : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1358,7 +1358,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       .insert({ email, source: window.location.pathname });
 
     btn.disabled    = false;
-    btn.textContent = 'Houd me op de hoogte â†’';
+    btn.textContent = 'Houd me op de hoogte →';
 
     if (error) {
       if (error.code === '23505') {
@@ -1378,7 +1378,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   };
 })();
 </script>
-<!-- â”€â”€ EINDE WAITLIST POPUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── EINDE WAITLIST POPUP ─────────────────────────────────────────────────── -->
 
 <!-- Google Translate Widget -->
 <div id="google_translate_element" style="display:none"></div>
@@ -1415,6 +1415,6 @@ window.addEventListener('load', function() {
 });
 </script>
 <script defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-<footer style="text-align:center;padding:1.5rem;font-size:.8rem;color:var(--ink3,#7a8799);border-top:1px solid var(--border,#e2e0d9)">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:1.5rem;font-size:.8rem;color:var(--ink3,#7a8799);border-top:1px solid var(--border,#e2e0d9)">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

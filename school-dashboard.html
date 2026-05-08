@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Schooldashboard â€” Internly</title>
+  <title>Schooldashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -52,7 +52,7 @@
   </script>
   <style>
     :root {
-      /* Pagina-aliassen â†’ globale tokens (css/style.css) */
+      /* Pagina-aliassen → globale tokens (css/style.css) */
       --blue:       var(--c-blue, #1756a8);
       --blue-dark:  #0f3f80;
       --blue-bg:    #e8f0fc;
@@ -90,7 +90,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* â”€â”€ TOPBAR (cream-warm + backdrop-blur per blueprint) â”€â”€ */
+    /* ── TOPBAR (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(244,243,239,.92);
@@ -121,10 +121,10 @@
       letter-spacing: .08em; text-transform: uppercase;
     }
 
-    /* â”€â”€ LAYOUT â”€â”€ */
+    /* ── LAYOUT ── */
     .layout { display: flex; min-height: calc(100vh - 56px); }
 
-    /* â”€â”€ SIDEBAR â”€â”€ */
+    /* ── SIDEBAR ── */
     .sidebar {
       width: var(--sidebar-w);
       background: var(--white);
@@ -157,10 +157,10 @@
       font-size: .65rem; font-weight: 700; padding: 2px 6px; border-radius: 10px;
     }
 
-    /* â”€â”€ MAIN â”€â”€ */
+    /* ── MAIN ── */
     .main { flex: 1; padding: 32px 32px 80px; max-width: 900px; }
 
-    /* â”€â”€ SCREENS â”€â”€ */
+    /* ── SCREENS ── */
     .screen { display: none; }
     .screen.active { display: block; }
 
@@ -170,7 +170,7 @@
     }
     .page-sub { font-size: .88rem; color: var(--ink3); margin-bottom: 24px; }
 
-    /* â”€â”€ STATS â”€â”€ */
+    /* ── STATS ── */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -190,7 +190,7 @@
     }
     .stat-note { font-size: .75rem; color: var(--ink4); margin-top: 3px; }
 
-    /* â”€â”€ SECTION TITLE â”€â”€ */
+    /* ── SECTION TITLE ── */
     .sec-title {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 1.05rem; font-weight: 700; color: var(--ink);
@@ -198,7 +198,7 @@
       display: flex; align-items: center; justify-content: space-between;
     }
 
-    /* â”€â”€ STUDENT ROWS â”€â”€ */
+    /* ── STUDENT ROWS ── */
     .student-row {
       background: var(--white); border: 1.5px solid var(--border);
       border-radius: var(--r); padding: 16px 18px;
@@ -229,7 +229,7 @@
     .dot-red    { background: var(--red); }
     .dot-gray   { background: var(--ink4); }
 
-    /* â”€â”€ SIGNAL CARDS â”€â”€ */
+    /* ── SIGNAL CARDS ── */
     .signal-card {
       background: var(--white); border: 1.5px solid var(--border);
       border-radius: var(--r); padding: 16px 18px; margin-bottom: 8px;
@@ -253,7 +253,7 @@
     .sb-blue   { background: var(--blue-bg);   color: var(--blue); }
     .sb-green  { background: var(--green-bg);  color: var(--green); }
 
-    /* â”€â”€ COMPANY CARDS â”€â”€ */
+    /* ── COMPANY CARDS ── */
     .company-card {
       background: var(--white); border: 1.5px solid var(--border);
       border-radius: var(--r); padding: 18px 20px; margin-bottom: 10px;
@@ -271,7 +271,7 @@
     .trust-b { background: var(--amber-bg); color: var(--amber); }
     .trust-c { background: var(--red-bg);   color: var(--red); }
 
-    /* â”€â”€ POSTING CARDS â”€â”€ */
+    /* ── POSTING CARDS ── */
     .posting-card {
       background: var(--white); border: 1.5px solid var(--border);
       border-radius: var(--r); padding: 18px 20px; margin-bottom: 10px;
@@ -304,7 +304,7 @@
     .btn-del      { background: var(--red-bg);   color: var(--red);   border-color: rgba(184,32,32,.15); }
     .btn-del:hover { background: #fccaca; }
 
-    /* â”€â”€ FORM â”€â”€ */
+    /* ── FORM ── */
     .form-card, .card {
       background: var(--white); border: 1.5px solid var(--border);
       border-radius: var(--r); padding: 24px; margin-bottom: 16px;
@@ -414,11 +414,11 @@
 
     .divider { height: 1px; background: var(--border); margin: 20px 0; }
 
-    /* â”€â”€ FOCUS STATES â”€â”€ */
+    /* ── FOCUS STATES ── */
     :focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
     .nav-btn:focus-visible { outline-offset: 0; }
 
-    /* â”€â”€ SIDEBAR USER â”€â”€ */
+    /* ── SIDEBAR USER ── */
     .sidebar-user {
       padding: 16px 12px 12px; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; gap: 10px;
@@ -433,7 +433,7 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    /* â”€â”€ LOGOUT â”€â”€ */
+    /* ── LOGOUT ── */
     .btn-logout, .btn-back {
       display: flex; align-items: center; gap: 9px;
       width: calc(100% - 24px); margin: 4px 12px;
@@ -446,7 +446,7 @@
     .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
     .btn-back:hover { background: #f3f4f6; color: var(--ink2); border-color: #d1d5db; }
 
-    /* â”€â”€ CONFIRM MODAL â”€â”€ */
+    /* ── CONFIRM MODAL ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(13,21,32,.45); z-index: 500;
@@ -476,7 +476,7 @@
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* â”€â”€ Animaties â”€â”€ */
+    /* ── Animaties ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
     }
@@ -485,7 +485,7 @@
     .modal-overlay.show .modal-box { animation: modalIn .22s ease both; }
     input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 3px rgba(26,122,72,.15); }
 
-    /* â”€â”€ UITNODIG STUDENT MODAL â”€â”€ */
+    /* ── UITNODIG STUDENT MODAL ── */
     .su-modal-box {
       background: var(--white); border-radius: var(--r);
       width: 100%; max-width: 480px; max-height: 80vh;
@@ -579,12 +579,12 @@
       <label style="display:block;font-size:.84rem;font-weight:600;color:var(--ink2);margin-bottom:5px">Student</label>
       <select id="koppelStudentSelect"
         style="width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.9rem;color:var(--ink);background:var(--white);outline:none">
-        <option value="">Kies een studentâ€¦</option>
+        <option value="">Kies een student…</option>
       </select>
     </div>
     <div class="modal-actions">
       <button class="btn-ghost" style="padding:9px 20px;font-size:.88rem" onclick="closeKoppelModal()">Annuleren</button>
-      <button class="btn-blue" id="koppelConfirmBtn" onclick="confirmKoppel()">Koppelen â†’</button>
+      <button class="btn-blue" id="koppelConfirmBtn" onclick="confirmKoppel()">Koppelen →</button>
     </div>
   </div>
 </div>
@@ -602,7 +602,7 @@
       <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
     </div>
     <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" aria-label="Meldingen">
-      <span class="bell-icon">ðŸ””</span>
+      <span class="bell-icon">🔔</span>
       <span class="bell-count" id="bellCount" style="display:none">0</span>
       <div class="notif-dropdown" id="notifDropdown" style="display:none">
         <div class="nd-header">
@@ -614,30 +614,30 @@
         </div>
       </div>
     </div>
-    <span class="role-pill">ðŸŽ“ School</span>
+    <span class="role-pill">🎓 School</span>
   </div>
 </div>
 
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs" aria-label="Navigatie">
   <button class="mt-tab active" onclick="show('dashboard')">
-    <span class="mt-icon">ðŸ“Š</span>
+    <span class="mt-icon">📊</span>
     <span class="mt-label">Dashboard</span>
   </button>
   <button class="mt-tab" onclick="show('studenten')">
-    <span class="mt-icon">ðŸ‘¥</span>
+    <span class="mt-icon">👥</span>
     <span class="mt-label">Studenten</span>
   </button>
   <button class="mt-tab" onclick="show('bedrijven')">
-    <span class="mt-icon">ðŸ¢</span>
+    <span class="mt-icon">🏢</span>
     <span class="mt-label">Bedrijven</span>
   </button>
   <button class="mt-tab" onclick="show('oproepen')">
-    <span class="mt-icon">ðŸ“¢</span>
+    <span class="mt-icon">📢</span>
     <span class="mt-label">Oproepen</span>
   </button>
   <button class="mt-tab" onclick="show('signalen')">
-    <span class="mt-icon">âš ï¸</span>
+    <span class="mt-icon">⚠️</span>
     <span class="mt-label">Signalen</span>
   </button>
 </nav>
@@ -649,7 +649,7 @@
     <div class="sidebar-user">
       <div class="avatar" id="userAvatar">??</div>
       <div class="sidebar-user-info">
-        <div class="sidebar-user-name" id="userName">Ladenâ€¦</div>
+        <div class="sidebar-user-name" id="userName">Laden…</div>
         <div class="sidebar-user-email" id="userEmail"></div>
       </div>
     </div>
@@ -658,14 +658,14 @@
       <div class="sidebar-section">
         <span class="sidebar-label">Overzicht</span>
         <button class="nav-btn active" id="nav-dashboard" onclick="show('dashboard')">
-          <span class="nav-icon">ðŸ“Š</span> Dashboard
+          <span class="nav-icon">📊</span> Dashboard
         </button>
         <button class="nav-btn" id="nav-studenten" onclick="show('studenten')">
-          <span class="nav-icon">ðŸ‘¥</span> Studenten
+          <span class="nav-icon">👥</span> Studenten
           <span class="nav-badge" id="badge-studenten" style="display:none">0</span>
         </button>
         <button class="nav-btn" id="nav-signalen" onclick="showSignalenGated()">
-          <span class="nav-icon">âš ï¸</span> Signalen
+          <span class="nav-icon">⚠️</span> Signalen
           <span class="nav-badge" id="badge-signalen" style="display:none">0</span>
         </button>
       </div>
@@ -673,49 +673,49 @@
       <div class="sidebar-section">
         <span class="sidebar-label">Matching</span>
         <button class="nav-btn" id="nav-oproepen" onclick="show('oproepen')">
-          <span class="nav-icon">ðŸ“¢</span> Mijn oproepen
+          <span class="nav-icon">📢</span> Mijn oproepen
         </button>
         <button class="nav-btn" id="nav-new-oproep" onclick="show('new-oproep')">
-          <span class="nav-icon">âž•</span> Nieuwe oproep
+          <span class="nav-icon">➕</span> Nieuwe oproep
         </button>
         <button class="nav-btn" id="nav-bedrijven" onclick="showBedrijvenGated()">
-          <span class="nav-icon">ðŸ¢</span> Bedrijven bekijken
+          <span class="nav-icon">🏢</span> Bedrijven bekijken
         </button>
         <button class="nav-btn" id="nav-berichten" onclick="window.location.href='chat.html'">
-          <span class="nav-icon">ðŸ’¬</span> Berichten
+          <span class="nav-icon">💬</span> Berichten
         </button>
       </div>
 
       <div class="sidebar-section">
         <span class="sidebar-label">Account</span>
         <button class="nav-btn" id="nav-profiel" onclick="show('profiel')">
-          <span class="nav-icon">ðŸŽ“</span> Schoolprofiel
+          <span class="nav-icon">🎓</span> Schoolprofiel
         </button>
         <button class="nav-btn" onclick="window.location.href='pricing.html?for=school'">
-          <span class="nav-icon">ðŸ’³</span> Abonnement
+          <span class="nav-icon">💳</span> Abonnement
         </button>
         <button class="nav-btn" id="nav-bundeling" onclick="show('bundeling')">
-          <span class="nav-icon">ðŸ”—</span> Opleidingen bundelen
+          <span class="nav-icon">🔗</span> Opleidingen bundelen
         </button>
         <button class="nav-btn" id="nav-account" onclick="show('account')">
-          <span class="nav-icon">âš™ï¸</span> Account
+          <span class="nav-icon">⚙️</span> Account
         </button>
       </div>
 
     </div>
     <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <a href="spelregels.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Spelregels</a>
-    <button class="btn-back" onclick="goBack('discover.html')" title="Vorige pagina">â† Vorige pagina</button>
-    <button class="btn-logout" onclick="signOut()">ðŸšª Uitloggen</button>
+    <button class="btn-back" onclick="goBack('discover.html')" title="Vorige pagina">← Vorige pagina</button>
+    <button class="btn-logout" onclick="signOut()">🚪 Uitloggen</button>
   </aside>
 
   <!-- MAIN -->
   <main class="main">
 
-    <!-- â”€â”€ DASHBOARD â”€â”€ -->
+    <!-- ── DASHBOARD ── -->
     <div class="screen active" id="screen-dashboard">
 
-      <!-- Run 3 â€” Welkomstblok school -->
+      <!-- Run 3 — Welkomstblok school -->
       <div id="school-welcome-anchor"></div>
       <script>
         (async () => {
@@ -758,17 +758,17 @@
           if (actions) {
             actions.innerHTML = `
               <a href="#section-studenten-actief" class="rl-action">
-                <span class="rl-action-icon">ðŸ‘¥</span>
+                <span class="rl-action-icon">👥</span>
                 <span class="rl-action-title">Studenten op stage</span>
                 <span class="rl-action-sub">Voortgang monitoren</span>
               </a>
               <a href="#section-studenten-zoekend" class="rl-action">
-                <span class="rl-action-icon">ðŸ”</span>
+                <span class="rl-action-icon">🔍</span>
                 <span class="rl-action-title">Zoeken nog</span>
                 <span class="rl-action-sub">Help studenten verder</span>
               </a>
               <a href="#section-bedrijven" class="rl-action">
-                <span class="rl-action-icon">ðŸ¢</span>
+                <span class="rl-action-icon">🏢</span>
                 <span class="rl-action-title">Stagepartners</span>
                 <span class="rl-action-sub">Bekijk Trust Scores</span>
               </a>
@@ -789,7 +789,7 @@
         display:flex;align-items:flex-start;
         gap:.75rem;
       ">
-        <span style="font-size:1.1rem;flex-shrink:0">ðŸ¤</span>
+        <span style="font-size:1.1rem;flex-shrink:0">🤝</span>
         <div style="flex:1">
           <div style="font-size:.88rem;font-weight:500;
             color:var(--amber,#a06010);margin-bottom:.2rem;">
@@ -798,7 +798,7 @@
           <div style="font-size:.82rem;color:var(--ink2);
             line-height:1.55;margin-bottom:.6rem;">
             Dan ken je waarschijnlijk iemand voor wie het
-            ook werkt â€” een bedrijf, school of begeleider
+            ook werkt — een bedrijf, school of begeleider
             die worstelt met hetzelfde probleem.
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;
@@ -806,7 +806,7 @@
             <button onclick="copyReferralText()"
               class="btn btn-ghost"
               style="font-size:.78rem;padding:5px 12px;">
-              ðŸ“‹ Kopieer aanbevelingstekst
+              📋 Kopieer aanbevelingstekst
             </button>
             <button onclick="dismissReferral()"
               style="background:none;border:none;
@@ -843,46 +843,46 @@
 
       <div id="risico-alert" style="display:none">
         <div class="alert-box alert-red">
-          <strong>âš  Let op</strong> â€” Er zijn studenten die aandacht nodig hebben. Controleer het signalenoverzicht.
-          <button class="btn-xs btn-del" style="margin-left:12px;font-size:.75rem" onclick="show('signalen')">Bekijk signalen â†’</button>
+          <strong>⚠ Let op</strong> — Er zijn studenten die aandacht nodig hebben. Controleer het signalenoverzicht.
+          <button class="btn-xs btn-del" style="margin-left:12px;font-size:.75rem" onclick="show('signalen')">Bekijk signalen →</button>
         </div>
       </div>
 
       <div class="sec-title">
         Studentenoverzicht
-        <button class="btn-blue" onclick="show('studenten')">Alle studenten â†’</button>
+        <button class="btn-blue" onclick="show('studenten')">Alle studenten →</button>
       </div>
       <div id="dashboard-studenten">
         <div class="empty-state">
-          <span class="es-icon">ðŸ‘¥</span>
+          <span class="es-icon">👥</span>
           <p class="es-primary">Nog geen studenten gekoppeld</p>
           <p class="es-secondary">Deel de registratielink met je studenten zodat zij zich kunnen aanmelden. Zodra ze inloggen, verschijnen ze hier automatisch.</p>
           <button type="button" class="es-cta"
             onclick="navigator.clipboard.writeText('https://internly.pro/auth.html?role=student').then(function(){notify('Link gekopieerd!');})">
-            ðŸ“‹ Kopieer studentenlink
+            📋 Kopieer studentenlink
           </button>
           <p class="es-sub">of stuur de link via email</p>
         </div>
       </div>
     </div>
 
-    <!-- â”€â”€ STUDENTEN â”€â”€ -->
+    <!-- ── STUDENTEN ── -->
     <div class="screen" id="screen-studenten">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px;">
         <div>
-          <div class="page-title" style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">Studenten<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Studenten">â“˜<span class="info-pop">Studenten worden automatisch gekoppeld op basis van de <strong>schoolnaam</strong> in hun profiel. Klik op een student om hun Stage Hub te openen en hun voortgang te bekijken.</span></span></div>
+          <div class="page-title" style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">Studenten<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Studenten">ⓘ<span class="info-pop">Studenten worden automatisch gekoppeld op basis van de <strong>schoolnaam</strong> in hun profiel. Klik op een student om hun Stage Hub te openen en hun voortgang te bekijken.</span></span></div>
           <p class="page-sub">Individueel stageverloop en signalen per student</p>
         </div>
         <button class="su-invite-btn" onclick="openSuModal()">+ Nodig student uit</button>
       </div>
       <div id="studenten-list">
         <div class="empty-state">
-          <span class="es-icon">ðŸ‘¥</span>
+          <span class="es-icon">👥</span>
           <p class="es-primary">Nog geen studenten gekoppeld</p>
           <p class="es-secondary">Deel de registratielink met je studenten zodat zij zich kunnen aanmelden. Zodra ze inloggen, verschijnen ze hier automatisch.</p>
           <button type="button" class="es-cta"
             onclick="navigator.clipboard.writeText('https://internly.pro/auth.html?role=student').then(function(){notify('Link gekopieerd!');})">
-            ðŸ“‹ Kopieer studentenlink
+            📋 Kopieer studentenlink
           </button>
           <p class="es-sub">of stuur de link via email</p>
         </div>
@@ -893,27 +893,27 @@
       </div>
     </div>
 
-    <!-- â”€â”€ SIGNALEN â”€â”€ -->
+    <!-- ── SIGNALEN ── -->
     <div class="screen" id="screen-signalen">
-      <div class="page-title" style="display:flex;align-items:center;gap:6px;">Signalen<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Signalen">â“˜<span class="info-pop">Signalen verschijnen automatisch wanneer een student <strong>meer dan 14 dagen</strong> geen activiteit heeft in de Stage Hub, of een deadline heeft gemist. Zo zie je in Ã©Ã©n oogopslag welke studenten extra aandacht nodig hebben.</span></span></div>
+      <div class="page-title" style="display:flex;align-items:center;gap:6px;">Signalen<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Signalen">ⓘ<span class="info-pop">Signalen verschijnen automatisch wanneer een student <strong>meer dan 14 dagen</strong> geen activiteit heeft in de Stage Hub, of een deadline heeft gemist. Zo zie je in één oogopslag welke studenten extra aandacht nodig hebben.</span></span></div>
       <p class="page-sub">Proactief gesignaleerde aandachtspunten per student</p>
       <div id="signalen-list">
-        <div class="empty"><span class="empty-icon">âœ…</span>Geen actieve signalen.</div>
+        <div class="empty"><span class="empty-icon">✅</span>Geen actieve signalen.</div>
       </div>
     </div>
 
-    <!-- â”€â”€ MIJN OPROEPEN â”€â”€ -->
+    <!-- ── MIJN OPROEPEN ── -->
     <div class="screen" id="screen-oproepen">
       <div class="sec-title">
         Mijn oproepen
         <button class="btn-blue" onclick="show('new-oproep')">+ Nieuwe oproep</button>
       </div>
       <div id="oproepen-list">
-        <div class="empty"><span class="empty-icon">ðŸ“¢</span>Nog geen oproepen geplaatst.</div>
+        <div class="empty"><span class="empty-icon">📢</span>Nog geen oproepen geplaatst.</div>
       </div>
     </div>
 
-    <!-- â”€â”€ NIEUWE OPROEP â”€â”€ -->
+    <!-- ── NIEUWE OPROEP ── -->
     <div class="screen" id="screen-new-oproep">
       <div class="page-title">Nieuwe oproep plaatsen</div>
       <p class="page-sub">Zoek je een bedrijf, stagiair of samenwerkingspartner? Plaats hier een oproep.</p>
@@ -947,9 +947,9 @@
         <div class="field">
           <label>Tags <span class="hint">typ en druk Enter</span></label>
           <div class="tags-box" id="oTagsBox" onclick="document.getElementById('oTagsInput').focus()">
-            <input type="text" id="oTagsInput" class="tags-input" placeholder="Bijv. Marketing, Designâ€¦" maxlength="30">
+            <input type="text" id="oTagsInput" class="tags-input" placeholder="Bijv. Marketing, Design…" maxlength="30">
           </div>
-          <div class="tags-hint">Max 8 tags â€” druk Enter of komma om toe te voegen.</div>
+          <div class="tags-hint">Max 8 tags — druk Enter of komma om toe te voegen.</div>
         </div>
 
         <div class="divider"></div>
@@ -959,34 +959,34 @@
           <div class="radio-group">
             <label class="radio-opt selected" id="ot-bedrijf" onclick="setOproepTarget('bedrijf')">
               <input type="radio" name="ot" value="bedrijf" checked>
-              <div class="radio-label">ðŸ¢ Bedrijven</div>
+              <div class="radio-label">🏢 Bedrijven</div>
             </label>
             <label class="radio-opt" id="ot-student" onclick="setOproepTarget('student')">
               <input type="radio" name="ot" value="student">
-              <div class="radio-label">ðŸ‘¤ Studenten</div>
+              <div class="radio-label">👤 Studenten</div>
             </label>
             <label class="radio-opt" id="ot-beide" onclick="setOproepTarget('beide')">
               <input type="radio" name="ot" value="beide">
-              <div class="radio-label">ðŸ‘¥ Beide</div>
+              <div class="radio-label">👥 Beide</div>
             </label>
           </div>
         </div>
 
         <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
-          <button class="btn-primary" id="submitOproep" onclick="submitOproep()">Oproep plaatsen â†’</button>
+          <button class="btn-primary" id="submitOproep" onclick="submitOproep()">Oproep plaatsen →</button>
           <button class="btn-ghost" onclick="show('oproepen')">Annuleren</button>
         </div>
       </div>
     </div>
 
-    <!-- â”€â”€ BEDRIJVEN â”€â”€ -->
+    <!-- ── BEDRIJVEN ── -->
     <div class="screen" id="screen-bedrijven">
       <div class="page-title">Bedrijven bekijken</div>
-      <p class="page-sub">Beschikbare stagebedrijven met Trust Score â€” van hoog naar laag gesorteerd</p>
+      <p class="page-sub">Beschikbare stagebedrijven met Trust Score — van hoog naar laag gesorteerd</p>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
         <input type="text" id="bz-search"
-          placeholder="Zoek op naam of sectorâ€¦"
+          placeholder="Zoek op naam of sector…"
           oninput="filterBedrijven()"
           style="flex:1;min-width:160px;padding:9px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .15s"
           onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border2)'">
@@ -1004,11 +1004,11 @@
       </div>
 
       <div id="bedrijven-list">
-        <div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
       </div>
     </div>
 
-    <!-- â”€â”€ PROFIEL â”€â”€ -->
+    <!-- ── PROFIEL ── -->
     <div class="screen" id="screen-profiel">
       <div class="page-title">Schoolprofiel</div>
       <p class="page-sub">Deze informatie is zichtbaar voor bedrijven en studenten</p>
@@ -1020,14 +1020,14 @@
       <div id="school-view-profiel" style="display:none">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap">
           <div>
-            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="spv-naam">â€”</div>
-            <div style="font-size:.88rem;color:var(--ink3)" id="spv-locatie">â€”</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="spv-naam">—</div>
+            <div style="font-size:.88rem;color:var(--ink3)" id="spv-locatie">—</div>
           </div>
-          <button onclick="toonSchoolFormulier()" class="btn-ghost">âœï¸ Bewerken</button>
+          <button onclick="toonSchoolFormulier()" class="btn-ghost">✏️ Bewerken</button>
         </div>
         <div class="card" style="margin-bottom:12px">
           <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px">Contactpersoon</div>
-          <div id="spv-contact" style="font-size:.9rem;color:var(--ink2)">â€”</div>
+          <div id="spv-contact" style="font-size:.9rem;color:var(--ink2)">—</div>
         </div>
         <div class="card">
           <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:8px">Opleidingen</div>
@@ -1060,18 +1060,18 @@
           <label>Aangeboden opleidingen <span class="hint">komma-gescheiden</span></label>
           <input type="text" id="p-opleidingen" placeholder="Bijv. Communicatie, CMD, Business">
         </div>
-        <button class="btn-primary" id="saveProfielBtn" onclick="saveProfiel()">Profiel opslaan â†’</button>
+        <button class="btn-primary" id="saveProfielBtn" onclick="saveProfiel()">Profiel opslaan →</button>
       </div>
       </div><!-- /#school-view-form -->
 
       <div class="form-card">
         <div class="form-section-title">Wachtwoord</div>
         <p style="font-size:.88rem;color:var(--ink3);margin-bottom:14px;line-height:1.6">Ontvang een e-mail met een wachtwoordherstelkoppeling. De link is 24 uur geldig.</p>
-        <button class="btn-ghost" style="font-size:.88rem" onclick="resetPassword()">ðŸ“§ Stuur herstelmail</button>
+        <button class="btn-ghost" style="font-size:.88rem" onclick="resetPassword()">📧 Stuur herstelmail</button>
       </div>
 
       <div class="form-card" style="margin-top:16px">
-        <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:600;color:#0d1520;margin:0 0 .5rem">ðŸ“… Mijn beschikbaarheid</h3>
+        <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:600;color:#0d1520;margin:0 0 .5rem">📅 Mijn beschikbaarheid</h3>
         <p style="font-size:.88rem;color:#6b7280;margin-bottom:1rem;line-height:1.6">
           Studenten en bedrijven zien dit wanneer ze een gesprek met jou willen plannen.
         </p>
@@ -1079,12 +1079,12 @@
       </div>
     </div>
 
-    <!-- â”€â”€ BUNDELING â”€â”€ -->
+    <!-- ── BUNDELING ── -->
     <div class="screen" id="screen-bundeling">
       <div id="bundeling-content"></div>
     </div>
 
-    <!-- â”€â”€ ACCOUNT â”€â”€ -->
+    <!-- ── ACCOUNT ── -->
     <div class="screen" id="screen-account">
       <div class="page-title">Account</div>
       <p class="page-sub">Beheer je contactgegevens en instellingen</p>
@@ -1096,7 +1096,7 @@
 
 <script>
 
-// â”€â”€ State â”€â”€
+// ── State ──
 const oTags = [];
 let oproepTarget      = 'bedrijf';
 let studenten         = [];
@@ -1199,7 +1199,7 @@ function startNotifSubscription() {
     .subscribe((status, err) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
         console.warn('[school] realtime verbinding verbroken:', err?.message);
-        notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
       }
     });
 }
@@ -1218,7 +1218,7 @@ function showToast(message) {
     t.style.cssText = 'position:fixed;top:66px;right:16px;background:#0d1520;color:#fff;padding:10px 16px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;line-height:1.4;font-family:Outfit,sans-serif;transition:opacity .3s';
     document.body.appendChild(t);
   }
-  t.textContent = 'ðŸ”” ' + message;
+  t.textContent = '🔔 ' + message;
   t.style.opacity = '1';
   clearTimeout(t._timeout);
   t._timeout = setTimeout(() => { t.style.opacity = '0'; }, 4000);
@@ -1233,7 +1233,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// â”€â”€ Auth â”€â”€
+// ── Auth ──
 async function loadUser() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) {
@@ -1241,7 +1241,7 @@ async function loadUser() {
     window.location.href = 'auth.html'; return;
   }
   currentUser = user;
-  // RUN7 Cat 3 â€” auth-check geslaagd, body kan zichtbaar
+  // RUN7 Cat 3 — auth-check geslaagd, body kan zichtbaar
   if (typeof markAuthReady === 'function') markAuthReady();
   const email = user.email || '';
   const name = getDisplayName(user);
@@ -1266,10 +1266,10 @@ async function resetPassword() {
     redirectTo: window.location.origin + '/auth.html'
   });
   if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
-  notify('âœ“ Herstelmail verstuurd naar ' + currentUser.email);
+  notify('✓ Herstelmail verstuurd naar ' + currentUser.email);
 }
 
-// â”€â”€ Confirm modal â”€â”€
+// ── Confirm modal ──
 let _modalConfirmFn = null;
 function openModal(title, body, onConfirm) {
   document.getElementById('modalTitle').textContent = title;
@@ -1320,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// â”€â”€ Navigation â”€â”€
+// ── Navigation ──
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1337,7 +1337,7 @@ function show(id) {
   }
 }
 
-// â”€â”€ Plan gates â”€â”€
+// ── Plan gates ──
 let _isPremiumSchool  = false;
 let _isBundledSchool  = false;
 
@@ -1348,7 +1348,7 @@ function upgradeCard(requiredPlan) {
   const label = labels[requiredPlan] ?? requiredPlan;
   return `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem 1.5rem;text-align:center;">
-      <div style="font-size:2.5rem;">ðŸ”’</div>
+      <div style="font-size:2.5rem;">🔒</div>
       <h3 style="font-size:1.25rem;font-weight:700;color:var(--ink);">Beschikbaar vanaf ${label}</h3>
       <p style="color:var(--ink3);max-width:360px;">Upgrade je abonnement om toegang te krijgen tot deze functie.</p>
       <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;">
@@ -1383,7 +1383,7 @@ async function showBedrijvenGated() {
   }
 }
 
-// â”€â”€ Load student data â”€â”€
+// ── Load student data ──
 // schoolNaamFilter is ingesteld vanuit DOMContentLoaded nadat het school-profiel geladen is.
 let _schoolNaamFilter = null;
 
@@ -1391,7 +1391,7 @@ async function loadStudenten() {
   // Safety: never load all students when school filter is unknown.
   // _schoolNaamFilter is set from the school_profiles row in DOMContentLoaded.
   if (!_schoolNaamFilter) {
-    const msg = '<div class="empty-state"><span class="icon">ðŸ«</span>Vul eerst je schoolnaam in bij Profiel om studenten te zien.</div>';
+    const msg = '<div class="empty-state"><span class="icon">🏫</span>Vul eerst je schoolnaam in bij Profiel om studenten te zien.</div>';
     const el  = document.getElementById('studenten-list');
     const el2 = document.getElementById('dashboard-studenten');
     if (el)  el.innerHTML  = msg;
@@ -1437,9 +1437,9 @@ async function loadStudenten() {
     // Start with base data (all zoekend / progress 0)
     studenten = (data || []).map(s => ({
       naam:            s.naam || 'Onbekende student',
-      opleiding:       [s.opleiding, s.school].filter(Boolean).join(' â€” ') || 'â€”',
+      opleiding:       [s.opleiding, s.school].filter(Boolean).join(' — ') || '—',
       bundleOpleiding: bundleActive ? (s.opleiding || null) : null,
-      jaar:            s.jaar || 'â€”',
+      jaar:            s.jaar || '—',
       status:          'zoekend',
       progress:        0,
       bedrijf:         null,
@@ -1466,7 +1466,7 @@ async function loadStudenten() {
             .select('match_id, progress')
             .in('match_id', matchIds);
 
-          // Build lookup: party_a â†’ { bedrijf, matchId, progress }
+          // Build lookup: party_a → { bedrijf, matchId, progress }
           const avgByMatch = {};
           (leerdoelenRows || []).forEach(l => {
             if (!avgByMatch[l.match_id]) avgByMatch[l.match_id] = [];
@@ -1485,7 +1485,7 @@ async function loadStudenten() {
           });
 
           // Apply to studenten array
-          // status: 'actief' = on track (â‰¥20%), 'risico' = lagging (<20%), 'zoekend' = no match
+          // status: 'actief' = on track (≥20%), 'risico' = lagging (<20%), 'zoekend' = no match
           studenten = studenten.map(s => {
             const info = s.profileId ? matchByPartyA[s.profileId] : null;
             if (!info) return s;
@@ -1500,7 +1500,7 @@ async function loadStudenten() {
         }
       } catch (enrichErr) {
         console.warn('Verrijking match-data mislukt:', enrichErr.message);
-        // Non-fatal â€” fall back to zoekend / 0
+        // Non-fatal — fall back to zoekend / 0
       }
     }
   }
@@ -1519,7 +1519,7 @@ async function loadStudenten() {
   const badge = document.getElementById('badge-studenten');
   if (studenten.length > 0) { badge.textContent = studenten.length; badge.style.display = 'inline'; }
 
-  // Batch milestones voor alle studenten â€” CC Instructie 2
+  // Batch milestones voor alle studenten — CC Instructie 2
   const _matchIds = studenten.map(s => s.matchId).filter(Boolean);
   let _milestoneMap = {};
   if (_matchIds.length > 0) {
@@ -1554,10 +1554,10 @@ async function loadStudenten() {
       banner.style.cssText = 'background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
       banner.innerHTML = `
         <span style="font-size:.88rem;color:#92400e;font-weight:600">
-          âš ï¸ Gratis plan: je ziet ${escapeHtml(String(studentenForList.length))} van de ${escapeHtml(String(studenten.length))} studenten â€” upgrade voor onbeperkt overzicht.
+          ⚠️ Gratis plan: je ziet ${escapeHtml(String(studentenForList.length))} van de ${escapeHtml(String(studenten.length))} studenten — upgrade voor onbeperkt overzicht.
         </span>
         <button onclick="window.location.href='pricing.html'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
-          Upgraden â†’
+          Upgraden →
         </button>`;
       listEl.parentNode.insertBefore(banner, listEl);
     }
@@ -1575,38 +1575,38 @@ function progressColor(p) {
   return p > 60 ? 'var(--green)' : p > 30 ? 'var(--amber)' : 'var(--red)';
 }
 
-// BOL Fix 2 â€” status labels per rol (school-perspectief, raw DB status)
+// BOL Fix 2 — status labels per rol (school-perspectief, raw DB status)
 function statusLabelSchool(status) {
   const labels = {
-    pending:  'ðŸ‘ Sollicitatie',
-    accepted: 'âœ“ Actief',
-    active:   'ðŸŽ¯ Stage loopt',
-    ended:    'âœ“ Afgerond'
+    pending:  '👁 Sollicitatie',
+    accepted: '✓ Actief',
+    active:   '🎯 Stage loopt',
+    ended:    '✓ Afgerond'
   };
-  return labels[status] || 'â€”';
+  return labels[status] || '—';
 }
 
 function renderStudentenRows(cid, data, milestoneMap = {}) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
-    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">ðŸŽ“</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen studenten gekoppeld</div><div style="font-size:.88rem;">Nodig studenten uit via de schoolcode of koppel ze handmatig aan jouw opleiding.</div><button type="button" onclick="openStudentUitnodigen()" class="btn-primary" style="margin-top:.75rem;">Eerste student toevoegen â†’</button></div>`;
+    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">🎓</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen studenten gekoppeld</div><div style="font-size:.88rem;">Nodig studenten uit via de schoolcode of koppel ze handmatig aan jouw opleiding.</div><button type="button" onclick="openStudentUitnodigen()" class="btn-primary" style="margin-top:.75rem;">Eerste student toevoegen →</button></div>`;
     return;
   }
   el.innerHTML = data.map(s => {
     const eNaam    = escapeHtml(s.naam);
     const eBedrijf = escapeHtml(s.bedrijf || '');
     const progress = Math.max(0, Math.min(100, parseInt(s.progress, 10) || 0));
-    // BOL Fix 2 â€” status labels per rol (school-perspectief)
+    // BOL Fix 2 — status labels per rol (school-perspectief)
     // school-dashboard gebruikt afgeleide statussen (zoekend/actief/risico)
     // op basis van progress%, niet rauwe DB-status. statusLabelSchool() blijft
     // beschikbaar voor toekomstige flows die met DB-status werken.
     const faseLabel = {
-      'actief':  'ðŸŽ¯ Stage loopt',
-      'risico':  'âš  Stage loopt â€” let op',
-      'zoekend': 'ðŸ‘ Sollicitatie'
+      'actief':  '🎯 Stage loopt',
+      'risico':  '⚠ Stage loopt — let op',
+      'zoekend': '👁 Sollicitatie'
     }[s.status] || '';
 
-    // Milestone bevestigingsbadge â€” CC Instructie 2
+    // Milestone bevestigingsbadge — CC Instructie 2
     let pendingBtn = '';
     if (s.matchId && s.status !== 'zoekend') {
       const ms = milestoneMap[s.matchId] || [];
@@ -1616,7 +1616,7 @@ function renderStudentenRows(cid, data, milestoneMap = {}) {
           style="color:var(--accent,#e05c1a);
             border-color:rgba(224,92,26,.25);margin-top:.4rem"
           onclick="openMilestoneModal('${s.matchId}','${escapeHtml(s.naam || '')}')">
-          â³ ${pending.length} bevestiging${pending.length > 1 ? 'en' : ''} vereist
+          ⏳ ${pending.length} bevestiging${pending.length > 1 ? 'en' : ''} vereist
         </button>`;
       }
     }
@@ -1631,7 +1631,7 @@ function renderStudentenRows(cid, data, milestoneMap = {}) {
       </div>
       <div class="sr-info">
         <div class="sr-name">${eNaam}</div>
-        <div class="sr-meta">${escapeHtml(s.opleiding)} Â· Jaar ${escapeHtml(String(s.jaar ?? ''))}${eBedrijf ? ' â€” ' + eBedrijf : ''}</div>
+        <div class="sr-meta">${escapeHtml(s.opleiding)} · Jaar ${escapeHtml(String(s.jaar ?? ''))}${eBedrijf ? ' — ' + eBedrijf : ''}</div>
         ${_isBundledSchool && s.bundleOpleiding ? `<span class="tag tag-neutral" style="font-size:.72rem;margin-top:3px;display:inline-block">${escapeHtml(s.bundleOpleiding)}</span>` : ''}
         ${faseLabel ? `<span style="font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--bg2,#eceae4);color:var(--ink2,#374151);margin-top:3px;display:inline-block;">${faseLabel}</span>` : ''}
       </div>
@@ -1644,18 +1644,18 @@ function renderStudentenRows(cid, data, milestoneMap = {}) {
             <div class="progress-label">${progress}%</div>
           </div>` : ''}
         <span class="signal-badge ${s.status === 'actief' ? 'sb-green' : s.status === 'risico' ? 'sb-red' : 'sb-amber'}">
-          ${s.status === 'actief' ? 'Actief' : s.status === 'risico' ? 'âš  Risico' : 'Zoekend'}
+          ${s.status === 'actief' ? 'Actief' : s.status === 'risico' ? '⚠ Risico' : 'Zoekend'}
         </span>
         ${_isPremiumSchool && s.matchId ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
            style="font-size:.75rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:3px 9px;border-radius:20px;white-space:nowrap;margin-left:4px;">
-           ðŸ“Š Hub</a>` : ''}
+           📊 Hub</a>` : ''}
         ${pendingBtn}
       </div>
     </div>`;
   }).join('');
 }
 
-// â”€â”€ Milestone bevestiging modal (CC Instructie 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Milestone bevestiging modal (CC Instructie 2) ─────────────────────────────
 async function openMilestoneModal(matchId, studentNaam) {
   let milestones = [];
   try {
@@ -1681,7 +1681,7 @@ async function openMilestoneModal(matchId, studentNaam) {
         margin-bottom:.5rem">
         ${escapeHtml(m.description || '')}
         ${m.submitted_at
-          ? ' Â· Ingediend op ' + escapeHtml(formatNLDate(m.submitted_at) || '')
+          ? ' · Ingediend op ' + escapeHtml(formatNLDate(m.submitted_at) || '')
           : ''}
       </div>
       <button class="btn btn-green btn-sm"
@@ -1741,7 +1741,7 @@ async function schoolConfirmMilestone(milestoneId, matchId) {
       currentUser?.id, studentId);
     const row = btn?.closest('div[style]');
     if (row) row.remove();
-    notify('Bevestigd â€” student ontvangt melding');
+    notify('Bevestigd — student ontvangt melding');
 
     const remaining = document.querySelectorAll('#ms-modal-backdrop .btn-green');
     if (!remaining.length) {
@@ -1760,7 +1760,7 @@ function renderSignalen() {
   const zoekend = studenten.filter(s => s.status === 'zoekend');
 
   if (risico.length === 0 && zoekend.length === 0) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âœ…</span>Geen actieve signalen. Alle studenten lopen op schema.</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">✅</span>Geen actieve signalen. Alle studenten lopen op schema.</div>`;
     return;
   }
 
@@ -1770,12 +1770,12 @@ function renderSignalen() {
     const hubLink  = s.matchId
       ? `<a href="match-dashboard.html?match=${encodeURIComponent(s.matchId)}"
             style="font-size:.78rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:3px 9px;border-radius:20px;margin-left:6px;white-space:nowrap;">
-            ðŸ“Š Stage Hub â†’</a>`
+            📊 Stage Hub →</a>`
       : '';
     html += `
       <div class="signal-card urgent">
-        <span class="signal-badge sb-red">âš  Urgent</span>
-        <div class="signal-title">${escapeHtml(s.naam)} â€” ${escapeHtml(s.bedrijf || '')}${hubLink}</div>
+        <span class="signal-badge sb-red">⚠ Urgent</span>
+        <div class="signal-title">${escapeHtml(s.naam)} — ${escapeHtml(s.bedrijf || '')}${hubLink}</div>
         <div class="signal-sub">Platform signaleert vertraagde leerdoelopvolging. Voortgang: ${progress}%. Neem contact op met de begeleider.</div>
       </div>`;
   });
@@ -1783,19 +1783,19 @@ function renderSignalen() {
     html += `
       <div class="signal-card warn">
         <span class="signal-badge sb-amber">Zoekend</span>
-        <div class="signal-title">${escapeHtml(s.naam)} â€” Nog geen stage</div>
+        <div class="signal-title">${escapeHtml(s.naam)} — Nog geen stage</div>
         <div class="signal-sub">Student heeft nog geen stageplaats gevonden. Overweeg matchsuggesties te sturen via het platform.</div>
       </div>`;
   });
   el.innerHTML = html;
 }
 
-// â”€â”€ Load bedrijven (with reviews) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Load bedrijven (with reviews) ─────────────────────────────────────────────
 let _allBedrijven = [];
 
 async function loadBedrijven() {
   const el = document.getElementById('bedrijven-list');
-  el.innerHTML = `<div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>`;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
 
   const [{ data: companies, error }, { data: allPostings }] = await Promise.all([
     db.from('company_profiles')
@@ -1806,7 +1806,7 @@ async function loadBedrijven() {
   ]);
 
   if (error) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âš ï¸</span>Fout bij laden: ${escapeHtml(error.message)}</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(error.message)}</div>`;
     return;
   }
 
@@ -1838,7 +1838,7 @@ async function loadBedrijven() {
       : null;
     return {
       profile_id:   b.profile_id,
-      naam:         b.bedrijfsnaam || 'â€”',
+      naam:         b.bedrijfsnaam || '—',
       sector:       b.sector || '',
       score:        b.trust_score ?? null,
       grade:        b.trust_grade || '',
@@ -1872,7 +1872,7 @@ function renderBedrijvenList(bedrijven) {
   const el = document.getElementById('bedrijven-list');
 
   if (!bedrijven || bedrijven.length === 0) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">ðŸ“­</span>Geen bedrijven gevonden.</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📭</span>Geen bedrijven gevonden.</div>`;
     return;
   }
 
@@ -1888,7 +1888,7 @@ function renderBedrijvenList(bedrijven) {
     if (b.reviewAvg !== null && b.reviewCount > 0) {
       const avgStr  = b.reviewAvg.toFixed(1);
       const starsFilled = Math.round(b.reviewAvg);
-      const starsStr = [1,2,3,4,5].map(i => i <= starsFilled ? 'â˜…' : 'â˜†').join('');
+      const starsStr = [1,2,3,4,5].map(i => i <= starsFilled ? '★' : '☆').join('');
       reviewStarsHtml = `<span class="mini-stars" style="margin-left:8px" title="${b.reviewCount} review${b.reviewCount !== 1 ? 's' : ''}">${starsStr} <span style="color:#FF7E42;font-weight:700">${avgStr}</span><span class="ms-count">(${b.reviewCount})</span></span>`;
     }
 
@@ -1897,14 +1897,14 @@ function renderBedrijvenList(bedrijven) {
         <div class="cc-head">
           <div>
             <div class="cc-name">${escapeHtml(b.naam)}</div>
-            <div class="cc-meta">${escapeHtml(b.sector || 'â€”')}${activeCount > 0 ? ` Â· <strong style="color:var(--green)">${activeCount} actieve stage${activeCount !== 1 ? 's' : ''}</strong>` : ' Â· geen actieve stages'}</div>
+            <div class="cc-meta">${escapeHtml(b.sector || '—')}${activeCount > 0 ? ` · <strong style="color:var(--green)">${activeCount} actieve stage${activeCount !== 1 ? 's' : ''}</strong>` : ' · geen actieve stages'}</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
             ${renderTrustBadge(b.grade, b.score)}
             ${reviewStarsHtml}
           </div>
         </div>
-        ${b.grade === 'C' ? `<div class="alert-box alert-red" style="margin:8px 0 4px;font-size:.78rem;padding:8px 12px">âš  Niet aanbevolen voor plaatsing â€” bespreek met student vÃ³Ã³r akkoord.</div>` : ''}
+        ${b.grade === 'C' ? `<div class="alert-box alert-red" style="margin:8px 0 4px;font-size:.78rem;padding:8px 12px">⚠ Niet aanbevolen voor plaatsing — bespreek met student vóór akkoord.</div>` : ''}
         ${activeTitles || moreTag ? `<div class="pc-tags" style="margin:8px 0 4px">${activeTitles}${moreTag}</div>` : ''}
         ${activeCount > 0 ? `
         <div style="margin-top:10px">
@@ -1912,14 +1912,14 @@ function renderBedrijvenList(bedrijven) {
             data-company-id="${escapeHtml(b.profile_id)}"
             data-posting-id="${escapeHtml(b.actief[0]?.id || '')}"
             data-company-naam="${escapeHtml(b.naam)}">
-            ðŸ”— Koppel aan student
+            🔗 Koppel aan student
           </button>
         </div>` : ''}
       </div>`;
   }).join('');
 }
 
-// â”€â”€ Koppel modal â”€â”€
+// ── Koppel modal ──
 let _koppelCompanyId = null;
 let _koppelPostingId = null;
 
@@ -1936,7 +1936,7 @@ async function openKoppelModal(companyId, postingId, companyNaam) {
     `Selecteer een student om te koppelen aan ${companyNaam}.`;
 
   const sel = document.getElementById('koppelStudentSelect');
-  sel.innerHTML = '<option value="">Ladenâ€¦</option>';
+  sel.innerHTML = '<option value="">Laden…</option>';
 
   const { data: profs } = await db
     .from('student_profiles')
@@ -1945,11 +1945,11 @@ async function openKoppelModal(companyId, postingId, companyNaam) {
     .eq('school', _schoolNaamFilter)
     .order('naam');
 
-  sel.innerHTML = '<option value="">Kies een studentâ€¦</option>';
+  sel.innerHTML = '<option value="">Kies een student…</option>';
   (profs || []).forEach(s => {
     const opt = document.createElement('option');
     opt.value = s.profile_id;
-    opt.textContent = `${s.naam || 'Onbekend'}${s.opleiding ? ' â€” ' + s.opleiding : ''}`;
+    opt.textContent = `${s.naam || 'Onbekend'}${s.opleiding ? ' — ' + s.opleiding : ''}`;
     sel.appendChild(opt);
   });
 
@@ -1968,7 +1968,7 @@ async function confirmKoppel() {
   if (!_koppelCompanyId || !currentUser) { notify('Fout: ontbrekende gegevens'); return; }
 
   const btn = document.getElementById('koppelConfirmBtn');
-  btn.disabled = true; btn.textContent = 'Koppelenâ€¦';
+  btn.disabled = true; btn.textContent = 'Koppelen…';
 
   // Verify student belongs to this school before creating match
   const { data: studentCheck } = await db
@@ -1979,7 +1979,7 @@ async function confirmKoppel() {
     .maybeSingle();
   if (!studentCheck) {
     notify('Deze student behoort niet tot jouw school');
-    btn.disabled = false; btn.textContent = 'Koppelen â†’';
+    btn.disabled = false; btn.textContent = 'Koppelen →';
     closeKoppelModal();
     return;
   }
@@ -1993,7 +1993,7 @@ async function confirmKoppel() {
 
   if (existing) {
     notify('Deze student is al gekoppeld aan dit bedrijf');
-    btn.disabled = false; btn.textContent = 'Koppelen â†’';
+    btn.disabled = false; btn.textContent = 'Koppelen →';
     closeKoppelModal();
     return;
   }
@@ -2008,12 +2008,12 @@ async function confirmKoppel() {
     posting_id:   _koppelPostingId || null,
   }).select('id').maybeSingle();
 
-  btn.disabled = false; btn.textContent = 'Koppelen â†’';
+  btn.disabled = false; btn.textContent = 'Koppelen →';
 
   if (error) { notify('Fout bij koppelen: ' + (error?.message || 'onbekende fout')); return; }
   if (!matchRow) { notify('Er ging iets mis bij opslaan'); return; }
 
-  // Notify student Ã©n bedrijf â€” beide met await, geen fire-and-forget (build rule P5)
+  // Notify student én bedrijf — beide met await, geen fire-and-forget (build rule P5)
   const schoolName = getDisplayName(currentUser);
   try {
     await createNotification(
@@ -2021,7 +2021,7 @@ async function confirmKoppel() {
       'school_referral',
       matchRow?.id || null,
       'match',
-      schoolName + ' heeft je gekoppeld aan een stagebedrijf â€” bekijk het in je Matches'
+      schoolName + ' heeft je gekoppeld aan een stagebedrijf — bekijk het in je Matches'
     );
     await createNotification(
       _koppelCompanyId,
@@ -2034,11 +2034,11 @@ async function confirmKoppel() {
     console.error('[school] school_referral notificaties mislukt:', e?.message || 'onbekende fout');
   }
 
-  notify('âœ“ Student gekoppeld aan bedrijf');
+  notify('✓ Student gekoppeld aan bedrijf');
   closeKoppelModal();
 }
 
-// â”€â”€ Oproepen â”€â”€
+// ── Oproepen ──
 async function loadOproepen() {
   if (!currentUser) return;
   const { data, error } = await db
@@ -2054,7 +2054,7 @@ async function loadOproepen() {
 function renderOproepen() {
   const el = document.getElementById('oproepen-list');
   if (!oproepen || oproepen.length === 0) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">ðŸ“¢</span>Nog geen oproepen geplaatst.<br>Klik op <strong>Nieuwe oproep</strong> om te beginnen.</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">📢</span>Nog geen oproepen geplaatst.<br>Klik op <strong>Nieuwe oproep</strong> om te beginnen.</div>`;
     return;
   }
   el.innerHTML = oproepen.map(o => {
@@ -2065,17 +2065,17 @@ function renderOproepen() {
       <div class="pc-head">
         <div>
           <div class="pc-title">${escapeHtml(o.title)}</div>
-          <div class="pc-meta">${escapeHtml(o.school_name)} Â· ${escapeHtml(o.sector || 'â€”')}</div>
+          <div class="pc-meta">${escapeHtml(o.school_name)} · ${escapeHtml(o.sector || '—')}</div>
         </div>
-        <span class="status-badge ${o.status === 'active' ? 's-active' : 's-closed'}">${o.status === 'active' ? 'âœ“ Actief' : 'âœ• Gesloten'}</span>
+        <span class="status-badge ${o.status === 'active' ? 's-active' : 's-closed'}">${o.status === 'active' ? '✓ Actief' : '✕ Gesloten'}</span>
       </div>
       <div class="pc-tags">
-        <span class="tag tag-blue">ðŸ‘¥ ${o.match_target === 'bedrijf' ? 'Bedrijven' : o.match_target === 'student' ? 'Studenten' : 'Beide'}</span>
+        <span class="tag tag-blue">👥 ${o.match_target === 'bedrijf' ? 'Bedrijven' : o.match_target === 'student' ? 'Studenten' : 'Beide'}</span>
         ${(o.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
       </div>
-      <div style="font-size:.85rem;color:var(--ink3);line-height:1.5">${escapeHtml(desc)}${hasMore ? 'â€¦' : ''}</div>
+      <div style="font-size:.85rem;color:var(--ink3);line-height:1.5">${escapeHtml(desc)}${hasMore ? '…' : ''}</div>
       <div class="pc-actions">
-        <button class="btn-xs btn-del" onclick="delOproep('${o.id}')">âœ• Verwijderen</button>
+        <button class="btn-xs btn-del" onclick="delOproep('${o.id}')">✕ Verwijderen</button>
       </div>
     </div>`;
   }).join('');
@@ -2097,7 +2097,7 @@ function addOTag(s) {
   chip.appendChild(document.createTextNode(s));
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = 'Ã—';
+  closeBtn.textContent = '×';
   closeBtn.addEventListener('click', () => removeOTag(s, closeBtn));
   chip.appendChild(closeBtn);
   document.getElementById('oTagsBox').insertBefore(chip, document.getElementById('oTagsInput'));
@@ -2123,7 +2123,7 @@ async function submitOproep() {
   if (!school || !sector || !title || !desc) { notify('Vul alle verplichte velden in'); return; }
 
   const btn = document.getElementById('submitOproep');
-  btn.disabled = true; btn.textContent = 'Plaatsenâ€¦';
+  btn.disabled = true; btn.textContent = 'Plaatsen…';
 
   const { error } = await db.from('school_postings').insert({
     created_by:   currentUser?.id || null,
@@ -2136,11 +2136,11 @@ async function submitOproep() {
     status:       'active',
   });
 
-  btn.disabled = false; btn.textContent = 'Oproep plaatsen â†’';
+  btn.disabled = false; btn.textContent = 'Oproep plaatsen →';
 
   if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
 
-  notify('âœ“ Oproep geplaatst');
+  notify('✓ Oproep geplaatst');
   ['o-school','o-sector','o-title','o-desc'].forEach(id => document.getElementById(id).value = '');
   oTags.length = 0;
   document.getElementById('oTagsBox').querySelectorAll('.tag-chip').forEach(c => c.remove());
@@ -2153,22 +2153,22 @@ async function delOproep(id) {
   openModal('Oproep verwijderen', 'Weet je zeker dat je deze oproep wilt verwijderen? Dit kan niet ongedaan worden gemaakt.', async () => {
     const { error } = await db.from('school_postings').delete().eq('id', id).eq('created_by', currentUser.id);
     if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
-    notify('âœ“ Oproep verwijderd');
+    notify('✓ Oproep verwijderd');
     await loadOproepen();
     renderOproepen();
   });
 }
 
-// â”€â”€ School profile overview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── School profile overview ───────────────────────────────────────────────────
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
 }
 
 function toonSchoolOverzicht(data) {
-  setText('spv-naam',    data.schoolnaam    || 'â€”');
-  setText('spv-locatie', data.locatie       || 'â€”');
-  setText('spv-contact', data.contactpersoon || 'â€”');
+  setText('spv-naam',    data.schoolnaam    || '—');
+  setText('spv-locatie', data.locatie       || '—');
+  setText('spv-contact', data.contactpersoon || '—');
   const oplEl = document.getElementById('spv-opleidingen');
   if (oplEl) {
     const opl = Array.isArray(data.opleidingen) ? data.opleidingen : [];
@@ -2191,7 +2191,7 @@ function toonSchoolFormulier() {
 async function saveProfiel() {
   if (!currentUser) { notify('Niet ingelogd'); return; }
   const btn = document.getElementById('saveProfielBtn');
-  btn.disabled = true; btn.textContent = 'Opslaanâ€¦';
+  btn.disabled = true; btn.textContent = 'Opslaan…';
 
   const naam       = document.getElementById('p-naam').value.trim();
   const locatie    = document.getElementById('p-locatie').value.trim();
@@ -2207,9 +2207,9 @@ async function saveProfiel() {
     avatar_key:    window._internlyAvatarKey || null,
   }, { onConflict: 'profile_id' });
 
-  btn.disabled = false; btn.textContent = 'Profiel opslaan â†’';
+  btn.disabled = false; btn.textContent = 'Profiel opslaan →';
   if (error) { notify('Fout: ' + (error?.message || 'onbekende fout')); return; }
-  notify('âœ“ Profiel opgeslagen');
+  notify('✓ Profiel opgeslagen');
   toonSchoolOverzicht({
     schoolnaam:     naam     || null,
     locatie:        locatie  || null,
@@ -2218,7 +2218,7 @@ async function saveProfiel() {
   });
 }
 
-// â”€â”€ Push prompt banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Push prompt banner ────────────────────────────────────────────────────────
 function showPushPromptBanner() {
   if (document.getElementById('push-banner')) return;
   const banner = document.createElement('div');
@@ -2226,7 +2226,7 @@ function showPushPromptBanner() {
   banner.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#fff;border:1px solid var(--border2);border-radius:14px;padding:18px 20px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);font-size:.88rem;';
   banner.innerHTML = `
     <div style="font-weight:600;margin-bottom:6px;font-size:.95rem">Meldingen aanzetten?</div>
-    <div style="color:var(--ink3);margin-bottom:14px;line-height:1.5">Ontvang een melding zodra er een update is over een student â€” ook als je dit tabblad sluit.</div>
+    <div style="color:var(--ink3);margin-bottom:14px;line-height:1.5">Ontvang een melding zodra er een update is over een student — ook als je dit tabblad sluit.</div>
     <div style="display:flex;gap:8px">
       <button onclick="acceptPush()" style="flex:1;padding:8px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem">Ja, aanzetten</button>
       <button onclick="dismissPush()" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:none;cursor:pointer;font-size:.85rem;color:var(--ink3)">Nee, bedankt</button>
@@ -2249,11 +2249,11 @@ function dismissPush() {
   if (banner) banner.remove();
 }
 
-// â”€â”€ Bundeling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Bundeling ─────────────────────────────────────────────────────────────
 async function renderBundeling() {
   const el = document.getElementById('bundeling-content');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--ink3)"><div style="font-size:.88rem">Ladenâ€¦</div></div>';
+  el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--ink3)"><div style="font-size:.88rem">Laden…</div></div>';
 
   const { data: sub } = await db
     .from('subscriptions')
@@ -2261,18 +2261,18 @@ async function renderBundeling() {
     .eq('profile_id', currentUser.id)
     .maybeSingle();
 
-  // STATE 1 â€” bundle_approved
+  // STATE 1 — bundle_approved
   if (sub?.bundle_approved === true) {
     const bundled = sub?.bundled_opleidingen || [];
     el.innerHTML = `
       <div class="page-title">Opleidingen bundelen</div>
       <div style="background:#dcfce7;border:1px solid #86efac;border-radius:var(--r);padding:1.5rem;margin-top:1rem">
-        <div style="font-size:1.1rem;font-weight:700;color:#166534;margin-bottom:.75rem">âœ“ Bundeling actief</div>
+        <div style="font-size:1.1rem;font-weight:700;color:#166534;margin-bottom:.75rem">✓ Bundeling actief</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem">
           ${bundled.map(o => `<span class="tag" style="background:#bbf7d0;color:#166534;border:none">${escapeHtml(o)}</span>`).join('')}
         </div>
         <p style="font-size:.88rem;color:#166534;line-height:1.6">
-          Je opleidingen zijn samengevoegd onder Ã©Ã©n licentie. Neem contact op via
+          Je opleidingen zijn samengevoegd onder één licentie. Neem contact op via
           <a href="mailto:hallo@internly.pro" style="color:#166534;font-weight:600">hallo@internly.pro</a>
           als je wijzigingen wil doorgeven.
         </p>
@@ -2280,7 +2280,7 @@ async function renderBundeling() {
     return;
   }
 
-  // STATE 2 â€” pending request
+  // STATE 2 — pending request
   const { data: pending } = await db
     .from('bundling_requests')
     .select('id, requested_at')
@@ -2291,11 +2291,11 @@ async function renderBundeling() {
   if (pending) {
     const dateStr = pending.requested_at
       ? new Date(pending.requested_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
-      : 'â€”';
+      : '—';
     el.innerHTML = `
       <div class="page-title">Opleidingen bundelen</div>
       <div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:var(--r);padding:1.5rem;margin-top:1rem">
-        <div style="font-size:1.1rem;font-weight:700;color:#92400e;margin-bottom:.75rem">â³ Verzoek ingediend</div>
+        <div style="font-size:1.1rem;font-weight:700;color:#92400e;margin-bottom:.75rem">⏳ Verzoek ingediend</div>
         <p style="font-size:.88rem;color:#92400e;line-height:1.6">
           We bekijken je verzoek persoonlijk en nemen binnen 5 werkdagen contact op via
           <a href="mailto:hallo@internly.pro" style="color:#92400e;font-weight:600">hallo@internly.pro</a>.
@@ -2305,12 +2305,12 @@ async function renderBundeling() {
     return;
   }
 
-  // STATE 3 â€” school_freemium or no plan
+  // STATE 3 — school_freemium or no plan
   if (!sub || sub.plan === 'school_freemium') {
     el.innerHTML = `
       <div class="page-title">Opleidingen bundelen</div>
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem 1.5rem;text-align:center">
-        <div style="font-size:2.5rem">ðŸ”’</div>
+        <div style="font-size:2.5rem">🔒</div>
         <h3 style="font-size:1.1rem;font-weight:700;color:var(--ink)">Opleidingen bundelen is beschikbaar voor Premium-abonnees.</h3>
         <p style="color:var(--ink3);max-width:360px;font-size:.88rem;line-height:1.6">
           Heb je een kleine opleiding met meerdere studierichtingen? Als Premium-abonnee kun je een verzoek
@@ -2318,13 +2318,13 @@ async function renderBundeling() {
         </p>
         <button onclick="window.location.href='pricing.html'"
           style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer">
-          Upgraden naar Premium â†’
+          Upgraden naar Premium →
         </button>
       </div>`;
     return;
   }
 
-  // STATE 4 â€” Premium, no pending, not approved â†’ form
+  // STATE 4 — Premium, no pending, not approved → form
   el.innerHTML = `
     <div class="page-title">Opleidingen bundelen</div>
     <p class="page-sub">Heb je een kleine opleiding? We kijken graag naar een passende oplossing. Vertel ons over je situatie en we bekijken je verzoek persoonlijk.</p>
@@ -2333,14 +2333,14 @@ async function renderBundeling() {
       <div class="field">
         <label>Welke opleidingen wil je bundelen?</label>
         <textarea id="bundle-opleidingen" rows="4" required
-          placeholder="Bijv: Zorg &amp; Welzijn niveau 3&#10;Helpende Zorg &amp; Welzijn niveau 2&#10;(Ã©Ã©n opleiding per regel)"
+          placeholder="Bijv: Zorg &amp; Welzijn niveau 3&#10;Helpende Zorg &amp; Welzijn niveau 2&#10;(één opleiding per regel)"
           style="width:100%;font-family:inherit;padding:.65rem .85rem;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:.9rem;resize:vertical"></textarea>
       </div>
 
       <div class="field">
         <label>Waarom wil je deze opleidingen bundelen?</label>
         <textarea id="bundle-motivatie" rows="4" required
-          placeholder="Vertel ons over je situatie â€” aantal studenten, schaalgrootte, waarom Ã©Ã©n licentie beter past."
+          placeholder="Vertel ons over je situatie — aantal studenten, schaalgrootte, waarom één licentie beter past."
           style="width:100%;font-family:inherit;padding:.65rem .85rem;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:.9rem;resize:vertical"></textarea>
       </div>
 
@@ -2356,7 +2356,7 @@ async function renderBundeling() {
 
       <button id="bundle-submit" disabled onclick="submitBundelVerzoek()"
         style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.7rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;opacity:.5;transition:opacity .15s">
-        Verzoek indienen â†’
+        Verzoek indienen →
       </button>
     </div>`;
 
@@ -2374,7 +2374,7 @@ async function submitBundelVerzoek() {
   const disclaimer = document.getElementById('bundle-disclaimer')?.checked;
 
   if (!opleidingen.length) {
-    notify('Voer minimaal Ã©Ã©n opleiding in');
+    notify('Voer minimaal één opleiding in');
     return;
   }
   if (motivatie.length < 20) {
@@ -2387,7 +2387,7 @@ async function submitBundelVerzoek() {
   }
 
   const btn = document.getElementById('bundle-submit');
-  if (btn) { btn.disabled = true; btn.textContent = 'Bezigâ€¦'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
 
   const { error } = await db
     .from('bundling_requests')
@@ -2399,20 +2399,20 @@ async function submitBundelVerzoek() {
     });
 
   if (error) {
-    notify('Er ging iets mis â€” probeer het opnieuw');
-    if (btn) { btn.disabled = false; btn.textContent = 'Verzoek indienen â†’'; }
+    notify('Er ging iets mis — probeer het opnieuw');
+    if (btn) { btn.disabled = false; btn.textContent = 'Verzoek indienen →'; }
     return;
   }
 
-  notify('Verzoek ingediend â€” je hoort binnen 5 werkdagen van ons');
+  notify('Verzoek ingediend — je hoort binnen 5 werkdagen van ons');
   renderBundeling();
 }
 
 // Offline/online listeners
-window.addEventListener('offline', () => notify('Geen internetverbinding â€” wijzigingen worden niet opgeslagen'));
+window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
 window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -2427,7 +2427,7 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 function copyReferralText() {
-  const text = 'Ik gebruik Internly voor stages â€” ' +
+  const text = 'Ik gebruik Internly voor stages — ' +
     'een platform dat ghosting structureel aanpakt. ' +
     'Studenten zien vooraf hoe betrouwbaar een ' +
     'werkgever is. Probeer het: internly.pro';
@@ -2451,7 +2451,7 @@ function initReferralBanner() {
   }
 }
 
-// â”€â”€ Uitnodig student modal (school) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Uitnodig student modal (school) ──────────────────────────────────────────
 let _suTimer = null;
 
 function openSuModal() {
@@ -2479,7 +2479,7 @@ async function _runSuSearch() {
     resultsEl.innerHTML = '<div class="su-hint">Typ een naam of opleiding om studenten te zoeken.</div>';
     return;
   }
-  resultsEl.innerHTML = '<div class="su-hint">Zoekenâ€¦</div>';
+  resultsEl.innerHTML = '<div class="su-hint">Zoeken…</div>';
 
   const { data: { user } } = await db.auth.getUser();
   if (!user) return;
@@ -2500,7 +2500,7 @@ async function _runSuSearch() {
     const initials = (r.naam || '??').slice(0, 2).toUpperCase();
     const opleiding = r.student_profiles?.opleiding || '';
     const school    = r.student_profiles?.school    || '';
-    const meta      = [opleiding, school].filter(Boolean).join(' Â· ');
+    const meta      = [opleiding, school].filter(Boolean).join(' · ');
     return `
       <div class="su-item">
         <div class="su-avatar">${escapeHtml(initials)}</div>
@@ -2518,7 +2518,7 @@ async function _runSuSearch() {
 
 async function _sendSchoolUitnodiging(studentId, studentNaam) {
   const btn = document.getElementById(`su-btn-${studentId}`);
-  if (btn) { btn.disabled = true; btn.textContent = 'Bezigâ€¦'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Bezig…'; }
 
   const { data: { user } } = await db.auth.getUser();
   if (!user) return;
@@ -2547,7 +2547,7 @@ async function _sendSchoolUitnodiging(studentId, studentNaam) {
 
   if (error) {
     if (btn) { btn.disabled = false; btn.textContent = 'Uitnodigen'; }
-    notify('Uitnodiging mislukt â€” probeer opnieuw');
+    notify('Uitnodiging mislukt — probeer opnieuw');
     console.error('[school-dashboard] _sendSchoolUitnodiging:', error.message);
     return;
   }
@@ -2555,11 +2555,11 @@ async function _sendSchoolUitnodiging(studentId, studentNaam) {
   await createNotification(studentId, 'buddy_request',
     `Een school heeft je een uitnodiging gestuurd`, user.id);
 
-  if (btn) { btn.disabled = true; btn.textContent = 'Verstuurd âœ“'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Verstuurd ✓'; }
   notify(`Uitnodiging verstuurd naar ${studentNaam}`);
 }
 
-// â”€â”€ Load school-initiated begeleider_link accepted matches â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Load school-initiated begeleider_link accepted matches ────────────────────
 async function loadSchoolLinkedStudents(userId) {
   const { data: links } = await db
     .from('matches')
@@ -2614,7 +2614,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'auth.html'; return;
   }
 
-  // Rolcheck â€” alleen school-gebruikers mogen dit dashboard zien
+  // Rolcheck — alleen school-gebruikers mogen dit dashboard zien
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'school') {
@@ -2626,8 +2626,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Welkom overlay â€” eenmalig na eerste login
-  // welcome-overlay.js â€” 1 mei 2026
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
   if (typeof maybeShowWelcomeOverlay === 'function') {
     const { data: _wcProf } = await db.from('profiles').select('naam').eq('id', user.id).maybeSingle();
     maybeShowWelcomeOverlay(user.id, 'school', _wcProf?.naam, null);
@@ -2650,15 +2650,15 @@ window.addEventListener('DOMContentLoaded', async () => {
           .maybeSingle();
         if (sub?.status === 'active') {
           clearInterval(poll);
-          notify('Betaling ontvangen â€” je plan is actief');
+          notify('Betaling ontvangen — je plan is actief');
           setTimeout(() => window.location.reload(), 1500);
         } else if (attempts >= 10) {
           clearInterval(poll);
-          notify('Betaling verwerkt â€” activering volgt binnen enkele minuten');
+          notify('Betaling verwerkt — activering volgt binnen enkele minuten');
         }
       }, 1000);
     } else {
-      notify('Betaling mislukt of geannuleerd â€” probeer opnieuw');
+      notify('Betaling mislukt of geannuleerd — probeer opnieuw');
     }
   })();
 
@@ -2687,7 +2687,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     toonSchoolOverzicht(sp);
   }
 
-  // Avatar picker â€” vanmiddag fix 30 apr 2026
+  // Avatar picker — vanmiddag fix 30 apr 2026
   if (typeof renderAvatarPicker === 'function') {
     const _curAvKey = sp?.avatar_key || null;
     window._internlyAvatarKey = _curAvKey;
@@ -2728,16 +2728,16 @@ window.addEventListener('beforeunload', () => {
 });
 </script>
 
-<!-- â”€â”€ UITNODIG STUDENT MODAL â”€â”€ -->
+<!-- ── UITNODIG STUDENT MODAL ── -->
 <div id="su-overlay" class="modal-overlay" onclick="if(event.target===this)closeSuModal()">
   <div class="su-modal-box" role="dialog" aria-modal="true" aria-labelledby="su-title-label">
     <div class="su-header">
       <span class="su-title" id="su-title-label">Student uitnodigen</span>
-      <button class="su-close" onclick="closeSuModal()" aria-label="Sluiten">âœ•</button>
+      <button class="su-close" onclick="closeSuModal()" aria-label="Sluiten">✕</button>
     </div>
     <div class="su-search-wrap">
       <input class="su-search" id="su-search-input" type="search"
-        placeholder="Zoek op naam of opleidingâ€¦"
+        placeholder="Zoek op naam of opleiding…"
         autocomplete="off" oninput="_suSearchDebounce()">
     </div>
     <div class="su-results" id="su-results">
@@ -2793,7 +2793,7 @@ window.addEventListener('load', function() {
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -2801,8 +2801,8 @@ window.addEventListener('load', function() {
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Bedrijfsdashboard â€” Internly</title>
+  <title>Bedrijfsdashboard — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -56,7 +56,7 @@
   </script>
   <style>
     :root {
-      /* Pagina-aliassen â†’ globale tokens (css/style.css) */
+      /* Pagina-aliassen → globale tokens (css/style.css) */
       --green:      var(--c-green, #1a7a48);
       --green-dark: var(--c-green-dark, #0f5c36);
       --green-bg:   var(--c-green-bg, #e8f5ee);
@@ -93,7 +93,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* â”€â”€ TOPBAR (cream-warm + backdrop-blur per blueprint) â”€â”€ */
+    /* ── TOPBAR (cream-warm + backdrop-blur per blueprint) ── */
     .topbar {
       position: sticky; top: 0; z-index: 100;
       background: rgba(244,243,239,.92);
@@ -124,13 +124,13 @@
       letter-spacing: .08em; text-transform: uppercase;
     }
 
-    /* â”€â”€ LAYOUT â”€â”€ */
+    /* ── LAYOUT ── */
     .layout {
       display: flex;
       min-height: calc(100vh - 56px);
     }
 
-    /* â”€â”€ SIDEBAR â”€â”€ */
+    /* ── SIDEBAR ── */
     .sidebar {
       width: var(--sidebar-w);
       background: var(--white);
@@ -170,18 +170,18 @@
       padding: 2px 6px; border-radius: 10px;
     }
 
-    /* â”€â”€ MAIN â”€â”€ */
+    /* ── MAIN ── */
     .main {
       flex: 1; padding: 32px 32px 80px;
       max-width: 900px;
       overflow: auto;
     }
 
-    /* â”€â”€ SCREENS â”€â”€ */
+    /* ── SCREENS ── */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* â”€â”€ PAGE HEADER â”€â”€ */
+    /* ── PAGE HEADER ── */
     .page-title {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 1.5rem; font-weight: 700;
@@ -189,7 +189,7 @@
     }
     .page-sub { font-size: .88rem; color: var(--ink3); margin-bottom: 24px; }
 
-    /* â”€â”€ STATS â”€â”€ */
+    /* ── STATS ── */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -213,7 +213,7 @@
     }
     .stat-note { font-size: .75rem; color: var(--ink4); margin-top: 3px; }
 
-    /* â”€â”€ SECTION TITLE â”€â”€ */
+    /* ── SECTION TITLE ── */
     .sec-title {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 1.05rem; font-weight: 700;
@@ -221,7 +221,7 @@
       display: flex; align-items: center; justify-content: space-between;
     }
 
-    /* â”€â”€ POSTING CARDS â”€â”€ */
+    /* ── POSTING CARDS ── */
     .posting-card {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -276,7 +276,7 @@
     .btn-del     { background: var(--red-bg);    color: var(--red);    border-color: rgba(184,32,32,.15); }
     .btn-del:hover { background: #fccaca; }
 
-    /* â”€â”€ FORM â”€â”€ */
+    /* ── FORM ── */
     .form-card {
       background: var(--white);
       border: 1.5px solid var(--border);
@@ -414,14 +414,14 @@
     /* Divider */
     .divider { height: 1px; background: var(--border); margin: 20px 0; }
 
-    /* â”€â”€ FOCUS STATES â”€â”€ */
+    /* ── FOCUS STATES ── */
     :focus-visible {
       outline: 2px solid var(--orange);
       outline-offset: 2px;
     }
     .nav-btn:focus-visible { outline-offset: 0; }
 
-    /* â”€â”€ SIDEBAR USER BLOCK â”€â”€ */
+    /* ── SIDEBAR USER BLOCK ── */
     .sidebar-user {
       padding: 16px 12px 12px;
       border-bottom: 1px solid var(--border);
@@ -444,7 +444,7 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    /* â”€â”€ SIDEBAR LOGOUT â”€â”€ */
+    /* ── SIDEBAR LOGOUT ── */
     .btn-logout, .btn-back {
       display: flex; align-items: center; gap: 9px;
       width: calc(100% - 24px); margin: 4px 12px;
@@ -457,7 +457,7 @@
     .btn-logout:hover { background: var(--red-bg); color: var(--red); border-color: rgba(184,32,32,.2); }
     .btn-back:hover { background: #f3f4f6; color: var(--ink2); border-color: #d1d5db; }
 
-    /* â”€â”€ CONFIRM MODAL â”€â”€ */
+    /* ── CONFIRM MODAL ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(13,21,32,.45); z-index: 500;
@@ -477,7 +477,7 @@
     .modal-body { font-size: .88rem; color: var(--ink3); line-height: 1.6; margin-bottom: 22px; }
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
-    /* â”€â”€ TOOLTIP â”€â”€ */
+    /* ── TOOLTIP ── */
     .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
     .tooltip-icon {
       display: inline-flex; align-items: center; justify-content: center;
@@ -524,7 +524,7 @@
     .tag.red    { background: var(--red-bg);   color: var(--red);   border: none; }
     .tag.neutral { background: #f0f0ee; color: var(--ink3); border: none; }
 
-    /* â”€â”€ Animaties â”€â”€ */
+    /* ── Animaties ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
     }
@@ -552,10 +552,10 @@
 <!-- FLAG REVIEW MODAL -->
 <div class="modal-overlay" id="flagModal" style="display:none">
   <div class="modal-box" role="dialog" aria-modal="true" style="max-width:420px">
-    <div class="modal-title">âš‘ Beoordeling melden</div>
+    <div class="modal-title">⚑ Beoordeling melden</div>
     <div class="modal-body">
       <p style="font-size:.88rem;color:var(--ink2);margin-bottom:12px">Geef een korte reden voor de melding. Het Internly-team beoordeelt deze binnen 48 uur.</p>
-      <textarea id="flagReasonInput" rows="3" maxlength="500" placeholder="Bijv. ongepaste inhoud, nep-reviewâ€¦"
+      <textarea id="flagReasonInput" rows="3" maxlength="500" placeholder="Bijv. ongepaste inhoud, nep-review…"
         style="width:100%;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:.88rem;resize:vertical;outline:none;"></textarea>
       <div id="flagReasonErr" style="display:none;color:var(--red);font-size:.8rem;margin-top:4px">Vul een reden in.</div>
     </div>
@@ -580,7 +580,7 @@
       <button onclick="switchLang('fr')" class="lang-btn" data-lang="fr">FR</button>
     </div>
     <div class="notif-bell" id="notifBell" onclick="toggleNotifDropdown(event)" aria-label="Meldingen">
-      <span class="bell-icon">ðŸ””</span>
+      <span class="bell-icon">🔔</span>
       <span class="bell-count" id="bellCount" style="display:none">0</span>
       <div class="notif-dropdown" id="notifDropdown" style="display:none">
         <div class="nd-header">
@@ -592,30 +592,30 @@
         </div>
       </div>
     </div>
-    <span class="role-pill">ðŸ¢ Bedrijf</span>
+    <span class="role-pill">🏢 Bedrijf</span>
   </div>
 </div>
 
 <!-- Mobile bottom tab bar -->
 <nav class="mobile-tabs" aria-label="Navigatie">
   <button class="mt-tab active" onclick="show('dashboard')">
-    <span class="mt-icon">ðŸ“Š</span>
+    <span class="mt-icon">📊</span>
     <span class="mt-label">Dashboard</span>
   </button>
   <button class="mt-tab" onclick="show('postings')">
-    <span class="mt-icon">ðŸ“Œ</span>
+    <span class="mt-icon">📌</span>
     <span class="mt-label">Vacatures</span>
   </button>
   <button class="mt-tab" onclick="show('matches')">
-    <span class="mt-icon">ðŸ¤</span>
+    <span class="mt-icon">🤝</span>
     <span class="mt-label">Matches</span>
   </button>
   <button class="mt-tab" onclick="show('berichten')">
-    <span class="mt-icon">ðŸ’¬</span>
+    <span class="mt-icon">💬</span>
     <span class="mt-label">Berichten</span>
   </button>
   <button class="mt-tab" onclick="show('reviews')">
-    <span class="mt-icon">â­</span>
+    <span class="mt-icon">⭐</span>
     <span class="mt-label">Reviews</span>
   </button>
 </nav>
@@ -628,7 +628,7 @@
     <div class="sidebar-user">
       <div class="avatar" id="userAvatar">?</div>
       <div class="sidebar-user-info">
-        <div class="sidebar-user-name" id="userName">Ladenâ€¦</div>
+        <div class="sidebar-user-name" id="userName">Laden…</div>
         <div class="sidebar-user-email" id="userEmail"></div>
       </div>
     </div>
@@ -638,28 +638,28 @@
       <div class="sidebar-section">
         <span class="sidebar-label">Beheer</span>
         <button class="nav-btn active" id="nav-dashboard" onclick="show('dashboard')">
-          <span class="nav-icon">ðŸ“Š</span> Dashboard
+          <span class="nav-icon">📊</span> Dashboard
         </button>
         <button class="nav-btn" id="nav-postings" onclick="show('postings')">
-          <span class="nav-icon">ðŸ“Œ</span> Mijn vacatures
+          <span class="nav-icon">📌</span> Mijn vacatures
           <span class="nav-badge" id="badge-count" style="display:none">0</span>
         </button>
         <button class="nav-btn" id="nav-new" onclick="show('new')">
-          <span class="nav-icon">âž•</span> Nieuwe vacature
+          <span class="nav-icon">➕</span> Nieuwe vacature
         </button>
       </div>
 
       <div class="sidebar-section">
         <span class="sidebar-label">Matching</span>
         <button class="nav-btn" id="nav-matches" onclick="show('matches')">
-          <span class="nav-icon">ðŸ¤</span> Matches
+          <span class="nav-icon">🤝</span> Matches
         </button>
         <button class="nav-btn" id="nav-berichten" onclick="gotoBerichtenGated()">
-          <span class="nav-icon">ðŸ’¬</span> Berichten
+          <span class="nav-icon">💬</span> Berichten
           <span class="nav-badge" id="badge-unread" style="display:none">0</span>
         </button>
 
-        <!-- Verificatie-waarschuwing â€” Worldwide 1 mei 2026 -->
+        <!-- Verificatie-waarschuwing — Worldwide 1 mei 2026 -->
         <div id="sidebar-verify-warn"
           style="display:none;margin:.75rem .75rem 0;
           background:rgba(255,126,66,.12);
@@ -667,7 +667,7 @@
           border-radius:8px;padding:.65rem .85rem">
           <div style="font-size:.76rem;font-weight:500;
             color:#FF7E42;margin-bottom:.2rem">
-            âš  Bedrijf niet geverifieerd
+            ⚠ Bedrijf niet geverifieerd
           </div>
           <div style="font-size:.7rem;
             color:rgba(255,255,255,.55);line-height:1.45">
@@ -677,45 +677,45 @@
             style="margin-top:.45rem;font-size:.72rem;
             color:#FF7E42;background:none;border:none;
             cursor:pointer;padding:0;text-decoration:underline">
-            Verifieer nu â†’
+            Verifieer nu →
           </button>
         </div>
 
         <button class="nav-btn" id="nav-studenten" onclick="show('studenten')">
-          <span class="nav-icon">ðŸ‘¥</span> Mijn studenten
+          <span class="nav-icon">👥</span> Mijn studenten
           <span class="nav-badge" id="badge-studenten" style="display:none">0</span>
         </button>
         <button class="nav-btn" onclick="gotoDiscoverGated()">
-          <span class="nav-icon">ðŸ”</span> Zoek stagiairs
+          <span class="nav-icon">🔍</span> Zoek stagiairs
         </button>
       </div>
 
       <div class="sidebar-section">
         <span class="sidebar-label">Reputatie</span>
         <button class="nav-btn" id="nav-reviews" onclick="showReviewsGated()">
-          <span class="nav-icon">â­</span> Reviews
+          <span class="nav-icon">⭐</span> Reviews
         </button>
         <button class="nav-btn" id="nav-esg" onclick="show('esg')">
-          <span class="nav-icon">ðŸŒ±</span> ESG &amp; Rapportage
+          <span class="nav-icon">🌱</span> ESG &amp; Rapportage
         </button>
         <button class="nav-btn" id="nav-vestigingen" onclick="show('vestigingen')">
-          <span class="nav-icon">ðŸ“</span> Vestigingen
+          <span class="nav-icon">📍</span> Vestigingen
         </button>
         <button class="nav-btn" id="nav-international" onclick="show('international')">
-          <span class="nav-icon">ðŸŒ</span> Internationaal
+          <span class="nav-icon">🌍</span> Internationaal
         </button>
       </div>
 
       <div class="sidebar-section">
         <span class="sidebar-label">Account</span>
         <button class="nav-btn" id="nav-profile" onclick="show('profile')">
-          <span class="nav-icon">ðŸ¢</span> Bedrijfsprofiel
+          <span class="nav-icon">🏢</span> Bedrijfsprofiel
         </button>
         <button class="nav-btn" onclick="window.location.href='pricing.html#section-bedrijf'">
-          <span class="nav-icon">ðŸ’³</span> Abonnement
+          <span class="nav-icon">💳</span> Abonnement
         </button>
         <button class="nav-btn" id="nav-account" onclick="show('account')">
-          <span class="nav-icon">âš™ï¸</span> Account
+          <span class="nav-icon">⚙️</span> Account
         </button>
       </div>
 
@@ -724,10 +724,10 @@
     <a href="privacybeleid.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Privacybeleid</a>
     <a href="spelregels.html" style="font-size:.78rem;color:var(--ink3);text-decoration:none;display:block;padding:.4rem .75rem;">Spelregels</a>
     <button class="btn-back" onclick="goBack('company-dashboard.html')" title="Vorige pagina">
-      <span class="nav-icon">â†</span> Vorige pagina
+      <span class="nav-icon">←</span> Vorige pagina
     </button>
     <button class="btn-logout" onclick="signOut()" title="Uitloggen">
-      <span class="nav-icon">ðŸšª</span> Uitloggen
+      <span class="nav-icon">🚪</span> Uitloggen
     </button>
 
   </aside>
@@ -735,10 +735,10 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- â”€â”€ DASHBOARD â”€â”€ -->
+    <!-- ── DASHBOARD ── -->
     <div class="screen active" id="screen-dashboard">
 
-      <!-- Run 3 â€” Welkomstblok bedrijf -->
+      <!-- Run 3 — Welkomstblok bedrijf -->
       <div id="company-welcome-anchor"></div>
       <script>
         (async () => {
@@ -793,17 +793,17 @@
             const trustGrade = companyProfile?.trust_grade ?? '?';
             actions.innerHTML = `
               <a href="#section-aanvragen" class="rl-action">
-                <span class="rl-action-icon">ðŸ“©</span>
+                <span class="rl-action-icon">📩</span>
                 <span class="rl-action-title">Nieuwe aanvragen${pendingBadge}</span>
                 <span class="rl-action-sub">Reageer op tijd</span>
               </a>
               <a href="#section-trust" class="rl-action">
-                <span class="rl-action-icon">â­</span>
+                <span class="rl-action-icon">⭐</span>
                 <span class="rl-action-title">Trust Score ${trustScore}</span>
                 <span class="rl-action-sub">Graad ${trustGrade}</span>
               </a>
               <a href="#section-vacatures" class="rl-action">
-                <span class="rl-action-icon">ðŸ“Œ</span>
+                <span class="rl-action-icon">📌</span>
                 <span class="rl-action-title">Plaats vacature</span>
                 <span class="rl-action-sub">Bereik gemotiveerde studenten</span>
               </a>
@@ -824,7 +824,7 @@
         display:flex;align-items:flex-start;
         gap:.75rem;
       ">
-        <span style="font-size:1.1rem;flex-shrink:0">ðŸ¤</span>
+        <span style="font-size:1.1rem;flex-shrink:0">🤝</span>
         <div style="flex:1">
           <div style="font-size:.88rem;font-weight:500;
             color:var(--amber,#a06010);margin-bottom:.2rem;">
@@ -833,7 +833,7 @@
           <div style="font-size:.82rem;color:var(--ink2);
             line-height:1.55;margin-bottom:.6rem;">
             Dan ken je waarschijnlijk iemand voor wie het
-            ook werkt â€” een bedrijf, school of begeleider
+            ook werkt — een bedrijf, school of begeleider
             die worstelt met hetzelfde probleem.
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;
@@ -841,7 +841,7 @@
             <button onclick="copyReferralText()"
               class="btn btn-ghost"
               style="font-size:.78rem;padding:5px 12px;">
-              ðŸ“‹ Kopieer aanbevelingstekst
+              📋 Kopieer aanbevelingstekst
             </button>
             <button onclick="dismissReferral()"
               style="background:none;border:none;
@@ -871,18 +871,18 @@
         </div>
         <div class="stat-card">
           <div class="stat-label">ESG-punten</div>
-          <div class="stat-val" id="stat-esg">â€”</div>
+          <div class="stat-val" id="stat-esg">—</div>
           <div class="stat-note">dit jaar</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label" style="display:flex;align-items:center;">Trust Score<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Trust Score">â“˜<span class="info-pop">De <strong>Trust Score</strong> bepaalt hoe betrouwbaar je profiel overkomt bij studenten. Een hogere score verhoogt je zichtbaarheid.<br><br><strong>A</strong> = Hoog &nbsp;Â·&nbsp; <strong>B</strong> = Gemiddeld &nbsp;Â·&nbsp; <strong>C</strong> = Laag<br><br>Vul je profiel verder in om de score te verhogen.</span></span></div>
-          <div class="stat-val" id="stat-trust">â€”</div>
-          <div class="stat-note" id="stat-grade">berekenenâ€¦</div>
-          <button onclick="forceTrustRecalculate()" style="margin-top:6px;font-size:.72rem;padding:3px 8px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;color:var(--ink3)">â†» Herberekenen</button>
+          <div class="stat-label" style="display:flex;align-items:center;">Trust Score<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg Trust Score">ⓘ<span class="info-pop">De <strong>Trust Score</strong> bepaalt hoe betrouwbaar je profiel overkomt bij studenten. Een hogere score verhoogt je zichtbaarheid.<br><br><strong>A</strong> = Hoog &nbsp;·&nbsp; <strong>B</strong> = Gemiddeld &nbsp;·&nbsp; <strong>C</strong> = Laag<br><br>Vul je profiel verder in om de score te verhogen.</span></span></div>
+          <div class="stat-val" id="stat-trust">—</div>
+          <div class="stat-note" id="stat-grade">berekenen…</div>
+          <button onclick="forceTrustRecalculate()" style="margin-top:6px;font-size:.72rem;padding:3px 8px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;color:var(--ink3)">↻ Herberekenen</button>
         </div>
       </div>
 
-      <!-- â”€â”€ Interesse in jou (swipe-inbox) â”€â”€ -->
+      <!-- ── Interesse in jou (swipe-inbox) ── -->
       <div id="incoming-likes-section" style="display:none;background:#fff;border:1.5px solid #f0f0ee;border-radius:12px;padding:18px 20px;margin-bottom:20px;">
         <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1a7a48;margin-bottom:6px;">Nieuw</div>
         <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:600;color:#0d1520;margin-bottom:4px;">Interesse in jou</div>
@@ -895,25 +895,25 @@
         <button class="btn-orange" onclick="show('new')">+ Nieuw</button>
       </div>
       <div id="recent-postings">
-        <div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">ðŸ“Œ</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen â†’</button></div>
+        <div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📌</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen →</button></div>
       </div>
     </div>
 
-    <!-- â”€â”€ MIJN VACATURES â”€â”€ -->
+    <!-- ── MIJN VACATURES ── -->
     <div class="screen" id="screen-postings">
       <div class="sec-title">
         Mijn vacatures
         <button class="btn-orange" onclick="show('new')">+ Nieuwe vacature</button>
       </div>
       <div id="all-postings">
-        <div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">ðŸ“Œ</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen â†’</button></div>
+        <div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📌</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen →</button></div>
       </div>
     </div>
 
-    <!-- â”€â”€ NIEUWE VACATURE â”€â”€ -->
+    <!-- ── NIEUWE VACATURE ── -->
     <div class="screen" id="screen-new">
       <div class="page-title">Nieuwe vacature plaatsen</div>
-      <p class="page-sub">Vul de details in â€” studenten en scholen zien deze posting direct.</p>
+      <p class="page-sub">Vul de details in — studenten en scholen zien deze posting direct.</p>
 
       <div class="form-card">
         <div class="form-section-title">Bedrijf &amp; sector</div>
@@ -974,24 +974,24 @@
 
         <div id="vestiging-selector-wrap" style="display:none">
           <div class="field">
-            <label>Vestiging <span class="hint">koppel een vestiging â€” postcode wordt automatisch ingevuld</span></label>
+            <label>Vestiging <span class="hint">koppel een vestiging — postcode wordt automatisch ingevuld</span></label>
             <select id="f-vestiging" onchange="onVestigingChange()">
-              <option value="">â€” Selecteer vestiging (optioneel) â€”</option>
+              <option value="">— Selecteer vestiging (optioneel) —</option>
             </select>
           </div>
         </div>
 
         <div class="field">
-          <label>Postcode locatie <span class="hint">optioneel â€” voor reistijdfilter</span></label>
+          <label>Postcode locatie <span class="hint">optioneel — voor reistijdfilter</span></label>
           <input type="text" id="f-postcode" placeholder="Bijv. 1012 AB" maxlength="7">
         </div>
 
         <div class="field">
           <label>Skills &amp; tags <span class="hint">typ en druk Enter</span></label>
           <div class="tags-box" id="tagsBox" onclick="document.getElementById('tagsInput').focus()">
-            <input type="text" id="tagsInput" class="tags-input" placeholder="Bijv. Python, Marketingâ€¦" maxlength="30">
+            <input type="text" id="tagsInput" class="tags-input" placeholder="Bijv. Python, Marketing…" maxlength="30">
           </div>
-          <div class="tags-hint">Max 8 tags â€” druk Enter of komma om toe te voegen.</div>
+          <div class="tags-hint">Max 8 tags — druk Enter of komma om toe te voegen.</div>
         </div>
 
         <div class="divider"></div>
@@ -1002,15 +1002,15 @@
           <div class="radio-group">
             <label class="radio-opt selected" id="mt-student" onclick="setTarget('student')">
               <input type="radio" name="mt" value="student" checked>
-              <div class="radio-label">ðŸ‘¤ Studenten</div>
+              <div class="radio-label">👤 Studenten</div>
             </label>
             <label class="radio-opt" id="mt-school" onclick="setTarget('school')">
               <input type="radio" name="mt" value="school">
-              <div class="radio-label">ðŸŽ“ Scholen</div>
+              <div class="radio-label">🎓 Scholen</div>
             </label>
             <label class="radio-opt" id="mt-beide" onclick="setTarget('beide')">
               <input type="radio" name="mt" value="beide">
-              <div class="radio-label">ðŸ‘¥ Beide</div>
+              <div class="radio-label">👥 Beide</div>
             </label>
           </div>
         </div>
@@ -1020,7 +1020,7 @@
             <label>Responsgarantie</label>
             <select id="f-guarantee">
               <option value="false">Geen garantie</option>
-              <option value="true">Ja â€” met garantie</option>
+              <option value="true">Ja — met garantie</option>
             </select>
           </div>
           <div class="field">
@@ -1030,64 +1030,64 @@
         </div>
 
         <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
-          <button class="btn-primary" id="submitBtn" onclick="submitPosting()">Vacature plaatsen â†’</button>
+          <button class="btn-primary" id="submitBtn" onclick="submitPosting()">Vacature plaatsen →</button>
           <button class="btn-ghost" onclick="show('postings')">Annuleren</button>
         </div>
       </div>
     </div>
 
-    <!-- â”€â”€ MATCHES â”€â”€ -->
+    <!-- ── MATCHES ── -->
     <div class="screen" id="screen-matches">
       <div class="page-title">Matches</div>
       <p class="page-sub">Studenten en scholen die gematcht zijn met jouw vacatures</p>
       <div id="matches-list">
-        <div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
       </div>
     </div>
 
-    <!-- â”€â”€ MIJN STUDENTEN â€” Hub fix 2026-04-30 â”€â”€ -->
+    <!-- ── MIJN STUDENTEN — Hub fix 2026-04-30 ── -->
     <div class="screen" id="screen-studenten">
       <div class="page-title">Mijn studenten</div>
-      <p class="page-sub">Actieve stages â€” open de Stage Hub per student</p>
+      <p class="page-sub">Actieve stages — open de Stage Hub per student</p>
       <div id="studenten-list">
-        <div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
       </div>
     </div>
 
-    <!-- â”€â”€ BERICHTEN â”€â”€ -->
+    <!-- ── BERICHTEN ── -->
     <div class="screen" id="screen-berichten">
       <div class="page-title">Berichten</div>
       <p class="page-sub">Directe gesprekken met studenten via de chat</p>
       <div id="berichten-list">
-        <div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
       </div>
     </div>
 
-    <!-- â”€â”€ REVIEWS â”€â”€ -->
+    <!-- ── REVIEWS ── -->
     <div class="screen" id="screen-reviews">
       <div class="page-title">Reviews</div>
       <p class="page-sub">Beoordelingen van studenten over jouw bedrijf als stageplaats</p>
       <div id="reviews-content">
-        <div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>
+        <div class="empty"><span class="empty-icon">⏳</span>Laden…</div>
       </div>
     </div>
 
-    <!-- â”€â”€ ESG & RAPPORTAGE â”€â”€ -->
+    <!-- ── ESG & RAPPORTAGE ── -->
     <div class="screen" id="screen-esg">
       <div style="padding: 2rem; background: #f6f2e8; border: 1px solid rgba(13,21,32,.08); border-radius: 10px; margin-bottom: 1.5rem;">
         <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: 1.1rem; color: #0d1520; margin-bottom: .5rem;">ESG-export is in ontwikkeling</div>
         <p style="font-size: .92rem; color: #2a3245; line-height: 1.65; margin-bottom: 1rem;">Wij bouwen een export die past binnen VSME en ESRS S1. De volledige uiteenzetting van wat Internly bijdraagt en wat niet, staat op de publieke pagina.</p>
-        <a href="/esg-rapportage.html" style="display: inline-block; padding: .7rem 1.4rem; background: #e05c1a; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: .88rem;">Lees de ESG-pagina â†’</a>
+        <a href="/esg-rapportage.html" style="display: inline-block; padding: .7rem 1.4rem; background: #e05c1a; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: .88rem;">Lees de ESG-pagina →</a>
       </div>
       <div id="esg-content"></div>
     </div>
 
-    <!-- â”€â”€ VESTIGINGEN â”€â”€ -->
+    <!-- ── VESTIGINGEN ── -->
     <div class="screen" id="screen-vestigingen">
       <div id="vestigingen-content"></div>
     </div>
 
-    <!-- â”€â”€ INTERNATIONAAL â”€â”€ -->
+    <!-- ── INTERNATIONAAL ── -->
     <div class="screen" id="screen-international">
       <div class="page-title">Internationaal</div>
       <p class="page-sub">Stel in of je open staat voor internationale stagiairs en wat je kunt aanbieden. Deze waarden gelden voor het hele bedrijfsprofiel; per vacature kun je nog fijnafstemmen.</p>
@@ -1115,12 +1115,12 @@
         <div class="field" style="margin-top:14px">
           <label>Vereiste talen op de werkvloer</label>
           <div class="tags-box" id="intlLangsBox" onclick="document.getElementById('intlLangsInput').focus()">
-            <input type="text" id="intlLangsInput" class="tags-input" placeholder="EN, NL, DE, FRâ€¦" maxlength="20">
+            <input type="text" id="intlLangsInput" class="tags-input" placeholder="EN, NL, DE, FR…" maxlength="20">
           </div>
           <div style="font-size:.78rem;color:var(--ink3);margin-top:4px">Druk Enter na elke taal. Veelgebruikt: EN, NL, DE, FR, ES, AR, ZH.</div>
         </div>
 
-        <button class="btn-primary" id="saveIntlBtn" onclick="saveInternational()" style="margin-top:14px">Opslaan â†’</button>
+        <button class="btn-primary" id="saveIntlBtn" onclick="saveInternational()" style="margin-top:14px">Opslaan →</button>
         <div id="intlSaveHint" style="margin-top:10px;font-size:.82rem;color:#6b7280;display:none"></div>
       </div>
 
@@ -1137,7 +1137,7 @@
       </div>
     </div>
 
-    <!-- â”€â”€ PROFIEL â”€â”€ -->
+    <!-- ── PROFIEL ── -->
     <div class="screen" id="screen-profile">
       <div class="page-title">Bedrijfsprofiel</div>
       <p class="page-sub">Deze informatie is zichtbaar voor studenten en scholen</p>
@@ -1146,16 +1146,16 @@
       <div id="company-view-profiel" style="display:none">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap">
           <div>
-            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="cpv-naam">â€”</div>
-            <div style="font-size:.88rem;color:var(--ink3);margin-top:2px" id="cpv-sector-size">â€”</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:700;color:#0d1520" id="cpv-naam">—</div>
+            <div style="font-size:.88rem;color:var(--ink3);margin-top:2px" id="cpv-sector-size">—</div>
             <!-- href en textContent worden via JS gevuld in toonBedrijfOverzicht (~regel 2229); bij ontbrekende website wordt element verborgen via display:none -->
-            <a id="cpv-website" href="#" target="_blank" rel="noopener noreferrer" style="font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none;margin-top:4px;display:none">â€”</a>
+            <a id="cpv-website" href="#" target="_blank" rel="noopener noreferrer" style="font-size:.82rem;color:var(--green);font-weight:600;text-decoration:none;margin-top:4px;display:none">—</a>
           </div>
-          <button onclick="toonBedrijfFormulier()" class="btn-ghost">âœï¸ Bewerken</button>
+          <button onclick="toonBedrijfFormulier()" class="btn-ghost">✏️ Bewerken</button>
         </div>
         <div class="card" style="margin-bottom:16px">
           <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink4);margin-bottom:6px">Over ons</div>
-          <p id="cpv-beschrijving" style="font-size:.9rem;color:var(--ink2);line-height:1.7;margin:0">â€”</p>
+          <p id="cpv-beschrijving" style="font-size:.9rem;color:var(--ink2);line-height:1.7;margin:0">—</p>
         </div>
         <div id="cpv-volledigheid" class="card" style="background:#fdf3e0;border-color:rgba(160,96,16,.2);font-size:.85rem"></div>
       </div>
@@ -1192,7 +1192,7 @@
           </div>
         </div>
 
-        <!-- â”€â”€ Worldwide verificatie â€” 1 mei 2026 â”€â”€ -->
+        <!-- ── Worldwide verificatie — 1 mei 2026 ── -->
         <div class="divider" style="margin:1.25rem 0"></div>
         <div style="font-size:.75rem;font-weight:600;
           letter-spacing:.07em;text-transform:uppercase;
@@ -1209,9 +1209,9 @@
             border:1.5px solid #e2e8f0;border-radius:8px;
             font-family:'Outfit',sans-serif;font-size:.88rem;
             color:#0d1520;background:#fff;outline:none">
-            <option value="nl">ðŸ‡³ðŸ‡± Nederlands bedrijf (KvK)</option>
-            <option value="eu">ðŸ‡ªðŸ‡º EU-bedrijf (BTW-nummer)</option>
-            <option value="worldwide">ðŸŒ Internationaal bedrijf</option>
+            <option value="nl">🇳🇱 Nederlands bedrijf (KvK)</option>
+            <option value="eu">🇪🇺 EU-bedrijf (BTW-nummer)</option>
+            <option value="worldwide">🌍 Internationaal bedrijf</option>
           </select>
         </div>
 
@@ -1224,28 +1224,28 @@
             border:1.5px solid #e2e8f0;border-radius:8px;
             font-family:'Outfit',sans-serif;font-size:.88rem;
             color:#0d1520;background:#fff;outline:none">
-            <option value="">â€” Selecteer land â€”</option>
-            <option value="BE">ðŸ‡§ðŸ‡ª BelgiÃ«</option>
-            <option value="DE">ðŸ‡©ðŸ‡ª Duitsland</option>
-            <option value="FR">ðŸ‡«ðŸ‡· Frankrijk</option>
-            <option value="GB">ðŸ‡¬ðŸ‡§ Verenigd Koninkrijk</option>
-            <option value="ES">ðŸ‡ªðŸ‡¸ Spanje</option>
-            <option value="IT">ðŸ‡®ðŸ‡¹ ItaliÃ«</option>
-            <option value="PL">ðŸ‡µðŸ‡± Polen</option>
-            <option value="SE">ðŸ‡¸ðŸ‡ª Zweden</option>
-            <option value="DK">ðŸ‡©ðŸ‡° Denemarken</option>
-            <option value="AT">ðŸ‡¦ðŸ‡¹ Oostenrijk</option>
-            <option value="CH">ðŸ‡¨ðŸ‡­ Zwitserland</option>
-            <option value="US">ðŸ‡ºðŸ‡¸ Verenigde Staten</option>
-            <option value="CA">ðŸ‡¨ðŸ‡¦ Canada</option>
-            <option value="AU">ðŸ‡¦ðŸ‡º AustraliÃ«</option>
-            <option value="SG">ðŸ‡¸ðŸ‡¬ Singapore</option>
-            <option value="JP">ðŸ‡¯ðŸ‡µ Japan</option>
-            <option value="CN">ðŸ‡¨ðŸ‡³ China</option>
-            <option value="IN">ðŸ‡®ðŸ‡³ India</option>
-            <option value="BR">ðŸ‡§ðŸ‡· BraziliÃ«</option>
-            <option value="ZA">ðŸ‡¿ðŸ‡¦ Zuid-Afrika</option>
-            <option value="OTHER">ðŸŒ Overig</option>
+            <option value="">— Selecteer land —</option>
+            <option value="BE">🇧🇪 België</option>
+            <option value="DE">🇩🇪 Duitsland</option>
+            <option value="FR">🇫🇷 Frankrijk</option>
+            <option value="GB">🇬🇧 Verenigd Koninkrijk</option>
+            <option value="ES">🇪🇸 Spanje</option>
+            <option value="IT">🇮🇹 Italië</option>
+            <option value="PL">🇵🇱 Polen</option>
+            <option value="SE">🇸🇪 Zweden</option>
+            <option value="DK">🇩🇰 Denemarken</option>
+            <option value="AT">🇦🇹 Oostenrijk</option>
+            <option value="CH">🇨🇭 Zwitserland</option>
+            <option value="US">🇺🇸 Verenigde Staten</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="AU">🇦🇺 Australië</option>
+            <option value="SG">🇸🇬 Singapore</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="CN">🇨🇳 China</option>
+            <option value="IN">🇮🇳 India</option>
+            <option value="BR">🇧🇷 Brazilië</option>
+            <option value="ZA">🇿🇦 Zuid-Afrika</option>
+            <option value="OTHER">🌍 Overig</option>
           </select>
         </div>
 
@@ -1268,7 +1268,7 @@
               font-family:'Outfit',sans-serif;font-size:.85rem;
               font-weight:500;cursor:pointer;white-space:nowrap;
               flex-shrink:0">
-              Verifieer â†’
+              Verifieer →
             </button>
           </div>
           <div id="vat-verify-status"
@@ -1281,7 +1281,7 @@
           style="display:none">
           <label for="p-taxid">Tax ID / Registration Number</label>
           <input type="text" id="p-taxid"
-            placeholder="bv. EIN, CRN, ABN â€” afhankelijk van land"
+            placeholder="bv. EIN, CRN, ABN — afhankelijk van land"
             maxlength="50"
             style="width:100%;padding:9px 12px;
             border:1.5px solid #e2e8f0;border-radius:8px;
@@ -1296,7 +1296,7 @@
           <p style="font-size:.78rem;color:#7a8799;
             margin-bottom:.5rem;line-height:1.5">
             Upload een uittreksel KvK, certificate of incorporation
-            of belastingregistratie (PDF, JPG, PNG â€” max 5MB).
+            of belastingregistratie (PDF, JPG, PNG — max 5MB).
           </p>
           <input type="file" id="p-verify-doc"
             accept=".pdf,.jpg,.jpeg,.png"
@@ -1334,13 +1334,13 @@
         </div>
 
         <div class="divider" style="margin:1.25rem 0"></div>
-        <!-- â”€â”€ Einde Worldwide verificatie â”€â”€ -->
+        <!-- ── Einde Worldwide verificatie ── -->
 
         <div class="field">
           <label>Beschrijving</label>
           <textarea id="p-desc" maxlength="2000" placeholder="Wie zijn jullie? Wat doen jullie? Waarom is een stage bij jullie waardevol?"></textarea>
         </div>
-        <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Profiel opslaan â†’</button>
+        <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Profiel opslaan →</button>
         <div id="profileCompleteHint" style="margin-top:10px;font-size:.82rem;color:#6b7280;display:none"></div>
       </div>
       </div><!-- /#company-view-form -->
@@ -1357,7 +1357,7 @@
       </div>
 
       <div class="form-card" style="margin-top:16px">
-        <div class="form-section-title" style="margin-bottom:.5rem">ðŸ“… Beschikbaarheid</div>
+        <div class="form-section-title" style="margin-bottom:.5rem">📅 Beschikbaarheid</div>
         <p style="font-size:.9rem;color:#6b7280;margin-bottom:1rem;line-height:1.6">
           Geef aan wanneer je beschikbaar bent voor gesprekken met studenten en scholen.
         </p>
@@ -1365,7 +1365,7 @@
       </div>
     </div>
 
-    <!-- â”€â”€ ACCOUNT â”€â”€ -->
+    <!-- ── ACCOUNT ── -->
     <div class="screen" id="screen-account">
       <div class="page-title">Account</div>
       <p class="page-sub">Beheer je contactgegevens en instellingen</p>
@@ -1377,7 +1377,7 @@
 
 <script>
 
-// â”€â”€ State â”€â”€
+// ── State ──
 const tags = [];
 let matchTarget       = 'student';
 let postings          = [];
@@ -1484,7 +1484,7 @@ function startNotifSubscription() {
     .subscribe((status, err) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
         console.warn('[company] realtime verbinding verbroken:', err?.message);
-        notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
+        notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
       }
     });
 }
@@ -1503,7 +1503,7 @@ function showToast(message) {
     t.style.cssText = 'position:fixed;top:66px;right:16px;background:#0d1520;color:#fff;padding:10px 16px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:280px;line-height:1.4;font-family:Outfit,sans-serif;transition:opacity .3s';
     document.body.appendChild(t);
   }
-  t.textContent = 'ðŸ”” ' + message;
+  t.textContent = '🔔 ' + message;
   t.style.opacity = '1';
   clearTimeout(t._timeout);
   t._timeout = setTimeout(() => { t.style.opacity = '0'; }, 4000);
@@ -1518,7 +1518,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// â”€â”€ Auth â”€â”€
+// ── Auth ──
 async function loadUser() {
   const { data: { user } } = await db.auth.getUser();
   if (!user) {
@@ -1526,7 +1526,7 @@ async function loadUser() {
     window.location.href = 'auth.html'; return;
   }
   currentUser = user;
-  // RUN7 Cat 3 â€” auth-check geslaagd, body kan zichtbaar
+  // RUN7 Cat 3 — auth-check geslaagd, body kan zichtbaar
   if (typeof markAuthReady === 'function') markAuthReady();
 
   const email = user.email || '';
@@ -1548,11 +1548,11 @@ async function resetPassword() {
   const { error } = await db.auth.resetPasswordForEmail(currentUser.email, {
     redirectTo: window.location.origin + '/auth.html'
   });
-  if (error) { console.error('[company] reset password fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); }
-  else notify('âœ“ Resetlink verstuurd naar ' + currentUser.email);
+  if (error) { console.error('[company] reset password fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); }
+  else notify('✓ Resetlink verstuurd naar ' + currentUser.email);
 }
 
-// â”€â”€ Modal â”€â”€
+// ── Modal ──
 let _modalCallback = null;
 function openModal(title, body, onConfirm) {
   document.getElementById('modal-title').textContent = title;
@@ -1590,7 +1590,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeFlagModal(); }
 });
 
-// â”€â”€ Navigation â”€â”€
+// ── Navigation ──
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1618,14 +1618,14 @@ function show(id) {
   }
 }
 
-// â”€â”€ Plan gates â€” hasActivePlan() is defined in js/supabase.js â”€â”€
+// ── Plan gates — hasActivePlan() is defined in js/supabase.js ──
 
 function upgradeCard(requiredPlan) {
   const labels = { company_pro: 'Pro', company_business: 'Business', school_premium: 'School Premium' };
   const label = labels[requiredPlan] ?? requiredPlan;
   return `
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem 1.5rem;text-align:center;">
-      <div style="font-size:2.5rem;">ðŸ”’</div>
+      <div style="font-size:2.5rem;">🔒</div>
       <h3 style="font-size:1.25rem;font-weight:700;color:var(--ink);">Beschikbaar vanaf ${label}</h3>
       <p style="color:var(--ink3);max-width:360px;">Upgrade je abonnement om toegang te krijgen tot deze functie.</p>
       <button onclick="window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:.65rem 1.5rem;font-size:.95rem;font-weight:600;cursor:pointer;">
@@ -1664,7 +1664,7 @@ async function gotoDiscoverGated() {
   }
 }
 
-// â”€â”€ Stats â”€â”€
+// ── Stats ──
 function updateStats() {
   document.getElementById('stat-active').textContent   = postings.filter(p => p.status === 'active').length;
   document.getElementById('stat-total').textContent    = postings.length;
@@ -1674,19 +1674,19 @@ function updateStats() {
 function updateTrustDisplay(score, grade, reviewCount) {
   const el = document.getElementById('stat-trust');
   const gl = document.getElementById('stat-grade');
-  if (el) el.textContent = score !== undefined ? score : 'â€”';
+  if (el) el.textContent = score !== undefined ? score : '—';
   if (gl) {
-    const labels = { A: 'Grade A â€” Betrouwbaar', B: 'Grade B â€” Gemiddeld', C: 'Grade C â€” Let op' };
-    let text = labels[grade] || 'â€”';
+    const labels = { A: 'Grade A — Betrouwbaar', B: 'Grade B — Gemiddeld', C: 'Grade C — Let op' };
+    let text = labels[grade] || '—';
     if (reviewCount !== undefined && reviewCount > 0) {
-      text += ' Â· ' + reviewCount + ' review' + (reviewCount !== 1 ? 's' : '');
+      text += ' · ' + reviewCount + ' review' + (reviewCount !== 1 ? 's' : '');
     }
     gl.textContent = text;
     gl.style.color = grade === 'A' ? 'var(--green)' : grade === 'C' ? 'var(--red)' : 'var(--amber)';
   }
 }
 
-// â”€â”€ Load â”€â”€
+// ── Load ──
 async function loadPostings() {
   if (!currentUser) return;
   showLoading('recent-postings', 'Vacatures laden...');
@@ -1707,21 +1707,21 @@ async function loadPostings() {
   renderList('recent-postings', postings.slice(0, 3));
 }
 
-// â”€â”€ Render â”€â”€
+// ── Render ──
 function statusBadge(s) {
-  if (s === 'active')  return `<span class="status-badge s-active">âœ“ Actief</span>`;
-  if (s === 'paused')  return `<span class="status-badge s-paused">â¸ Gepauzeerd</span>`;
-  return `<span class="status-badge s-closed">âœ• Gesloten</span>`;
+  if (s === 'active')  return `<span class="status-badge s-active">✓ Actief</span>`;
+  if (s === 'paused')  return `<span class="status-badge s-paused">⏸ Gepauzeerd</span>`;
+  return `<span class="status-badge s-closed">✕ Gesloten</span>`;
 }
 
 function targetLabel(t) {
-  return t === 'student' ? 'ðŸ‘¤ Studenten' : t === 'school' ? 'ðŸŽ“ Scholen' : 'ðŸ‘¥ Beide';
+  return t === 'student' ? '👤 Studenten' : t === 'school' ? '🎓 Scholen' : '👥 Beide';
 }
 
 function renderList(cid, data) {
   const el = document.getElementById(cid);
   if (!data || data.length === 0) {
-    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">ðŸ“Œ</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen â†’</button></div>`;
+    el.innerHTML = `<div style="text-align:center;padding:2rem 1rem;color:var(--ink3,#7a8799);"><div style="font-size:1.5rem;margin-bottom:.5rem;">📌</div><div style="font-weight:500;color:var(--ink,#0d1520);margin-bottom:.35rem;">Nog geen vacatures</div><div style="font-size:.88rem;margin-bottom:1rem;">Plaats je eerste stage-opdracht en bereik gemotiveerde studenten.</div><button onclick="show('new')" type="button" style="background:var(--accent,#e05c1a);color:white;border:none;padding:8px 18px;border-radius:8px;font-size:.88rem;cursor:pointer;">Eerste vacature plaatsen →</button></div>`;
     return;
   }
 
@@ -1735,10 +1735,10 @@ function renderList(cid, data) {
     html += `
     <div style="background:#fff7ed;border:1px solid #f97316;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
       <span style="font-size:.88rem;color:#c2410c;font-weight:600">
-        ðŸ”’ Starter: 1 actieve vacature inbegrepen â€” ${escapeHtml(String(data.length - 1))} vacature${data.length - 1 !== 1 ? 's' : ''} vergrendeld
+        🔒 Starter: 1 actieve vacature inbegrepen — ${escapeHtml(String(data.length - 1))} vacature${data.length - 1 !== 1 ? 's' : ''} vergrendeld
       </span>
       <button onclick="window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
-        Upgraden â†’
+        Upgraden →
       </button>
     </div>`;
   }
@@ -1751,30 +1751,30 @@ function renderList(cid, data) {
     <div class="posting-card" data-posting-id="${p.id}" style="position:relative;${locked ? 'pointer-events:none;' : ''}">
       ${locked ? `
       <div style="position:absolute;inset:0;background:rgba(248,249,250,.88);border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:2">
-        <span style="font-size:1.4rem">ðŸ”’</span>
+        <span style="font-size:1.4rem">🔒</span>
         <span style="font-size:.83rem;color:var(--ink3);font-weight:600">Beschikbaar vanaf Pro</span>
         <button onclick="event.stopPropagation();window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer;pointer-events:all">
-          Upgraden â†’
+          Upgraden →
         </button>
       </div>` : ''}
       <div class="pc-head">
         <div>
           <div class="pc-title">${escapeHtml(p.title)}</div>
-          <div class="pc-meta">${escapeHtml(p.company_name)} Â· ${escapeHtml(p.sector || 'â€”')} Â· ${escapeHtml(p.duration || 'â€”')}</div>
+          <div class="pc-meta">${escapeHtml(p.company_name)} · ${escapeHtml(p.sector || '—')} · ${escapeHtml(p.duration || '—')}</div>
         </div>
         ${statusBadge(p.status)}
       </div>
       <div class="pc-tags">
         <span class="tag tag-target">${targetLabel(p.match_target)}</span>
-        ${p.guarantee ? `<span class="tag tag-green">âš¡ Responsgarantie</span>` : ''}
+        ${p.guarantee ? `<span class="tag tag-green">⚡ Responsgarantie</span>` : ''}
         ${(p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
       </div>
-      <div class="pc-desc">${escapeHtml(desc)}${hasMore ? 'â€¦' : ''}</div>
+      <div class="pc-desc">${escapeHtml(desc)}${hasMore ? '…' : ''}</div>
       <div class="pc-actions">
         ${p.status === 'active'
-          ? `<button class="btn-xs btn-pause" onclick="setStatus('${p.id}','paused')">â¸ Pauzeren</button>`
-          : `<button class="btn-xs btn-activate" onclick="setStatus('${p.id}','active')">âœ“ Activeren</button>`}
-        <button class="btn-xs btn-del" onclick="delPosting('${p.id}')">âœ• Verwijderen</button>
+          ? `<button class="btn-xs btn-pause" onclick="setStatus('${p.id}','paused')">⏸ Pauzeren</button>`
+          : `<button class="btn-xs btn-activate" onclick="setStatus('${p.id}','active')">✓ Activeren</button>`}
+        <button class="btn-xs btn-del" onclick="delPosting('${p.id}')">✕ Verwijderen</button>
       </div>
     </div>`;
   }).join('');
@@ -1782,7 +1782,7 @@ function renderList(cid, data) {
   el.innerHTML = html;
 }
 
-// â”€â”€ Tags â”€â”€
+// ── Tags ──
 document.getElementById('tagsInput').addEventListener('keydown', function(e) {
   if ((e.key === 'Enter' || e.key === ',') && this.value.trim()) {
     e.preventDefault();
@@ -1798,7 +1798,7 @@ function addTag(s) {
   chip.appendChild(document.createTextNode(s));
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = 'Ã—';
+  closeBtn.textContent = '×';
   closeBtn.addEventListener('click', () => removeTag(s, closeBtn));
   chip.appendChild(closeBtn);
   document.getElementById('tagsBox').insertBefore(chip, document.getElementById('tagsInput'));
@@ -1808,7 +1808,7 @@ function removeTag(s, btn) {
   btn.closest('.tag-chip').remove();
 }
 
-// â”€â”€ Target â”€â”€
+// ── Target ──
 function setTarget(val) {
   matchTarget = val;
   ['student','school','beide'].forEach(v => {
@@ -1816,7 +1816,7 @@ function setTarget(val) {
   });
 }
 
-// â”€â”€ Matches screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Matches screen ────────────────────────────────────────────────────────────
 function calcDeadlineState(match, posting) {
   if (!posting?.response_days) return null;
   const elapsed   = Math.floor((Date.now() - new Date(match.created_at)) / 86400000);
@@ -1830,7 +1830,7 @@ function calcDeadlineState(match, posting) {
 async function loadCompanyMatches() {
   const el = document.getElementById('matches-list');
   if (!currentUser) return;
-  el.innerHTML = `<div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>`;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
 
   try {
     const { data: matchRows, error } = await db
@@ -1841,7 +1841,7 @@ async function loadCompanyMatches() {
 
     if (error) throw error;
     if (!matchRows || matchRows.length === 0) {
-      el.innerHTML = `<div class="empty-state"><span class="es-icon">ðŸ¤</span><p class="es-primary">Nog geen aanmeldingen op je vacature.</p><p class="es-secondary">Vacatures met een actieve responsgarantie krijgen meer sollicitaties. Stel hem in bij het aanmaken of bewerken van een vacature.</p><button onclick="show('new')" class="es-cta">Nieuwe vacature plaatsen</button></div>`;
+      el.innerHTML = `<div class="empty-state"><span class="es-icon">🤝</span><p class="es-primary">Nog geen aanmeldingen op je vacature.</p><p class="es-secondary">Vacatures met een actieve responsgarantie krijgen meer sollicitaties. Stel hem in bij het aanmaken of bewerken van een vacature.</p><button onclick="show('new')" class="es-cta">Nieuwe vacature plaatsen</button></div>`;
       return;
     }
 
@@ -1856,22 +1856,22 @@ async function loadCompanyMatches() {
         banner.style.cssText = 'background:#fffbeb;border:1px solid #f59e0b;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
         banner.innerHTML = `
           <span style="font-size:.88rem;color:#92400e;font-weight:600">
-            âš ï¸ Je hebt deze maand ${escapeHtml(String(thisMonthCount))} sollicitaties ontvangen â€” Starter is bedoeld voor max. 5/mnd. Upgrade voor onbeperkte matches.
+            ⚠️ Je hebt deze maand ${escapeHtml(String(thisMonthCount))} sollicitaties ontvangen — Starter is bedoeld voor max. 5/mnd. Upgrade voor onbeperkte matches.
           </span>
           <button onclick="window.location.href='pricing.html#section-bedrijf'" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
-            Upgraden â†’
+            Upgraden →
           </button>`;
         el.parentNode.insertBefore(banner, el);
       }
     }
 
-    // BOL Fix 2 â€” status labels per rol (bedrijf-perspectief)
+    // BOL Fix 2 — status labels per rol (bedrijf-perspectief)
     const statusLabel = {
-      pending:  'ðŸ“© Nieuwe aanmelding',
-      accepted: 'âœ“ Geaccepteerd',
-      active:   'ðŸŽ¯ Stage loopt',
-      rejected: 'âœ• Afgewezen',
-      ended:    'âœ“ Stage afgerond'
+      pending:  '📩 Nieuwe aanmelding',
+      accepted: '✓ Geaccepteerd',
+      active:   '🎯 Stage loopt',
+      rejected: '✕ Afgewezen',
+      ended:    '✓ Stage afgerond'
     };
     const statusCls   = { pending: 'neutral', accepted: 'green', rejected: 'red', active: 'green', ended: 'green' };
 
@@ -1900,43 +1900,43 @@ async function loadCompanyMatches() {
             <div>
               <div class="card-title">${escapeHtml(posting.title || 'Stageplek')}</div>
               <div class="card-sub">${escapeHtml(formatNLDate(m.created_at))}</div>
-              ${dl ? `<div class="deadline-meter" data-state="${escapeHtml(dl.state)}">â± ${escapeHtml(dl.label)}</div>` : ''}
+              ${dl ? `<div class="deadline-meter" data-state="${escapeHtml(dl.state)}">⏱ ${escapeHtml(dl.label)}</div>` : ''}
             </div>
             <span class="tag ${sCls}">${escapeHtml(sLabel)}</span>
           </div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
             ${isPending ? `
-              <button class="btn-xs btn-activate" onclick="acceptMatch('${m.id}','${m.party_a}')">âœ“ Accepteren</button>
-              <button class="btn-xs btn-del" onclick="rejectMatch('${m.id}','${m.party_a}')">âœ• Afwijzen</button>
+              <button class="btn-xs btn-activate" onclick="acceptMatch('${m.id}','${m.party_a}')">✓ Accepteren</button>
+              <button class="btn-xs btn-del" onclick="rejectMatch('${m.id}','${m.party_a}')">✕ Afwijzen</button>
             ` : ''}
             ${hasConv ? `
               <a href="chat.html?match=${escapeHtml(m.id)}"
                  style="font-size:.82rem;color:var(--green);font-weight:700;text-decoration:none;
                         background:var(--green-bg);padding:7px 14px;border-radius:20px;display:inline-block;min-height:36px;align-items:center;display:inline-flex">
-                ðŸ’¬ Open chat â†’
+                💬 Open chat →
               </a>` : ''}
             ${hasConv && hasBusiness ? `
               <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
                  style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;
                         background:#fdf0e8;padding:7px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;min-height:36px">
-                ðŸ“Š Stage Hub â†’
+                📊 Stage Hub →
               </a>` : ''}
             ${m.status === 'accepted' ? `
               <button class="btn btn-ghost btn-sm"
                 onclick="openEindbeoordelingModal('${m.id}','${m.party_a}')"
                 title="Stage afronden en eindbeoordeling geven">
-                Stage afronden â†’
+                Stage afronden →
               </button>` : ''}
           </div>
         </div>`;
     }).join('');
   } catch(e) {
     console.error('loadCompanyMatches fout:', e?.message || 'onbekende fout');
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âš ï¸</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-// â”€â”€ Mijn studenten badge â€” Bundel A 30 apr 2026 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Mijn studenten badge — Bundel A 30 apr 2026 ──────────────────────────────
 function updateStudentenBadge(count) {
   const badge = document.getElementById('badge-studenten');
   if (!badge) return;
@@ -1966,15 +1966,15 @@ async function loadStudentenBadge(userId) {
   }
 }
 
-// â”€â”€ Mijn studenten screen â€” Hub fix 2026-04-30 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Mijn studenten screen — Hub fix 2026-04-30 ────────────────────────────────
 async function loadCompanyStudenten() {
   const el = document.getElementById('studenten-list');
   if (!el) return;
   if (!currentUser) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>';
+    el.innerHTML = '<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>';
     return;
   }
-  el.innerHTML = '<div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>';
+  el.innerHTML = '<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>';
 
   try {
     const { data: matchRows, error } = await db
@@ -1994,7 +1994,7 @@ async function loadCompanyStudenten() {
     if (!matchRows || matchRows.length === 0) {
       el.innerHTML = `
         <div class="empty-state">
-          <span class="es-icon">ðŸŽ“</span>
+          <span class="es-icon">🎓</span>
           <p class="es-primary">Nog geen actieve stages.</p>
           <p class="es-secondary">Studenten verschijnen hier zodra je een sollicitatie hebt geaccepteerd.</p>
           <button onclick="show('matches')" class="es-cta">Bekijk matches</button>
@@ -2026,7 +2026,7 @@ async function loadCompanyStudenten() {
     el.innerHTML = matchRows.map(m => {
       const student = studentMap[m.party_a] || {};
       const naam     = student.naam     || 'Student';
-      const opleiding = student.opleiding || 'â€”';
+      const opleiding = student.opleiding || '—';
       const jaar     = student.jaar ? 'Jaar ' + student.jaar : '';
       const ms       = msMap[m.id] || [];
       const pct      = (typeof calcProgress === 'function') ? calcProgress(ms) : 0;
@@ -2045,40 +2045,40 @@ async function loadCompanyStudenten() {
           ${avatarHtml}
           <div style="flex:1;min-width:200px">
             <div style="font-weight:600;color:var(--ink);font-size:.95rem;margin-bottom:2px">${escapeHtml(naam)}</div>
-            <div style="font-size:.82rem;color:var(--ink3);margin-bottom:8px">${escapeHtml(opleiding)}${jaar ? ' Â· ' + jaar : ''}</div>
+            <div style="font-size:.82rem;color:var(--ink3);margin-bottom:8px">${escapeHtml(opleiding)}${jaar ? ' · ' + jaar : ''}</div>
             <div style="height:6px;background:#eceae4;border-radius:3px;overflow:hidden;margin-bottom:4px;max-width:280px">
               <div style="height:100%;width:${pct}%;background:${barColor};border-radius:3px"></div>
             </div>
-            <div style="font-size:.74rem;color:var(--ink3)">${confirmed} van ${total} mijlpalen â€” ${pct}%</div>
+            <div style="font-size:.74rem;color:var(--ink3)">${confirmed} van ${total} mijlpalen — ${pct}%</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:center">
             <a href="chat.html?match=${escapeHtml(m.id)}"
-               style="font-size:.82rem;color:var(--green);font-weight:700;text-decoration:none;background:var(--green-bg);padding:7px 14px;border-radius:20px">ðŸ’¬ Chat</a>
+               style="font-size:.82rem;color:var(--green);font-weight:700;text-decoration:none;background:var(--green-bg);padding:7px 14px;border-radius:20px">💬 Chat</a>
             <a href="match-dashboard.html?match=${escapeHtml(m.id)}"
-               style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:7px 14px;border-radius:20px">ðŸ“Š Stage Hub â†’</a>
+               style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;background:#fdf0e8;padding:7px 14px;border-radius:20px">📊 Stage Hub →</a>
           </div>
         </div>`;
     }).join('');
   } catch (e) {
     console.warn('[loadCompanyStudenten] fout:', e?.message || e);
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âš ï¸</span>Kon studenten niet laden â€” probeer opnieuw</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Kon studenten niet laden — probeer opnieuw</div>`;
   }
 }
 
 async function acceptMatch(matchId, studentId) {
   const { error } = await db.from('matches').update({ status: 'accepted' }).eq('id', matchId).eq('party_b', currentUser.id);
-  if (error) { console.error('[company] acceptMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); return; }
+  if (error) { console.error('[company] acceptMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
 
   // Create conversation
   let { data: conv } = await db.from('conversations').select('id').eq('match_id', matchId).limit(1).maybeSingle();
   if (!conv) {
     const { data: newConv, error: convErr } = await db.from('conversations').insert({ match_id: matchId }).select('id').maybeSingle();
-    if (convErr) { console.error('[company] conv aanmaken fout:', convErr.message || 'onbekende fout'); notify('Match geaccepteerd maar chat aanmaken mislukt â€” probeer opnieuw', false); return; }
+    if (convErr) { console.error('[company] conv aanmaken fout:', convErr.message || 'onbekende fout'); notify('Match geaccepteerd maar chat aanmaken mislukt — probeer opnieuw', false); return; }
     if (!newConv) { notify('Gesprek kon niet worden aangemaakt'); return; }
     conv = newConv;
   }
 
-  // Seed stage milestone tracker â€” CC Instructie 2
+  // Seed stage milestone tracker — CC Instructie 2
   try {
     const { data: _sp } = await db
       .from('student_profiles')
@@ -2092,21 +2092,21 @@ async function acceptMatch(matchId, studentId) {
   } catch (_e) {
     console.warn('[acceptMatch] milestone seed fout:',
       _e?.message || _e);
-    // non-blocking â€” match accept gaat door
+    // non-blocking — match accept gaat door
   }
 
   // Notify student
   const companyName = getDisplayName(currentUser);
-  createNotification(studentId, 'application_accepted', matchId, 'match', companyName + ' heeft jouw match geaccepteerd â€” start het gesprek!');
+  createNotification(studentId, 'application_accepted', matchId, 'match', companyName + ' heeft jouw match geaccepteerd — start het gesprek!');
 
   sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
-  notify('âœ“ Match geaccepteerd');
+  notify('✓ Match geaccepteerd');
   loadCompanyMatches();
 }
 
 async function rejectMatch(matchId, studentId) {
   const { error } = await db.from('matches').update({ status: 'rejected' }).eq('id', matchId).eq('party_b', currentUser.id);
-  if (error) { console.error('[company] rejectMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); return; }
+  if (error) { console.error('[company] rejectMatch fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
 
   // Notify student
   const companyName = getDisplayName(currentUser);
@@ -2117,7 +2117,7 @@ async function rejectMatch(matchId, studentId) {
   loadCompanyMatches();
 }
 
-// â”€â”€ Eindbeoordeling modal (CC Instructie 2) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Eindbeoordeling modal (CC Instructie 2) ───────────────────────────────────
 async function openEindbeoordelingModal(matchId, studentId) {
   let milestones = [];
   try {
@@ -2131,7 +2131,7 @@ async function openEindbeoordelingModal(matchId, studentId) {
     notify('Eindbeoordeling al afgerond.'); return;
   }
   if (m8.status === 'ingediend') {
-    notify('Eindbeoordeling al ingediend â€” wacht op bevestiging school.');
+    notify('Eindbeoordeling al ingediend — wacht op bevestiging school.');
     return;
   }
 
@@ -2183,7 +2183,7 @@ async function openEindbeoordelingModal(matchId, studentId) {
           </button>
           <button class="btn btn-primary" id="eind-confirm-btn"
             onclick="submitEindbeoordeling('${m8.id}','${matchId}','${studentId}')">
-            Versturen â†’
+            Versturen →
           </button>
         </div>
       </div>
@@ -2200,7 +2200,7 @@ async function submitEindbeoordeling(milestoneId, matchId, studentId) {
     await submitMilestone(milestoneId,
       currentUser?.id || window._currentUserId, matchId);
     document.getElementById('eind-modal-backdrop')?.remove();
-    notify('Eindbeoordeling verstuurd â€” school ontvangt bericht');
+    notify('Eindbeoordeling verstuurd — school ontvangt bericht');
   } catch (e) {
     if (btn) btn.disabled = false;
     notify('Kon eindbeoordeling niet versturen', false);
@@ -2208,11 +2208,11 @@ async function submitEindbeoordeling(milestoneId, matchId, studentId) {
   }
 }
 
-// â”€â”€ Berichten screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Berichten screen ──────────────────────────────────────────────────────────
 async function loadBerichten() {
   const el = document.getElementById('berichten-list');
   if (!currentUser) return;
-  el.innerHTML = `<div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>`;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
 
   try {
     const { data: matchRows, error: mErr } = await db
@@ -2226,10 +2226,10 @@ async function loadBerichten() {
     if (!matchRows || matchRows.length === 0) {
       el.innerHTML = `
         <div class="empty-state">
-          <span class="es-icon">ðŸ’¬</span>
+          <span class="es-icon">💬</span>
           <p class="es-primary">Nog geen berichten</p>
           <p class="es-secondary">Berichten verschijnen zodra een student jouw interesse accepteert. Bekijk je openstaande aanmeldingen en matches.</p>
-          <button type="button" class="es-cta" onclick="show('matches')">Bekijk aanmeldingen â†’</button>
+          <button type="button" class="es-cta" onclick="show('matches')">Bekijk aanmeldingen →</button>
         </div>`;
       const badge = document.getElementById('badge-unread');
       if (badge) badge.style.display = 'none';
@@ -2283,27 +2283,27 @@ async function loadBerichten() {
             <a href="chat.html?match=${escapeHtml(m.id)}"
                style="font-size:.85rem;color:var(--green);font-weight:700;text-decoration:none;
                       background:var(--green-bg);padding:6px 14px;border-radius:20px;display:inline-block">
-              ðŸ’¬ Open gesprek â†’
+              💬 Open gesprek →
             </a>
             ${hasBusiness ? `<a href="match-dashboard.html?match=${escapeHtml(m.id)}"
                style="font-size:.85rem;color:#e05c1a;font-weight:700;text-decoration:none;
                       background:#fdf0e8;padding:6px 14px;border-radius:20px;display:inline-block">
-              ðŸ“Š Stage Hub â†’
+              📊 Stage Hub →
             </a>` : ''}
           </div>
         </div>`;
     }).join('');
   } catch(e) {
     console.error('loadBerichten fout:', e?.message || 'onbekende fout');
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âš ï¸</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-// â”€â”€ Reviews screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Reviews screen ────────────────────────────────────────────────────────────
 async function loadReviews() {
   const el = document.getElementById('reviews-content');
   if (!currentUser) return;
-  el.innerHTML = `<div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div>`;
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>Laden…</div>`;
 
   try {
     const { data: reviewRows, error } = await db
@@ -2317,7 +2317,7 @@ async function loadReviews() {
     if (!reviewRows || reviewRows.length === 0) {
       el.innerHTML = `
         <div class="empty">
-          <span class="empty-icon">â­</span>
+          <span class="empty-icon">⭐</span>
           Nog geen reviews ontvangen.<br>
           <small style="font-size:.82rem">Reviews verschijnen hier zodra studenten een beoordeling achterlaten na hun stage.</small>
         </div>`;
@@ -2344,14 +2344,14 @@ async function loadReviews() {
         .select('id, naam, name, email')
         .in('id', reviewerIds);
       (profiles || []).forEach(p => {
-        reviewerMap[p.id] = getDisplayName(p); // SPRINT5 NOTE: getDisplayName checkt p.naam en p.email; p.name niet â€” zie sprint5_findings.md
+        reviewerMap[p.id] = getDisplayName(p); // SPRINT5 NOTE: getDisplayName checkt p.naam en p.email; p.name niet — zie sprint5_findings.md
       });
     }
 
     // Stars HTML helper
     const starsHtml = (rating) => {
       return [1,2,3,4,5].map(i =>
-        `<span class="${i <= rating ? 'review-star-filled' : 'review-star-empty'}">â˜…</span>`
+        `<span class="${i <= rating ? 'review-star-filled' : 'review-star-empty'}">★</span>`
       ).join('');
     };
 
@@ -2365,7 +2365,7 @@ async function loadReviews() {
         <div class="review-dist">
           ${dist.map(d => `
             <div class="review-dist-row">
-              <span style="min-width:14px">â˜… ${d.star}</span>
+              <span style="min-width:14px">★ ${d.star}</span>
               <div class="review-dist-bar">
                 <div class="review-dist-fill" style="width:${count > 0 ? Math.round(d.count/count*100) : 0}%"></div>
               </div>
@@ -2378,7 +2378,7 @@ async function loadReviews() {
       const reviewerName = reviewerMap[r.reviewer_id] || 'Student';
       const initials = reviewerName.slice(0, 2).toUpperCase();
       const dateStr = new Date(r.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
-      const flaggedNote = r.flagged ? `<span style="font-size:.72rem;color:var(--red);margin-left:8px">âš‘ gemeld</span>` : '';
+      const flaggedNote = r.flagged ? `<span style="font-size:.72rem;color:var(--red);margin-left:8px">⚑ gemeld</span>` : '';
       const titleHtml = r.title ? `<div style="font-weight:700;font-size:.95rem;color:var(--ink);margin-bottom:6px">${escapeHtml(r.title)}</div>` : '';
 
       let replyHtml = '';
@@ -2386,7 +2386,7 @@ async function loadReviews() {
         const replyDate = r.company_reply_at ? new Date(r.company_reply_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
         replyHtml = `
           <div style="background:var(--green-bg,#e8f5ee);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:12px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:4px">Jouw reactie ${replyDate ? 'Â· ' + escapeHtml(replyDate) : ''}</div>
+            <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:4px">Jouw reactie ${replyDate ? '· ' + escapeHtml(replyDate) : ''}</div>
             <div style="font-size:.87rem;color:var(--ink2);line-height:1.6">${escapeHtml(r.company_reply)}</div>
           </div>`;
       } else if (!r.flagged) {
@@ -2394,7 +2394,7 @@ async function loadReviews() {
           <div id="reply-area-${escapeHtml(r.id)}" style="margin-top:12px">
             <button onclick="openReplyForm('${escapeHtml(r.id)}')"
               style="font-size:.8rem;color:var(--green);background:none;border:1px solid var(--green);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:'Outfit',sans-serif">
-              âœï¸ Reageer op deze review
+              ✏️ Reageer op deze review
             </button>
           </div>`;
       }
@@ -2417,16 +2417,16 @@ async function loadReviews() {
 
   } catch(e) {
     console.error('loadReviews fout:', e?.message || 'onbekende fout');
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âš ï¸</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden: ${escapeHtml(e.message)}</div>`;
   }
 }
 
-// â”€â”€ Right of reply â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Right of reply ───────────────────────────────────────────────────────────
 function _replyOpenBtn(reviewId) {
   const area = document.getElementById('reply-area-' + reviewId);
   if (!area) return;
   const btn = document.createElement('button');
-  btn.textContent = 'âœï¸ Reageer op deze review';
+  btn.textContent = '✏️ Reageer op deze review';
   btn.style.cssText = 'font-size:.8rem;color:var(--green);background:none;border:1px solid var(--green);border-radius:20px;padding:5px 14px;cursor:pointer;font-family:\'Outfit\',sans-serif';
   btn.onclick = () => openReplyForm(reviewId);
   area.innerHTML = '';
@@ -2444,7 +2444,7 @@ function openReplyForm(reviewId) {
   ta.id          = 'reply-text-' + reviewId;
   ta.maxLength   = 1000;
   ta.rows        = 4;
-  ta.placeholder = 'Schrijf een professionele reactie (10â€“1000 tekens)â€¦';
+  ta.placeholder = 'Schrijf een professionele reactie (10–1000 tekens)…';
   ta.style.cssText = 'width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:10px;font-family:\'Outfit\',sans-serif;font-size:.88rem;color:var(--ink);outline:none;resize:vertical;box-sizing:border-box';
 
   const counter = document.createElement('div');
@@ -2491,7 +2491,7 @@ async function sendReply(reviewId) {
       const dateStr = new Date().toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
       area.innerHTML = `
         <div style="background:var(--green-bg,#e8f5ee);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:12px">
-          <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:4px">Jouw reactie Â· ${escapeHtml(dateStr)}</div>
+          <div style="font-size:.75rem;font-weight:600;color:var(--green);margin-bottom:4px">Jouw reactie · ${escapeHtml(dateStr)}</div>
           <div style="font-size:.87rem;color:var(--ink2);line-height:1.6">${escapeHtml(text)}</div>
         </div>`;
     }
@@ -2500,7 +2500,7 @@ async function sendReply(reviewId) {
   }
 }
 
-// â”€â”€ Trust Score Engine (A=30%, B=25%, C=20%, D=25%) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Trust Score Engine (A=30%, B=25%, C=20%, D=25%) ──────────────────────────
 async function herberekeningTrustScore(companyUserId) {
   if (!companyUserId) return;
   const key = 'internly_trust_calculated_' + companyUserId;
@@ -2514,7 +2514,7 @@ async function herberekeningTrustScore(companyUserId) {
       .eq('created_by', companyUserId);
     const postingIds = (myPostings || []).map(p => p.id);
 
-    // Pre-fetch matches once â€” used by both Component A and Component B
+    // Pre-fetch matches once — used by both Component A and Component B
     const { data: myMatches } = await db
       .from('matches')
       .select('status')
@@ -2522,7 +2522,7 @@ async function herberekeningTrustScore(companyUserId) {
 
     // Component A: match response rate (30%)
     // Measures how often the company responds (accepts or rejects) vs ignoring matches.
-    let componentA = 15; // default (50% equivalent â€” neutral for new companies)
+    let componentA = 15; // default (50% equivalent — neutral for new companies)
     {
       const totalReceived = (myMatches || []).length;
       const responded     = (myMatches || []).filter(m => m.status !== 'pending').length;
@@ -2570,7 +2570,7 @@ async function herberekeningTrustScore(companyUserId) {
     updateTrustDisplay(score, grade, reviewCount);
 
     // AUDIT FIX 2026-04-30: trust_score
-    // write disabled â€” score berekend client-side voor display
+    // write disabled — score berekend client-side voor display
     // maar NIET naar DB geschreven. Edge Function vereist.
     // Zie PREDEPLOY_AUDIT_2026-04-30.md CHECK 18/30.
     // await db.from('company_profiles').upsert(
@@ -2579,7 +2579,7 @@ async function herberekeningTrustScore(companyUserId) {
     // );
 
     // AUDIT FIX 2026-04-30: trust_score
-    // write disabled â€” score berekend client-side voor display
+    // write disabled — score berekend client-side voor display
     // maar NIET naar DB geschreven. Edge Function vereist.
     // Zie PREDEPLOY_AUDIT_2026-04-30.md CHECK 18/30.
     // if (postingIds.length > 0) {
@@ -2593,7 +2593,7 @@ async function herberekeningTrustScore(companyUserId) {
   }
 }
 
-// â”€â”€ Sector mapping: company sector â†’ student opdracht_domein values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Sector mapping: company sector → student opdracht_domein values ───────────
 const COMPANY_TO_STUDENT_SECTOR = {
   'Marketing':    ['Marketing & Communicatie'],
   'IT':           ['Software & Development', 'Data & Analytics'],
@@ -2609,7 +2609,7 @@ const COMPANY_TO_STUDENT_SECTOR = {
   'Anders':       ['Anders'],
 };
 
-// â”€â”€ Matching trigger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Matching trigger ──────────────────────────────────────────────────────────
 async function triggerCompanyMatching(companyUserId, sector, postingId) {
   if (!companyUserId || !sector || !postingId) return 0;
   try {
@@ -2657,7 +2657,7 @@ async function triggerCompanyMatching(companyUserId, sector, postingId) {
   }
 }
 
-// â”€â”€ Submit â”€â”€
+// ── Submit ──
 async function submitPosting() {
   const company = document.getElementById('f-company').value.trim();
   const sector  = document.getElementById('f-sector').value;
@@ -2670,7 +2670,7 @@ async function submitPosting() {
   }
 
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = 'Plaatsenâ€¦';
+  btn.disabled = true; btn.textContent = 'Plaatsen…';
 
   const postcode = document.getElementById('f-postcode').value.trim().toUpperCase().replace(/\s+/g, ' ') || null;
 
@@ -2691,9 +2691,9 @@ async function submitPosting() {
     status:        'active',
   }).select('id').maybeSingle();
 
-  btn.disabled = false; btn.textContent = 'Vacature plaatsen â†’';
+  btn.disabled = false; btn.textContent = 'Vacature plaatsen →';
 
-  if (error) { notify('Fout bij plaatsen â€” probeer het opnieuw'); return; }
+  if (error) { notify('Fout bij plaatsen — probeer het opnieuw'); return; }
   if (!inserted) { notify('Er ging iets mis'); return; }
 
   const postingId  = inserted?.id;
@@ -2702,8 +2702,8 @@ async function submitPosting() {
     : 0;
 
   notify(matchCount > 0
-    ? `âœ“ Vacature geplaatst! ${matchCount} potentiÃ«le student${matchCount !== 1 ? 'en' : ''} gevonden.`
-    : 'âœ“ Vacature geplaatst!');
+    ? `✓ Vacature geplaatst! ${matchCount} potentiële student${matchCount !== 1 ? 'en' : ''} gevonden.`
+    : '✓ Vacature geplaatst!');
 
   ['f-company','f-title','f-desc','f-start','f-responsedays','f-postcode'].forEach(id => document.getElementById(id).value = '');
   const vestSel = document.getElementById('f-vestiging');
@@ -2719,7 +2719,7 @@ async function submitPosting() {
   show('postings');
 }
 
-// â”€â”€ Status â”€â”€
+// ── Status ──
 async function setStatus(id, status) {
   if (status === 'paused') {
     // Optimistic: verberg kaart meteen, toon undo-toast
@@ -2749,38 +2749,38 @@ async function setStatus(id, status) {
     return;
   }
 
-  // Activeren â€” directe feedback (niet onderdaan-maakbaar)
+  // Activeren — directe feedback (niet onderdaan-maakbaar)
   const { error } = await db.from('internship_postings').update({ status }).eq('id', id);
-  if (error) { console.error('[company] setStatus fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); return; }
-  notify('âœ“ Vacature geactiveerd');
+  if (error) { console.error('[company] setStatus fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
+  notify('✓ Vacature geactiveerd');
   await loadPostings();
   renderList('all-postings', postings);
 }
 
-// â”€â”€ Delete â”€â”€
+// ── Delete ──
 async function delPosting(id) {
   openModal(
     'Vacature verwijderen',
     'Weet je zeker dat je deze vacature definitief wilt verwijderen? Dit kan niet ongedaan worden gemaakt.',
     async () => {
       const { error } = await db.from('internship_postings').delete().eq('id', id).eq('created_by', currentUser.id);
-      if (error) { console.error('[company] delPosting fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); return; }
-      notify('âœ“ Vacature verwijderd');
+      if (error) { console.error('[company] delPosting fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
+      notify('✓ Vacature verwijderd');
       await loadPostings();
       renderList('all-postings', postings);
     }
   );
 }
 
-// â”€â”€ Company profile overview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Company profile overview ─────────────────────────────────────────────────
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
 }
 
 function toonBedrijfOverzicht(data) {
-  setText('cpv-naam',        data.bedrijfsnaam || 'â€”');
-  setText('cpv-sector-size', [data.sector, data.size].filter(Boolean).join(' Â· ') || 'â€”');
+  setText('cpv-naam',        data.bedrijfsnaam || '—');
+  setText('cpv-sector-size', [data.sector, data.size].filter(Boolean).join(' · ') || '—');
   setText('cpv-beschrijving', data.beschrijving || 'Nog geen beschrijving toegevoegd.');
 
   const websiteEl = document.getElementById('cpv-website');
@@ -2802,10 +2802,10 @@ function toonBedrijfOverzicht(data) {
   const vollEl  = document.getElementById('cpv-volledigheid');
   if (vollEl) {
     if (filled === 5) {
-      vollEl.innerHTML = '<span style="color:#1a7a48;font-weight:600">âœ“ Profiel volledig ingevuld</span>';
+      vollEl.innerHTML = '<span style="color:#1a7a48;font-weight:600">✓ Profiel volledig ingevuld</span>';
     } else {
       vollEl.innerHTML = '<span style="font-weight:600;color:#a06010">Profiel ' + filled + '/5 compleet</span>'
-        + '<span style="color:#6b7280;font-size:.82rem"> â€” vul nog in: ' + missing.join(', ') + '</span>';
+        + '<span style="color:#6b7280;font-size:.82rem"> — vul nog in: ' + missing.join(', ') + '</span>';
     }
   }
 
@@ -2819,7 +2819,7 @@ function toonBedrijfFormulier() {
   window.scrollTo(0, 0);
 }
 
-// â”€â”€ Profile completeness indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Profile completeness indicator ───────────────────────────────────────────
 function updateProfileCompleteness() {
   const fields = [
     { id: 'p-naam',    label: 'bedrijfsnaam' },
@@ -2840,10 +2840,10 @@ function updateProfileCompleteness() {
     return;
   }
   hint.style.display = 'block';
-  hint.innerHTML = `Profiel <strong>${filled}/${fields.length}</strong> compleet â€” vul <em>${missing.join(', ')}</em> in voor een hogere Trust Score.`;
+  hint.innerHTML = `Profiel <strong>${filled}/${fields.length}</strong> compleet — vul <em>${missing.join(', ')}</em> in voor een hogere Trust Score.`;
 }
 
-// â”€â”€ Worldwide verificatie UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Worldwide verificatie UI ──────────────────────────
 // 1 mei 2026
 
 function handleCompanyTypeChange(type) {
@@ -2883,8 +2883,8 @@ async function startVatVerification() {
   }
 
   btn.disabled = true;
-  btn.textContent = 'VerifiÃ«ren...';
-  statusEl.textContent = 'â³ VIES wordt geraadpleegd...';
+  btn.textContent = 'Verifiëren...';
+  statusEl.textContent = '⏳ VIES wordt geraadpleegd...';
   statusEl.style.color = '#7a8799';
 
   try {
@@ -2910,19 +2910,19 @@ async function startVatVerification() {
 
     if (res.status === 429) {
       statusEl.textContent =
-        `â° ${data.error || 'Rate limit bereikt'}`;
+        `⏰ ${data.error || 'Rate limit bereikt'}`;
       statusEl.style.color = '#a06010';
       return;
     }
 
     if (data.valid && data.status === 'verified') {
       statusEl.innerHTML =
-        `âœ“ Geverifieerd via VIES${data.name ? ' â€” ' + escapeHtml(data.name) : ''}`;
+        `✓ Geverifieerd via VIES${data.name ? ' — ' + escapeHtml(data.name) : ''}`;
       statusEl.style.color = '#1a7a48';
       renderVerificationBadge('verified');
     } else if (data.status === 'pending') {
       statusEl.textContent =
-        data.message || 'â³ Handmatige verificatie gestart.';
+        data.message || '⏳ Handmatige verificatie gestart.';
       statusEl.style.color = '#a06010';
       renderVerificationBadge('pending');
       // Toon document upload voor manual-flow
@@ -2941,7 +2941,7 @@ async function startVatVerification() {
     console.error('[vat-verify] fout:', err);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Verifieer â†’';
+    btn.textContent = 'Verifieer →';
   }
 }
 
@@ -2973,7 +2973,7 @@ async function uploadVerificationDoc() {
     if (error) throw error;
 
     if (statusEl) {
-      statusEl.textContent = 'âœ“ Document geÃ¼pload';
+      statusEl.textContent = '✓ Document geüpload';
       statusEl.style.color = '#1a7a48';
     }
 
@@ -3002,22 +3002,22 @@ function renderVerificationBadge(status) {
   const config = {
     verified:   {
       bg: '#e8f5ee', color: '#0f5c36', border: '#1a7a48',
-      text: 'âœ“ Bedrijf geverifieerd',
+      text: '✓ Bedrijf geverifieerd',
       sub: 'Je vacatures zijn zichtbaar voor studenten.'
     },
     pending:    {
       bg: '#fdf3e0', color: '#a06010', border: '#e6a817',
-      text: 'â³ Verificatie in behandeling',
+      text: '⏳ Verificatie in behandeling',
       sub: 'Je ontvangt bericht zodra je bedrijf is goedgekeurd.'
     },
     rejected:   {
       bg: '#fdeaea', color: '#b82020', border: '#e04040',
-      text: 'âœ• Verificatie afgewezen',
+      text: '✕ Verificatie afgewezen',
       sub: 'Bekijk de reden hieronder en upload een nieuw document.'
     },
     unverified: {
       bg: '#f4f3ef', color: '#7a8799', border: '#d4d2cc',
-      text: 'âšª Nog niet geverifieerd',
+      text: '⚪ Nog niet geverifieerd',
       sub: 'Verifieer je bedrijf om vacatures zichtbaar te maken.'
     }
   };
@@ -3034,11 +3034,11 @@ function renderVerificationBadge(status) {
     </div>`;
 }
 
-// â”€â”€ Save profile â”€â”€
+// ── Save profile ──
 async function saveProfile() {
   if (!currentUser) { notify('Niet ingelogd'); return; }
   const btn = document.getElementById('saveProfileBtn');
-  btn.disabled = true; btn.textContent = 'Opslaanâ€¦';
+  btn.disabled = true; btn.textContent = 'Opslaan…';
 
   const { error } = await db.from('company_profiles').upsert({
     profile_id:      currentUser.id,
@@ -3056,16 +3056,16 @@ async function saveProfile() {
     accepts_erasmus: document.getElementById('p-erasmus')?.checked ?? false,
   }, { onConflict: 'profile_id' });
 
-  btn.disabled = false; btn.textContent = 'Profiel opslaan â†’';
-  if (error) { console.error('[company] profiel opslaan fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); return; }
+  btn.disabled = false; btn.textContent = 'Profiel opslaan →';
+  if (error) { console.error('[company] profiel opslaan fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
 
-  // Upload verification doc indien geselecteerd â€” Worldwide 1 mei 2026
+  // Upload verification doc indien geselecteerd — Worldwide 1 mei 2026
   const _docInput = document.getElementById('p-verify-doc');
   if (_docInput?.files?.length) {
     await uploadVerificationDoc();
   }
 
-  notify('âœ“ Profiel opgeslagen');
+  notify('✓ Profiel opgeslagen');
   toonBedrijfOverzicht({
     bedrijfsnaam: document.getElementById('p-naam').value.trim()    || null,
     sector:       document.getElementById('p-sector').value.trim()  || null,
@@ -3077,7 +3077,7 @@ async function saveProfile() {
   herberekeningTrustScore(currentUser.id);
 }
 
-// â”€â”€ Flag review â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Flag review ──────────────────────────────────────────────────────────────
 let _flagReviewId = null;
 
 function flagReview(reviewId) {
@@ -3103,7 +3103,7 @@ async function submitFlagReview() {
   const btn    = document.getElementById('flagModalSubmit');
   if (!reason) { if (err) err.style.display = 'block'; return; }
   if (err) err.style.display = 'none';
-  if (btn) { btn.disabled = true; btn.textContent = 'Meldenâ€¦'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Melden…'; }
 
   const { error } = await db.from('reviews').update({
     flagged:     true,
@@ -3113,22 +3113,22 @@ async function submitFlagReview() {
   }).eq('id', _flagReviewId);
 
   closeFlagModal();
-  if (error) { console.error('[company] flagReview fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan â€” probeer het opnieuw', false); return; }
-  notify('Beoordeling gemeld â€” wordt beoordeeld door het Internly team');
+  if (error) { console.error('[company] flagReview fout:', error?.message || 'onbekende fout'); notify('Er is iets misgegaan — probeer het opnieuw', false); return; }
+  notify('Beoordeling gemeld — wordt beoordeeld door het Internly team');
   loadReviews();
 }
 
-// â”€â”€ Force Trust Score recalculation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Force Trust Score recalculation ──────────────────────────────────────────
 async function forceTrustRecalculate() {
   if (!currentUser) return;
   sessionStorage.removeItem('internly_trust_calculated_' + currentUser.id);
-  document.getElementById('stat-trust').textContent = 'â€¦';
-  document.getElementById('stat-grade').textContent = 'berekenenâ€¦';
+  document.getElementById('stat-trust').textContent = '…';
+  document.getElementById('stat-grade').textContent = 'berekenen…';
   await herberekeningTrustScore(currentUser.id);
   notify('Trust Score herberekend');
 }
 
-// â”€â”€ Push prompt banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Push prompt banner ────────────────────────────────────────────────────────
 function showPushPromptBanner() {
   if (document.getElementById('push-banner')) return;
   const banner = document.createElement('div');
@@ -3136,7 +3136,7 @@ function showPushPromptBanner() {
   banner.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#fff;border:1px solid var(--border2);border-radius:14px;padding:18px 20px;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);font-size:.88rem;';
   banner.innerHTML = `
     <div style="font-weight:600;margin-bottom:6px;font-size:.95rem">Meldingen aanzetten?</div>
-    <div style="color:var(--ink3);margin-bottom:14px;line-height:1.5">Ontvang een melding zodra er een nieuwe match of reactie binnenkomt â€” ook als je dit tabblad sluit.</div>
+    <div style="color:var(--ink3);margin-bottom:14px;line-height:1.5">Ontvang een melding zodra er een nieuwe match of reactie binnenkomt — ook als je dit tabblad sluit.</div>
     <div style="display:flex;gap:8px">
       <button onclick="acceptPush()" style="flex:1;padding:8px;border-radius:8px;border:none;background:var(--orange);color:#fff;font-weight:600;cursor:pointer;font-size:.85rem">Ja, aanzetten</button>
       <button onclick="dismissPush()" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:none;cursor:pointer;font-size:.85rem;color:var(--ink3)">Nee, bedankt</button>
@@ -3159,7 +3159,7 @@ function dismissPush() {
   if (banner) banner.remove();
 }
 
-// â”€â”€ ESG & Rapportage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ESG & Rapportage ─────────────────────────────────────────────────────────
 
 async function loadESGData(companyProfileId, year) {
   const yStart = `${year}-01-01`;
@@ -3244,34 +3244,34 @@ async function renderESG() {
   const el = document.getElementById('esg-content');
   if (!el || !currentUser) return;
 
-  // â”€â”€ Plan gate â”€â”€
+  // ── Plan gate ──
   const isPro      = currentPlan === 'company_pro';
   const isBusiness = currentPlan === 'company_business';
   if (!isPro && !isBusiness) {
     el.innerHTML = `
       <div style="text-align:center;padding:3rem 1rem;">
-        <div style="font-size:2rem;margin-bottom:.75rem">ðŸŒ±</div>
+        <div style="font-size:2rem;margin-bottom:.75rem">🌱</div>
         <div style="font-weight:500;margin-bottom:.5rem">
           ESG-rapportage is beschikbaar vanaf Pro
         </div>
         <div style="font-size:.88rem;color:var(--ink3);margin-bottom:1.25rem;max-width:360px;margin-left:auto;margin-right:auto;line-height:1.6;">
-          Bedrijven op het Pro- of Business-plan krijgen automatisch een overzicht van hun investering in jong talent â€” klaar voor het CSRD-verslag.
+          Bedrijven op het Pro- of Business-plan krijgen automatisch een overzicht van hun investering in jong talent — klaar voor het CSRD-verslag.
         </div>
         <a href="pricing.html#section-bedrijf" style="display:inline-flex;align-items:center;gap:.4rem;padding:9px 20px;background:var(--accent);color:white;border-radius:var(--r-sm);text-decoration:none;font-size:.88rem;font-weight:500;">
-          Upgraden naar Pro â†’
+          Upgraden naar Pro →
         </a>
       </div>`;
     return;
   }
 
-  // â”€â”€ Loading state â”€â”€
-  el.innerHTML = `<div class="empty"><span class="empty-icon">â³</span>ESG-data ladenâ€¦</div>`;
+  // ── Loading state ──
+  el.innerHTML = `<div class="empty"><span class="empty-icon">⏳</span>ESG-data laden…</div>`;
 
   let data;
   try {
     data = await loadESGData(currentUser.id, _esgYear);
   } catch(e) {
-    el.innerHTML = `<div class="empty"><span class="empty-icon">âš ï¸</span>Fout bij laden van ESG-data.</div>`;
+    el.innerHTML = `<div class="empty"><span class="empty-icon">⚠️</span>Fout bij laden van ESG-data.</div>`;
     return;
   }
 
@@ -3283,26 +3283,26 @@ async function renderESG() {
 
   const csrdText = `${escapeHtml(companyName)} heeft in ${_esgYear} ${totaalStages} stageplekken aangeboden aan studenten in de sectoren ${sectorenStr}. De gemiddelde beoordeling door stagiairs bedroeg ${gemiddeldeRating.toFixed(1)} op een schaal van 1 tot 5. Er werden ${aantalGesprekken} begeleidingsgesprekken gehouden. Het platform Internly registreerde een responspercentage van ${responsPercentage.toFixed(0)}% op sollicitaties. Totale ESG-score via Internly: ${esgPunten} punten.`;
 
-  // â”€â”€ Export section â”€â”€
+  // ── Export section ──
   let exportHtml;
   if (isBusiness) {
     exportHtml = `
       <div class="sec-title" style="margin-top:28px">Exporteren</div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
-        <button class="btn btn-ghost" id="btn-esg-pdf" onclick="esgExportPDF()">ðŸ“„ Download PDF</button>
-        <button class="btn btn-ghost" id="btn-esg-csv" onclick="esgExportCSV()">ðŸ“Š Download CSV</button>
+        <button class="btn btn-ghost" id="btn-esg-pdf" onclick="esgExportPDF()">📄 Download PDF</button>
+        <button class="btn btn-ghost" id="btn-esg-csv" onclick="esgExportCSV()">📊 Download CSV</button>
       </div>
       <div id="esg-history-section"></div>`;
   } else {
     exportHtml = `
       <div class="sec-title" style="margin-top:28px">Exporteren</div>
       <div style="background:var(--bg);border:1px solid var(--border2);border-radius:var(--r-sm);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <span style="font-size:.88rem;color:var(--ink3)">ðŸ”’ Volledige export beschikbaar op Business</span>
-        <a href="pricing.html#section-bedrijf" style="font-size:.82rem;color:var(--accent);font-weight:600;text-decoration:none">Upgraden naar Business â†’</a>
+        <span style="font-size:.88rem;color:var(--ink3)">🔒 Volledige export beschikbaar op Business</span>
+        <a href="pricing.html#section-bedrijf" style="font-size:.82rem;color:var(--accent);font-weight:600;text-decoration:none">Upgraden naar Business →</a>
       </div>`;
   }
 
-  // â”€â”€ Render all sections â”€â”€
+  // ── Render all sections ──
   el.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:4px">
       <div>
@@ -3324,25 +3324,25 @@ async function renderESG() {
         <div class="stat-label">Stages begeleid</div>
         <div class="stat-val">${totaalStages}</div>
         <div class="stat-note">Geaccepteerde stagiairs</div>
-        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 â€” niet-werknemers</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 — niet-werknemers</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Begeleidingskwaliteit</div>
         <div class="stat-val">${gemiddeldeRating.toFixed(1)} <span style="font-size:1rem;font-weight:400;color:var(--ink4)">/ 5</span></div>
         <div class="stat-note">gemiddelde beoordeling</div>
-        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 â€” werkomstandigheden</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 — werkomstandigheden</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Gesprekken gehouden</div>
         <div class="stat-val">${aantalGesprekken}</div>
         <div class="stat-note">Voltooide afspraken</div>
-        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1-13 â€” begeleiding &amp; ontwikkeling</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1-13 — begeleiding &amp; ontwikkeling</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Responspercentage</div>
         <div class="stat-val">${responsPercentage.toFixed(0)}%</div>
         <div class="stat-note">Op sollicitaties</div>
-        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 â€” werkgeversbetrokkenheid</div>
+        <div style="font-size:.7rem;color:var(--ink3);margin-top:2px">ESRS S1 — werkgeversbetrokkenheid</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">ESG-punten</div>
@@ -3361,10 +3361,10 @@ async function renderESG() {
     <div class="sec-title">Klaar voor je verslag</div>
     <div style="background:var(--bg2,var(--bg));border-radius:var(--r-sm);padding:1rem 1.25rem;font-size:.88rem;color:var(--ink2);line-height:1.7;font-style:italic;border:1px solid var(--border);margin-bottom:8px" id="csrd-tekst">${csrdText}</div>
     <p style="font-size:.75rem;color:var(--ink3);margin-top:.5rem;line-height:1.5;margin-bottom:12px">
-      Deze tekst is gegenereerd op basis van platformdata en dient als richtlijn. Controleer de gegevens voor gebruik in officiÃ«le verslagen. Internly-score is geen officiÃ«le CSRD-meetwaarde.
+      Deze tekst is gegenereerd op basis van platformdata en dient als richtlijn. Controleer de gegevens voor gebruik in officiële verslagen. Internly-score is geen officiële CSRD-meetwaarde.
     </p>
     <button onclick="copyCsrdTekst()" class="btn btn-ghost" style="background:transparent;border:1.5px solid var(--border2);color:var(--ink2);padding:9px 20px;border-radius:50px;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;">
-      ðŸ“‹ Kopieer naar klembord
+      📋 Kopieer naar klembord
     </button>
 
     ${exportHtml}
@@ -3427,10 +3427,10 @@ async function renderESGHistory() {
 }
 
 // Offline/online listeners
-window.addEventListener('offline', () => notify('Geen internetverbinding â€” wijzigingen worden niet opgeslagen'));
+window.addEventListener('offline', () => notify('Geen internetverbinding — wijzigingen worden niet opgeslagen'));
 window.addEventListener('online',  () => { notify('Verbinding hersteld'); location.reload(); });
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -3445,7 +3445,7 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 function copyReferralText() {
-  const text = 'Ik gebruik Internly voor stages â€” ' +
+  const text = 'Ik gebruik Internly voor stages — ' +
     'een platform dat ghosting structureel aanpakt. ' +
     'Studenten zien vooraf hoe betrouwbaar een ' +
     'werkgever is. Probeer het: internly.pro';
@@ -3476,7 +3476,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'auth.html'; return;
   }
 
-  // Rolcheck â€” alleen bedrijf-gebruikers mogen dit dashboard zien
+  // Rolcheck — alleen bedrijf-gebruikers mogen dit dashboard zien
   const { data: roleRow } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
   const userRole = roleRow?.role;
   if (userRole && userRole !== 'bedrijf') {
@@ -3488,8 +3488,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Welkom overlay â€” eenmalig na eerste login
-  // welcome-overlay.js â€” 1 mei 2026
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
   if (typeof maybeShowWelcomeOverlay === 'function') {
     const { data: _wcProf } = await db.from('profiles').select('naam').eq('id', user.id).maybeSingle();
     maybeShowWelcomeOverlay(user.id, 'bedrijf', _wcProf?.naam, null);
@@ -3512,21 +3512,21 @@ window.addEventListener('DOMContentLoaded', async () => {
           .maybeSingle();
         if (sub?.status === 'active') {
           clearInterval(poll);
-          notify('Betaling ontvangen â€” je plan is actief');
+          notify('Betaling ontvangen — je plan is actief');
           setTimeout(() => window.location.reload(), 1500);
         } else if (attempts >= 10) {
           clearInterval(poll);
-          notify('Betaling verwerkt â€” activering volgt binnen enkele minuten');
+          notify('Betaling verwerkt — activering volgt binnen enkele minuten');
         }
       }, 1000);
     } else {
-      notify('Betaling mislukt of geannuleerd â€” probeer opnieuw', false);
+      notify('Betaling mislukt of geannuleerd — probeer opnieuw', false);
     }
   })();
 
   await loadUser();
 
-  // â”€â”€ Load subscription plan for limit enforcement â”€â”€
+  // ── Load subscription plan for limit enforcement ──
   {
     const { data: sub } = await db
       .from('subscriptions')
@@ -3540,7 +3540,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await loadPostings();
 
-  // â”€â”€ Feature gate: form fields â”€â”€
+  // ── Feature gate: form fields ──
   if (!await hasActivePlan('company_pro')) {
     const sel = document.getElementById('f-guarantee');
     if (sel) { sel.value = 'false'; sel.disabled = true; sel.title = 'Beschikbaar vanaf Pro'; }
@@ -3569,7 +3569,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     set('p-website', cp.website);
     set('p-desc',    cp.beschrijving);
 
-    // Worldwide verification fields â€” 1 mei 2026
+    // Worldwide verification fields — 1 mei 2026
     const _typeEl = document.getElementById('p-company-type');
     if (_typeEl && cp?.company_type) {
       _typeEl.value = cp.company_type;
@@ -3616,7 +3616,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     toonBedrijfOverzicht(cp);
   }
 
-  // Avatar picker â€” vanmiddag fix 30 apr 2026
+  // Avatar picker — vanmiddag fix 30 apr 2026
   if (typeof renderAvatarPicker === 'function') {
     const _curAvKey = cp?.avatar_key || null;
     window._internlyAvatarKey = _curAvKey;
@@ -3628,7 +3628,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadStudentenBadge(user.id);
   herberekeningTrustScore(user.id);
 
-  // â”€â”€ Dashboard ESG stat (background load, non-blocking) â”€â”€
+  // ── Dashboard ESG stat (background load, non-blocking) ──
   loadESGData(user.id, new Date().getFullYear()).then(d => {
     const el = document.getElementById('stat-esg');
     if (el) el.textContent = d.esgPunten;
@@ -3683,7 +3683,7 @@ async function loadUnreadBadge(userId) {
   }
 }
 
-// â”€â”€ Vestigingen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Vestigingen ────────────────────────────────────────────────────────────────
 let _vestigingen = [];
 
 async function renderVestigingen() {
@@ -3694,24 +3694,24 @@ async function renderVestigingen() {
 
   if (!isBusiness) {
     el.innerHTML = `
-      <div class="page-title">ðŸ“ Vestigingen</div>
+      <div class="page-title">📍 Vestigingen</div>
       <p class="page-sub">Beheer meerdere kantoorlocaties en koppel ze aan vacatures</p>
       <div class="card" style="text-align:center;padding:40px 24px">
-        <div style="font-size:2rem;margin-bottom:12px">ðŸ“</div>
-        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:8px">Vestigingen â€” Business-functie</div>
+        <div style="font-size:2rem;margin-bottom:12px">📍</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:8px">Vestigingen — Business-functie</div>
         <p style="font-size:.9rem;color:var(--ink2);max-width:420px;margin:0 auto 20px">
           Voeg meerdere locaties toe en koppel elke vacature aan de juiste vestiging.
           Studenten zien de vestigingsnaam en locatie op de vacatureskaart.
         </p>
-        <a href="pricing.html#section-bedrijf" class="btn-primary" style="text-decoration:none;display:inline-block">Upgrade naar Business â†’</a>
+        <a href="pricing.html#section-bedrijf" class="btn-primary" style="text-decoration:none;display:inline-block">Upgrade naar Business →</a>
       </div>`;
     return;
   }
 
   el.innerHTML = `
-    <div class="page-title">ðŸ“ Vestigingen</div>
+    <div class="page-title">📍 Vestigingen</div>
     <p class="page-sub">Beheer de locaties van jouw organisatie</p>
-    <div id="vest-list"><div class="empty"><span class="empty-icon">â³</span>Ladenâ€¦</div></div>
+    <div id="vest-list"><div class="empty"><span class="empty-icon">⏳</span>Laden…</div></div>
     <div class="card" style="margin-top:20px">
       <div class="form-section-title">Nieuwe vestiging toevoegen</div>
       <div class="field-row">
@@ -3734,7 +3734,7 @@ async function renderVestigingen() {
           <input type="text" id="vest-adres" maxlength="200" placeholder="Bijv. Damrak 1">
         </div>
       </div>
-      <button class="btn-primary" onclick="addVestiging()">Vestiging opslaan â†’</button>
+      <button class="btn-primary" onclick="addVestiging()">Vestiging opslaan →</button>
     </div>`;
 
   await loadVestigingen();
@@ -3757,7 +3757,7 @@ function renderVestigingenList() {
   const el = document.getElementById('vest-list');
   if (!el) return;
   if (_vestigingen.length === 0) {
-    el.innerHTML = '<div class="empty"><span class="empty-icon">ðŸ“</span>Nog geen vestigingen toegevoegd.</div>';
+    el.innerHTML = '<div class="empty"><span class="empty-icon">📍</span>Nog geen vestigingen toegevoegd.</div>';
     return;
   }
   el.innerHTML = _vestigingen.map(v => `
@@ -3765,7 +3765,7 @@ function renderVestigingenList() {
       <div>
         <div style="font-weight:700;color:var(--ink)">${escapeHtml(v.naam)}</div>
         <div style="font-size:.85rem;color:var(--ink3);margin-top:2px">
-          ${escapeHtml(v.stad)} Â· ${escapeHtml(v.postcode)}${v.adres ? ' Â· ' + escapeHtml(v.adres) : ''}
+          ${escapeHtml(v.stad)} · ${escapeHtml(v.postcode)}${v.adres ? ' · ' + escapeHtml(v.adres) : ''}
         </div>
       </div>
       <button class="btn-ghost" style="font-size:.8rem;color:#e53e3e" onclick="deleteVestiging('${v.id}')">Verwijderen</button>
@@ -3777,7 +3777,7 @@ function populateVestigingSelector() {
   if (!sel) return;
   while (sel.options.length > 1) sel.remove(1);
   _vestigingen.forEach(v => {
-    const opt = new Option(`${v.naam} â€” ${v.stad} (${v.postcode})`, v.id);
+    const opt = new Option(`${v.naam} — ${v.stad} (${v.postcode})`, v.id);
     sel.add(opt);
   });
 }
@@ -3795,8 +3795,8 @@ async function addVestiging() {
     naam, stad, postcode, adres,
   });
 
-  if (error) { notify('Fout bij opslaan â€” probeer het opnieuw'); return; }
-  notify('âœ“ Vestiging toegevoegd');
+  if (error) { notify('Fout bij opslaan — probeer het opnieuw'); return; }
+  notify('✓ Vestiging toegevoegd');
   ['vest-naam','vest-stad','vest-postcode','vest-adres'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
@@ -3833,7 +3833,7 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && currentUser) loadNotifications();
 });
 
-// â”€â”€ Internationaal tabblad â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Internationaal tabblad ──────────────────────────────────────────────────
 let intlLangs = [];
 
 async function renderInternational() {
@@ -3869,7 +3869,7 @@ async function renderInternational() {
     existing.forEach(l => addIntlLang(l));
   } catch (err) {
     console.error('[intl] renderInternational exception:', err?.message || err);
-    notify('Er ging iets mis bij laden â€” probeer opnieuw', false);
+    notify('Er ging iets mis bij laden — probeer opnieuw', false);
   }
 }
 
@@ -3885,7 +3885,7 @@ async function saveInternational() {
     lastInput.value = '';
   }
 
-  btn.disabled = true; btn.textContent = 'Opslaanâ€¦';
+  btn.disabled = true; btn.textContent = 'Opslaan…';
 
   try {
     const { error } = await db.from('company_profiles').upsert({
@@ -3896,11 +3896,11 @@ async function saveInternational() {
       languages_required:    intlLangs.slice() // copy
     }, { onConflict: 'profile_id' });
 
-    btn.disabled = false; btn.textContent = 'Opslaan â†’';
+    btn.disabled = false; btn.textContent = 'Opslaan →';
 
     if (error) {
       console.error('[intl] saveInternational fout:', error.message);
-      notify('Opslaan mislukt â€” probeer het opnieuw', false);
+      notify('Opslaan mislukt — probeer het opnieuw', false);
       if (hint) {
         hint.textContent = 'Fout: ' + error.message;
         hint.style.display = 'block';
@@ -3908,13 +3908,13 @@ async function saveInternational() {
       return;
     }
 
-    notify('âœ“ Internationale instellingen opgeslagen');
+    notify('✓ Internationale instellingen opgeslagen');
     if (hint) {
       hint.textContent = 'Laatst opgeslagen: nu';
       hint.style.display = 'block';
     }
   } catch (err) {
-    btn.disabled = false; btn.textContent = 'Opslaan â†’';
+    btn.disabled = false; btn.textContent = 'Opslaan →';
     console.error('[intl] saveInternational exception:', err?.message || err);
     notify('Onverwachte fout bij opslaan', false);
   }
@@ -3935,7 +3935,7 @@ function addIntlLang(s) {
 
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = 'Ã—';
+  closeBtn.textContent = '×';
   closeBtn.addEventListener('click', () => removeIntlLang(norm, closeBtn));
   chip.appendChild(closeBtn);
 
@@ -4013,7 +4013,7 @@ window.addEventListener('load', function() {
       <li><a href="about.html">Over ons</a></li>
       <li><a href="kennisbank.html">Kennisbank</a></li>
       <li><a href="hoe-het-werkt.html">Hoe het werkt</a></li>
-      <li><a href="internly-worldwide.html">Worldwide ðŸŒ</a></li>
+      <li><a href="internly-worldwide.html">Worldwide 🌍</a></li>
       <li><a href="pricing.html">Prijzen</a></li>
       <li><a href="faq.html">FAQ</a></li>
       <li><a href="privacybeleid.html">Privacybeleid</a></li>
@@ -4021,8 +4021,8 @@ window.addEventListener('load', function() {
       <li><a href="/esg-rapportage.html">ESG &amp; rapportage</a></li>
       <li><a href="mailto:hallo@internly.pro">Contact</a></li>
     </ul>
-    <div class="footer-copy">Â© 2026 Sasubo Holding B.V.</div>
-    <p class="footer-tagline">Eerlijk het stageproces verbeteren â€” voor studenten, bedrijven en scholen.</p>
+    <div class="footer-copy">© 2026 Sasubo Holding B.V.</div>
+    <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
 </body>

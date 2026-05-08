@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
-  BBL PROFIEL â€” Internly
-  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  BBL PROFIEL — Internly
+  ─────────────────────────────────────────────────────────────────────────────
   Profielpagina exclusief voor BBL-studenten (bbl_mode = true).
   BOL-studenten worden doorgestuurd naar student-profile.html.
-  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  ─────────────────────────────────────────────────────────────────────────────
 -->
 <html lang="nl">
 <head>
@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>BBL Profiel â€” Internly</title>
+  <title>BBL Profiel — Internly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
@@ -62,7 +62,7 @@
       min-height: 100vh;
     }
 
-    /* â”€â”€ Topbar â”€â”€ */
+    /* ── Topbar ── */
     .topbar {
       background: linear-gradient(135deg, #1a7a48, #0f5c36);
       padding: 0 24px; height: 56px;
@@ -100,17 +100,17 @@
     .topbar-privacy { font-size: .72rem; color: rgba(255,255,255,.3); text-decoration: none; padding: 5px 4px; }
     .topbar-privacy:hover { color: rgba(255,255,255,.6); }
 
-    /* â”€â”€ Shell â”€â”€ */
+    /* ── Shell ── */
     .shell { max-width: 680px; margin: 0 auto; padding: 28px 16px 80px; }
 
-    /* â”€â”€ Page title â”€â”€ */
+    /* ── Page title ── */
     .page-title {
       font-family: 'Bricolage Grotesque', sans-serif;
       font-size: 1.5rem; font-weight: 700; color: #0d1520; margin-bottom: 4px;
     }
     .page-sub { font-size: .9rem; color: #6b7280; margin-bottom: 24px; }
 
-    /* â”€â”€ Section card â”€â”€ */
+    /* ── Section card ── */
     .section-card {
       background: #fff; border: 1px solid rgba(15,17,23,.09);
       border-radius: 14px; padding: 20px 22px; margin-bottom: 14px;
@@ -130,7 +130,7 @@
       font-size: 1rem; font-weight: 700; color: #0d1520;
     }
 
-    /* â”€â”€ Form fields â”€â”€ */
+    /* ── Form fields ── */
     .field { margin-bottom: 14px; }
     .field:last-child { margin-bottom: 0; }
     .field label {
@@ -173,7 +173,7 @@
     .ld-field input:focus { border-color: #1a7a48; }
     .ld-hint { font-size: .75rem; color: #9ca3af; margin-top: -4px; margin-bottom: 10px; }
 
-    /* â”€â”€ Save button â”€â”€ */
+    /* ── Save button ── */
     .btn-save {
       width: 100%; padding: 13px;
       background: #0f6e56; color: #fff; border: none;
@@ -184,7 +184,7 @@
     .btn-save:hover { background: #0a5040; }
     .btn-save:disabled { opacity: .45; cursor: not-allowed; }
 
-    /* â”€â”€ Profile overview â”€â”€ */
+    /* ── Profile overview ── */
     .overview-card {
       background: #fff; border: 1px solid rgba(15,17,23,.09);
       border-radius: 14px; padding: 20px 22px; margin-bottom: 12px;
@@ -233,7 +233,7 @@
       background: #f8fdf9; border-radius: 8px; border-left: 3px solid #c9e8d5;
     }
 
-    /* â”€â”€ Toast â”€â”€ */
+    /* ── Toast ── */
     .notif {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(12px);
@@ -255,9 +255,9 @@
       .topbar { padding: 0 14px; }
     }
 
-    /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-       ILY-code widget (Run 5 â€” 7 mei 2026)
-       â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    /* ─────────────────────────────────────────────────
+       ILY-code widget (Run 5 — 7 mei 2026)
+       ───────────────────────────────────────────────── */
     .ily-code-widget {
       background: var(--bg-card, #fff);
       border: 1px solid var(--line-default, #e2e8f0);
@@ -315,7 +315,7 @@
 
 <div class="notif" id="notif"></div>
 
-<!-- â”€â”€ Topbar â”€â”€ -->
+<!-- ── Topbar ── -->
 <div class="topbar">
   <a href="#" onclick="event.preventDefault();smartHomeRedirect();" class="topbar-logo" style="cursor:pointer">intern<span>ly</span></a>
   <span class="topbar-bbl-tag">BBL-traject</span>
@@ -328,22 +328,22 @@
   <div class="topbar-right">
     <span class="topbar-user" id="topbarUser"></span>
     <a href="privacybeleid.html" class="topbar-privacy">Privacy</a>
-    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">â†ª Uit</button>
+    <button class="topbar-signout" onclick="signOut()" title="Uitloggen">↪ Uit</button>
   </div>
 </div>
 
 <div class="shell">
 
-  <a href="bbl-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--ink3,#888);font-size:.88rem;text-decoration:none;">â† Terug naar dashboard</a>
+  <a href="bbl-dashboard.html" style="display:inline-block;margin-bottom:16px;color:var(--ink3,#888);font-size:.88rem;text-decoration:none;">← Terug naar dashboard</a>
 
-  <!-- â”€â”€ Profieloverzicht (toon na opslaan) â”€â”€ -->
+  <!-- ── Profieloverzicht (toon na opslaan) ── -->
   <div id="view-overview" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
       <div>
         <div class="page-title" id="ov-title">Mijn BBL-profiel</div>
         <div class="page-sub" style="margin-bottom:0">Bekijk en bewerk je gegevens.</div>
       </div>
-      <button class="btn-edit" onclick="showForm()">âœï¸ Bewerken</button>
+      <button class="btn-edit" onclick="showForm()">✏️ Bewerken</button>
     </div>
 
     <!-- ILY-code widget container (Run 5) -->
@@ -352,26 +352,26 @@
     <div class="overview-card">
       <div class="ov-head">
         <div>
-          <div class="ov-name" id="ov-naam">â€”</div>
-          <div class="ov-opleiding" id="ov-opleiding">â€”</div>
+          <div class="ov-name" id="ov-naam">—</div>
+          <div class="ov-opleiding" id="ov-opleiding">—</div>
         </div>
         <span class="bbl-badge">BBL</span>
       </div>
       <div class="ov-grid">
-        <div class="ov-item"><div class="ov-label">School / ROC</div><div class="ov-val" id="ov-school">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Leerjaar</div><div class="ov-val" id="ov-jaar">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Schooldag</div><div class="ov-val" id="ov-schooldag">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Postcode</div><div class="ov-val" id="ov-postcode">â€”</div></div>
+        <div class="ov-item"><div class="ov-label">School / ROC</div><div class="ov-val" id="ov-school">—</div></div>
+        <div class="ov-item"><div class="ov-label">Leerjaar</div><div class="ov-val" id="ov-jaar">—</div></div>
+        <div class="ov-item"><div class="ov-label">Schooldag</div><div class="ov-val" id="ov-schooldag">—</div></div>
+        <div class="ov-item"><div class="ov-label">Postcode</div><div class="ov-val" id="ov-postcode">—</div></div>
       </div>
 
       <div class="ov-section-label">Leerbedrijf</div>
       <div class="ov-grid">
-        <div class="ov-item"><div class="ov-label">Bedrijfsnaam</div><div class="ov-val" id="ov-bedrijf">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Sector</div><div class="ov-val" id="ov-sector">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Contract start</div><div class="ov-val" id="ov-contract-start">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Contract einde</div><div class="ov-val" id="ov-contract-end">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Uren per week</div><div class="ov-val" id="ov-uren">â€”</div></div>
-        <div class="ov-item"><div class="ov-label">Praktijkbegeleider</div><div class="ov-val" id="ov-pb">â€”</div></div>
+        <div class="ov-item"><div class="ov-label">Bedrijfsnaam</div><div class="ov-val" id="ov-bedrijf">—</div></div>
+        <div class="ov-item"><div class="ov-label">Sector</div><div class="ov-val" id="ov-sector">—</div></div>
+        <div class="ov-item"><div class="ov-label">Contract start</div><div class="ov-val" id="ov-contract-start">—</div></div>
+        <div class="ov-item"><div class="ov-label">Contract einde</div><div class="ov-val" id="ov-contract-end">—</div></div>
+        <div class="ov-item"><div class="ov-label">Uren per week</div><div class="ov-val" id="ov-uren">—</div></div>
+        <div class="ov-item"><div class="ov-label">Praktijkbegeleider</div><div class="ov-val" id="ov-pb">—</div></div>
       </div>
 
       <div id="ov-leerdoelen-wrap">
@@ -386,7 +386,7 @@
     </div>
   </div>
 
-  <!-- â”€â”€ Formulier â”€â”€ -->
+  <!-- ── Formulier ── -->
   <div id="view-form">
     <div class="page-title" id="form-title">Mijn BBL-profiel aanmaken</div>
     <div class="page-sub">Vul je BBL-gegevens in. Je begeleiders en ROC kunnen dit bekijken.</div>
@@ -394,7 +394,7 @@
     <!-- Sectie 1: Persoonlijk -->
     <div class="section-card">
       <div class="section-header">
-        <div class="section-icon">ðŸ‘¤</div>
+        <div class="section-icon">👤</div>
         <div class="section-title-text">Persoonlijk</div>
       </div>
 
@@ -444,7 +444,7 @@
     <!-- Sectie 2: Leerbedrijf -->
     <div class="section-card">
       <div class="section-header">
-        <div class="section-icon">ðŸ—</div>
+        <div class="section-icon">🏗</div>
         <div class="section-title-text">Leerbedrijf</div>
       </div>
 
@@ -481,7 +481,7 @@
     <!-- Sectie 3: Leerdoelen -->
     <div class="section-card">
       <div class="section-header">
-        <div class="section-icon">ðŸŽ¯</div>
+        <div class="section-icon">🎯</div>
         <div class="section-title-text">Leerdoelen</div>
       </div>
       <p class="ld-hint">Vul maximaal 5 leerdoelen in die je tijdens je BBL-traject wilt behalen.</p>
@@ -493,7 +493,7 @@
       <div class="ld-field" style="margin-bottom:18px"><div class="ld-num">5</div><input type="text" id="ld5" placeholder="optioneel"></div>
 
       <div class="field">
-        <label>Motivatie <span class="hint">optioneel â€” in eigen woorden</span></label>
+        <label>Motivatie <span class="hint">optioneel — in eigen woorden</span></label>
         <textarea id="motivatie" placeholder="Waarom heb je gekozen voor dit leerbedrijf? Wat wil je leren?"></textarea>
       </div>
 
@@ -520,7 +520,7 @@
       </div>
     </div>
 
-    <button class="btn-save" id="saveBtn" onclick="saveProfile()">Profiel opslaan â†’</button>
+    <button class="btn-save" id="saveBtn" onclick="saveProfile()">Profiel opslaan →</button>
   </div>
 
 </div><!-- /shell -->
@@ -530,7 +530,7 @@
 let currentUser = null;
 let isEditMode  = false;
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function showLoading(containerId, tekst) {
   const el = document.getElementById(containerId);
@@ -538,7 +538,7 @@ function showLoading(containerId, tekst) {
   el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--ink3,#888)"><div style="font-size:.88rem">${tekst || 'Laden...'}</div></div>`;
 }
 
-// Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+// Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
 window.addEventListener('unhandledrejection', function(e) {
   if (e.reason && (
     e.reason.code === 'PGRST301' ||
@@ -552,34 +552,34 @@ window.addEventListener('unhandledrejection', function(e) {
 });
 
 function formatDate(iso) {
-  if (!iso) return 'â€”';
+  if (!iso) return '—';
   return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function signOut() { performLogout(); }
 
-// â”€â”€ Views â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Views ─────────────────────────────────────────────────────────────────────
 
 function showOverview(data) {
-  document.getElementById('ov-naam').textContent     = data.naam      || 'â€”';
-  document.getElementById('ov-opleiding').textContent = data.opleiding || 'â€”';
-  document.getElementById('ov-school').textContent   = data.school    || 'â€”';
-  document.getElementById('ov-jaar').textContent     = data.jaar      ? 'Jaar ' + data.jaar : 'â€”';
+  document.getElementById('ov-naam').textContent     = data.naam      || '—';
+  document.getElementById('ov-opleiding').textContent = data.opleiding || '—';
+  document.getElementById('ov-school').textContent   = data.school    || '—';
+  document.getElementById('ov-jaar').textContent     = data.jaar      ? 'Jaar ' + data.jaar : '—';
   document.getElementById('ov-schooldag').textContent = data.schooldag
-    ? data.schooldag.charAt(0).toUpperCase() + data.schooldag.slice(1) : 'â€”';
-  document.getElementById('ov-postcode').textContent = data.postcode  || 'â€”';
-  document.getElementById('ov-bedrijf').textContent  = data._bedrijfsnaam  || 'â€”';
-  document.getElementById('ov-sector').textContent   = data.opdracht_domein || 'â€”';
+    ? data.schooldag.charAt(0).toUpperCase() + data.schooldag.slice(1) : '—';
+  document.getElementById('ov-postcode').textContent = data.postcode  || '—';
+  document.getElementById('ov-bedrijf').textContent  = data._bedrijfsnaam  || '—';
+  document.getElementById('ov-sector').textContent   = data.opdracht_domein || '—';
   document.getElementById('ov-contract-start').textContent = formatDate(data.contract_start);
   document.getElementById('ov-contract-end').textContent   = formatDate(data.contract_end);
-  document.getElementById('ov-uren').textContent   = data._uren_per_week ? data._uren_per_week + ' uur/week' : 'â€”';
-  document.getElementById('ov-pb').textContent     = data.pb_naam || 'â€”';
+  document.getElementById('ov-uren').textContent   = data._uren_per_week ? data._uren_per_week + ' uur/week' : '—';
+  document.getElementById('ov-pb').textContent     = data.pb_naam || '—';
 
   // Leerdoelen chips
   const skills = Array.isArray(data.skills) ? data.skills.filter(Boolean) : [];
   const ldEl = document.getElementById('ov-leerdoelen');
   if (skills.length > 0) {
-    ldEl.innerHTML = skills.map(s => `<span class="ld-chip">ðŸŽ¯ ${escapeHtml(s)}</span>`).join('');
+    ldEl.innerHTML = skills.map(s => `<span class="ld-chip">🎯 ${escapeHtml(s)}</span>`).join('');
   } else {
     ldEl.innerHTML = '<span style="font-size:.82rem;color:#9ca3af">Nog geen leerdoelen ingevuld.</span>';
   }
@@ -604,7 +604,7 @@ function showForm() {
   window.scrollTo(0, 0);
 }
 
-// â”€â”€ Populate form from existing data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Populate form from existing data ─────────────────────────────────────────
 
 function populateForm(data) {
   const setVal = (id, val) => {
@@ -623,11 +623,11 @@ function populateForm(data) {
   setVal('pb_naam',     data.pb_naam);
   setVal('motivatie',   data.motivatie);
 
-  // zoekt_buddy toggle â€” backlog 30 apr 2026
+  // zoekt_buddy toggle — backlog 30 apr 2026
   const _zb = document.getElementById('zoekt-buddy');
   if (_zb) _zb.checked = !!(data?.zoekt_buddy);
 
-  // Leerdoelen (skills array â†’ individual fields)
+  // Leerdoelen (skills array → individual fields)
   const skills = Array.isArray(data.skills) ? data.skills.filter(Boolean) : [];
   for (let i = 0; i < 5; i++) {
     setVal('ld' + (i + 1), skills[i] || null);
@@ -643,11 +643,11 @@ function populateForm(data) {
     const t = document.getElementById('form-title');
     const b = document.getElementById('saveBtn');
     if (t) t.textContent = 'Profiel bewerken';
-    if (b) b.textContent = 'Wijzigingen opslaan â†’';
+    if (b) b.textContent = 'Wijzigingen opslaan →';
   }
 }
 
-// â”€â”€ Save profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Save profile ──────────────────────────────────────────────────────────────
 
 async function saveProfile() {
   const naam      = document.getElementById('naam').value.trim();
@@ -677,13 +677,13 @@ async function saveProfile() {
   const _cs = document.getElementById('contract_start')?.value;
   const _ce = document.getElementById('contract_end')?.value;
   if (_cs && _ce && _ce < _cs) {
-    notify('Einddatum BBL-contract mag niet vÃ³Ã³r de startdatum liggen.', false);
+    notify('Einddatum BBL-contract mag niet vóór de startdatum liggen.', false);
     return;
   }
 
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
-  btn.textContent = 'Opslaanâ€¦';
+  btn.textContent = 'Opslaan…';
 
   const payload = {
     profile_id:     currentUser.id,
@@ -709,7 +709,7 @@ async function saveProfile() {
   const { error } = await db.from('student_profiles').upsert(payload, { onConflict: 'profile_id' });
 
   btn.disabled = false;
-  btn.textContent = wasEditing ? 'Wijzigingen opslaan â†’' : 'Profiel opslaan â†’';
+  btn.textContent = wasEditing ? 'Wijzigingen opslaan →' : 'Profiel opslaan →';
 
   if (error) {
     console.error('[bbl-profile] upsert fout:', error.message);
@@ -720,7 +720,7 @@ async function saveProfile() {
   isEditMode = true;
 
   // Cache bedrijfsnaam + uren (niet in student_profiles kolommen)
-  // Altijd schrijven â€” ook als leeg, zodat een gebruiker deze velden kan wissen
+  // Altijd schrijven — ook als leeg, zodat een gebruiker deze velden kan wissen
   const bedrijfsnaam = document.getElementById('bedrijfsnaam').value.trim();
   const urenPerWeek  = document.getElementById('uren_per_week').value;
   localStorage.setItem('internly_bbl_bedrijf_' + currentUser.id, JSON.stringify({
@@ -730,7 +730,7 @@ async function saveProfile() {
 
   if (postcode) localStorage.setItem('internly_student_postcode_' + currentUser.id, postcode);
 
-  notify(wasEditing ? 'âœ“ Profiel bijgewerkt!' : 'âœ“ Profiel aangemaakt!');
+  notify(wasEditing ? '✓ Profiel bijgewerkt!' : '✓ Profiel aangemaakt!');
 
   // Show overview
   const overviewData = {
@@ -741,7 +741,7 @@ async function saveProfile() {
   showOverview(overviewData);
 }
 
-// â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Init ──────────────────────────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await db.auth.getUser();
@@ -757,7 +757,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   if (spErr) {
     console.error('[bbl-profile] student_profiles fout:', spErr.message);
-    notify('Fout bij laden â€” probeer opnieuw');
+    notify('Fout bij laden — probeer opnieuw');
     return;
   }
 
@@ -781,8 +781,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // sp === null: nieuw BBL-account, auth.html heeft bbl_mode=true gezet bij registratie
   sessionStorage.setItem('internly_role', 'bbl');
 
-  // Welkom overlay â€” eenmalig na eerste login
-  // welcome-overlay.js â€” 1 mei 2026
+  // Welkom overlay — eenmalig na eerste login
+  // welcome-overlay.js — 1 mei 2026
   if (typeof maybeShowWelcomeOverlay === 'function') {
     maybeShowWelcomeOverlay(
       user.id,
@@ -796,7 +796,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
   document.getElementById('topbarUser').textContent = naam;
 
-  // Avatar picker â€” vanmiddag fix 30 apr 2026
+  // Avatar picker — vanmiddag fix 30 apr 2026
   if (typeof renderAvatarPicker === 'function') {
     const _curAvKey = sp?.avatar_key || null;
     window._internlyAvatarKey = _curAvKey;
@@ -816,7 +816,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     populateForm({ ...sp, profile_id: user.id });
     showOverview(ovData);
   } else {
-    // Nieuw profiel â€” toon formulier direct
+    // Nieuw profiel — toon formulier direct
     document.getElementById('view-form').style.display = 'block';
   }
 
@@ -840,7 +840,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
-<!-- â”€â”€ BESCHIKBAARHEID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+<!-- ── BESCHIKBAARHEID ──────────────────────────────────────────────────────── -->
 <div class="container" style="padding-top:0;padding-bottom:2.5rem">
   <div class="section-label">Jouw planning</div>
   <div class="section-title">Beschikbaarheid</div>
@@ -849,6 +849,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 </div>
 
 <script src="js/calendar.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>

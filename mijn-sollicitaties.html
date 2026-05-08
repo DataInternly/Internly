@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#1a7a48">
-  <title>Mijn sollicitaties â€” Internly</title>
+  <title>Mijn sollicitaties — Internly</title>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <script src="js/utils.js"></script>
   <script src="js/roles.js"></script>
@@ -46,11 +46,11 @@
   </script>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       Lijst archetype (mijn-sollicitaties) â€” applications overzicht.
+    /* ═══════════════════════════════════════════════════════════════
+       Lijst archetype (mijn-sollicitaties) — applications overzicht.
        Globale tokens uit css/style.css. Topbar wordt door utils.js
        renderStudentHeader gerendered in #student-header.
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       ═══════════════════════════════════════════════════════════════ */
 
     :focus-visible {
       outline: 2px solid var(--c-orange-deep, #FF7E42);
@@ -58,7 +58,7 @@
     }
 
     /* Legacy topbar-user / topbar-avatar / btn-topbar-logout
-       (mogelijk gebruikt door utils.js renderStudentHeader) â€” token-based */
+       (mogelijk gebruikt door utils.js renderStudentHeader) — token-based */
     .topbar-user {
       display: flex; align-items: center; gap: 10px;
       color: var(--fg-secondary, #374151);
@@ -89,7 +89,7 @@
       color: var(--fg-primary, #0d1520);
     }
 
-    /* â”€â”€ Page head â”€â”€ */
+    /* ── Page head ── */
     .page-head { margin-bottom: var(--s6, 28px); }
     .page-eyebrow {
       font-family: var(--font-mono, 'DM Mono', monospace);
@@ -112,7 +112,7 @@
       color: var(--fg-tertiary, #6b8070);
     }
 
-    /* â”€â”€ Status bar â€” 4 counters â”€â”€ */
+    /* ── Status bar — 4 counters ── */
     .status-bar {
       display: flex; gap: 12px;
       margin-bottom: var(--s5, 24px);
@@ -137,7 +137,7 @@
       margin-bottom: 2px;
     }
 
-    /* â”€â”€ Empty state â€” page-level (lokaal, niet de globale) â”€â”€ */
+    /* ── Empty state — page-level (lokaal, niet de globale) ── */
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -154,7 +154,7 @@
       margin-bottom: 12px;
     }
 
-    /* â”€â”€ Review badges â”€â”€ */
+    /* ── Review badges ── */
     .review-pending-badge {
       display: inline-flex; align-items: center; gap: 5px;
       font-size: .78rem; font-weight: 600;
@@ -194,23 +194,23 @@
   <!-- Mobile bottom tab bar -->
   <nav class="mobile-tabs">
     <a href="discover.html" class="mt-tab">
-      <span class="mt-icon">ðŸ”</span>
+      <span class="mt-icon">🔍</span>
       <span class="mt-label">Ontdek</span>
     </a>
     <a href="matches.html" class="mt-tab">
-      <span class="mt-icon">ðŸ’«</span>
+      <span class="mt-icon">💫</span>
       <span class="mt-label">Matches</span>
     </a>
     <a href="mijn-sollicitaties.html" class="mt-tab active">
-      <span class="mt-icon">ðŸ“‹</span>
+      <span class="mt-icon">📋</span>
       <span class="mt-label">Stages</span>
     </a>
     <a href="match-dashboard.html" class="mt-tab">
-      <span class="mt-icon">ðŸ“Š</span>
+      <span class="mt-icon">📊</span>
       <span class="mt-label">Hub</span>
     </a>
     <a href="student-profile.html" class="mt-tab">
-      <span class="mt-icon">ðŸ‘¤</span>
+      <span class="mt-icon">👤</span>
       <span class="mt-label">Profiel</span>
     </a>
   </nav>
@@ -225,25 +225,25 @@
       </div>
       <div class="page-head">
         <div class="page-eyebrow">Mijn aanvragen</div>
-        <div class="page-title" style="display:flex;align-items:center;gap:6px;">Mijn Sollicitaties<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg statussen en Stage Hub">â“˜<span class="info-pop"><strong>Statussen:</strong><br>âœ“ Uitgenodigd â€” het bedrijf wil je spreken.<br>â³ In behandeling â€” je aanvraag wordt beoordeeld.<br>âœ• Afgewezen â€” het bedrijf gaat niet verder.<br><br>Klik op <strong>Stage Hub â†’</strong> bij een actieve stage om je persoonlijke werkruimte te openen.</span></span></div>
+        <div class="page-title" style="display:flex;align-items:center;gap:6px;">Mijn Sollicitaties<span class="info-btn" onclick="toggleInfoPop(this,event)" role="button" tabindex="0" aria-label="Uitleg statussen en Stage Hub">ⓘ<span class="info-pop"><strong>Statussen:</strong><br>✓ Uitgenodigd — het bedrijf wil je spreken.<br>⏳ In behandeling — je aanvraag wordt beoordeeld.<br>✕ Afgewezen — het bedrijf gaat niet verder.<br><br>Klik op <strong>Stage Hub →</strong> bij een actieve stage om je persoonlijke werkruimte te openen.</span></span></div>
         <div class="page-sub">Overzicht van je ingediende aanvragen</div>
       </div>
 
       <div class="status-bar">
-        <div class="status-count"><strong id="cnt-total">â€”</strong>Totaal</div>
-        <div class="status-count"><strong id="cnt-uitgenodigd" style="color:#1a7a48">â€”</strong>Uitgenodigd</div>
-        <div class="status-count"><strong id="cnt-wacht" style="color:#a06010">â€”</strong>In behandeling</div>
-        <div class="status-count"><strong id="cnt-afgewezen" style="color:#b82020">â€”</strong>Afgewezen</div>
+        <div class="status-count"><strong id="cnt-total">—</strong>Totaal</div>
+        <div class="status-count"><strong id="cnt-uitgenodigd" style="color:#1a7a48">—</strong>Uitgenodigd</div>
+        <div class="status-count"><strong id="cnt-wacht" style="color:#a06010">—</strong>In behandeling</div>
+        <div class="status-count"><strong id="cnt-afgewezen" style="color:#b82020">—</strong>Afgewezen</div>
       </div>
 
       <div id="applications-container">
         <div class="empty-state">
-          <span class="icon">â³</span>Ladenâ€¦
+          <span class="icon">⏳</span>Laden…
         </div>
       </div>
 
       <div style="text-align:center; margin-top:40px;">
-        <a href="discover.html" class="btn btn-primary" style="padding:12px 32px;">Meer vacatures ontdekken â†’</a>
+        <a href="discover.html" class="btn btn-primary" style="padding:12px 32px;">Meer vacatures ontdekken →</a>
       </div>
     </main>
   </div>
@@ -255,7 +255,7 @@
     let currentUserId = null;
     let notifSubscription = null;
 
-    // Status mapping: Supabase waarden â†’ weergave
+    // Status mapping: Supabase waarden → weergave
     const STATUS_NL = {
       pending:   'wacht',
       invited:   'uitgenodigd',
@@ -268,26 +268,26 @@
       afgewezen:  'afgewezen',
     };
 
-    // BOL Fix 2 â€” status labels per rol (student-perspectief)
+    // BOL Fix 2 — status labels per rol (student-perspectief)
     function statusLabelStudent(status) {
       const labels = {
-        pending:  'â³ Wacht op reactie',
-        accepted: 'âœ“ Uitgenodigd',
-        active:   'ðŸŽ¯ Stage loopt',
-        rejected: 'âœ• Niet geselecteerd',
-        ended:    'âœ“ Stage afgerond'
+        pending:  '⏳ Wacht op reactie',
+        accepted: '✓ Uitgenodigd',
+        active:   '🎯 Stage loopt',
+        rejected: '✕ Niet geselecteerd',
+        ended:    '✓ Stage afgerond'
       };
       return labels[status] || status;
     }
 
-    // Per-application review rating state â€” keyed by unique app card id
+    // Per-application review rating state — keyed by unique app card id
     const reviewRatings = {};
 
     function formatDate(d) {
       return new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    // â”€â”€ Review form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Review form ────────────────────────────────────────────────────────
 
     function openReviewForm(appId, matchId, revieweeId, companyName) {
       const form = document.getElementById('review-form-' + appId);
@@ -305,7 +305,7 @@
         const star = document.getElementById('star-' + appId + '-' + i);
         if (star) {
           star.classList.toggle('filled', i <= rating);
-          star.textContent = i <= rating ? 'â˜…' : 'â˜†';
+          star.textContent = i <= rating ? '★' : '☆';
         }
       }
     }
@@ -321,7 +321,7 @@
       }
 
       const body = (document.getElementById('review-body-' + appId)?.value || '').trim();
-      if (btn) { btn.disabled = true; btn.textContent = 'Plaatsenâ€¦'; }
+      if (btn) { btn.disabled = true; btn.textContent = 'Plaatsen…'; }
       if (errEl) errEl.style.display = 'none';
 
       try {
@@ -347,13 +347,13 @@
         closeReviewForm(appId);
         const reviewBtnContainer = document.getElementById('review-btn-container-' + appId);
         if (reviewBtnContainer) {
-          reviewBtnContainer.innerHTML = '<span class="review-placed-badge">âœ“ Review geplaatst â€” dankjewel!</span>';
+          reviewBtnContainer.innerHTML = '<span class="review-placed-badge">✓ Review geplaatst — dankjewel!</span>';
         }
 
         // Clear Trust Score throttle so company dashboard recalculates on next load
         sessionStorage.removeItem('internly_trust_calculated_' + revieweeId);
 
-        // Notify the reviewee (company) â€” fire and forget
+        // Notify the reviewee (company) — fire and forget
         await createNotification(
           revieweeId,
           'new_review',
@@ -369,7 +369,7 @@
       }
     }
 
-    // â”€â”€ Render applications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Render applications ───────────────────────────────────────────────
 
     function renderApplications(apps, matchByPosting = {}, revieweeByPosting = {}, reviewedMatchIds = new Set()) {
       const container = document.getElementById('applications-container');
@@ -384,9 +384,9 @@
       if (norm.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <span class="es-icon">ðŸ“­</span>
+            <span class="es-icon">📭</span>
             <p class="es-primary">Nog geen sollicitaties verstuurd.</p>
-            <p class="es-secondary">Op Internly krijg je altijd een antwoord â€” meestal binnen de tijd die het bedrijf zelf belooft.</p>
+            <p class="es-secondary">Op Internly krijg je altijd een antwoord — meestal binnen de tijd die het bedrijf zelf belooft.</p>
             <a href="discover.html" class="es-cta">Bekijk vacatures</a>
           </div>`;
         return;
@@ -397,11 +397,11 @@
       container.innerHTML = norm.map((app, idx) => {
         const vacature   = app.internships || app.internship_postings || {};
         const title      = vacature.title      || app.title      || 'Onbekende vacature';
-        const company    = vacature.company_name || app.company_name || 'â€”';
-        const grade      = vacature.trust_grade || app.trust_grade || 'â€”';
-        const score      = vacature.trust_score ?? app.trust_score ?? 'â€”';
+        const company    = vacature.company_name || app.company_name || '—';
+        const grade      = vacature.trust_grade || app.trust_grade || '—';
+        const score      = vacature.trust_score ?? app.trust_score ?? '—';
         const created    = app.created_at || app.date;
-        const titleShort = title.length > 50 ? title.slice(0, 50) + 'â€¦' : title;
+        const titleShort = title.length > 50 ? title.slice(0, 50) + '…' : title;
         const appId      = 'app-' + (app.id || idx);
 
         let statusTag = '';
@@ -414,7 +414,7 @@
           const _daysSince = created ? Math.floor((Date.now() - new Date(created).getTime()) / 86400000) : null;
           const _deadlineInfo = (_respDays && _daysSince !== null)
             ? (_daysSince > _respDays
-                ? `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Bedrijf heeft nog niet gereageerd â€” wij houden dit bij</div>`
+                ? `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Bedrijf heeft nog niet gereageerd — wij houden dit bij</div>`
                 : `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Verwachte reactie: binnen ${_respDays - _daysSince} dag${(_respDays - _daysSince) !== 1 ? 'en' : ''}</div>`)
             : '';
           const _bewaakt = !_respDays
@@ -422,13 +422,13 @@
             : '';
           statusTag = `<span class="tag neutral">${statusLabelStudent('pending')}</span>${_deadlineInfo}${_bewaakt}`;
         } else if (app._status === 'afgewezen') {
-          statusTag = `<span class="tag red">${statusLabelStudent('rejected')}</span><div style="background:var(--bg2,#f4f6f9);border-radius:var(--radius-sm,8px);padding:8px 12px;margin-top:6px;border-left:3px solid var(--ink3,#7a8799);font-size:.8rem;color:var(--ink2,#374151);line-height:1.55;">ðŸ’™ Dit zegt niets over jou als kandidaat.</div>`;
+          statusTag = `<span class="tag red">${statusLabelStudent('rejected')}</span><div style="background:var(--bg2,#f4f6f9);border-radius:var(--radius-sm,8px);padding:8px 12px;margin-top:6px;border-left:3px solid var(--ink3,#7a8799);font-size:.8rem;color:var(--ink2,#374151);line-height:1.55;">💙 Dit zegt niets over jou als kandidaat.</div>`;
         }
 
         const detailLink = app.internship_id
           ? `<a href="vacature-detail.html?id=${escapeHtml(String(app.internship_id))}&source=internships"
                style="font-size:.82rem;color:#1a7a48;font-weight:600;text-decoration:none;white-space:nowrap;">
-               Bekijk vacature â†’</a>`
+               Bekijk vacature →</a>`
           : '';
 
         const matchId   = app.internship_id ? matchByPosting[String(app.internship_id)] : null;
@@ -436,16 +436,16 @@
           ? `<a href="chat.html?match=${escapeHtml(String(matchId))}"
                style="font-size:.82rem;color:#0f5c36;font-weight:700;text-decoration:none;white-space:nowrap;
                       background:#e8f5ee;padding:4px 10px;border-radius:20px;">
-               ðŸ’¬ Open chat â†’</a>`
+               💬 Open chat →</a>`
           : '';
         const stageHubLink = (app._status === 'uitgenodigd' && matchId)
           ? `<a href="match-dashboard.html?match=${escapeHtml(String(matchId))}"
                style="font-size:.82rem;color:#e05c1a;font-weight:700;text-decoration:none;white-space:nowrap;
                       background:#fdf0e8;padding:4px 10px;border-radius:20px;">
-               ðŸ“Š Stage Hub â†’</a>`
+               📊 Stage Hub →</a>`
           : '';
 
-        // â”€â”€ Review eligibility â”€â”€
+        // ── Review eligibility ──
         let reviewSection = '';
         if (app._status === 'uitgenodigd' && matchId) {
           const revieweeId = revieweeByPosting[String(app.internship_id)];
@@ -454,12 +454,12 @@
 
           if (reviewedMatchIds.has(matchId)) {
             // Already reviewed
-            reviewSection = `<div style="margin-top:8px"><span class="review-placed-badge">â˜… Review geplaatst</span></div>`;
+            reviewSection = `<div style="margin-top:8px"><span class="review-placed-badge">★ Review geplaatst</span></div>`;
           } else if (eligible && revieweeId) {
             const eligibleDate = new Date(new Date(created).getTime() + NINETY_DAYS_MS)
               .toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
             const starsHtml = [1,2,3,4,5].map(i =>
-              `<span class="star review-star" id="star-${appId}-${i}" data-app="${escapeHtml(appId)}" data-val="${i}">â˜†</span>`
+              `<span class="star review-star" id="star-${appId}-${i}" data-app="${escapeHtml(appId)}" data-val="${i}">☆</span>`
             ).join('');
             reviewSection = `
               <div id="review-btn-container-${appId}" style="margin-top:8px">
@@ -468,7 +468,7 @@
                   data-match="${escapeHtml(matchId)}"
                   data-reviewee="${escapeHtml(revieweeId)}"
                   data-company="${escapeHtml(company)}">
-                  â˜… Laat een review achter
+                  ★ Laat een review achter
                 </button>
               </div>
               <div class="review-form" id="review-form-${appId}" style="display:none">
@@ -492,7 +492,7 @@
               ? new Date(new Date(created).getTime() + NINETY_DAYS_MS)
                   .toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
               : '';
-            reviewSection = `<div style="margin-top:8px"><span class="review-soon-badge">â³ Review beschikbaar na ${escapeHtml(eligibleDate)}</span></div>`;
+            reviewSection = `<div style="margin-top:8px"><span class="review-soon-badge">⏳ Review beschikbaar na ${escapeHtml(eligibleDate)}</span></div>`;
           }
         }
 
@@ -556,7 +556,7 @@
       });
     }
 
-    // â”€â”€ Sollicitatie terugnemen (optimistic UI + undo) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Sollicitatie terugnemen (optimistic UI + undo) ────────────────────
     async function terugnemenOptimistic(appId, internshipId) {
       const cardEl = document.querySelector(`.card[data-app-id="${CSS.escape(appId)}"]`);
       const restoreCard = optimistic.hideEl(cardEl);
@@ -573,7 +573,7 @@
           });
           if (reErr) {
             console.error('[sollicitaties] undo terugnemen fout:', reErr?.message);
-            toast.error('Ongedaan maken mislukt â€” neem contact op met support');
+            toast.error('Ongedaan maken mislukt — neem contact op met support');
             return;
           }
           await loadApplications(currentUserId);
@@ -589,11 +589,11 @@
       }
     }
 
-    // â”€â”€ Load applications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Load applications ─────────────────────────────────────────────────
 
     async function loadApplications(userId) {
       const container = document.getElementById('applications-container');
-      container.innerHTML = `<div class="empty-state"><span class="icon">â³</span>Ladenâ€¦</div>`;
+      container.innerHTML = `<div class="empty-state"><span class="icon">⏳</span>Laden…</div>`;
 
       // Fetch applications, accepted matches, and existing reviews in parallel
       const [
@@ -619,13 +619,13 @@
         const errBox = document.createElement('div');
         errBox.className = 'empty-state';
         errBox.textContent = `Fout bij laden: ${error.message}`;
-        errBox.prepend(Object.assign(document.createElement('span'), { className: 'icon', textContent: 'âš ï¸' }));
+        errBox.prepend(Object.assign(document.createElement('span'), { className: 'icon', textContent: '⚠️' }));
         container.innerHTML = '';
         container.appendChild(errBox);
         return;
       }
 
-      // Build posting_id â†’ match_id lookup for chat links and reviews
+      // Build posting_id → match_id lookup for chat links and reviews
       const matchByPosting   = {};
       const revieweeByPosting = {};
       (acceptedMatches || []).forEach(m => {
@@ -748,7 +748,7 @@
         .subscribe((status, err) => {
           if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
             console.warn('[sollicitaties] realtime verbinding verbroken:', err?.message);
-            notify('Verbinding verbroken â€” ververs de pagina om door te gaan', false);
+            notify('Verbinding verbroken — ververs de pagina om door te gaan', false);
           }
         });
     }
@@ -765,7 +765,7 @@
         box-shadow:0 8px 24px rgba(0,0,0,.2);
         font-family:'Outfit',sans-serif;line-height:1.4;
       `;
-      toast.innerHTML = '<span style="margin-right:8px">ðŸ””</span>' + escapeHtml(message);
+      toast.innerHTML = '<span style="margin-right:8px">🔔</span>' + escapeHtml(message);
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 4000);
     }
@@ -777,7 +777,7 @@
       }
     });
 
-    // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Helpers ───────────────────────────────────────────────────────────
 
     function showLoading(containerId, tekst) {
       const el = document.getElementById(containerId);
@@ -787,14 +787,14 @@
 
     function signOut() { performLogout(); }
 
-    // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Init ──────────────────────────────────────────────────────────────
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // â”€â”€ Guard: alleen BOL-studenten â”€â”€
+      // ── Guard: alleen BOL-studenten ──
       const hasValidRole = await requireRole('student');
       if (!hasValidRole) return;
 
-      // Pre-login localStorage opschonen â€” sollicitaties komen nu uit de DB
+      // Pre-login localStorage opschonen — sollicitaties komen nu uit de DB
       try { localStorage.removeItem('internly_saved_vacatures'); } catch(e) {}
 
       const { data: { user } } = await db.auth.getUser();
@@ -822,7 +822,7 @@
       if (!document.hidden && currentUserId) loadApplications(currentUserId);
     });
 
-    // Session expiry guard â€” vang verlopen JWT op bij elke DB-aanroep
+    // Session expiry guard — vang verlopen JWT op bij elke DB-aanroep
     window.addEventListener('unhandledrejection', function(e) {
       if (e.reason && (
         e.reason.code === 'PGRST301' ||
@@ -838,11 +838,11 @@
 
   <script src="js/translate.js"></script>
   <script src="js/info.js"></script>
-<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">Â© 2026 Sasubo Holding B.V.</footer>
+<footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
 </body>
 </html>
 
-<!-- â”€â”€ SESSION IMPLEMENTATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+<!-- ── SESSION IMPLEMENTATION ─────────────────────────────────────────────────
    TASK:         Task 1 (Review System) + Task 2 (Notifications) + Task 3 (Mobile)
    ADDED:        Review eligibility check (90-day rule), inline star rating form,
                  submitReview() with duplicate guard, notification bell + dropdown,
@@ -851,9 +851,9 @@
                  loadApplications() parallel-fetches reviews alongside matches;
                  bell-count is 44px touch target on mobile
    MOBILE:       Bell touch target 44px, DE/FR lang btns hidden, topbar padding 14px
-   NOTIFICATIONS: Review submitted â†’ notify company (new_review). Bell shows unread
+   NOTIFICATIONS: Review submitted → notify company (new_review). Bell shows unread
                   count from notifications table; Realtime subscription for live delivery
    SQL REQUIRED: reviews table + notifications table (from session prompt)
    TESTED VIA:   Student accepts a stage, waits 90 days, leaves review; company sees
                  notification badge on dashboard
-   â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ -->
+   ─────────────────────────────────────────────────────────────────────────── -->

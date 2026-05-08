@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
@@ -7,20 +7,20 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
-  <title>ESG &amp; Rapportage â€” Internly</title>
+  <title>ESG &amp; Rapportage — Internly</title>
   <meta name="description" content="Internly levert zes gedefinieerde datapunten die passen binnen VSME en ESRS S1 Own Workforce. De volledige uiteenzetting van wat het platform bijdraagt en wat niet.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       Subpage archetype (esg-rapportage) â€” datapunten variant.
+    /* ═══════════════════════════════════════════════════════════════
+       Subpage archetype (esg-rapportage) — datapunten variant.
        Globale tokens uit css/style.css. Pagina-eigen esg-* prefix
-       voorkomt class-conflicten. Geen JS â€” native details/summary.
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+       voorkomt class-conflicten. Geen JS — native details/summary.
+       ═══════════════════════════════════════════════════════════════ */
 
-    /* â”€â”€ Reset & base â”€â”€ */
+    /* ── Reset & base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -31,7 +31,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* â”€â”€ Sticky nav â€” translucent cream blueprint â”€â”€ */
+    /* ── Sticky nav — translucent cream blueprint ── */
     .esg-nav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(244,243,239,.92);
@@ -71,7 +71,7 @@
       border-color: var(--fg-tertiary);
     }
 
-    /* â”€â”€ Mini-hero (blueprint pattern) â”€â”€ */
+    /* ── Mini-hero (blueprint pattern) ── */
     .esg-hero {
       background:
         radial-gradient(ellipse 70% 60% at 50% 0%, rgba(120,200,160,.10), transparent 70%),
@@ -139,7 +139,7 @@
       background: rgba(255,255,255,.06);
     }
 
-    /* â”€â”€ Sections â”€â”€ */
+    /* ── Sections ── */
     .esg-section {
       padding: clamp(2.5rem,7vw,5rem) clamp(1rem,5vw,3rem);
       max-width: 900px;
@@ -185,7 +185,7 @@
     }
     .esg-section-ink .esg-lead { color: rgba(255,255,255,.78); }
 
-    /* â”€â”€ Compliance alert â”€â”€ */
+    /* ── Compliance alert ── */
     .esg-compliance-box {
       background: var(--bg-surface);
       border: 1px solid rgba(26,122,72,.2);
@@ -203,7 +203,7 @@
     }
     .esg-compliance-box a { color: var(--c-green); }
 
-    /* â”€â”€ Datapunten grid â”€â”€ */
+    /* ── Datapunten grid ── */
     .dp-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -256,7 +256,7 @@
       letter-spacing: .04em;
     }
 
-    /* â”€â”€ Hoe het werkt â”€â”€ */
+    /* ── Hoe het werkt ── */
     .hoe-steps {
       display: flex; flex-direction: column; gap: 1.2rem;
       margin-top: 1.8rem;
@@ -303,7 +303,7 @@
     }
     .live-banner-text strong { color: var(--c-orange-deep); }
 
-    /* â”€â”€ Waar staat u (tree-levels) â”€â”€ */
+    /* ── Waar staat u (tree-levels) ── */
     .tree-levels {
       display: flex; flex-direction: column; gap: .6rem;
       margin: 1.5rem 0;
@@ -346,7 +346,7 @@
     }
     .tree-note strong { color: var(--fg-primary); }
 
-    /* â”€â”€ Grenzen â”€â”€ */
+    /* ── Grenzen ── */
     .grenzen-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -385,10 +385,10 @@
       display: flex; gap: .5rem;
     }
     .grenzen-card ul li::before { flex-shrink: 0; }
-    .grenzen-card.ja li::before { content: 'âœ“'; color: var(--c-green); font-weight: 700; }
-    .grenzen-card.nee li::before { content: 'âœ•'; color: var(--c-orange-deep); font-weight: 700; }
+    .grenzen-card.ja li::before { content: '✓'; color: var(--c-green); font-weight: 700; }
+    .grenzen-card.nee li::before { content: '✕'; color: var(--c-orange-deep); font-weight: 700; }
 
-    /* â”€â”€ CTA (donker blok) â”€â”€ */
+    /* ── CTA (donker blok) ── */
     .esg-cta-inner {
       max-width: 700px; margin: 0 auto;
       text-align: center;
@@ -462,7 +462,7 @@
       margin-left: .4rem;
     }
 
-    /* â”€â”€ FAQ (native details/summary) â”€â”€ */
+    /* ── FAQ (native details/summary) ── */
     .esg-faq { max-width: 720px; margin: 1.5rem auto 0; }
     .esg-faq details {
       border-bottom: 1px solid var(--line-subtle);
@@ -506,7 +506,7 @@
     }
     .esg-faq-answer strong { color: var(--fg-primary); }
 
-    /* â”€â”€ Footer (blueprint dark green) â”€â”€ */
+    /* ── Footer (blueprint dark green) ── */
     .esg-footer {
       background: var(--c-green-deep);
       padding: 2.2rem clamp(1rem,5vw,3rem);
@@ -533,7 +533,7 @@
     }
     .esg-footer a:hover { color: var(--c-orange); }
 
-    /* â”€â”€ Divider â”€â”€ */
+    /* ── Divider ── */
     .esg-divider {
       height: 3px;
       background: linear-gradient(90deg, var(--c-green), #22a85e, var(--c-orange-deep));
@@ -544,7 +544,7 @@
       outline-offset: 2px;
     }
 
-    /* â”€â”€ Responsive â”€â”€ */
+    /* ── Responsive ── */
     @media (max-width: 768px) {
       .dp-grid { grid-template-columns: 1fr; }
       .esg-nav-label { display: none; }
@@ -561,20 +561,20 @@
 </head>
 <body>
 
-<!-- â”€â”€ Nav â”€â”€ -->
+<!-- ── Nav ── -->
 <nav class="esg-nav" aria-label="Paginanavigatie" data-public-header>
   <a href="/" class="esg-nav-logo">intern<span>ly</span></a>
   <span class="esg-nav-label">ESG &amp; Rapportage</span>
   <a href="/auth.html" class="esg-nav-login">Inloggen</a>
 </nav>
 
-<!-- â”€â”€ Hero â”€â”€ -->
+<!-- ── Hero ── -->
 <section class="esg-hero" aria-labelledby="hero-heading">
   <span class="esg-hero-script-eyebrow">ESG &amp; rapportage</span>
-  <span class="esg-hero-eyebrow">VSME Â· ESRS S1 Â· Omnibus I</span>
+  <span class="esg-hero-eyebrow">VSME · ESRS S1 · Omnibus I</span>
   <h1 id="hero-heading">Wat we leveren voor je CSRD-verslag</h1>
   <p class="esg-hero-sub">
-    Internly levert zes gedefinieerde datapunten die passen binnen VSME of ESRS S1 Own Workforce. Het platform is geen rapporteringstool â€” het bedrijf blijft de rapporterende partij.
+    Internly levert zes gedefinieerde datapunten die passen binnen VSME of ESRS S1 Own Workforce. Het platform is geen rapporteringstool — het bedrijf blijft de rapporterende partij.
   </p>
   <div class="esg-hero-tags">
     <span class="esg-tag">VSME Sociaal blok</span>
@@ -586,19 +586,19 @@
 
 <div class="esg-divider"></div>
 
-<!-- â”€â”€ Sectie 1: Regulatoire context â”€â”€ -->
+<!-- ── Sectie 1: Regulatoire context ── -->
 <div class="esg-section-wide esg-section-cream">
   <div class="esg-section" style="max-width:900px;margin:0 auto;padding-top:0;padding-bottom:0;">
     <p class="esg-eyebrow">Regulatoire context</p>
     <h2 class="esg-h2">Waar staat CSRD na Omnibus I?</h2>
     <p class="esg-lead">
-      Omnibus I (Directive 2026/470, gepubliceerd maart 2026) heeft CSRD drastisch versmald. De verplichting geldt nu alleen nog voor ondernemingen met meer dan <strong>1.000 medewerkers</strong> Ã©n meer dan <strong>â‚¬&nbsp;450&nbsp;miljoen omzet</strong>. De overgrote meerderheid van onze klanten valt daar niet onder.
+      Omnibus I (Directive 2026/470, gepubliceerd maart 2026) heeft CSRD drastisch versmald. De verplichting geldt nu alleen nog voor ondernemingen met meer dan <strong>1.000 medewerkers</strong> én meer dan <strong>€&nbsp;450&nbsp;miljoen omzet</strong>. De overgrote meerderheid van onze klanten valt daar niet onder.
     </p>
 
     <div class="esg-compliance-box">
       <p>
         <strong>Wat is dan het juiste kader?</strong><br>
-        Voor bedrijven die wÃ©l rapporteren â€” of die vragen krijgen van banken, grote opdrachtgevers of aanbesteders â€” is <strong>VSME</strong> (Voluntary SME Standard) het ontworpen kader om ongestructureerde ESG-vragen te standaardiseren. Het sociale blok van VSME en ESRS S1 Own Workforce raken aan young talent, leerdoelen, begeleiding en stageverloop. Precies de activiteit die Internly registreert.
+        Voor bedrijven die wél rapporteren — of die vragen krijgen van banken, grote opdrachtgevers of aanbesteders — is <strong>VSME</strong> (Voluntary SME Standard) het ontworpen kader om ongestructureerde ESG-vragen te standaardiseren. Het sociale blok van VSME en ESRS S1 Own Workforce raken aan young talent, leerdoelen, begeleiding en stageverloop. Precies de activiteit die Internly registreert.
       </p>
     </div>
 
@@ -608,7 +608,7 @@
   </div>
 </div>
 
-<!-- â”€â”€ Sectie 2: De zes datapunten â”€â”€ -->
+<!-- ── Sectie 2: De zes datapunten ── -->
 <div class="esg-section-wide">
   <div class="esg-section" style="max-width:900px;margin:0 auto;padding-top:0;padding-bottom:0;">
     <p class="esg-eyebrow">Wat levert het platform</p>
@@ -623,51 +623,51 @@
         <div class="dp-num">Datapunt 01</div>
         <div class="dp-name">Aantal aangeboden stageplekken</div>
         <p class="dp-what">Het totaal aantal unieke vacatures dat uw organisatie via Internly actief heeft geplaatst in het gerapporteerde boekjaar, ongeacht of ze zijn ingevuld.</p>
-        <span class="dp-scope">VSME S1-a Â· ESRS S1-1</span>
+        <span class="dp-scope">VSME S1-a · ESRS S1-1</span>
       </div>
 
       <div class="dp-card">
         <div class="dp-num">Datapunt 02</div>
         <div class="dp-name">Gemiddelde eindbeoordeling door stagiair</div>
-        <p class="dp-what">Het gemiddelde van alle door stagiairs ingevulde eindbeoordelingen (schaal 1â€“5) binnen het boekjaar. Alleen beoordelingen via het platform worden meegeteld; buiten het platform verzamelde data niet.</p>
-        <span class="dp-scope">VSME S1-c Â· ESRS S1-8</span>
+        <p class="dp-what">Het gemiddelde van alle door stagiairs ingevulde eindbeoordelingen (schaal 1–5) binnen het boekjaar. Alleen beoordelingen via het platform worden meegeteld; buiten het platform verzamelde data niet.</p>
+        <span class="dp-scope">VSME S1-c · ESRS S1-8</span>
       </div>
 
-      <!-- Datapunt 03 â€” Audit Amendment 2: naam gewijzigd van "Matchvoltooiingspercentage" -->
+      <!-- Datapunt 03 — Audit Amendment 2: naam gewijzigd van "Matchvoltooiingspercentage" -->
       <div class="dp-card">
         <div class="dp-num">Datapunt 03</div>
         <div class="dp-name">Aandeel stages met afgetekend eindgesprek op Internly</div>
         <p class="dp-what">Het aandeel gestarte stages dat met een afgetekend eindgesprek via het platform is afgesloten. Zodra uw bedrijf dat eindgesprek op Internly vastlegt, telt de stage mee.</p>
-        <span class="dp-scope">VSME S1-c Â· ESRS S1-8</span>
+        <span class="dp-scope">VSME S1-c · ESRS S1-8</span>
       </div>
 
       <div class="dp-card">
         <div class="dp-num">Datapunt 04</div>
         <div class="dp-name">Responspercentage op sollicitaties</div>
-        <p class="dp-what">Het percentage ingediende sollicitaties waarop uw organisatie binnen het platform heeft gereageerd (accept, afwijzing of bericht) vÃ³Ã³r het einde van het boekjaar. Stille afwijzingen tellen als non-respons.</p>
+        <p class="dp-what">Het percentage ingediende sollicitaties waarop uw organisatie binnen het platform heeft gereageerd (accept, afwijzing of bericht) vóór het einde van het boekjaar. Stille afwijzingen tellen als non-respons.</p>
         <span class="dp-scope">VSME S1-b</span>
       </div>
 
-      <!-- Datapunt 05 â€” Audit Amendment 1: Trust Score onderscheid momentopname vs historisch gemiddelde -->
+      <!-- Datapunt 05 — Audit Amendment 1: Trust Score onderscheid momentopname vs historisch gemiddelde -->
       <div class="dp-card">
         <div class="dp-num">Datapunt 05</div>
         <div class="dp-name">Trust Score met vier dimensies</div>
         <p class="dp-what">Uw huidige Trust Score met vier onderliggende dimensies: responssnelheid, leerdoelopvolging, nakomen afspraken en begeleidingskwaliteit. Historische snapshots worden vanaf live-gang van deze feature opgebouwd, zodat toekomstige boekjaarexports een gemiddelde tonen in plaats van een momentopname.</p>
-        <span class="dp-scope">VSME S1-c Â· ESRS S1-9</span>
+        <span class="dp-scope">VSME S1-c · ESRS S1-9</span>
       </div>
 
       <div class="dp-card">
         <div class="dp-num">Datapunt 06</div>
         <div class="dp-name">Actieve opleidingsniveaus en sectoren</div>
         <p class="dp-what">Een overzicht van de opleidingsniveaus (BBL, MBO, HBO, WO) en sectoren van de studenten waarmee uw organisatie een match heeft gehad in het boekjaar. Dit ondersteunt de S1-eis rond diversiteit van de instroom.</p>
-        <span class="dp-scope">VSME S1-a Â· ESRS S1-3</span>
+        <span class="dp-scope">VSME S1-a · ESRS S1-3</span>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- â”€â”€ Sectie 3: Hoe het werkt â”€â”€ -->
+<!-- ── Sectie 3: Hoe het werkt ── -->
 <div class="esg-section-wide esg-section-cream">
   <div class="esg-section" style="max-width:900px;margin:0 auto;padding-top:0;padding-bottom:0;">
     <p class="esg-eyebrow">Exportproces</p>
@@ -702,22 +702,22 @@
         <div class="hoe-step-num">4</div>
         <div class="hoe-step-body">
           <strong>Verwerken in uw rapportage</strong>
-          <p>U draagt de data over aan uw duurzaamheidscoÃ¶rdinator, accountant of ESG-adviseur. Die bepaalt hoe de datapunten passen in uw bredere VSME-invulling. Internly levert geen advies over die vertaling.</p>
+          <p>U draagt de data over aan uw duurzaamheidscoördinator, accountant of ESG-adviseur. Die bepaalt hoe de datapunten passen in uw bredere VSME-invulling. Internly levert geen advies over die vertaling.</p>
         </div>
       </div>
     </div>
 
-    <!-- Audit Amendment 1 context: [LIVE-DATUM] placeholder â€” Barry vult in zodra export MVP live-datum heeft -->
+    <!-- Audit Amendment 1 context: [LIVE-DATUM] placeholder — Barry vult in zodra export MVP live-datum heeft -->
     <div class="live-banner">
-      <div class="live-banner-icon">ðŸ•</div>
+      <div class="live-banner-icon">🕐</div>
       <div class="live-banner-text">
-        <strong>Beschikbaar vanaf [LIVE-DATUM].</strong> De export-functionaliteit is in ontwikkeling. Bedrijven op het Business-abonnement krijgen als eerste toegang. <span style="font-weight:600;color:#e05c1a;" aria-label="Abonnementen beschikbaar vanaf Q3 2026">Bekijk abonnementen</span> <span class="soon-pill">Binnenkort beschikbaar Â· Q3 2026</span>
+        <strong>Beschikbaar vanaf [LIVE-DATUM].</strong> De export-functionaliteit is in ontwikkeling. Bedrijven op het Business-abonnement krijgen als eerste toegang. <span style="font-weight:600;color:#e05c1a;" aria-label="Abonnementen beschikbaar vanaf Q3 2026">Bekijk abonnementen</span> <span class="soon-pill">Binnenkort beschikbaar · Q3 2026</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- â”€â”€ Sectie 4: Waar staat u â”€â”€ -->
+<!-- ── Sectie 4: Waar staat u ── -->
 <div class="esg-section-wide">
   <div class="esg-section" style="max-width:900px;margin:0 auto;padding-top:0;padding-bottom:0;">
     <p class="esg-eyebrow">Benchmarking</p>
@@ -730,12 +730,12 @@
       <div class="tree-level" role="listitem">
         <div class="tree-level-dot dot-good"></div>
         <div class="tree-level-label">Actief</div>
-        <div class="tree-level-desc">Responspercentage â‰¥ 70 %, ten minste Ã©Ã©n afgetekend eindgesprek per kwartaal, Trust Score â‰¥ 3,5.</div>
+        <div class="tree-level-desc">Responspercentage ≥ 70 %, ten minste één afgetekend eindgesprek per kwartaal, Trust Score ≥ 3,5.</div>
       </div>
       <div class="tree-level" role="listitem">
         <div class="tree-level-dot dot-mid"></div>
         <div class="tree-level-label">In ontwikkeling</div>
-        <div class="tree-level-desc">Responspercentage 40â€“70 %, eindgesprekken incidenteel vastgelegd, Trust Score 2,5â€“3,5.</div>
+        <div class="tree-level-desc">Responspercentage 40–70 %, eindgesprekken incidenteel vastgelegd, Trust Score 2,5–3,5.</div>
       </div>
       <div class="tree-level" role="listitem">
         <div class="tree-level-dot dot-low"></div>
@@ -751,7 +751,7 @@
   </div>
 </div>
 
-<!-- â”€â”€ Sectie 5: Grenzen â”€â”€ -->
+<!-- ── Sectie 5: Grenzen ── -->
 <div class="esg-section-wide esg-section-cream">
   <div class="esg-section" style="max-width:900px;margin:0 auto;padding-top:0;padding-bottom:0;">
     <p class="esg-eyebrow">Scope en grenzen</p>
@@ -762,7 +762,7 @@
 
     <div class="grenzen-grid">
       <div class="grenzen-card ja">
-        <h3>âœ“ Wat het platform levert</h3>
+        <h3>✓ Wat het platform levert</h3>
         <ul>
           <li>Zes kwantitatieve datapunten uitsluitend gebaseerd op platformactiviteit</li>
           <li>Export per boekjaar in PDF en CSV</li>
@@ -772,7 +772,7 @@
         </ul>
       </div>
       <div class="grenzen-card nee">
-        <h3>âœ• Wat het platform niet levert</h3>
+        <h3>✕ Wat het platform niet levert</h3>
         <ul>
           <li>Een volledige CSRD- of VSME-rapportage</li>
           <li>Audit-grade assurance of accountantsverklaring</li>
@@ -785,7 +785,7 @@
   </div>
 </div>
 
-<!-- â”€â”€ Sectie 6: CTA â”€â”€ -->
+<!-- ── Sectie 6: CTA ── -->
 <div class="esg-section-wide esg-section-ink">
   <div class="esg-cta-inner" style="max-width:700px;margin:0 auto;padding:clamp(1rem,4vw,2rem) clamp(1rem,5vw,3rem);text-align:center;">
     <p class="esg-eyebrow" style="color:rgba(255,255,255,.4);margin-bottom:.7rem;">Business-abonnement</p>
@@ -794,7 +794,7 @@
       De ESG-export is inbegrepen in het Business-abonnement. Meld u aan voor een proefperiode van 30 dagen, geen creditcard vereist.
     </p>
     <div class="esg-cta-btns">
-      <a href="/auth.html?tier=business" class="btn-cta-primary">Start Business-proef â†’</a>
+      <a href="/auth.html?tier=business" class="btn-cta-primary">Start Business-proef →</a>
       <span class="btn-cta-secondary btn-cta-disabled" role="button" aria-disabled="true" title="Abonnementenpagina beschikbaar vanaf Q3 2026">Bekijk alle abonnementen <span class="soon-pill-dark">Q3 2026</span></span>
     </div>
     <p style="margin-top:1.2rem;font-size:.75rem;color:rgba(255,255,255,.3);">
@@ -803,7 +803,7 @@
   </div>
 </div>
 
-<!-- â”€â”€ Sectie 7: FAQ â”€â”€ -->
+<!-- ── Sectie 7: FAQ ── -->
 <div class="esg-section-wide">
   <div class="esg-section" style="max-width:900px;margin:0 auto;padding-top:0;padding-bottom:0;">
     <p class="esg-eyebrow">Veelgestelde vragen</p>
@@ -814,7 +814,7 @@
       <details role="listitem">
         <summary>Voor welke bedrijven is dit relevant?</summary>
         <div class="esg-faq-answer">
-          <p>Primair voor drie groepen. <strong>Eerste groep:</strong> bedrijven die onder CSRD vallen (meer dan 1.000 medewerkers Ã©n meer dan â‚¬&nbsp;450&nbsp;miljoen omzet na Omnibus I) en het sociale blok van ESRS S1 Own Workforce willen onderbouwen met stagegerelateerde data. <strong>Tweede groep:</strong> mkb-bedrijven die op vrijwillige basis of op verzoek van een bank of grote opdrachtgever VSME invullen. <strong>Derde groep:</strong> bedrijven die intern willen sturen op hun jong-talentbeleid en daarvoor gestructureerde platformdata willen gebruiken.</p>
+          <p>Primair voor drie groepen. <strong>Eerste groep:</strong> bedrijven die onder CSRD vallen (meer dan 1.000 medewerkers én meer dan €&nbsp;450&nbsp;miljoen omzet na Omnibus I) en het sociale blok van ESRS S1 Own Workforce willen onderbouwen met stagegerelateerde data. <strong>Tweede groep:</strong> mkb-bedrijven die op vrijwillige basis of op verzoek van een bank of grote opdrachtgever VSME invullen. <strong>Derde groep:</strong> bedrijven die intern willen sturen op hun jong-talentbeleid en daarvoor gestructureerde platformdata willen gebruiken.</p>
         </div>
       </details>
 
@@ -846,11 +846,11 @@
         </div>
       </details>
 
-      <!-- FAQ antwoord 6 â€” bevat [LIVE-DATUM] placeholder â€” Barry vult in -->
+      <!-- FAQ antwoord 6 — bevat [LIVE-DATUM] placeholder — Barry vult in -->
       <details role="listitem">
         <summary>Wanneer is de export-functionaliteit beschikbaar?</summary>
         <div class="esg-faq-answer">
-          <p>De volledige exportfunctie is gepland voor <strong>[LIVE-DATUM]</strong>. Business-klanten worden per e-mail genotificeerd zodra de functie live gaat. De ESG-statistieken in het dashboard (zonder exportfunctie) zijn al beschikbaar voor alle Business-accounts. Heeft u een concrete rapportagedeadline? Neem contact op via <a href="mailto:boekhouding@internly.pro">boekhouding@internly.pro</a> â€” we bekijken dan wat op dat moment beschikbaar is.</p>
+          <p>De volledige exportfunctie is gepland voor <strong>[LIVE-DATUM]</strong>. Business-klanten worden per e-mail genotificeerd zodra de functie live gaat. De ESG-statistieken in het dashboard (zonder exportfunctie) zijn al beschikbaar voor alle Business-accounts. Heeft u een concrete rapportagedeadline? Neem contact op via <a href="mailto:boekhouding@internly.pro">boekhouding@internly.pro</a> — we bekijken dan wat op dat moment beschikbaar is.</p>
         </div>
       </details>
 
@@ -858,13 +858,13 @@
   </div>
 </div>
 
-<!-- â”€â”€ Footer â”€â”€ -->
+<!-- ── Footer ── -->
 <footer class="esg-footer">
   <div class="esg-footer-logo">intern<span>ly</span></div>
   <p>
-    Â© 2026 Sasubo Holding B.V. &nbsp;Â·&nbsp;
-    <a href="/privacybeleid.html">Privacybeleid</a> &nbsp;Â·&nbsp;
-    <a href="/auth.html">Inloggen</a> &nbsp;Â·&nbsp;
+    © 2026 Sasubo Holding B.V. &nbsp;·&nbsp;
+    <a href="/privacybeleid.html">Privacybeleid</a> &nbsp;·&nbsp;
+    <a href="/auth.html">Inloggen</a> &nbsp;·&nbsp;
     <a href="mailto:boekhouding@internly.pro">boekhouding@internly.pro</a>
   </p>
   <p style="margin-top:.5rem;">
@@ -872,13 +872,13 @@
   </p>
 </footer>
 
-<!-- Run 1.8 â€” scripts toegevoegd voor hybrid header
+<!-- Run 1.8 — scripts toegevoegd voor hybrid header
      (autoRefreshToken=false op publieke pagina's via js/supabase.js Run 1.5 v2). -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4" integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug" crossorigin="anonymous"></script>
 <script src="js/supabase.js"></script>
 <script src="js/utils.js"></script>
 
-<!-- Run 1.8 â€” Hybrid header: render rol-aware header voor ingelogde users
+<!-- Run 1.8 — Hybrid header: render rol-aware header voor ingelogde users
      Run 1.8-bis: ROLES_WITH_MINIBAR-pad voor bedrijf/school/begeleider/admin
      (sidebar-rollen krijgen mini-bar, geen volledige top-bar). -->
 <script>
@@ -938,14 +938,14 @@
           <div style="display:flex;align-items:center;gap:14px;">
             <span style="opacity:.75;">Ingelogd als ${escapedNaam}</span>
             <span style="background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;">${roleLabels[role]}</span>
-            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">â†’ Dashboard</a>
+            <a href="${dash}" style="color:#fff;text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,.2);border-radius:6px;font-size:13px;font-weight:500;">→ Dashboard</a>
             <button onclick="(async()=>{try{if(window.clearUserState)clearUserState();await db.auth.signOut();window.location.href='index.html';}catch(e){console.error(e);}})()" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;">Uitloggen</button>
           </div>
         </div>
       `;
       publicHeader.className = 'hybrid-minibar-wrapper';
     }
-    // role onbekend â†’ publieke header blijft staan, geen warn
+    // role onbekend → publieke header blijft staan, geen warn
   } catch (err) {
     console.warn('[hybrid-header] fallback to public:', err?.message);
   }
