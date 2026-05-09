@@ -95,6 +95,13 @@ const PROTECTED_KEYS = [
 ];
 
 function clearUserState() {
+  // F7.1.A: defensieve in-memory state cleanup (cross-account leak prevention)
+  if (typeof window !== 'undefined') {
+    if ('_currentUserId' in window) window._currentUserId = null;
+    if ('__currentUser' in window)  window.__currentUser  = null;
+    if ('__currentRole' in window)  window.__currentRole  = null;
+  }
+
   // localStorage: verwijder alle internly_* en buddy_* keys behalve protected
   const toRemove = [];
   for (let i = 0; i < localStorage.length; i++) {

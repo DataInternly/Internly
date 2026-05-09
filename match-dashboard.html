@@ -5525,7 +5525,10 @@ async function acceptMeeting(id) {
       proposed_date: pd?.date || null,
       time_start:    pd?.from || null,
       time_end:      pd?.to   || null,
-    }).eq('id', m._dbId).catch(err => console.warn('[hub] accept DB err:', err));
+    }).eq('id', m._dbId).catch((err) => {
+      console.error('meeting status update failed:', err);
+      notify('Status kon niet worden bijgewerkt — probeer opnieuw');
+    });
     const organizerId = roleToUserId(m.from);
     if (organizerId && organizerId !== currentUser.id) {
       const senderName = getDisplayName(currentUser);
@@ -5582,7 +5585,10 @@ async function declineMeeting(id) {
 
   if (MATCH_ID && currentUser && m._dbId) {
     await db.from('meetings').update({ status: 'afgewezen' })
-      .eq('id', m._dbId).catch(err => console.warn('[hub] decline DB err:', err));
+      .eq('id', m._dbId).catch((err) => {
+        console.error('meeting status update failed:', err);
+        notify('Status kon niet worden bijgewerkt — probeer opnieuw');
+      });
     const organizerId = roleToUserId(m.from);
     if (organizerId && organizerId !== currentUser.id) {
       const senderName = getDisplayName(currentUser);
@@ -5616,7 +5622,10 @@ async function cancelMeeting(id) {
 
   if (MATCH_ID && currentUser && m._dbId) {
     await db.from('meetings').update({ status: 'geannuleerd' })
-      .eq('id', m._dbId).catch(err => console.warn('[hub] cancel DB err:', err));
+      .eq('id', m._dbId).catch((err) => {
+        console.error('meeting status update failed:', err);
+        notify('Status kon niet worden bijgewerkt — probeer opnieuw');
+      });
     const attendeeId = roleToUserId(m.to);
     if (attendeeId && attendeeId !== currentUser.id) {
       const senderName = getDisplayName(currentUser);

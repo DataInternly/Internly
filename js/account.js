@@ -20,11 +20,20 @@ const AccountModule = (() => {
   // ── DATA LADEN ────────────────────────────────────────────────────────
 
   async function loadContactData(userId) {
-    const { data, error } = await db.from('profiles')
+    // F2.5.A: maybeSingle ipv single — voorkomt PGRST116 crash bij ontbrekend
+    // profile-rij (bv. net-aangemaakt account dat nog geen profiles-rij heeft).
+    const { data: profile, error } = await db.from('profiles')
       .select('naam, email, telefoon, taal_voorkeur, email_notificaties')
-      .eq('id', userId).single();
-    if (error) throw error;
-    return data;
+      .eq('id', userId).maybeSingle();
+    if (error) {
+      console.error('profile fetch failed:', error);
+      throw error;
+    }
+    if (!profile) {
+      notify('Profiel niet gevonden — log opnieuw in');
+      throw new Error('Profile not found for user ' + userId);
+    }
+    return profile;
   }
 
   async function loadSubscription(userId) {

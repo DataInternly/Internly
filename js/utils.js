@@ -415,6 +415,28 @@ async function performLogout() {
                  : (typeof supabase !== 'undefined') ? supabase
                  : null;
     if (!client) throw new Error('geen Supabase client beschikbaar');
+
+    // F7.3.A: cleanup push subscription (cross-account leak prevention)
+    try {
+      const userId = (await client.auth.getUser()).data?.user?.id;
+      if (userId && 'serviceWorker' in navigator && 'PushManager' in window) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        const sub = await reg?.pushManager?.getSubscription();
+        if (sub) {
+          // 1. Browser-level unsubscribe
+          await sub.unsubscribe().catch(e => console.warn('push unsubscribe:', e));
+          // 2. DB-level delete (RLS limit tot eigen rij)
+          await client.from('push_subscriptions')
+            .delete()
+            .eq('user_id', userId)
+            .catch(e => console.warn('push_subscriptions delete:', e));
+        }
+      }
+    } catch (e) {
+      console.warn('push cleanup skipped:', e);
+      // Niet blokkerend — logout moet altijd doorgaan
+    }
+
     const { error } = await client.auth.signOut();
     if (error) throw error;
     // Run 1.6: clearUserState() vervangt losse sessionStorage.clear() en
