@@ -36,3 +36,36 @@
 ### Nieuwe items toegevoegd (vervolg)
 - C-16 (NIEUW): Canon-gat — 13 kolommen in productie student_profiles tabel ontbreken in repo-migraties (info_schema dump 6 mei). Refactor: dump live schema → genereer canon-migration → PR. Linkt aan eerder OUT_OF_SCOPE_CRITICAL regel 478. Sprint: PREP-4 of week 13+.
 - C-17 (NIEUW): Lena onderwijsniveau is HBO (memory zei MBO_BOL). Memory-update verzonden, geen code-impact.
+
+## Post-LT Mama-test Sessie
+
+### F5 — Debounce match-dashboard meeting buttons
+match-dashboard.html accept/decline/cancel meeting-handlers
+missen disable-during-await pattern. Mama-test risico (D3):
+rapid clicks → race-conflict + dubbele notify. Vereist
+`data-meeting-action="<action>-${m.id}"` attribuut op buttons
+(5 locaties: 5337, 5365, 5377, 5390, 5401) of equivalent
+DOM-handle. Polish 4 in pre-browser-test-audit.md skipped
+9 mei: attribuut bestaat niet, ~15 min werk vereist.
+
+### G3 — School-naam snapshot bij match-acceptatie
+Student kan student_profiles.school wijzigen mid-stage.
+Stage-rapport toont dan nieuwe school-naam ipv school-bij-
+matching. Side-effect kan begeleiders verwarren.
+Voorstel: snapshot bij match.status='accepted' in
+matches.school_name_at_match (nieuwe kolom) of in
+match-metadata. Bron: pre-browser-test-audit.md scenario G3.
+
+### C5 — Duplicate push-notif suppression
+sw.js push-handler toont notif zonder Visibility API
+check. Tester ziet bericht 2× (push op telefoon +
+realtime in laptop-tab). Acceptabel UX maar polishbaar.
+Voorstel: in sw.js push-handler, query `clients.matchAll()`
+en skip notif als `visibility=visible` op zelfde origin.
+
+### Browser-test verifies (4)
+- B5 — avatar upload tijdens refresh: toont UI half-save?
+- F4 — bbl-profile motivatie veld heeft maxlength?
+- F6 — 320px viewport rendert mobile-tabs correct?
+- G4 — applications.posting_id FK ON DELETE behavior
+       (RESTRICT vs CASCADE)?

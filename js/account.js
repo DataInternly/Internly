@@ -26,12 +26,12 @@ const AccountModule = (() => {
       .select('naam, email, telefoon, taal_voorkeur, email_notificaties')
       .eq('id', userId).maybeSingle();
     if (error) {
-      console.error('profile fetch failed:', error);
+      console.error('[account] profile fetch failed:', error);
       throw error;
     }
     if (!profile) {
-      notify('Profiel niet gevonden — log opnieuw in');
-      throw new Error('Profile not found for user ' + userId);
+      // Polish 3: gooi typed error, caller kiest i18n-correcte melding.
+      throw new Error('PROFILE_NOT_FOUND');
     }
     return profile;
   }
@@ -389,8 +389,13 @@ const AccountModule = (() => {
 
     } catch (err) {
       console.error('[account] renderAccountScreen fout:', err?.message || err);
-      notify(nl ? 'Kon accountinstellingen niet laden'
-                : 'Could not load account settings');
+      if (err?.message === 'PROFILE_NOT_FOUND') {
+        notify(nl ? 'Profiel niet gevonden — log opnieuw in'
+                  : 'Profile not found — please log in again');
+      } else {
+        notify(nl ? 'Kon accountinstellingen niet laden'
+                  : 'Could not load account settings');
+      }
       el.innerHTML = `<div class="account-error">
         ${nl
           ? 'Kon instellingen niet laden. Probeer het opnieuw.'

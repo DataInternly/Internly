@@ -5526,8 +5526,8 @@ async function acceptMeeting(id) {
       time_start:    pd?.from || null,
       time_end:      pd?.to   || null,
     }).eq('id', m._dbId).catch((err) => {
-      console.error('meeting status update failed:', err);
-      notify('Status kon niet worden bijgewerkt — probeer opnieuw');
+      console.error('[match-dashboard] meeting status update failed:', err);
+      notify('Bevestiging niet opgeslagen — probeer opnieuw');
     });
     const organizerId = roleToUserId(m.from);
     if (organizerId && organizerId !== currentUser.id) {
@@ -5586,8 +5586,8 @@ async function declineMeeting(id) {
   if (MATCH_ID && currentUser && m._dbId) {
     await db.from('meetings').update({ status: 'afgewezen' })
       .eq('id', m._dbId).catch((err) => {
-        console.error('meeting status update failed:', err);
-        notify('Status kon niet worden bijgewerkt — probeer opnieuw');
+        console.error('[match-dashboard] meeting status update failed:', err);
+        notify('Afwijzing niet opgeslagen — probeer opnieuw');
       });
     const organizerId = roleToUserId(m.from);
     if (organizerId && organizerId !== currentUser.id) {
@@ -5623,8 +5623,8 @@ async function cancelMeeting(id) {
   if (MATCH_ID && currentUser && m._dbId) {
     await db.from('meetings').update({ status: 'geannuleerd' })
       .eq('id', m._dbId).catch((err) => {
-        console.error('meeting status update failed:', err);
-        notify('Status kon niet worden bijgewerkt — probeer opnieuw');
+        console.error('[match-dashboard] meeting status update failed:', err);
+        notify('Annulering niet opgeslagen — probeer opnieuw');
       });
     const attendeeId = roleToUserId(m.to);
     if (attendeeId && attendeeId !== currentUser.id) {

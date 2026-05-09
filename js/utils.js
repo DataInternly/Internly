@@ -424,16 +424,16 @@ async function performLogout() {
         const sub = await reg?.pushManager?.getSubscription();
         if (sub) {
           // 1. Browser-level unsubscribe
-          await sub.unsubscribe().catch(e => console.warn('push unsubscribe:', e));
+          await sub.unsubscribe().catch(e => console.warn('[performLogout] push unsubscribe failed:', e));
           // 2. DB-level delete (RLS limit tot eigen rij)
           await client.from('push_subscriptions')
             .delete()
             .eq('user_id', userId)
-            .catch(e => console.warn('push_subscriptions delete:', e));
+            .catch(e => console.warn('[performLogout] push_subscriptions delete failed:', e));
         }
       }
     } catch (e) {
-      console.warn('push cleanup skipped:', e);
+      console.warn('[performLogout] push cleanup skipped:', e);
       // Niet blokkerend — logout moet altijd doorgaan
     }
 
