@@ -493,8 +493,9 @@
       <div class="ld-field" style="margin-bottom:18px"><div class="ld-num">5</div><input type="text" id="ld5" placeholder="optioneel"></div>
 
       <div class="field">
-        <label>Motivatie <span class="hint">optioneel — in eigen woorden</span></label>
-        <textarea id="motivatie" placeholder="Waarom heb je gekozen voor dit leerbedrijf? Wat wil je leren?"></textarea>
+        <label>Motivatie <span class="hint">optioneel — max 300 tekens</span></label>
+        <textarea id="motivatie" maxlength="300" placeholder="Waarom heb je gekozen voor dit leerbedrijf? Wat wil je leren?" oninput="charCount('motivatie','mc',300)"></textarea>
+        <div class="char-count" id="mc">0 / 300</div>
       </div>
 
       <div class="field" style="margin-top:1rem">
@@ -554,6 +555,15 @@ window.addEventListener('unhandledrejection', function(e) {
 function formatDate(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// 1-op-1 met bol-profile.html:936 + student-profile.html:1237 — drift-risico
+// (3× lokaal). Post-LT consolideren naar js/utils.js — zie BACKLOG.
+function charCount(inputId, countId, max) {
+  const len = document.getElementById(inputId).value.length;
+  const el  = document.getElementById(countId);
+  el.textContent = `${len} / ${max}`;
+  el.className   = 'char-count' + (len > max * .9 ? ' warn' : '');
 }
 
 function signOut() { performLogout(); }

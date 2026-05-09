@@ -63,9 +63,12 @@ realtime in laptop-tab). Acceptabel UX maar polishbaar.
 Voorstel: in sw.js push-handler, query `clients.matchAll()`
 en skip notif als `visibility=visible` op zelfde origin.
 
-### Browser-test verifies (4)
+### Browser-test verifies (2)
 - B5 — avatar upload tijdens refresh: toont UI half-save?
-- F4 — bbl-profile motivatie veld heeft maxlength?
 - F6 — 320px viewport rendert mobile-tabs correct?
-- G4 — applications.posting_id FK ON DELETE behavior
-       (RESTRICT vs CASCADE)?
+
+### charCount duplicatie (post-LT, 7/11 violation)
+`function charCount` lokaal gedefinieerd in 3 profile-form pagina's:
+bol-profile.html:936, student-profile.html:1237, bbl-profile.html:562
+(toegevoegd 9 mei voor F4 fix). Drift-risico — alle 3 moeten
+synchroon blijven. Post-LT consolidatie naar js/utils.js (~10 min).
