@@ -202,6 +202,25 @@
     }
     .cs-action:hover { background: rgba(0,0,0,.12); }
 
+    /* Fase 4 C5 — Leeragreement primair document banner */
+    .hub-la-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: 10px;
+      margin-bottom: 10px;
+      background: rgba(124,58,237,.06);
+      border: 1px solid rgba(124,58,237,.22);
+      color: #0d1520;
+    }
+    .hub-la-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: #fff; border: 1px solid rgba(124,58,237,.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .hub-la-body { flex: 1; min-width: 0; }
+    .hub-la-title { font-size: 13px; font-weight: 600; line-height: 1.2; }
+    .hub-la-sub   { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
     /* ── View tabs ── */
     .view-tabs {
       display: flex; gap: 3px;
@@ -779,6 +798,16 @@
     <button class="cs-action" onclick="goView('verlenging')">Bekijk verlenging</button>
   </div>
 
+  <!-- Fase 4 C5 — Leeragreement primair document (boven stage-kaart) -->
+  <div class="hub-la-banner" id="hubLaBanner">
+    <div class="hub-la-icon" aria-hidden="true">📄</div>
+    <div class="hub-la-body">
+      <div class="hub-la-title">Leeragreement</div>
+      <div class="hub-la-sub" id="hubLaSub">Laden…</div>
+    </div>
+    <a id="hub-la-action" href="bbl-profile.html#leeragreement" class="cs-action" style="text-decoration:none">Bekijk →</a>
+  </div>
+
   <!-- ── View tabs ── -->
   <div class="view-tabs">
     <button class="vtab active" id="tab-berichten"  onclick="goView('berichten')">Berichten</button>
@@ -1169,6 +1198,31 @@ function formatDate(iso) {
 
 // Notification helper — exact kopie patroon chat.html
 function signOut() { performLogout(); }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fase 4 C5 — LEERAGREEMENT BANNER (boven view-tabs, primair document)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderHubLeeragreement(sp) {
+  const subEl    = document.getElementById('hubLaSub');
+  const actionEl = document.getElementById('hub-la-action');
+  if (!subEl || !actionEl) return;
+  if (sp?.leeragreement_url) {
+    const _datum = sp.leeragreement_uploaded_at
+      ? formatDate(sp.leeragreement_uploaded_at.split('T')[0])
+      : '';
+    subEl.textContent = _datum ? `Geüpload op ${_datum}` : 'Geüpload';
+    actionEl.href = sp.leeragreement_url;
+    actionEl.target = '_blank';
+    actionEl.rel = 'noopener';
+    actionEl.textContent = 'Download →';
+  } else {
+    subEl.textContent = 'Nog niet geüpload — klik om toe te voegen';
+    actionEl.href = 'bbl-profile.html#leeragreement';
+    actionEl.removeAttribute('target');
+    actionEl.removeAttribute('rel');
+    actionEl.textContent = 'Upload nu →';
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VIEW SWITCHING
@@ -2603,7 +2657,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 2. BBL-check
   const { data: sp, error: spErr } = await db
     .from('student_profiles')
-    .select('profile_id, naam, opleiding, sector, opdracht_domein, schooldag, skills, bbl_mode, school, pb_naam, contract_start, contract_end, jaar')
+    .select('profile_id, naam, opleiding, sector, opdracht_domein, schooldag, skills, bbl_mode, school, pb_naam, contract_start, contract_end, jaar, leeragreement_url, leeragreement_uploaded_at')
     .eq('profile_id', user.id)
     .maybeSingle();
 
@@ -2617,6 +2671,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   sessionStorage.setItem('internly_role', 'bbl');
 
   currentStudentProfile = sp;
+
+  // Fase 4 C5 — leeragreement-banner (primair document, boven view-tabs)
+  renderHubLeeragreement(sp);
 
   // Welkom overlay — eenmalig na eerste login
   // welcome-overlay.js — 1 mei 2026
