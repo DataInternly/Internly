@@ -26,5 +26,10 @@ Disallow: /preview.html
 Disallow: /internly_simulator.html
 Disallow: /supabase/
 Disallow: /js/telemetry.js
+Disallow: /_revamp_2026-04-29/
+Disallow: /_archief/
+Disallow: /_docs/
+Disallow: /sql/
+Disallow: /docs/
 
 Sitemap: https://internly.pro/sitemap.xml

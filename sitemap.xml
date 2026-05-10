@@ -60,4 +60,19 @@
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
+  <url>
+    <loc>https://internly.pro/blog.html</loc>
+    <lastmod>2026-05-11</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://internly.pro/security.html</loc>
+    <lastmod>2026-05-11</lastmod>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://internly.pro/esg-rapportage.html</loc>
+    <lastmod>2026-05-11</lastmod>
+    <priority>0.4</priority>
+  </url>
 </urlset>
