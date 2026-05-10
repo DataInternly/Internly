@@ -2,3 +2,9 @@
 *.backup.*.html
 *.backup.*.js
 hero-audit.md
+_git_backup_pre_push_2026-05-10/
+
+# Build output uit scripts/ — PDFs gegenereerd door generate-bbl-placeholder.py
+scripts/output/
+.env
+node_modules/
