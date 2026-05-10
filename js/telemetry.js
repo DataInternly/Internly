@@ -97,7 +97,7 @@ const _tel = (function() {
   const _key = window.__SUPABASE_ANON_KEY
     || (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : '');
 
-  if (!_key && _cfg.LOG_TO_DB) {
+  if (!_key && _cfg.LOG_TO_DB && _cfg.LOG_TO_CONSOLE) {
     console.warn(
       '[t] geen sleutel gevonden —'
       + ' DB-logging uitgeschakeld voor deze pagina'
@@ -370,6 +370,7 @@ const _fCtx = (function() {
 // inline calls (_fCtx._init / _fCtx._plant / _fCtx._guard) altijd defined
 // zijn, ook als telemetry.js 404't of door een blocker tegengehouden wordt.
 window._fCtx = _fCtx;
+window._perf = _perf;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // BLOK 5 — _env
@@ -404,7 +405,7 @@ const _env = (function() {
           return Promise.reject(new Error('Not found'));
         }
       } catch (e) {
-        console.error('[ev] guard error:', e?.message || 'onbekende fout');
+        if (_cfg.LOG_TO_CONSOLE) console.error('[ev] guard error:', e?.message || 'onbekende fout');
       }
       // doorgifte aan origineel ook in try/catch
       try {
@@ -602,7 +603,7 @@ function _bootReady() {
   ['notify', 'escapeHtml', 'createNotification'].forEach(name => {
     if (typeof window[name] === 'function') {
       _state.snapshot(name, window[name]);
-    } else {
+    } else if (_cfg.LOG_TO_CONSOLE) {
       console.warn(
         `[t] snapshot miss: ${name} — function not found at boot`
       );
@@ -610,4 +611,17 @@ function _bootReady() {
   });
 
   _tel.report('tel_init', { ts: Date.now() });
+
+  // Periodieke integriteitscheck — detecteert function-hijacking van
+  // notify/escapeHtml/createNotification (bijv. via console-injectie).
+  // 45s interval: laag genoeg om hijacks binnen één session-window te
+  // pakken, hoog genoeg om geen merkbare CPU/memory te kosten.
+  setInterval(() => {
+    ['notify', 'escapeHtml', 'createNotification'].forEach(name => {
+      const fn = window[name];
+      if (typeof fn === 'function') {
+        _state.verify(name, fn);
+      }
+    });
+  }, 45000);
 }

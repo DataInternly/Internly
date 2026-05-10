@@ -1264,6 +1264,10 @@
       .replace(/[​‌‍‎‏﻿ ]/g, '')
       .trim();
     if (!content) return;
+    if (typeof window._perf?.tick === 'function' && !window._perf.tick()) {
+      notify('Even rustig aan — te veel acties tegelijk', false);
+      return;
+    }
 
     const btn = document.getElementById('sendBtn');
     btn.disabled = true;

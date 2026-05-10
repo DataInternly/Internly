@@ -955,6 +955,10 @@ function verstuurSollicitatie() {
 }
 
 async function handleSave(motivatieText) {
+  if (typeof window._perf?.tick === 'function' && !window._perf.tick()) {
+    notify('Even rustig aan — te veel acties tegelijk', false);
+    return;
+  }
   if (isApplying()) {
     notify('Je hebt al een sollicitatie in behandeling — wacht even');
     return;
