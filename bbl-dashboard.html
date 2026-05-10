@@ -337,6 +337,16 @@
 
   </div>
 
+  <!-- Fase 4 C4 — Leeragreement card (full-width, ankert mijn-berichten BBL-CTA) -->
+  <div class="dash-card full" id="laDashCard" style="margin-bottom:12px;">
+    <div class="dc-label">Leeragreement</div>
+    <div id="la-dash-status" style="font-size:.92rem;color:#374151;">Laden…</div>
+    <a id="la-dash-link" href="bbl-profile.html#leeragreement"
+       class="cs-action" style="margin-top:8px;display:inline-block;text-decoration:none">
+      Bekijk →
+    </a>
+  </div>
+
   <!-- Grid rij 2: Begeleiders + Leerdoelen -->
   <div class="card-grid">
 
@@ -533,6 +543,25 @@ async function renderLeerdoelen(skills, userId) {
   }
 }
 
+// ── Fase 4 C4 — Leeragreement-card render ─────────────────────────────────
+
+function renderLeeragreementCard(sp) {
+  const status = document.getElementById('la-dash-status');
+  const link   = document.getElementById('la-dash-link');
+  if (!status) return;
+  if (sp?.leeragreement_url) {
+    const _datum = sp.leeragreement_uploaded_at
+      ? formatDate(sp.leeragreement_uploaded_at.split('T')[0])
+      : '';
+    status.innerHTML = '✓ Geüpload'
+      + (_datum ? ` <span style="color:#9ca3af;font-size:.82rem">(${escapeHtml(_datum)})</span>` : '');
+    if (link) link.textContent = 'Bekijk leeragreement →';
+  } else {
+    status.textContent = 'Nog niet geüpload';
+    if (link) link.textContent = 'Upload nu →';
+  }
+}
+
 // ── Welkomstgroet op basis van tijdstip ──────────────────────────────────────
 
 function setWelcome(naam) {
@@ -582,7 +611,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 2. BBL-check
   const { data: sp, error: spErr } = await db
     .from('student_profiles')
-    .select('profile_id, opleiding, schooldag, skills, bbl_mode, school')
+    .select('profile_id, opleiding, schooldag, skills, bbl_mode, school, leeragreement_url, leeragreement_uploaded_at')
     .eq('profile_id', user.id)
     .maybeSingle();
 
@@ -613,6 +642,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   const naam = getDisplayName(user, 'Student');
   await renderStudentHeader({ activeTab: null });
   setWelcome(naam);
+
+  // Fase 4 C4 — leeragreement-card status
+  renderLeeragreementCard(sp);
 
   // 4. Actieve match ophalen
   const { data: match, error: matchErr } = await db
