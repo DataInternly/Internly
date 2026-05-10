@@ -885,28 +885,6 @@ body::before {
 }
 .btn-esg:hover { background: var(--green-deep); }
 
-/* ── PREV BAND ── */
-.prev-band {
-  background: var(--beige-warm);
-  padding: var(--s2) var(--s4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s3);
-  flex-wrap: wrap;
-  font-family: 'Outfit', sans-serif;
-  font-size: .85rem;
-}
-.prev-band-lbl { color: var(--ink-muted); }
-.prev-band a {
-  color: var(--orange-deep);
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity .15s;
-}
-.prev-band a:hover { opacity: .65; }
-.prev-band a + a::before { content: '·'; color: var(--ink-muted); margin-right: var(--s2); margin-left: 0; }
-
 /* ── SIMULATOR ── */
 .sim-section {
   background: var(--ink);
@@ -1692,13 +1670,6 @@ footer {
     <a class="btn-esg" href="/esg-rapportage.html">Lees wat wij leveren →</a>
   </div>
 </section>
-
-<!-- AL EERDER GESOLLICITEERD -->
-<div class="prev-band">
-  <span class="prev-band-lbl">Al eerder gesolliciteerd?</span>
-  <a href="mijn-sollicitaties.html">Bekijk je sollicitaties →</a>
-  <a href="matches.html">Mijn matches →</a>
-</div>
 
 <!-- SIMULATOR -->
 <section class="sim-section anim-card">
