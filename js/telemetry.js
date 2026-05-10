@@ -77,7 +77,7 @@ const _cfg = Object.freeze({
   FREEZE_DURATION_MS: 30000,
 
   // ── Logging ─────────────────────────────────────────────────────────────────
-  LOG_TO_CONSOLE: true,
+  LOG_TO_CONSOLE: false,
   LOG_TO_DB:      true,
 });
 

@@ -3286,7 +3286,7 @@ async function renderESG() {
   const companyName = getDisplayName(currentUser);
   const sectorenStr = sectoren.length > 0 ? sectoren.join(', ') : 'diverse sectoren';
 
-  const csrdText = `${escapeHtml(companyName)} heeft in ${_esgYear} ${totaalStages} stageplekken aangeboden aan studenten in de sectoren ${sectorenStr}. De gemiddelde beoordeling door stagiairs bedroeg ${gemiddeldeRating.toFixed(1)} op een schaal van 1 tot 5. Er werden ${aantalGesprekken} begeleidingsgesprekken gehouden. Het platform Internly registreerde een responspercentage van ${responsPercentage.toFixed(0)}% op sollicitaties. Totale ESG-score via Internly: ${esgPunten} punten.`;
+  const csrdText = `${escapeHtml(companyName)} heeft in ${_esgYear} ${totaalStages} stageplekken aangeboden aan studenten in de sectoren ${escapeHtml(sectorenStr)}. De gemiddelde beoordeling door stagiairs bedroeg ${gemiddeldeRating.toFixed(1)} op een schaal van 1 tot 5. Er werden ${aantalGesprekken} begeleidingsgesprekken gehouden. Het platform Internly registreerde een responspercentage van ${responsPercentage.toFixed(0)}% op sollicitaties. Totale ESG-score via Internly: ${esgPunten} punten.`;
 
   // ── Export section ──
   let exportHtml;
