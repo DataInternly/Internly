@@ -199,9 +199,9 @@
     }
     .ov-opleiding { font-size: .9rem; color: #6b7280; margin-top: 2px; }
     .bbl-badge {
-      background: #eaf5ed; color: #0f6e56;
+      background: #7c3aed; color: #fff;
       font-size: .72rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-      padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
+      padding: 6px 14px; border-radius: 20px; flex-shrink: 0;
     }
     .ov-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;
@@ -244,6 +244,87 @@
       pointer-events: none; white-space: nowrap;
     }
     .notif.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Fase 2 — design polish ── */
+
+    /* A1 — empty-field action hints */
+    .bbl-empty-hint {
+      color: #9ca3af;
+      font-style: italic;
+      font-size: .85rem;
+      cursor: pointer;
+      text-decoration: underline dotted;
+    }
+    .bbl-empty-hint:hover { color: #6b7280; }
+
+    /* A3 — leerbedrijf card-in-card */
+    .bbl-leerbedrijf-card {
+      border-left: 3px solid #7c3aed;
+      background: rgba(124,58,237,0.04);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      margin: .75rem 0;
+    }
+    .bbl-leerbedrijf-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+
+    /* A4 — leerdoelen quick-add inline form */
+    .bbl-ld-quickadd {
+      display: flex; gap: 8px; align-items: center;
+      margin-top: 4px;
+    }
+    .bbl-ld-quickadd input {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 9px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .88rem; color: #0d1520;
+      background: #fff; outline: none;
+      transition: border-color .15s;
+    }
+    .bbl-ld-quickadd input:focus { border-color: #1a7a48; }
+    .bbl-ld-add-btn {
+      padding: 9px 14px;
+      background: #1a7a48; color: #fff; border: none;
+      border-radius: 9px;
+      font-family: 'Outfit', sans-serif;
+      font-size: .85rem; font-weight: 500;
+      cursor: pointer; white-space: nowrap;
+      transition: background .15s;
+    }
+    .bbl-ld-add-btn:hover { background: #0f5c36; }
+    .ld-chip-remove {
+      background: transparent; border: none; padding: 0 2px;
+      margin-left: 4px;
+      color: #0f6e56; font-size: 1rem; line-height: 1;
+      cursor: pointer; border-radius: 50%;
+      width: 18px; height: 18px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background .12s, color .12s;
+    }
+    .ld-chip-remove:hover { background: rgba(184,32,32,.12); color: #b82020; }
+
+    /* A5 — beschikbaarheid legenda */
+    .bbl-grid-legenda {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+      font-size: .8rem; color: #4b5563;
+      margin-bottom: 6px;
+    }
+    .leg-dot { font-size: 1rem; vertical-align: middle; }
+    .leg-beschikbaar { color: #1a7a48; }
+    .leg-voorkeur    { color: #FF7E42; }
+    .leg-bezet       { color: #b82020; }
+    .bbl-grid-tip {
+      font-size: .8rem; color: #9ca3af;
+      margin: 0 0 12px;
+    }
 
     @media (max-width: 480px) {
       .shell { padding: 16px 12px 80px; }
@@ -355,7 +436,7 @@
           <div class="ov-name" id="ov-naam">—</div>
           <div class="ov-opleiding" id="ov-opleiding">—</div>
         </div>
-        <span class="bbl-badge">BBL</span>
+        <span class="bbl-badge" title="BBL — werkend leren: 2 dagen school, 3 dagen praktijk">BBL</span>
       </div>
       <div class="ov-grid">
         <div class="ov-item"><div class="ov-label">School / ROC</div><div class="ov-val" id="ov-school">—</div></div>
@@ -364,14 +445,16 @@
         <div class="ov-item"><div class="ov-label">Postcode</div><div class="ov-val" id="ov-postcode">—</div></div>
       </div>
 
-      <div class="ov-section-label">Leerbedrijf</div>
-      <div class="ov-grid">
-        <div class="ov-item"><div class="ov-label">Bedrijfsnaam</div><div class="ov-val" id="ov-bedrijf">—</div></div>
-        <div class="ov-item"><div class="ov-label">Sector</div><div class="ov-val" id="ov-sector">—</div></div>
-        <div class="ov-item"><div class="ov-label">Contract start</div><div class="ov-val" id="ov-contract-start">—</div></div>
-        <div class="ov-item"><div class="ov-label">Contract einde</div><div class="ov-val" id="ov-contract-end">—</div></div>
-        <div class="ov-item"><div class="ov-label">Uren per week</div><div class="ov-val" id="ov-uren">—</div></div>
-        <div class="ov-item"><div class="ov-label">Praktijkbegeleider</div><div class="ov-val" id="ov-pb">—</div></div>
+      <div class="bbl-leerbedrijf-card">
+        <div class="bbl-leerbedrijf-label">Mijn leerbedrijf</div>
+        <div class="ov-grid">
+          <div class="ov-item"><div class="ov-label">Bedrijfsnaam</div><div class="ov-val" id="ov-bedrijf">—</div></div>
+          <div class="ov-item"><div class="ov-label">Sector</div><div class="ov-val" id="ov-sector">—</div></div>
+          <div class="ov-item" id="ov-contract-start-cell"><div class="ov-label" id="ov-contract-start-label">Contract start</div><div class="ov-val" id="ov-contract-start">—</div></div>
+          <div class="ov-item" id="ov-contract-end-cell"><div class="ov-label">Contract einde</div><div class="ov-val" id="ov-contract-end">—</div></div>
+          <div class="ov-item"><div class="ov-label">Uren per week</div><div class="ov-val" id="ov-uren">—</div></div>
+          <div class="ov-item"><div class="ov-label">Praktijkbegeleider</div><div class="ov-val" id="ov-pb">—</div></div>
+        </div>
       </div>
 
       <div id="ov-leerdoelen-wrap">
@@ -561,29 +644,155 @@ function signOut() { performLogout(); }
 
 // ── Views ─────────────────────────────────────────────────────────────────────
 
+// Fase 2 A1 — empty-field action hint
+function _emptyHint() {
+  return '<span class="bbl-empty-hint" onclick="openEditMode()">Nog niet ingevuld — klik om in te vullen</span>';
+}
+
+// Fase 2 — open editmode = naar formulier scrollen
+function openEditMode() { showForm(); }
+
+// Fase 2 A4 — render leerdoelen (chips met verwijder-knop, anders inline quick-add)
+function _renderLeerdoelen(skills) {
+  const ldEl = document.getElementById('ov-leerdoelen');
+  if (!ldEl) return;
+  if (skills.length > 0) {
+    ldEl.innerHTML = skills.map((s, i) =>
+      `<span class="ld-chip">✓ ${escapeHtml(s)}<button type="button" class="ld-chip-remove" `
+      + `data-index="${i}" title="Verwijder leerdoel" aria-label="Verwijder leerdoel">×</button></span>`
+    ).join('');
+    ldEl.querySelectorAll('.ld-chip-remove').forEach(btn => {
+      btn.addEventListener('click', () => removeLeerdoel(parseInt(btn.dataset.index, 10)));
+    });
+  } else {
+    ldEl.innerHTML = `
+      <div class="bbl-ld-quickadd">
+        <input type="text" id="ld-quickadd-input" placeholder="Voeg een leerdoel toe..." maxlength="80"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();addLeerdoel(this);}">
+        <button type="button" class="bbl-ld-add-btn"
+                onclick="addLeerdoel(document.getElementById('ld-quickadd-input'))">+ Toevoegen</button>
+      </div>`;
+  }
+}
+
+// Fase 2 A4 — leerdoel verwijderen via chip ×-knop
+async function removeLeerdoel(index) {
+  if (!currentUser || typeof index !== 'number' || isNaN(index)) return;
+  const { data: sp, error: fetchErr } = await db
+    .from('student_profiles')
+    .select('skills')
+    .eq('profile_id', currentUser.id)
+    .maybeSingle();
+  if (fetchErr) {
+    console.error('[bbl-profile] leerdoel-remove fetch fout:', fetchErr.message);
+    notify('Kon leerdoelen niet laden', false);
+    return;
+  }
+  const skills = Array.isArray(sp?.skills) ? sp.skills.filter(Boolean) : [];
+  if (index < 0 || index >= skills.length) return;
+  skills.splice(index, 1);
+  const { error: updErr } = await db
+    .from('student_profiles')
+    .update({ skills })
+    .eq('profile_id', currentUser.id);
+  if (updErr) {
+    console.error('[bbl-profile] leerdoel-remove fout:', updErr.message);
+    notify('Kon leerdoel niet verwijderen', false);
+    return;
+  }
+  _renderLeerdoelen(skills);
+  notify('Leerdoel verwijderd');
+}
+
+// Fase 2 A4 — leerdoel toevoegen via quick-add (schrijft naar student_profiles.skills jsonb)
+async function addLeerdoel(input) {
+  if (!input || !currentUser) return;
+  const val = (input.value || '').trim();
+  if (!val) return;
+
+  const { data: sp, error: fetchErr } = await db
+    .from('student_profiles')
+    .select('skills')
+    .eq('profile_id', currentUser.id)
+    .maybeSingle();
+  if (fetchErr) {
+    console.error('[bbl-profile] leerdoel-fetch fout:', fetchErr.message);
+    notify('Kon huidige leerdoelen niet laden — probeer opnieuw', false);
+    return;
+  }
+
+  const skills = Array.isArray(sp?.skills) ? sp.skills.filter(Boolean) : [];
+  if (skills.length >= 5) {
+    notify('Maximaal 5 leerdoelen — bewerk je profiel om er een te wijzigen', false);
+    return;
+  }
+  if (skills.includes(val)) {
+    notify('Dit leerdoel staat al in je lijst', false);
+    return;
+  }
+  skills.push(val);
+
+  const { error: updErr } = await db
+    .from('student_profiles')
+    .update({ skills })
+    .eq('profile_id', currentUser.id);
+  if (updErr) {
+    console.error('[bbl-profile] leerdoel-add fout:', updErr.message);
+    notify('Kon leerdoel niet opslaan', false);
+    return;
+  }
+
+  input.value = '';
+  _renderLeerdoelen(skills);
+  notify('✓ Leerdoel toegevoegd');
+}
+
 function showOverview(data) {
   document.getElementById('ov-naam').textContent     = data.naam      || '—';
   document.getElementById('ov-opleiding').textContent = data.opleiding || '—';
   document.getElementById('ov-school').textContent   = data.school    || '—';
   document.getElementById('ov-jaar').textContent     = data.jaar      ? 'Jaar ' + data.jaar : '—';
-  document.getElementById('ov-schooldag').textContent = data.schooldag
-    ? data.schooldag.charAt(0).toUpperCase() + data.schooldag.slice(1) : '—';
-  document.getElementById('ov-postcode').textContent = data.postcode  || '—';
-  document.getElementById('ov-bedrijf').textContent  = data._bedrijfsnaam  || '—';
-  document.getElementById('ov-sector').textContent   = data.opdracht_domein || '—';
-  document.getElementById('ov-contract-start').textContent = formatDate(data.contract_start);
-  document.getElementById('ov-contract-end').textContent   = formatDate(data.contract_end);
-  document.getElementById('ov-uren').textContent   = data._uren_per_week ? data._uren_per_week + ' uur/week' : '—';
-  document.getElementById('ov-pb').textContent     = data.pb_naam || '—';
+  // A1 — schooldag, postcode action-hint bij leeg
+  const _schooldagEl = document.getElementById('ov-schooldag');
+  _schooldagEl.innerHTML = data.schooldag
+    ? data.schooldag.charAt(0).toUpperCase() + data.schooldag.slice(1)
+    : _emptyHint();
+  document.getElementById('ov-postcode').innerHTML = data.postcode || _emptyHint();
+  // A1 — leerbedrijf-naam (bedrijfsnaam komt uit localStorage cache via _bedrijfsnaam)
+  document.getElementById('ov-bedrijf').innerHTML = data._bedrijfsnaam || _emptyHint();
+  document.getElementById('ov-sector').textContent = data.opdracht_domein || '—';
+  // A2 — contract-display: combineer als beide ingevuld, anders losse action-hints
+  const _startCell  = document.getElementById('ov-contract-start-cell');
+  const _endCell    = document.getElementById('ov-contract-end-cell');
+  const _startLabel = document.getElementById('ov-contract-start-label');
+  // reset eerst (bij re-render na edit)
+  if (_endCell)    _endCell.style.display    = '';
+  if (_startCell)  _startCell.style.gridColumn = '';
+  if (_startLabel) _startLabel.textContent   = 'Contract start';
 
-  // Leerdoelen chips
-  const skills = Array.isArray(data.skills) ? data.skills.filter(Boolean) : [];
-  const ldEl = document.getElementById('ov-leerdoelen');
-  if (skills.length > 0) {
-    ldEl.innerHTML = skills.map(s => `<span class="ld-chip">🎯 ${escapeHtml(s)}</span>`).join('');
+  if (data.contract_start && data.contract_end) {
+    const _sDate = new Date(data.contract_start);
+    const _eDate = new Date(data.contract_end);
+    const _months = Math.max(1, Math.round((_eDate - _sDate) / (1000 * 60 * 60 * 24 * 30)));
+    document.getElementById('ov-contract-start').textContent =
+      `${_months} maanden — start ${formatDate(data.contract_start)}, eind ${formatDate(data.contract_end)}`;
+    if (_startCell)  _startCell.style.gridColumn = '1 / -1';
+    if (_endCell)    _endCell.style.display = 'none';
+    if (_startLabel) _startLabel.textContent = 'Contract';
   } else {
-    ldEl.innerHTML = '<span style="font-size:.82rem;color:#9ca3af">Nog geen leerdoelen ingevuld.</span>';
+    document.getElementById('ov-contract-start').innerHTML =
+      data.contract_start ? formatDate(data.contract_start) : _emptyHint();
+    document.getElementById('ov-contract-end').innerHTML =
+      data.contract_end   ? formatDate(data.contract_end)   : _emptyHint();
   }
+  // A1 — uren_per_week (localStorage) en praktijkbegeleider
+  document.getElementById('ov-uren').innerHTML =
+    data._uren_per_week ? data._uren_per_week + ' uur/week' : _emptyHint();
+  document.getElementById('ov-pb').innerHTML = data.pb_naam || _emptyHint();
+
+  // A4 — leerdoelen (chips als gevuld, inline quick-add form als leeg)
+  const skills = Array.isArray(data.skills) ? data.skills.filter(Boolean) : [];
+  _renderLeerdoelen(skills);
 
   // Motivatie
   const motWrap = document.getElementById('ov-motivatie-wrap');
@@ -846,6 +1055,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   <div class="section-label">Jouw planning</div>
   <div class="section-title">Beschikbaarheid</div>
   <p class="section-sub">Geef aan wanneer je beschikbaar bent voor gesprekken of afspraken. Je leerbedrijf en begeleider zien dit bij het plannen van een meeting.</p>
+  <div class="bbl-grid-legenda">
+    <span><span class="leg-dot leg-beschikbaar">●</span> Beschikbaar</span>
+    <span><span class="leg-dot leg-voorkeur">●</span> Voorkeur</span>
+    <span><span class="leg-dot leg-bezet">●</span> Bezet</span>
+  </div>
+  <p class="bbl-grid-tip">Tip: dubbelklik op een blok om het voor de hele dag in te stellen.</p>
   <div id="ical-container"></div>
 </div>
 
