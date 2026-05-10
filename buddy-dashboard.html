@@ -500,6 +500,7 @@
                name="naam"
                maxlength="80"
                required
+               autocomplete="name"
                placeholder="Hoe je heet — zichtbaar voor studenten">
         <div class="avail-note">Wordt opgeslagen op je hoofdprofiel. Wijzig wanneer je wilt.</div>
       </div>
@@ -617,11 +618,11 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
         <div class="profile-field" style="margin-top:0;">
           <label>Postcode</label>
-          <input type="text" id="bp-postcode" placeholder="1234 AB" maxlength="7">
+          <input type="text" id="bp-postcode" placeholder="1234 AB" maxlength="7" autocomplete="postal-code">
         </div>
         <div class="profile-field" style="margin-top:0;">
           <label>Woonplaats</label>
-          <input type="text" id="bp-stad" placeholder="Amsterdam">
+          <input type="text" id="bp-stad" placeholder="Amsterdam" autocomplete="address-level2">
         </div>
       </div>
 

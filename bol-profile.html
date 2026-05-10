@@ -523,7 +523,7 @@
 
     <div class="field">
       <label>Naam <span class="req">*</span></label>
-      <input type="text" id="naam" maxlength="100" placeholder="Voornaam Achternaam">
+      <input type="text" id="naam" maxlength="100" placeholder="Voornaam Achternaam" autocomplete="name">
     </div>
 
     <div class="field">
@@ -587,7 +587,8 @@
       <label>Jouw postcode <span class="hint">voor reistijdfilter</span></label>
       <input type="text" id="postcode" placeholder="1234AB" maxlength="7"
         style="text-transform:uppercase;max-width:140px"
-        oninput="this.value=this.value.toUpperCase()">
+        oninput="this.value=this.value.toUpperCase()"
+        autocomplete="postal-code">
     </div>
     <div class="field">
       <label>Skills <span class="req">*</span> <span class="hint">typ en druk Enter</span></label>
@@ -1675,7 +1676,7 @@ function removeSaved(index) {
     </p>
 
     <div id="wl-form">
-      <input type="email" id="wl-email" placeholder="jouw@email.nl" style="
+      <input type="email" id="wl-email" placeholder="jouw@email.nl" autocomplete="email" style="
         width:100%;padding:11px 16px;
         border:1.5px solid #e2e8f0;border-radius:10px;
         font-family:'Outfit',sans-serif;font-size:.95rem;
