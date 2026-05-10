@@ -270,6 +270,64 @@
       top: 54px;
       height: calc(100vh - 54px);
     }
+
+    /* ── Bedrijf/School/Begeleider terracotta-view (pre-livetest) ──
+       Visuele rol-indicator: vervang groene Internly-accenten door
+       terracotta zodat viewer onmiddellijk ziet dat hij een student-
+       dossier inkijkt. Geen visibility-filter (post-livetest).
+       Internly---accent (oranje #FF7E42) blijft ongemoeid — dat is brand. */
+    body[data-role="bedrijf"],
+    body[data-role="school"],
+    body[data-role="begeleider"] {
+      --primary:     #e05c1a;
+      --dark-green:  #b84910;
+      --green:       #e05c1a;
+      --green-bg:    #fdf0e8;
+      --bedrijf:     #e05c1a;
+      --bedrijf-bg:  #fdf0e8;
+      --student:     #e05c1a;
+      --student-bg:  #fdf0e8;
+      --blue:        #b84910;
+      --blue-bg:     #fdf0e8;
+    }
+    /* Specifieke overrides voor hardcoded #1a7a48 in selectors die niet via vars lopen.
+       .hub-topbar-logo (links in topbar) en #sidebar krijgen beide een groene
+       gradient — vervangen door terracotta gradient. */
+    body[data-role="bedrijf"] .hub-topbar-logo,
+    body[data-role="school"] .hub-topbar-logo,
+    body[data-role="begeleider"] .hub-topbar-logo,
+    body[data-role="bedrijf"] #sidebar,
+    body[data-role="school"] #sidebar,
+    body[data-role="begeleider"] #sidebar {
+      background: linear-gradient(180deg, #e05c1a 0%, #b84910 100%);
+    }
+
+    /* Banner — dismissable rol-indicator als eerste child van #main-content */
+    .cv-banner {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #fdf0e8;
+      border-bottom: 2px solid #e05c1a;
+      padding: .85rem 1.25rem;
+      font-size: .88rem;
+      position: relative;
+      z-index: 50;
+    }
+    .cv-banner-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .cv-banner-text { flex: 1; line-height: 1.45; }
+    .cv-banner-text strong { color: #b84910; }
+    .cv-banner-close {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #b84910;
+      padding: 0 4px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .cv-banner-close:hover { opacity: .7; }
     /* Andere rollen: student-header verbergen, hub-topbar tonen */
     body:not([data-role="student"]) #student-header { display: none; }
 
@@ -2614,12 +2672,59 @@ function startHub(role) {
     renderStudentHeader({ activeTab: 'hub' });
   }
 
+  // Pre-livetest: viewer-rol banner voor bedrijf/school/begeleider.
+  // match.student.name is op dit punt al gezet — auth-mode vult via studentRes
+  // vóór startHub-aanroep, demo-mode vult via hardcoded match-state.
+  renderViewerBanner(role, match?.student?.name);
+
   updateRoleBadge();
   updateSidebarUser();
   updateTakenBadge();
   initDemoToggle();
   switchTab('overzicht');
   if (MATCH_ID) loadHubFromDB();
+}
+
+/* Pre-livetest — terracotta viewer-banner voor bedrijf/school/begeleider.
+   Eén keer gerenderd als eerste child van #main-content; sluitbaar via ×.
+   Bij re-startHub (role-picker switch) wordt eventuele oude banner eerst
+   verwijderd zodat er geen duplicate ontstaat. Student ziet niets. */
+function renderViewerBanner(role, studentNaam) {
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  // Verwijder oude banner (idempotent bij role-switch)
+  const _existing = document.getElementById('cv-banner');
+  if (_existing) _existing.remove();
+
+  if (role !== 'bedrijf' && role !== 'school' && role !== 'begeleider') return;
+
+  const _naam = studentNaam || 'de student';
+  const _safeNaam = (function (s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  })(_naam);
+
+  let _title, _subHtml;
+  if (role === 'school') {
+    _title   = 'Schoolweergave';
+    _subHtml = `Je ziet de voortgang van <strong>${_safeNaam}</strong> als stagebegeleider.`;
+  } else if (role === 'begeleider') {
+    _title   = 'Begeleidersweergave';
+    _subHtml = `Je ziet het traject van <strong>${_safeNaam}</strong> als praktijkbegeleider.`;
+  } else { // bedrijf
+    _title   = 'Bedrijfsweergave';
+    _subHtml = `Je ziet het stagedossier van <strong>${_safeNaam}</strong> zoals de student het bijhoudt.`;
+  }
+
+  const banner = document.createElement('div');
+  banner.className = 'cv-banner';
+  banner.id = 'cv-banner';
+  banner.innerHTML =
+    '<span class="cv-banner-icon" aria-hidden="true">👁</span>' +
+    '<div class="cv-banner-text">' +
+      `<strong>${_title}</strong> — <span>${_subHtml}</span>` +
+    '</div>' +
+    '<button class="cv-banner-close" onclick="document.getElementById(\'cv-banner\').remove()" aria-label="Sluit melding">×</button>';
+  main.insertBefore(banner, main.firstChild);
 }
 
 function switchRole() {
@@ -2649,9 +2754,13 @@ function renderMatchIndicator() {
     hubState.milestones?.length
     ? calcProgress(hubState.milestones)
     : weekPct;
+  // Pre-livetest viewer-modus: voltooid-kleur (>=80%) volgt body[data-role].
+  // Student: groen #1a7a48. Bedrijf/school/begeleider: donker terracotta #b84910.
+  // Tussenstaten (40-79%) blijven #e05c1a (terracotta-medium, neutraal voor beide rollen).
+  const _msDoneColor = ['bedrijf','school','begeleider'].includes(hubState.role) ? '#b84910' : '#1a7a48';
   const _msColor = typeof calcProgress === 'function' &&
     hubState.milestones?.length
-    ? (_msPct >= 80 ? '#1a7a48' : _msPct >= 40 ? '#e05c1a' : '#7a8799')
+    ? (_msPct >= 80 ? _msDoneColor : _msPct >= 40 ? '#e05c1a' : '#7a8799')
     : pctColor(avgPct);
 
   const node = (name, roleKey, colorVar, bgVar, label) => {
