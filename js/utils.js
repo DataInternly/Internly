@@ -816,6 +816,17 @@ window.formatDate = function(dateInput, options = {}) {
   return d.toLocaleDateString(locale, opts);
 };
 
+// charCount — counter-helper voor textarea oninput (Run 12.6, F5.1.A)
+// Eerder 3× lokaal in bbl-/bol-/student-profile. CSS-class blijft 'warn'.
+window.charCount = function(inputId, countId, max) {
+  const input = document.getElementById(inputId);
+  const el    = document.getElementById(countId);
+  if (!input || !el) return;
+  const len = input.value.length;
+  el.textContent = `${len} / ${max}`;
+  el.className   = 'char-count' + (len > max * .9 ? ' warn' : '');
+};
+
 // ── createNotification (shared DB helper) ────────────────────────────────────
 async function createNotification(userId, type, refId, refType, message) {
   if (!userId) {

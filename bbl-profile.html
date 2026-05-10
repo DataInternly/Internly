@@ -557,15 +557,6 @@ function formatDate(iso) {
   return window.formatDate(iso, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-// 1-op-1 met bol-profile.html:936 + student-profile.html:1237 — drift-risico
-// (3× lokaal). Post-LT consolideren naar js/utils.js — zie BACKLOG.
-function charCount(inputId, countId, max) {
-  const len = document.getElementById(inputId).value.length;
-  const el  = document.getElementById(countId);
-  el.textContent = `${len} / ${max}`;
-  el.className   = 'char-count' + (len > max * .9 ? ' warn' : '');
-}
-
 function signOut() { performLogout(); }
 
 // ── Views ─────────────────────────────────────────────────────────────────────

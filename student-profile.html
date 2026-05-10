@@ -1234,13 +1234,6 @@ function removeSkill(s, btn) {
   btn.closest('.skill-chip').remove();
 }
 
-function charCount(inputId, countId, max) {
-  const len = document.getElementById(inputId).value.length;
-  const el  = document.getElementById(countId);
-  el.textContent = `${len} / ${max}`;
-  el.className   = 'char-count' + (len > max * .9 ? ' warn' : '');
-}
-
 // ── Sector mapping: student opdracht_domein → company sector values ───────────
 const STUDENT_TO_COMPANY_SECTOR = {
   'Marketing & Communicatie': ['Marketing'],
