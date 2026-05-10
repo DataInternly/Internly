@@ -2956,3 +2956,25 @@ footer.kb-shared-footer {
 .skip-link:focus {
   top: 0;
 }
+
+/* ── 320px viewport — graceful degradation voor oudere/smalle Android ─── */
+@media (max-width: 360px) {
+  body {
+    font-size: 14px;
+  }
+  .container, main, .shell, .dash-shell {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .card, .panel, .dash-card {
+    padding: 12px;
+  }
+  .topbar, .header, .role-header {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  input, textarea, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
