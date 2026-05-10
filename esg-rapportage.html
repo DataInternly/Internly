@@ -886,7 +886,19 @@
 (async () => {
   try {
     if (typeof db === 'undefined') return;
-    const { data: { user } } = await db.auth.getUser();
+    let user;
+    try {
+      const { data } = await db.auth.getUser();
+      user = data?.user;
+    } catch(e) {}
+
+    if (!user) {
+      try {
+        const { data: sessionData } = await db.auth.getSession();
+        user = sessionData?.session?.user;
+      } catch(e) {}
+    }
+
     if (!user) return;
 
     const { data: profile } = await db
