@@ -326,6 +326,52 @@
       margin: 0 0 12px;
     }
 
+    /* ── Fase 4 C3 — leeragreement-sectie ── */
+    .bbl-leeragreement-sectie {
+      background: #f8fdf9;
+      border: 1px solid rgba(26,122,72,.18);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin: .75rem 0;
+    }
+    .bbl-leeragreement-sectie h3 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin: 0 0 12px;
+    }
+    .la-card {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+    }
+    .la-card #la-bestandsnaam {
+      font-weight: 600; color: #0d1520; font-size: .9rem;
+    }
+    .la-datum { font-size: .75rem; color: #6b7280; flex: 1; min-width: 120px; }
+    .btn-ghost {
+      background: #fff; border: 1px solid #e2e8f0; color: #374151;
+      padding: 7px 14px; border-radius: 8px;
+      font-family: 'Outfit', sans-serif; font-size: .85rem; font-weight: 500;
+      text-decoration: none; cursor: pointer; transition: all .15s;
+      display: inline-flex; align-items: center;
+    }
+    .btn-ghost:hover { border-color: #1a7a48; color: #1a7a48; }
+    .btn-ghost.btn-sm { padding: 5px 10px; font-size: .78rem; }
+    .btn-la-primary {
+      background: #1a7a48; color: #fff; border: none;
+      padding: 9px 16px; border-radius: 9px;
+      font-family: 'Outfit', sans-serif; font-size: .88rem; font-weight: 500;
+      cursor: pointer; transition: background .15s;
+      margin-top: 6px;
+    }
+    .btn-la-primary:hover { background: #0f5c36; }
+    .btn-la-primary.btn-sm { padding: 7px 12px; font-size: .82rem; }
+
     @media (max-width: 480px) {
       .shell { padding: 16px 12px 80px; }
       .topbar-bbl-nav { gap: 10px; }
@@ -456,6 +502,26 @@
           <div class="ov-item"><div class="ov-label">Praktijkbegeleider</div><div class="ov-val" id="ov-pb">—</div></div>
         </div>
       </div>
+
+      <!-- Fase 4 C3 — Leeragreement-sectie (anchor #leeragreement vanuit mijn-berichten) -->
+      <section class="bbl-leeragreement-sectie" id="leeragreement">
+        <h3>Mijn leeragreement</h3>
+        <div id="la-aanwezig" style="display:none">
+          <div class="la-card">
+            <span aria-hidden="true">📄</span>
+            <span id="la-bestandsnaam">leeragreement.pdf</span>
+            <span id="la-datum" class="la-datum"></span>
+            <a id="la-bekijk-btn" href="#" target="_blank" rel="noopener" class="btn-ghost btn-sm">Bekijk →</a>
+            <button type="button" onclick="triggerLaUpload()" class="btn-ghost btn-sm">Vervang</button>
+          </div>
+        </div>
+        <div id="la-leeg">
+          <p style="font-size:.85rem;color:#9ca3af;margin:0 0 8px">Geen leeragreement geüpload.</p>
+          <button type="button" onclick="triggerLaUpload()" class="btn-la-primary btn-sm">+ Upload leeragreement (PDF)</button>
+        </div>
+        <input type="file" id="la-file-input" accept="application/pdf,.pdf"
+               style="display:none" onchange="handleLaUpload(this)">
+      </section>
 
       <div id="ov-leerdoelen-wrap">
         <div class="ov-section-label">Leerdoelen</div>
@@ -745,6 +811,107 @@ async function addLeerdoel(input) {
   input.value = '';
   _renderLeerdoelen(skills);
   notify('✓ Leerdoel toegevoegd');
+}
+
+// ── Fase 4 C3 — Leeragreement upload/load ──────────────────────────────────
+
+async function loadLeeragreement(profileId) {
+  if (!profileId) return;
+  const aanwezig = document.getElementById('la-aanwezig');
+  const leeg     = document.getElementById('la-leeg');
+  if (!aanwezig || !leeg) return;
+
+  const { data: sp, error } = await db
+    .from('student_profiles')
+    .select('leeragreement_url, leeragreement_uploaded_at')
+    .eq('profile_id', profileId)
+    .maybeSingle();
+  if (error) {
+    console.warn('[bbl-profile] leeragreement fetch fout:', error.message);
+    return;
+  }
+
+  if (sp?.leeragreement_url) {
+    aanwezig.style.display = '';
+    leeg.style.display = 'none';
+    const bekijk = document.getElementById('la-bekijk-btn');
+    if (bekijk) bekijk.href = sp.leeragreement_url;
+    const datumEl = document.getElementById('la-datum');
+    if (datumEl && sp.leeragreement_uploaded_at) {
+      const _datePart = sp.leeragreement_uploaded_at.split('T')[0];
+      datumEl.textContent = 'Geüpload op ' + formatDate(_datePart);
+    }
+  } else {
+    aanwezig.style.display = 'none';
+    leeg.style.display = '';
+  }
+}
+
+function triggerLaUpload() {
+  const input = document.getElementById('la-file-input');
+  if (input) input.click();
+}
+
+async function handleLaUpload(input) {
+  const file = input?.files?.[0];
+  if (!file || !currentUser) return;
+
+  if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
+    notify('Alleen PDF-bestanden ondersteund', false);
+    input.value = '';
+    return;
+  }
+  // 10 MB maximum (live-tester veiligheid)
+  if (file.size > 10 * 1024 * 1024) {
+    notify('Bestand te groot — maximaal 10 MB', false);
+    input.value = '';
+    return;
+  }
+
+  notify('Bezig met uploaden…');
+  const storagePath = `${currentUser.id}/leeragreement.pdf`;
+
+  const { error: upErr } = await db.storage
+    .from('leeragreementen')
+    .upload(storagePath, file, {
+      contentType: 'application/pdf',
+      upsert: true,
+    });
+  if (upErr) {
+    console.error('[bbl-profile] leeragreement upload fout:', upErr.message);
+    notify('Upload mislukt: ' + (upErr.message || 'onbekende fout'), false);
+    input.value = '';
+    return;
+  }
+
+  // Signed URL — 7 dagen geldig (livetest-window)
+  const { data: signed, error: signErr } = await db.storage
+    .from('leeragreementen')
+    .createSignedUrl(storagePath, 60 * 60 * 24 * 7);
+  if (signErr) {
+    console.error('[bbl-profile] signed URL fout:', signErr.message);
+    notify('URL kon niet worden opgesteld', false);
+    input.value = '';
+    return;
+  }
+
+  const { error: updErr } = await db
+    .from('student_profiles')
+    .update({
+      leeragreement_url: signed.signedUrl,
+      leeragreement_uploaded_at: new Date().toISOString(),
+    })
+    .eq('profile_id', currentUser.id);
+  if (updErr) {
+    console.error('[bbl-profile] leeragreement DB-update fout:', updErr.message);
+    notify('Opslaan in DB mislukt', false);
+    input.value = '';
+    return;
+  }
+
+  input.value = '';
+  notify('✓ Leeragreement geüpload');
+  await loadLeeragreement(currentUser.id);
 }
 
 function showOverview(data) {
@@ -1045,6 +1212,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (ilyContainer && ilyProfile?.ily_code) {
     ilyContainer.innerHTML = renderILYCodeWidget(ilyProfile.ily_code);
   }
+
+  // Fase 4 C3 — leeragreement-sectie laden (binnen view-overview, dus altijd aanwezig in DOM)
+  loadLeeragreement(user.id);
 
   InternlyCalendar.render('ical-container', db, user.id);
 });
