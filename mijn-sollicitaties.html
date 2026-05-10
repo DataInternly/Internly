@@ -284,7 +284,7 @@
     const reviewRatings = {};
 
     function formatDate(d) {
-      return new Date(d).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+      return window.formatDate(d, { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
     // ── Review form ────────────────────────────────────────────────────────

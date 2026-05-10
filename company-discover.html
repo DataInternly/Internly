@@ -533,7 +533,7 @@ function initials(naam) {
 
 function formatDate(d) {
   if (!d) return 'Flexibel';
-  return new Date(d).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+  return window.formatDate(d, { month: 'long', year: 'numeric' });
 }
 
 function renderCard(s) {

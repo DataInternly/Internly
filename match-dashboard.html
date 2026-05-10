@@ -4736,8 +4736,7 @@ function stageWeekNum() {
 
 function formatDate(dateStr) {
   if (!dateStr) return '—';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+  return window.formatDate(dateStr, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function formatDateShort(dateStr) {

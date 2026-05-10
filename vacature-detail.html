@@ -726,7 +726,7 @@ function trustTitle(grade) {
 
 function formatDate(d) {
   if (!d) return 'Flexibel';
-  return new Date(d).toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
+  return window.formatDate(d, { month: 'long', year: 'numeric' });
 }
 
 function isSaved(id, source) {

@@ -801,6 +801,21 @@ function formatNLDate(dateStr) {
     .toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+// Generieke datum-helper (F5.1.A — Run 12.3, 11 mei 2026)
+// Pagina's met afwijkende format-options delegeren via thin-wrappers
+// (bbl-dashboard, bbl-hub, bbl-profile, company-discover, match-dashboard,
+// mijn-sollicitaties, vacature-detail) — fallback-logica blijft per caller.
+window.formatDate = function(dateInput, options = {}) {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return '';
+  const { locale = 'nl-NL', ...fmt } = options;
+  const opts = Object.keys(fmt).length
+    ? fmt
+    : { year: 'numeric', month: 'short', day: 'numeric' };
+  return d.toLocaleDateString(locale, opts);
+};
+
 // ── createNotification (shared DB helper) ────────────────────────────────────
 async function createNotification(userId, type, refId, refType, message) {
   if (!userId) {

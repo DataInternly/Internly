@@ -1164,7 +1164,7 @@ function formatDay(iso) {
 }
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+  return window.formatDate(iso, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // Notification helper — exact kopie patroon chat.html
