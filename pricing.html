@@ -8,9 +8,9 @@
   <link rel="apple-touch-icon" href="/favicon_180x180.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0d1520">
-  <meta name="description" content="Internly prijzen — transparante tarieven voor bedrijven en scholen.">
+  <meta name="description" content="Internly prijzen — gratis voor studenten en scholen, één transparant tarief voor bedrijven.">
   <meta property="og:title" content="Prijzen — Internly">
-  <meta property="og:description" content="Transparante tarieven voor bedrijven en scholen. Geen verborgen kosten.">
+  <meta property="og:description" content="Voor bedrijven. Studenten en scholen altijd gratis. Geen verborgen kosten.">
   <meta property="og:image" content="https://internly.pro/og-image.png">
   <meta property="og:url" content="https://internly.pro/pricing.html">
   <meta property="og:type" content="website">
@@ -457,259 +457,66 @@ body {
 <header class="hero">
   <div class="hero-inner">
     <span class="hero-script-eyebrow">prijzen</span>
-    <div class="hero-eyebrow">Transparante tarieven</div>
-    <h1 class="hero-title">Eerlijk geprijsd,<br><span>altijd duidelijk</span></h1>
-    <p class="hero-sub">Geen verborgen kosten. Bedrijven en scholen starten gratis. Individuele begeleiders starten vanaf €49/mnd.</p>
+    <div class="hero-eyebrow">Eén model · transparant</div>
+    <h1 class="hero-title">Voor bedrijven —<br><span>studenten en scholen altijd gratis</span></h1>
+    <p class="hero-sub">Studenten betalen nooit. Scholen ook niet. Bedrijven betalen één tarief — eerste maand gratis, eerste 100 bedrijven krijgen het hele eerste jaar cadeau.</p>
   </div>
 </header>
 
-<!-- ── Student anchor ── -->
-<p style="text-align:center;font-size:.82rem;color:var(--ink3);margin-bottom:1rem;">
-  Student? Internly is voor jou altijd gratis —
-  <a href="auth.html" style="color:var(--orange);text-decoration:none;font-weight:500">maak direct een account aan →</a>
-</p>
-
-<!-- ── Toggle ── -->
-<div class="audience-toggle">
-  <button class="toggle-btn active" id="toggle-bedrijf" onclick="showSection('bedrijf')">Voor bedrijven</button>
-  <button class="toggle-btn" id="toggle-school" onclick="showSection('school')">Voor scholen</button>
-  <button class="toggle-btn" id="toggle-begeleider" onclick="showSection('begeleider')">Voor begeleiders</button>
-</div>
-
 <!-- ══════════════════════════════════
-     BEDRIJVEN
+     BEDRIJVEN — enige betalende partij
 ═══════════════════════════════════ -->
 <section class="pricing-section visible" id="section-bedrijf">
 
   <p class="section-eyebrow">Bedrijven</p>
   <h2 class="section-title">Vind de juiste stagiair. Geen gedoe.</h2>
 
-  <div class="pricing-grid">
+  <div class="pricing-grid" style="max-width:520px;margin:0 auto;">
 
-    <!-- Starter -->
-    <div class="plan-card">
-      <div class="plan-name">Starter</div>
-      <div class="plan-price">€0</div>
-      <div class="plan-period">gratis, voor altijd</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> 1 actieve vacature</li>
-        <li><span class="check">✓</span> Standaard matchingprofiel</li>
-        <li><span class="check">✓</span> Directe chat met studenten</li>
-        <li><span class="check">✓</span> Stage Hub (basis)</li>
-        <li class="muted"><span class="cross">–</span> ESG-rapportage</li>
-        <li class="muted"><span class="cross">–</span> Trust Score analytics</li>
-        <li class="muted"><span class="cross">–</span> ATS-integratie</li>
-      </ul>
-      <button class="btn-plan outline" onclick="startCheckout('company_starter')">Begin gratis</button>
-    </div>
-
-    <!-- Pro (featured) -->
-    <div class="plan-card featured">
-      <div class="plan-name">Pro</div>
-      <div class="plan-price">€59 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> Onbeperkt vacatures plaatsen</li>
-        <li><span class="check">✓</span> S1-stagedata voor je CSRD-onderbouwing</li>
-        <li><span class="check">✓</span> Trust Score analytics dashboard</li>
-        <li><span class="check">✓</span> Prioriteit in zoekresultaten</li>
-        <li><span class="check">✓</span> Stage Hub (volledig)</li>
-        <li><span class="check">✓</span> Doorstroomstatistieken</li>
-        <li><span class="check">✓</span> Postcode per vacature (1 locatie)</li>
-        <li class="muted"><span class="cross">–</span> ATS-integratie</li>
-      </ul>
-      <button class="btn-plan primary" data-plan="company_pro" onclick="startCheckout('company_pro')">Kies Pro →</button>
-    </div>
-
-    <!-- Business -->
-    <div class="plan-card">
-      <div class="plan-name">Business</div>
-      <div class="plan-price">€169 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> Alles van Pro</li>
-        <li class="future">🔜 ATS-integratie (beschikbaar in 2027)</li>
-        <li><span class="check">✓</span> Prioriteitssupport via e-mail</li>
-        <li><span class="check">✓</span> Meerdere vestigingen beheren</li>
-        <li><span class="check">✓</span> Vestiging koppelen per vacature</li>
-        <li class="future">🔜 Whitelabel Stage Hub (beschikbaar in 2027)</li>
-        <li><span class="check">✓</span> Kwartaalrapportage per e-mail</li>
-        <li><span class="check">✓</span> Custom matching-criteria</li>
-      </ul>
-      <button class="btn-plan secondary" data-plan="company_business" onclick="startCheckout('company_business')">Kies Business →</button>
-    </div>
-
-  </div>
-
-  <p class="pricing-note">
-    Vragen? Mail naar <a href="mailto:hallo@internly.pro">hallo@internly.pro</a> of bekijk de <a href="stagebegeleiding.html">begeleidingspagina</a>.
-  </p>
-
-</section>
-
-<!-- ══════════════════════════════════
-     SCHOLEN
-═══════════════════════════════════ -->
-<section class="pricing-section" id="section-school">
-
-  <p class="section-eyebrow">Scholen &amp; ROC's</p>
-  <h2 class="section-title">Grip op elke stagiair in je cohort.</h2>
-
-  <div class="pricing-grid" style="max-width:760px;margin:0 auto;">
-
-    <!-- Freemium -->
-    <div class="plan-card">
-      <div class="plan-name">Freemium</div>
-      <div class="plan-price">€0</div>
-      <div class="plan-period">gratis, voor altijd</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> 1 stagebegeleider</li>
-        <li><span class="check">✓</span> Basisdashboard (voortgangsoverzicht)</li>
-        <li><span class="check">✓</span> Inzage in Stage Hub van eigen studenten</li>
-        <li class="muted"><span class="cross">–</span> Signalen (Premium)</li>
-        <li class="muted"><span class="cross">–</span> Meerdere begeleiders</li>
-        <li class="muted"><span class="cross">–</span> Exportrapportages (PDF/CSV)</li>
-        <li class="muted"><span class="cross">–</span> Cohortanalyse &amp; trends</li>
-      </ul>
-      <button class="btn-plan outline" onclick="startCheckout('school_freemium')">Begin gratis</button>
-    </div>
-
-    <!-- Premium (featured) -->
-    <div class="plan-card featured">
-      <div class="plan-name">Premium</div>
-      <div class="plan-price">€29 <span>/mnd</span></div>
-      <div class="plan-period">of €249/jaar — bespaar €99 &nbsp;·&nbsp; per opleiding · excl. btw</div>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> Onbeperkt stagebegeleiders</li>
-        <li><span class="check">✓</span> Exportrapportages (PDF &amp; CSV)</li>
-        <li><span class="check">✓</span> Cohortanalyse &amp; trendgrafieken</li>
-        <li><span class="check">✓</span> Driegesprek-workflow (student + bedrijf + ROC)</li>
-        <li><span class="check">✓</span> BBL-traject volledig ondersteund</li>
-        <li><span class="check">✓</span> Prioriteitssupport</li>
-        <li><span class="check">✓</span> AVG-compliant dataverwerking</li>
-      </ul>
-      <button class="btn-plan primary" data-plan="school_premium_monthly" onclick="startCheckout('school_premium_monthly')">Kies maandelijks →</button>
-      <button class="btn-plan secondary" data-plan="school_premium" onclick="startCheckout('school_premium')" style="margin-top:8px">Kies jaarlijks →</button>
-    </div>
-
-  </div>
-
-  <p class="pricing-note">
-    Meerdere opleidingen? <a href="mailto:hallo@internly.pro">Neem contact op</a> voor een instellingskorting.
-  </p>
-
-</section>
-
-<!-- ══════════════════════════════════
-     BEGELEIDERS
-═══════════════════════════════════ -->
-<section class="pricing-section" id="section-begeleider">
-
-  <p class="section-eyebrow">Individuele stagebegeleiders</p>
-  <h2 class="section-title">Begeleid studenten op jouw tempo.</h2>
-
-  <div class="pricing-grid" style="max-width:760px;margin:0 auto;">
-
-    <!-- Begeleider Starter -->
-    <div class="plan-card">
-      <div class="plan-name">Starter</div>
-      <div class="plan-price">€49 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar · tot 30 studenten</div>
-      <p style="font-size:.75rem;color:var(--ink3);margin-top:.5rem">
-        Nog geen account?
-        <a href="auth.html" style="color:var(--orange);text-decoration:none;font-weight:500">
-          Registreer gratis →
-        </a>
-      </p>
-      <div class="plan-divider"></div>
-      <p style="font-size:.8rem;font-style:italic;color:var(--ink3);margin-bottom:.75rem">Je houdt het overzicht over al je studenten — ook als je er twintig tegelijk begeleidt.</p>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> Dashboard met voortgangsoverzicht</li>
-        <li><span class="check">✓</span> Stage Hub per student</li>
-        <li><span class="check">✓</span> Signalen &amp; alerts</li>
-        <li><span class="check">✓</span> Begeleidingsgesprekken plannen</li>
-        <li class="muted"><span class="cross">–</span> Exportrapportages</li>
-        <li class="muted"><span class="cross">–</span> Tot 100 studenten</li>
-      </ul>
-      <button class="btn-plan secondary" data-plan="begeleider_starter" onclick="startCheckout('begeleider_starter')">Kies Starter →</button>
-    </div>
-
-    <!-- Begeleider Pro (featured) -->
     <div class="plan-card featured">
       <div class="plan-name">Pro</div>
       <div class="plan-price">€79 <span>/mnd</span></div>
-      <div class="plan-period">excl. btw · maandelijks opzegbaar · tot 100 studenten</div>
+      <div class="plan-period">excl. btw · maandelijks opzegbaar · 1 maand gratis proberen</div>
       <div class="plan-divider"></div>
-      <p style="font-size:.8rem;font-style:italic;color:var(--ink3);margin-bottom:.75rem">Voor begeleiders die niets aan het toeval willen overlaten en elke student willen kunnen verantwoorden.</p>
+      <p style="background:#e8f5ee;color:#0f5c36;font-size:.82rem;font-weight:600;padding:.6rem .8rem;border-radius:8px;margin-bottom:1rem;text-align:center;">
+        🎉 Eerste 100 bedrijven: <strong>1 jaar gratis</strong>
+      </p>
       <ul class="plan-features">
-        <li><span class="check">✓</span> Alles van Starter</li>
-        <li><span class="check">✓</span> Exportrapportages (PDF &amp; CSV)</li>
-        <li><span class="check">✓</span> Tot 100 studenten</li>
-        <li><span class="check">✓</span> Prioriteitssupport</li>
+        <li><span class="check">✓</span> Onbeperkt vacatures plaatsen</li>
+        <li><span class="check">✓</span> Directe chat met studenten</li>
+        <li><span class="check">✓</span> Stage Hub (volledig)</li>
+        <li><span class="check">✓</span> Trust Score analytics dashboard</li>
+        <li><span class="check">✓</span> S1-stagedata voor je CSRD-onderbouwing</li>
+        <li><span class="check">✓</span> Prioriteit in zoekresultaten</li>
+        <li><span class="check">✓</span> Doorstroomstatistieken</li>
+        <li><span class="check">✓</span> Meerdere vestigingen beheren</li>
       </ul>
-      <button class="btn-plan primary" data-plan="begeleider_pro" onclick="startCheckout('begeleider_pro')">Kies Pro →</button>
+      <button class="btn-plan primary" data-plan="company_pro" onclick="startCheckout('company_pro')">Start gratis maand →</button>
     </div>
 
   </div>
 
   <p class="pricing-note">
-    Vragen over limieten of groepsbegeleiding? <a href="mailto:hallo@internly.pro">Neem contact op</a>.
+    <strong>Studenten en scholen gebruiken Internly altijd gratis</strong> — geen tiers, geen freemium, geen betaalwal. Ooit.<br>
+    Vragen? Mail naar <a href="mailto:hallo@internly.pro">hallo@internly.pro</a> of bekijk de <a href="stagebegeleiding.html">begeleidingspagina</a>.
   </p>
 
 </section>
 
 <script>
 /*
-  SQL REQUIRED IN SUPABASE (run before go-live with school_premium_monthly):
+  SQL note (Mollie go-live, één bedrijf-plan model):
   ALTER TABLE subscriptions DROP CONSTRAINT subscriptions_plan_check;
   ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_plan_check
-  CHECK (plan IN (
-    'company_starter','company_pro','company_business',
-    'school_freemium','school_premium','school_premium_monthly',
-    'begeleider_starter','begeleider_pro'
-  ));
+  CHECK (plan IN ('company_pro'));
 */
 
-// ── Toggle ────────────────────────────────────────────────────────────────────
-
-function showSection(audience) {
-  ['bedrijf','school','begeleider'].forEach(a => {
-    document.getElementById('section-' + a).classList.toggle('visible', audience === a);
-    document.getElementById('toggle-'  + a).classList.toggle('active',  audience === a);
-  });
-}
-
-// Open the right tab if the URL contains ?for=school or ?for=begeleider
-(function () {
-  const p = new URLSearchParams(window.location.search).get('for');
-  if (p === 'school' || p === 'begeleider') showSection(p);
-})();
-
-// ── Mollie checkout flow — create-checkout Edge Function actief ─────────────
+// ── Mollie checkout flow — create-checkout Edge Function ────────────────────
 
 async function startCheckout(plan) {
   const { data: { session } } = await db.auth.getSession();
   if (!session) {
     window.location.href = 'auth.html';
-    return;
-  }
-
-  if (plan === 'company_starter' || plan === 'school_freemium') {
-    const { error } = await db.from('subscriptions').upsert(
-      { profile_id: session.user.id, plan, status: 'active' },
-      { onConflict: 'profile_id' }
-    );
-    if (!error) {
-      notify('Je gratis plan is actief.');
-      setTimeout(() => window.location.reload(), 1200);
-    } else {
-      notify('Er ging iets mis. Probeer opnieuw.');
-    }
     return;
   }
 
@@ -731,24 +538,16 @@ async function startCheckout(plan) {
     const json = await res.json();
     if (json.error) {
       notify('Fout: ' + json.error);
-      if (btn) { btn.disabled = false; btn.textContent = 'Upgrade'; }
+      if (btn) { btn.disabled = false; btn.textContent = 'Start gratis maand →'; }
       return;
     }
     window.location.href = json.checkoutUrl;
   } catch (err) {
     console.error('startCheckout error:', err?.message || 'onbekende fout');
     notify('Netwerkfout. Probeer opnieuw.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Upgrade'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Start gratis maand →'; }
   }
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function goToAuth() {
-  window.location.href = 'auth.html';
-}
-
-
 </script>
 
 <!-- TODO: vervang met shared renderFooter() (Backlog #8) -->
