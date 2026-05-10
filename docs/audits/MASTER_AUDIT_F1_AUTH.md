@@ -164,6 +164,13 @@ Totaal **7 pagina's** (CLAUDE.md noemt 6 — student-home was extra). Allen rol 
 
 **Classificatie: P1** — exploitabel maar vereist authenticated user en specifieke kennis. Niet "data-leak naar publiek" maar wel "authenticated user kan integriteit breken". Pre-LT fix.
 
+> **STATUS UPDATE 10 mei 2026**: Bevinding gemarkeerd
+> als RESOLVED. Pg_policies ground-truth check (10 mei)
+> toonde dat alle UPDATE-policies al WITH CHECK +
+> role-immutability hebben. Originele bevinding was
+> false-positive op hardening-script-niveau, niet op
+> productie-policies-niveau.
+
 #### **F1.3.B — `FOR ALL` policies zonder WITH CHECK** [P1]
 8 policies gebruiken `FOR ALL USING (...)` zonder `WITH CHECK`:
 `bq_own` (buddy_queue), `splan_write_match`, `sleer_match_party`, `sdead_match_party`, `stask_match_party`, `srefl_match_party`, `slog_match_party`, `cdoor_write_own`, `push_own`, `sp2_write_own`.
@@ -231,6 +238,13 @@ CREATE POLICY "profiles_update_own" ON profiles
   );
 -- of harder: blokkeer role-wijziging via aparte trigger
 ```
+
+> **STATUS UPDATE 10 mei 2026**: Bevinding gemarkeerd
+> als RESOLVED. Pg_policies ground-truth check (10 mei)
+> toonde dat alle UPDATE-policies al WITH CHECK +
+> role-immutability hebben. Originele bevinding was
+> false-positive op hardening-script-niveau, niet op
+> productie-policies-niveau.
 
 ---
 
