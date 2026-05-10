@@ -189,6 +189,9 @@
   --ink2:       #374151;
   --ink3:       #7a8799;
   --bg2:        #f4f6f9;
+
+  /* Layout-tokens — Run 12.4 (F5.2.A) */
+  --topbar-h:   62px;
 }
 
 body {
@@ -202,7 +205,7 @@ body {
 .topbar {
   background: linear-gradient(135deg, var(--primary), var(--dark-green));
   padding: 0 32px;
-  height: 62px;
+  height: var(--topbar-h);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -621,7 +624,7 @@ body                  { top: 0 !important; position: static !important; }
 
 .notif-dropdown {
   position: absolute;
-  top: 62px;
+  top: var(--topbar-h);
   right: -8px;
   width: 320px;
   max-height: 400px;
@@ -1035,7 +1038,7 @@ body                  { top: 0 !important; position: static !important; }
   /* Notification dropdown full-width on mobile */
   .notif-dropdown {
     position: fixed;
-    top: 62px;
+    top: var(--topbar-h);
     left: 8px;
     right: 8px;
     width: auto;
