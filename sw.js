@@ -2,8 +2,6 @@
 // Version: 1.0.0
 // Registered from js/supabase.js via registerPushNotifications()
 
-const CACHE_VERSION = 'internly-v1';
-
 // ── Push event ────────────────────────────────────────────────────────────────
 self.addEventListener('push', function(event) {
   if (!event.data) return;

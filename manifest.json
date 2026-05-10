@@ -3,6 +3,7 @@
   "short_name": "Internly",
   "description": "Internly — de stagemarkt voor studenten, scholen en bedrijven",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#FF7E42",
