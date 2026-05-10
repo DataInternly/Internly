@@ -878,5 +878,13 @@
 </script>
 
 <footer style="text-align:center;padding:8px 0 12px;font-size:.6rem;color:rgba(0,0,0,.18);">© 2026 Sasubo Holding B.V.</footer>
+<script>
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('[unhandled-rejection]', e.reason);
+    if (e.reason?.message?.includes('expired') || e.reason?.code === 'PGRST301') {
+      window.location.href = 'auth.html?expired=1';
+    }
+  });
+</script>
 </body>
 </html>

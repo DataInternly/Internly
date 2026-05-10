@@ -542,5 +542,13 @@
     <p class="footer-tagline">Eerlijk het stageproces verbeteren — voor studenten, bedrijven en scholen.</p>
   </div>
 </footer>
+<script>
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('[unhandled-rejection]', e.reason);
+    if (e.reason?.message?.includes('expired') || e.reason?.code === 'PGRST301') {
+      window.location.href = 'auth.html?expired=1';
+    }
+  });
+</script>
 </body>
 </html>

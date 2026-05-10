@@ -1431,5 +1431,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 <script src="js/calendar.js"></script>
 <script src="js/translate.js"></script>
+<script>
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('[unhandled-rejection]', e.reason);
+    if (e.reason?.message?.includes('expired') || e.reason?.code === 'PGRST301') {
+      window.location.href = 'auth.html?expired=1';
+    }
+  });
+</script>
 </body>
 </html>

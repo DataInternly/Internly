@@ -2207,6 +2207,11 @@ window.addEventListener('load', function() {
   lpUpdateBtn();
 })();
 </script>
+<script>
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('[unhandled-rejection]', e.reason);
+  });
+</script>
 
 </body>
 </html>
