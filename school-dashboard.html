@@ -749,7 +749,7 @@
           };
           data.profile_completeness = window.calculateProfileCompleteness('school', data);
           data.completeness_suggestions = window.getCompletenessSuggestions('school', data);
-          data.profile_edit_url = '#';
+          data.profile_edit_url = "javascript:show('profiel')";
 
           const anchor = document.getElementById('school-welcome-anchor');
           if (!anchor) return;

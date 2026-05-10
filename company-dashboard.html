@@ -781,7 +781,7 @@
           };
           data.profile_completeness = window.calculateProfileCompleteness('bedrijf', data);
           data.completeness_suggestions = window.getCompletenessSuggestions('bedrijf', data);
-          data.profile_edit_url = '#';
+          data.profile_edit_url = "javascript:show('profile')";
 
           const anchor = document.getElementById('company-welcome-anchor');
           if (!anchor) return;
