@@ -8,3 +8,5 @@ _git_backup_pre_push_2026-05-10/
 scripts/output/
 .env
 node_modules/
+package.json
+package-lock.json
