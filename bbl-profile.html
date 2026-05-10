@@ -794,7 +794,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Naam tonen in topbar
-  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || '';
+  const naam = getDisplayName(user, '');
   document.getElementById('topbarUser').textContent = naam;
 
   // Avatar picker — vanmiddag fix 30 apr 2026

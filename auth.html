@@ -1349,7 +1349,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (sp?.bbl_mode === true) { dest = sp?.naam ? 'bbl-hub.html' : 'bbl-profile.html'; roleLabel = 'BBL-student'; }
         else if (!sp?.naam) { dest = 'student-profile.html'; }
       }
-      const name = user.user_metadata?.naam || user.user_metadata?.name || user.email;
+      const name = getDisplayName(user, '');
       document.getElementById('alreadyName').textContent = name;
       document.getElementById('alreadyRole').textContent = roleLabel;
       document.getElementById('alreadyDashBtn').href = dest;

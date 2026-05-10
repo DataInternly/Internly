@@ -3151,7 +3151,10 @@ async function acceptPush() {
   const banner = document.getElementById('push-banner');
   if (banner) banner.remove();
   if (currentUser) {
-    try { await registerPushNotifications(db, currentUser.id); } catch(_) {}
+    try { await registerPushNotifications(db, currentUser.id); } catch(e) {
+      console.warn('[company-dashboard] push registratie mislukt:', e?.message);
+      notify('Push aanzetten mislukt — probeer later opnieuw via instellingen', false);
+    }
   }
 }
 

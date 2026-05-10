@@ -511,7 +511,9 @@ async function renderLeerdoelen(skills, userId) {
       .eq('profile_id', userId)
       .maybeSingle();
     progress = sp?.skills || {};
-  } catch(e) {}
+  } catch(e) {
+    console.warn('[bbl-dashboard] skills fetch fout:', e?.message);
+  }
   // Lokale fallback
   if (!Object.keys(progress).length) {
     try { progress = JSON.parse(localStorage.getItem('internly_ld_' + userId) || '{}'); } catch(e) {}
@@ -608,8 +610,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   AccountModule.renderAccountScreen('account-container', 'nl');
 
   // 3. Shared header
-  const naam = user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Student';
-  await renderStudentHeader({ activeTab: 'matches' });
+  const naam = getDisplayName(user, 'Student');
+  await renderStudentHeader({ activeTab: null });
   setWelcome(naam);
 
   // 4. Actieve match ophalen

@@ -786,7 +786,7 @@
 
     const rowClass   = isOwn ? 'own' : 'other';
     const initSrc    = isOwn
-      ? (currentUser?.user_metadata?.naam || currentUser?.email || 'J')
+      ? getDisplayName(currentUser, 'J')
       : otherPartyName;
     const senderInit = escapeHtml(initSrc.slice(0, 2).toUpperCase());
     const timeStr    = meeting.created_at

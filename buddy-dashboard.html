@@ -1123,7 +1123,9 @@ async function _loadPrefs() {
         anon   = wl.anonymous !== false; // null → default true
         paused = !!wl.paused;
       }
-    } catch(e) {}
+    } catch(e) {
+      console.warn('[buddy] waitlist toggle-fetch fout:', e?.message);
+    }
   }
   // Lokale fallback als waitlist nog niet bestaat
   const uid = currentUser?.id || '';
@@ -1324,7 +1326,7 @@ window.addEventListener('unhandledrejection', function(e) {
 window.addEventListener('DOMContentLoaded', async () => {
 
   // 0. Buddy module init (fire-and-forget — module used by inline pair/request logic)
-  try { if (typeof buddyInit === 'function') buddyInit(); } catch(e) {}
+  try { if (typeof buddyInit === 'function') buddyInit(); } catch(e) { console.error('[buddy-dashboard] buddyInit fout:', e); }
 
   // 1. Auth guard
   const { data: { user } } = await db.auth.getUser();
@@ -1374,7 +1376,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 3. Welkomstgroet — alleen topbarUser; greeting via overz-greeting (RUN4)
-  const naam = profile.naam || user.user_metadata?.naam || user.user_metadata?.name || user.email?.split('@')?.[0] || 'Buddy';
+  const naam = profile.naam || getDisplayName(user, 'Buddy');
   document.getElementById('topbarUser').textContent = naam;
 
   // 4. Waitlist profiel ophalen (voor sector/expertise)

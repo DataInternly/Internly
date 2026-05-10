@@ -1254,7 +1254,7 @@ function renderMessages(messages) {
     // Meeting-uitnodiging als speciaal berichttype
     if (msg.type === 'meeting_invite' && msg.metadata) {
       let meta = {};
-      try { meta = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata; } catch(e) {}
+      try { meta = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata; } catch(e) { console.warn('[bbl-hub] metadata parse fout msg', msg?.id, e); }
       const typeClass = { evaluatie:'eval', voortgangsgesprek:'vpg', driegesprek:'drie', verlengingsgesprek:'urg' }[meta.meeting_type] || 'eval';
       const typeLabel = { evaluatie:'Evaluatiegesprek', voortgangsgesprek:'Voortgangsgesprek', driegesprek:'Driegesprek', verlengingsgesprek:'Verlengingsgesprek' }[meta.meeting_type] || 'Gesprek';
       html += `
@@ -1809,7 +1809,9 @@ async function renderLeerdoelen(skills) {
       .eq('profile_id', currentUser.id)
       .maybeSingle();
     progress = sp?.skills_progress || {};
-  } catch(e) {}
+  } catch(e) {
+    console.warn('[bbl-hub] skills_progress fetch fout:', e?.message);
+  }
   // Lokale fallback voor offline / snelheid
   try {
     const local = JSON.parse(localStorage.getItem('internly_ld_' + currentUser.id) || '{}');
@@ -1930,7 +1932,9 @@ async function loadBBLReflecties() {
           try {
             const parsed = JSON.parse(raw.slice('[Zelfreflectie-STARR] '.length));
             return { ...parsed, savedAt: m.created_at, msgId: m.id };
-          } catch(e) {}
+          } catch(e) {
+            console.warn('[bbl-hub] STARR JSON corrupt voor msg', m?.id, e);
+          }
         }
         // Oud formaat: sla hele tekst op als leermoment
         const text = raw.replace(/^\[Zelfreflectie\] /, '');
@@ -2456,7 +2460,9 @@ async function loadRenewalStatus() {
       .eq('id', activeMatch.id)
       .maybeSingle();
     if (m?.renewal_status) status = m.renewal_status;
-  } catch(e) {}
+  } catch(e) {
+    console.warn('[bbl-hub] renewal_status read fout:', e?.message);
+  }
   if (!status.student) {
     try { status = JSON.parse(localStorage.getItem('internly_renewal_' + activeMatch.id) || '{}'); } catch(e) {}
   }
@@ -2477,7 +2483,11 @@ async function studentChoice(keuze) {
       .eq('id', activeMatch.id)
       .maybeSingle();
     status = m?.renewal_status || {};
-  } catch(e) {}
+  } catch(e) {
+    console.error('[bbl-hub] renewal_status read fout:', e?.message);
+    notify('Kon vernieuwingsstatus niet laden — probeer opnieuw', false);
+    return;
+  }
   status.student = keuze;
 
   // DB write

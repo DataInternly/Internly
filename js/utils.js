@@ -371,13 +371,16 @@ async function guardPage(allowedRoles, options) {
 window.guardPage = guardPage;
 
 
-function getDisplayName(user) {
-  if (!user) return 'Gebruiker';
-  const naam = user?.user_metadata?.naam || user?.naam || user?.full_name;
+function getDisplayName(user, fallback = 'Gebruiker') {
+  if (!user) return fallback;
+  const naam = user?.user_metadata?.naam
+            || user?.user_metadata?.name
+            || user?.naam
+            || user?.full_name;
   if (naam && typeof naam === 'string' && naam.trim()) return naam.trim();
   const email = user?.email || user?.user_metadata?.email;
   if (email && typeof email === 'string' && email.includes('@')) return email.split('@')[0];
-  return 'Gebruiker';
+  return fallback;
 }
 
 /**

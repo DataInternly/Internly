@@ -993,16 +993,7 @@ async function signAsSchool(laId) {
 // ════════════════════════════════════════════════════════════════
 // Sign out
 // ════════════════════════════════════════════════════════════════
-async function signOut() {
-  try {
-    await db.auth.signOut();
-  } catch (err) {
-    console.error('[intl-school] signOut fout:', err?.message || err);
-  }
-  // Run 1.6: full state cleanup
-  if (typeof clearUserState === 'function') clearUserState();
-  window.location.href = 'auth.html';
-}
+function signOut() { performLogout(); }
 
 // notify() and escapeHtml() come from js/utils.js — do not redefine here.
 </script>

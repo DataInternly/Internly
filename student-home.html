@@ -237,6 +237,13 @@
         .eq('profile_id', user.id)
         .maybeSingle();
 
+      if (sp?.bbl_mode === true) {
+        window.location.replace(typeof getRoleLanding === 'function'
+          ? getRoleLanding('student', true)
+          : 'bbl-hub.html');
+        return;
+      }
+
       if (!sp?.naam) {
         window.location.replace('bol-profile.html');
         return;
