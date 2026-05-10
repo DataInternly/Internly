@@ -588,9 +588,7 @@ async function refreshProfileData(userId) {
 // ── Welkomstgroet op basis van tijdstip ──────────────────────────────────────
 
 function setWelcome(naam) {
-  const h = new Date().getHours();
-  const greeting = h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond';
-  document.getElementById('welcomeMsg').textContent = `${greeting}, ${naam}`;
+  document.getElementById('welcomeMsg').textContent = getDaypartGreeting(naam);
   document.getElementById('welcomeSub').textContent = 'Je BBL-traject in één overzicht.';
 }
 

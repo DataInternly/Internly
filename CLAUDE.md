@@ -271,6 +271,7 @@ Bestaande tabellen (auditbevestigd, niet-uitputtend):
 - `bundling_requests` — gebundelde school-aanvragen
 - `verification_log` — audit-trail SBB / verificatie-events
 - `stage_milestones` — 8-mijlpalen voortgang
+- `security_reports` — telemetry logging (hunters → SecurityLog via _tel.report)
 
 **internships vs internship_postings** — beide tabellen bestaan en worden parallel gebruikt:
 - `internships` = curated demo-data (seeded, voor livetest-showcase)
