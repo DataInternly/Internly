@@ -1088,11 +1088,8 @@ function renderRoleLanding(role, profileData = {}) {
   const naam = (profileData.naam || '').toString().split('@')[0] || 'daar';
   const escapedNaam = escapeHtml(naam);
 
-  // Greeting op basis van uur
-  const hour = new Date().getHours();
-  const greeting = hour < 6  ? 'Goedenacht'  :
-                   hour < 12 ? 'Goedemorgen' :
-                   hour < 18 ? 'Goedemiddag' : 'Goedenavond';
+  // Greeting op basis van uur — gebruikt centrale getDaypartGreeting helper
+  const greeting = getDaypartGreeting('');
 
   // Datum NL formaat: "dinsdag 5 mei 2026"
   const datum = new Date().toLocaleDateString('nl-NL', {

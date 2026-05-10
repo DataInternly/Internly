@@ -103,7 +103,7 @@ await renderRoleHeader(headerRole, '<tabkey>', { ... });
 - 5 tabs: Overzicht, Mijn matches, Mijn berichten, Mijn notities, Mijn profiel
 - Geen sidebar — top-bar zoals Type B
 
-**Helper** — `renderRoleHeader('buddy', '<tabkey>', { ... })`
+**Helper** — `renderRoleHeader('gepensioneerd', '<tabkey>', { ... })`
 
 ---
 
@@ -147,7 +147,7 @@ const HEADER_NAV_BY_ROLE = {
   begeleider: [       // identiek aan school
     // (zelfde 5 items, andere accent)
   ],
-  buddy: [            // 5 tabs paars
+  gepensioneerd: [    // 5 tabs paars (UI-label "Buddy", DB-key 'gepensioneerd')
     { key: 'overzicht',    href: 'buddy-dashboard.html',    label: 'Overzicht' },
     { key: 'matches',      href: 'buddy-matches.html',      label: 'Mijn matches' },
     { key: 'berichten',    href: 'mijn-berichten.html',     label: 'Mijn berichten' },

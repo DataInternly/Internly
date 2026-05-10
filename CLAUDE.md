@@ -247,6 +247,36 @@ Niet kapot, blijft werken voor 6 bestaande callers. Wordt over tijd ook gemigree
 - CSS in `style.css` regelt opacity op basis van die attributes (anti-flicker)
 - 300ms CSS-fallback animation zorgt dat pagina nooit permanent zwart blijft als JS faalt
 
+## Database tabellen
+
+Bestaande tabellen (auditbevestigd, niet-uitputtend):
+
+- `profiles` — basis-account (id, role, naam, email)
+- `student_profiles` — opleiding, school, bbl_mode, leerdoelen
+- `company_profiles` — bedrijfsdata, sector, trust score
+- `school_profiles` — schoolinfo
+- `international_school_profiles` — int'l school-variant
+- `matches` — match_type-asymmetrie via party_a/party_b (zie keten)
+- `applications` — sollicitaties student → vacature
+- `internship_postings` — user-generated vacatures (bedrijf)
+- `internships` — curated demo-data
+- `school_postings` — school-uitgezette stages
+- `subscriptions` — Mollie-flow (stub), hasActivePlan() bron
+- `learning_agreements` — BBL leerovereenkomst
+- `meetings` — driegesprekken, evaluatiesessies
+- `notifications` — realtime in-app meldingen
+- `reviews` — student → bedrijf na afgeronde stage
+- `vestigingen` — bedrijfsvestigingen
+- `buddy_notes` — notities buddy ↔ student
+- `bundling_requests` — gebundelde school-aanvragen
+- `verification_log` — audit-trail SBB / verificatie-events
+- `stage_milestones` — 8-mijlpalen voortgang
+
+**internships vs internship_postings** — beide tabellen bestaan en worden parallel gebruikt:
+- `internships` = curated demo-data (seeded, voor livetest-showcase)
+- `internship_postings` = user-generated (bedrijven posten via company-dashboard)
+- `discover.html` en `matches.html` queryen beide tabellen en mergen het resultaat
+
 ## Architecturele ketens
 
 ### signOff-keten (bbl-hub.html)
