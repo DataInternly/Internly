@@ -431,11 +431,15 @@
     const begBtnHtml = (_isStudent && !_isBBL && !_hasBegeleider)
       ? `<button class="empty-cta-btn tertiary" onclick="openBegeleiderModal()">+ Voeg begeleider toe</button>`
       : '';
-    // Buddy-rol krijgt aangepaste CTA — geen "Vind een stage" maar terug naar dashboard
+    // Buddy-rol krijgt aangepaste CTA — geen "Vind een stage" maar terug naar dashboard.
+    // BBL-student heeft al een leerbedrijf, dus primary verwijst naar leeragreement.
     const ctaHtml = _isStudent
-      ? `<a href="/discover.html" class="empty-cta-btn primary">Vind een stage</a>
-         <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>
-         ${begBtnHtml}`
+      ? (_isBBL
+          ? `<a href="bbl-profile.html#leeragreement" class="empty-cta-btn primary">Bekijk leeragreement</a>
+             <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>`
+          : `<a href="/discover.html" class="empty-cta-btn primary">Vind een stage</a>
+             <a href="/buddy-dashboard.html" class="empty-cta-btn secondary">Vind een buddy</a>
+             ${begBtnHtml}`)
       : `<a href="/buddy-dashboard.html" class="empty-cta-btn primary">Terug naar dashboard</a>`;
     const subText = _isStudent
       ? 'Zodra je matcht met een bedrijf, buddy of school verschijnen ze hier.'
