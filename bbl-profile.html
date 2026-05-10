@@ -1109,6 +1109,13 @@ async function saveProfile() {
 
   notify(wasEditing ? '✓ Profiel bijgewerkt!' : '✓ Profiel aangemaakt!');
 
+  // Fase 5 — broadcast profile-update naar andere tabs (bbl-dashboard, bbl-hub)
+  try {
+    const bc = new BroadcastChannel('internly-profile-update');
+    bc.postMessage({ type: 'profile-updated', profileId: currentUser.id });
+    bc.close();
+  } catch(e) { /* BroadcastChannel niet ondersteund — geen breaker */ }
+
   // Show overview
   const overviewData = {
     ...payload,

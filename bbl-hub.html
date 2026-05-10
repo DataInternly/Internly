@@ -1224,6 +1224,30 @@ function renderHubLeeragreement(sp) {
   }
 }
 
+// Fase 5 — refreshHubProfile voor BroadcastChannel-listener.
+// Re-fetcht student_profiles, update currentStudentProfile cache en
+// re-rendert de leeragreement-banner + contract-strip. Geen match-fetch
+// of conversations-fetch (die draaien alleen bij page-load).
+async function refreshHubProfile(userId) {
+  if (!userId) return;
+  const { data: sp, error } = await db
+    .from('student_profiles')
+    .select('profile_id, naam, opleiding, sector, opdracht_domein, schooldag, skills, bbl_mode, school, pb_naam, contract_start, contract_end, jaar, leeragreement_url, leeragreement_uploaded_at')
+    .eq('profile_id', userId)
+    .maybeSingle();
+  if (error) {
+    console.warn('[bbl-hub] refreshHubProfile fetch fout:', error.message);
+    return;
+  }
+  if (!sp) return;
+  currentStudentProfile = sp;
+  renderHubLeeragreement(sp);
+  // Contract-strip leest match.contract_end_date (uit activeMatch), niet sp.contract_end —
+  // dus profile-update raakt de strip niet. Bij volgende page-load is alles gesynct.
+  const _contractEnd = activeMatch?.contract_end_date || activeMatch?.internship_postings?.contract_end;
+  if (_contractEnd) updateContractStrip(_contractEnd);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // VIEW SWITCHING
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2840,6 +2864,17 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadDoorstroom();
   loadRenewalStatus();
   initSessionTimeout();
+
+  // Fase 5 — luister naar profile-updates uit andere tabs (bv. bbl-profile save)
+  // Profiel is gecached in currentStudentProfile, dus broadcast triggert re-fetch.
+  try {
+    const bc = new BroadcastChannel('internly-profile-update');
+    bc.onmessage = async (e) => {
+      if (e.data?.type === 'profile-updated' && e.data?.profileId === currentUser?.id) {
+        await refreshHubProfile(currentUser.id);
+      }
+    };
+  } catch(e) { /* BroadcastChannel niet ondersteund — geen breaker */ }
 });
 
 // ── Buddy sectie (gepensioneerd) — sprint 29 april ──────────────────────

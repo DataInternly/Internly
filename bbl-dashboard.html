@@ -404,6 +404,9 @@
 
 <script>
 
+// Module-scope user reference voor BroadcastChannel-listener (Fase 5)
+let currentUser = null;
+
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 function showLoading(containerId, tekst) {
@@ -562,6 +565,26 @@ function renderLeeragreementCard(sp) {
   }
 }
 
+// ── Fase 5 — refreshProfileData voor BroadcastChannel-listener ─────────────
+// Re-fetcht de profiel-afhankelijke velden en herrendert leerdoelen +
+// leeragreement-card. Niet de auth-guard, match-fetch, meetings-fetch of
+// begeleiders-fetch (die draaien alleen bij page-load).
+async function refreshProfileData(userId) {
+  if (!userId) return;
+  const { data: sp, error } = await db
+    .from('student_profiles')
+    .select('profile_id, opleiding, schooldag, skills, bbl_mode, school, leeragreement_url, leeragreement_uploaded_at')
+    .eq('profile_id', userId)
+    .maybeSingle();
+  if (error) {
+    console.warn('[bbl-dashboard] refreshProfileData fetch fout:', error.message);
+    return;
+  }
+  if (!sp) return;
+  await renderLeerdoelen(sp.skills || [], userId);
+  renderLeeragreementCard(sp);
+}
+
 // ── Welkomstgroet op basis van tijdstip ──────────────────────────────────────
 
 function setWelcome(naam) {
@@ -591,6 +614,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 1. Auth guard
   const { data: { user } } = await db.auth.getUser();
   if (!user) { window.location.href = 'auth.html'; return; }
+  currentUser = user; // Fase 5 — module-scope ref voor BroadcastChannel-listener
 
   // Role guard — Bundel A 30 apr 2026
   const { data: _bblProf } = await db
@@ -725,6 +749,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   // 9. Leerdoelen
   await renderLeerdoelen(sp?.skills || [], user.id);
   initSessionTimeout();
+
+  // Fase 5 — luister naar profile-updates uit andere tabs (bv. bbl-profile save)
+  try {
+    const bc = new BroadcastChannel('internly-profile-update');
+    bc.onmessage = async (e) => {
+      if (e.data?.type === 'profile-updated' && e.data?.profileId === currentUser?.id) {
+        await refreshProfileData(currentUser.id);
+      }
+    };
+  } catch(e) { /* BroadcastChannel niet ondersteund — geen breaker */ }
 });
 </script>
 
