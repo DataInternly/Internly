@@ -297,6 +297,10 @@
     if (!activeId) return;
     const title = document.getElementById('notitie-title')?.value?.trim() || null;
     const content = document.getElementById('notitie-body')?.value?.trim() || null;
+    if (!title && !content) {
+      notify('Schrijf eerst iets voor je opslaat');
+      return;
+    }
     const { error } = await db.from('buddy_notes')
       .update({ title, content })
       .eq('id', activeId)

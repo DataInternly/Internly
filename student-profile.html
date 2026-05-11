@@ -1513,6 +1513,19 @@ function populateForm(data) {
 }
 
 async function submitProfile() {
+  // Minimaal-verplichte velden — voorkomt silent-save met leeg profiel
+  const naam = document.getElementById('naam')?.value?.trim();
+  const opleiding = document.getElementById('opleiding')?.value?.trim();
+
+  if (!naam) {
+    notify('Vul je naam in om je profiel op te slaan');
+    return;
+  }
+  if (!opleiding) {
+    notify('Vul je opleiding in om je profiel op te slaan');
+    return;
+  }
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = 'Opslaan…';
