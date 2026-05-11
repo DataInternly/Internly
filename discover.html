@@ -897,6 +897,9 @@ function renderCard(row) {
           <span class="guarantee ${row.guarantee ? 'yes' : 'no'}">
             ${row.guarantee ? '⚡ Responsgarantie' : 'Geen garantie'}
           </span>
+          ${row.guarantee && row.response_days
+            ? `<span style="font-size:.78rem;color:#1a7a48;font-weight:500">Reactie binnen ${row.response_days} dag${row.response_days === 1 ? '' : 'en'}</span>`
+            : ''}
           ${reviewStarsHtml}
         </div>
         <a class="apply-btn"
@@ -913,7 +916,7 @@ async function loadInternships() {
 
   // Postings-query opbouwen met optionele international filter
   let postingsQuery = db.from('internship_postings')
-    .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode, created_by, vestigingen(naam, stad, postcode), open_to_international, visa_sponsorship, housing_available')
+    .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, response_days, trust_score, trust_grade, postcode, created_by, vestigingen(naam, stad, postcode), open_to_international, visa_sponsorship, housing_available')
     .eq('status', 'active')
     .order('trust_score', { ascending: false });
 
@@ -926,7 +929,7 @@ async function loadInternships() {
     { data: postings,    error: err2 },
   ] = await Promise.all([
     db.from('internships')
-      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, trust_score, trust_grade, postcode')
+      .select('id, company_name, sector, title, description, duration, start_date, tags, guarantee, response_days, trust_score, trust_grade, postcode')
       .order('trust_score', { ascending: false }),
     postingsQuery,
   ]);

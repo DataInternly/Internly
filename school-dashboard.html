@@ -1804,7 +1804,7 @@ async function loadBedrijven() {
       .select('profile_id, bedrijfsnaam, sector, trust_score, trust_grade, beschrijving')
       .order('trust_score', { ascending: false, nullsFirst: false }),
     db.from('internship_postings')
-      .select('id, title, sector, status, tags, created_by'),
+      .select('id, title, sector, status, tags, created_by, guarantee, response_days'),
   ]);
 
   if (error) {
@@ -1838,6 +1838,11 @@ async function loadBedrijven() {
     const reviewAvg = ratings.length > 0
       ? (ratings.reduce((s, r) => s + r, 0) / ratings.length)
       : null;
+    const actief = postings.filter(p => p.status === 'active');
+    const guaranteePosts = actief.filter(p => p.guarantee);
+    const minRespDays = guaranteePosts.length > 0
+      ? Math.min(...guaranteePosts.map(p => p.response_days).filter(d => typeof d === 'number'))
+      : null;
     return {
       profile_id:   b.profile_id,
       naam:         b.bedrijfsnaam || '—',
@@ -1846,7 +1851,9 @@ async function loadBedrijven() {
       grade:        b.trust_grade || '',
       beschrijving: b.beschrijving || '',
       postings,
-      actief:       postings.filter(p => p.status === 'active'),
+      actief,
+      hasGuarantee: guaranteePosts.length > 0,
+      minRespDays:  Number.isFinite(minRespDays) ? minRespDays : null,
       reviewAvg,
       reviewCount:  ratings.length,
     };
@@ -1907,6 +1914,9 @@ function renderBedrijvenList(bedrijven) {
           </div>
         </div>
         ${b.grade === 'C' ? `<div class="alert-box alert-red" style="margin:8px 0 4px;font-size:.78rem;padding:8px 12px">⚠ Niet aanbevolen voor plaatsing — bespreek met student vóór akkoord.</div>` : ''}
+        <div style="margin:6px 0 2px">${b.hasGuarantee
+          ? `<span style="font-size:.75rem;color:#1a7a48;font-weight:500">⚡ Responsgarantie${b.minRespDays ? ` (${b.minRespDays}d)` : ''}</span>`
+          : `<span style="font-size:.75rem;color:#888">Geen responsgarantie</span>`}</div>
         ${activeTitles || moreTag ? `<div class="pc-tags" style="margin:8px 0 4px">${activeTitles}${moreTag}</div>` : ''}
         ${activeCount > 0 ? `
         <div style="margin-top:10px">

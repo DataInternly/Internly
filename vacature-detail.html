@@ -795,7 +795,7 @@ function render(v, source) {
       <div class="meta-row">
         <span class="meta-chip">⏱ ${eDuration}</span>
         <span class="meta-chip">📅 ${formatDate(v.start_date)}</span>
-        ${v.guarantee ? '<span class="meta-chip green">⚡ Responsgarantie</span>' : ''}
+        ${v.guarantee ? `<span class="meta-chip green">⚡ Responsgarantie${v.response_days ? ` · binnen ${v.response_days} dag${v.response_days === 1 ? '' : 'en'}` : ''}</span>` : ''}
       </div>
 
       ${tags.length > 0 ? `

@@ -3545,11 +3545,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   await loadPostings();
 
-  // ── Feature gate: form fields ──
-  if (!await hasActivePlan('company_pro')) {
-    const sel = document.getElementById('f-guarantee');
-    if (sel) { sel.value = 'false'; sel.disabled = true; sel.title = 'Beschikbaar vanaf Pro'; }
-  }
+  // Responsgarantie (f-guarantee + f-responsedays) is gratis voor alle
+  // bedrijven — geen Pro-gating. Beslissing 11 mei 2026.
   if (!await hasActivePlan('company_business')) {
     const beideLbl = document.getElementById('mt-beide');
     if (beideLbl) {
