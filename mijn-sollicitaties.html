@@ -414,7 +414,7 @@
           const _daysSince = created ? Math.floor((Date.now() - new Date(created).getTime()) / 86400000) : null;
           const _deadlineInfo = (_respDays && _daysSince !== null)
             ? (_daysSince > _respDays
-                ? `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Bedrijf heeft nog niet gereageerd — wij houden dit bij</div>`
+                ? `<div style="font-size:.78rem;color:var(--amber,#b84910);font-weight:500;margin-top:3px;">Reactietermijn verstreken — neem contact op of solliciteer elders</div>`
                 : `<div style="font-size:.78rem;color:var(--ink3,#7a8799);margin-top:3px;">Verwachte reactie: binnen ${_respDays - _daysSince} dag${(_respDays - _daysSince) !== 1 ? 'en' : ''}</div>`)
             : '';
           const _bewaakt = !_respDays

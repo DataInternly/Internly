@@ -2671,6 +2671,14 @@ async function submitPosting() {
     notify('Vul alle verplichte velden in'); return;
   }
 
+  const guaranteeVal = document.getElementById('f-guarantee').value === 'true';
+  const respDaysVal  = parseInt(document.getElementById('f-responsedays').value);
+
+  if (guaranteeVal && (!respDaysVal || respDaysVal < 1 || respDaysVal > 14)) {
+    notify('Vul een reactietermijn in (1–14 dagen) bij responsgarantie');
+    return;
+  }
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true; btn.textContent = 'Plaatsen…';
 

@@ -895,7 +895,7 @@ function renderCard(row) {
       <div class="card-footer">
         <div style="display:flex;flex-direction:column;gap:4px">
           <span class="guarantee ${row.guarantee ? 'yes' : 'no'}">
-            ${row.guarantee ? '⚡ Responsgarantie' : 'Geen garantie'}
+            ${row.guarantee ? '⚡ Responsgarantie' : ''}
           </span>
           ${row.guarantee && row.response_days
             ? `<span style="font-size:.78rem;color:#1a7a48;font-weight:500">Reactie binnen ${row.response_days} dag${row.response_days === 1 ? '' : 'en'}</span>`
